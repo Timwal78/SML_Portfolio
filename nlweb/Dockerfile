@@ -11,14 +11,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends git && rm -rf /
 # Pull the Microsoft NLWeb reference implementation
 RUN git clone --depth 1 https://github.com/microsoft/NLWeb.git .
 
-# Install deps (path may be code/ in the repo; adjust if the layout changed)
-RUN pip install --no-cache-dir -r requirements.txt || pip install --no-cache-dir -r code/requirements.txt
+# Install deps
+RUN pip install --no-cache-dir -r AskAgent/python/requirements.txt
 
 # Your config (mounted/copied below) tells NLWeb what data to ingest + which LLM/vector store to use
-COPY config.yaml /app/config/config.yaml
+# The aiohttp_server defaults to config/config_webserver.yaml relative to the repo root
+COPY config.yaml /app/config/config_webserver.yaml
 
 ENV PORT=8000
 EXPOSE 8000
 
-# Start the NLWeb server (entrypoint name may vary by repo version — check README)
-CMD ["python", "-m", "code.app", "--config", "/app/config/config.yaml", "--port", "8000"]
+ENV PYTHONPATH=/app/AskAgent/python
+
+WORKDIR /app/AskAgent/python
+
+# Start the NLWeb server
+CMD ["python", "-m", "webserver.aiohttp_server"]
