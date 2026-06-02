@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timothy Walton | ScriptMasterLabs Ecosystem</title>
+    <meta name="description" content="Portfolio of Timothy Walton, Lead Architect at ScriptMasterLabs. Building autonomous financial intelligence and Web3 layers.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #050507;
+            --text-color: #f1f1f1;
+            --text-muted: #8892b0;
+            --accent-cyan: #00f0ff;
+            --accent-purple: #b026ff;
+            --accent-green: #00ff66;
+            --accent-orange: #ff5e00;
+            --card-bg: rgba(20, 20, 25, 0.6);
+            --card-border: rgba(255, 255, 255, 0.05);
+            --glass-blur: blur(12px);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Canvas Background */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            opacity: 0.4;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Header / Nav */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1.5rem 0;
+            background: rgba(5, 5, 7, 0.8);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            z-index: 100;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .nav-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Fira Code', monospace;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--accent-cyan);
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-cyan);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding-top: 5rem;
+        }
+
+        .mono-intro {
+            font-family: 'Fira Code', monospace;
+            color: var(--accent-green);
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+            background: linear-gradient(90deg, #fff, var(--text-muted));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero h2 {
+            font-size: clamp(2rem, 5vw, 4rem);
+            font-weight: 800;
+            line-height: 1.1;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .hero p {
+            max-width: 650px;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 3rem;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 2rem;
+            border-radius: 4px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: transparent;
+            color: var(--accent-cyan);
+            border: 1px solid var(--accent-cyan);
+        }
+
+        .btn-primary:hover {
+            background: rgba(0, 240, 255, 0.1);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            border: 1px solid var(--card-border);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Section Global */
+        section {
+            padding: 80px 0;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 3rem;
+            margin-top: 2rem;
+        }
+
+        .section-title::after {
+            content: "";
+            height: 1px;
+            background: var(--card-border);
+            flex-grow: 1;
+            margin-left: 1.5rem;
+        }
+
+        .section-title span {
+            font-family: 'Fira Code', monospace;
+            color: var(--accent-cyan);
+            font-size: 1.2rem;
+            margin-right: 0.5rem;
+        }
+
+        /* Category Header */
+        .category-header {
+            font-family: 'Fira Code', monospace;
+            font-size: 1.1rem;
+            color: var(--accent-purple);
+            margin-bottom: -1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Projects Grid */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        .project-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 2rem;
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .project-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 10px 30px -10px rgba(0, 240, 255, 0.2);
+        }
+        
+        .project-card.purple:hover {
+            border-color: var(--accent-purple);
+            box-shadow: 0 10px 30px -10px rgba(176, 38, 255, 0.2);
+        }
+
+        .project-card.green:hover {
+            border-color: var(--accent-green);
+            box-shadow: 0 10px 30px -10px rgba(0, 255, 102, 0.2);
+        }
+        
+        .project-card.orange:hover {
+            border-color: var(--accent-orange);
+            box-shadow: 0 10px 30px -10px rgba(255, 94, 0, 0.2);
+        }
+
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .project-image {
+            width: 100%;
+            height: 180px;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            background-size: cover;
+            background-position: center top;
+            border: 1px solid var(--card-border);
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+        .project-card:hover .project-image {
+            opacity: 1;
+        }
+
+        .folder-icon {
+            font-size: 2.5rem;
+            color: var(--accent-cyan);
+        }
+        .project-card.purple .folder-icon { color: var(--accent-purple); }
+        .project-card.green .folder-icon { color: var(--accent-green); }
+        .project-card.orange .folder-icon { color: var(--accent-orange); }
+
+        .project-links a {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            transition: color 0.3s;
+        }
+
+        .project-links a:hover {
+            color: var(--accent-cyan);
+        }
+
+        .project-title {
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .project-desc {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+            flex-grow: 1;
+        }
+
+        .tech-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+        
+        .tech-list span {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px 10px;
+            border-radius: 4px;
+        }
+
+        /* Tech Stack Marquee */
+        .tech-marquee {
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+            padding: 3rem 0;
+            border-top: 1px solid var(--card-border);
+            border-bottom: 1px solid var(--card-border);
+            background: rgba(10, 10, 10, 0.5);
+            margin: 2rem 0;
+        }
+
+        .tech-marquee::before, .tech-marquee::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            width: 150px;
+            height: 100%;
+            z-index: 2;
+        }
+
+        .tech-marquee::before {
+            left: 0;
+            background: linear-gradient(to right, var(--bg-color), transparent);
+        }
+
+        .tech-marquee::after {
+            right: 0;
+            background: linear-gradient(to left, var(--bg-color), transparent);
+        }
+
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 30s linear infinite;
+        }
+
+        .marquee-content span {
+            font-family: 'Fira Code', monospace;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.2);
+            margin: 0 2rem;
+            transition: color 0.3s ease, text-shadow 0.3s ease;
+            cursor: default;
+        }
+
+        .marquee-content span:hover {
+            color: #fff;
+            text-shadow: 0 0 15px var(--accent-cyan);
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* Footer */
+        footer {
+            padding: 3rem 0;
+            text-align: center;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--card-border);
+        }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .hero h1 { font-size: 2.5rem; }
+            .hero h2 { font-size: 1.8rem; }
+            .section-title::after { margin-left: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+
+    <header>
+        <div class="container nav-inner">
+            <a href="#" class="logo">&lt;ScriptMasterLabs /&gt;</a>
+            <nav class="nav-links">
+                <a href="#about"><span style="color: var(--accent-cyan);">01.</span> About</a>
+                <a href="#core"><span style="color: var(--accent-cyan);">02.</span> Core</a>
+                <a href="#finance"><span style="color: var(--accent-cyan);">03.</span> Alpha</a>
+                <a href="#web3"><span style="color: var(--accent-cyan);">04.</span> Web3</a>
+                <a href="#saas"><span style="color: var(--accent-cyan);">05.</span> SaaS</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Hero Section -->
+        <section class="hero" id="about">
+            <div class="mono-intro">Hi, my name is</div>
+            <h1>Timothy Walton.</h1>
+            <h2>I build autonomous architectures.</h2>
+            <p>
+                Lead Architect at ScriptMasterLabs. Operating an SDVO enterprise specializing in institutional-grade AI trading intelligence, agentic micropayment layers, zero-trust AI deployments, and sovereign Web3 ecosystems. 
+            </p>
+            <div class="btn-group">
+                <a href="#core" class="btn btn-primary">
+                    <i class="fa-solid fa-code"></i> View the Ecosystem
+                </a>
+                <a href="mailto:scriptmasterlabs@gmail.com" class="btn btn-secondary">
+                    <i class="fa-solid fa-envelope"></i> Contact Me
+                </a>
+            </div>
+        </section>
+
+        <!-- Tech Stack Marquee -->
+        <div class="tech-marquee" id="tech">
+            <div class="marquee-content">
+                <span>Python</span><span>Anthropic Claude</span><span>MCP Protocol</span><span>OpenAI</span><span>Stripe</span><span>Tradier</span><span>Polygon.io</span><span>XRPL</span><span>RLUSD</span><span>Go</span><span>Node.js</span><span>PostgreSQL</span>
+                <span>Python</span><span>Anthropic Claude</span><span>MCP Protocol</span><span>OpenAI</span><span>Stripe</span><span>Tradier</span><span>Polygon.io</span><span>XRPL</span><span>RLUSD</span><span>Go</span><span>Node.js</span><span>PostgreSQL</span>
+            </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- CATEGORY 1: CORE QUARTET -->
+        <!-- ============================================== -->
+        <section id="core">
+            <div class="category-header">Sector I</div>
+            <h2 class="section-title"><span>02.</span> The Core Quartet (Institutional MCP)</h2>
+            <div class="projects-grid">
+                
+                <div class="project-card orange">
+                    <div class="project-header">
+                        <i class="fa-solid fa-network-wired folder-icon"></i>
+                    </div>
+                    <h3 class="project-title">Graphify</h3>
+                    <p class="project-desc">Converts unstructured internal data lakes into queryable, semantic knowledge graphs for deep agentic analytics.</p>
+                    <div class="tech-list">
+                        <span>Neo4j</span><span>Knowledge Graphs</span><span>MCP</span>
+                    </div>
+                </div>
+
+                <div class="project-card orange">
+                    <div class="project-header">
+                        <i class="fa-solid fa-code-branch folder-icon"></i>
+                    </div>
+                    <h3 class="project-title">GitNexus</h3>
+                    <p class="project-desc">Open-source enterprise-grade code intelligence. Integrated into the ecosystem to trace execution flows and map architectural relationships for AI agents.</p>
+                    <div class="tech-list">
+                        <span>Code Intelligence</span><span>AST</span><span>MCP</span>
+                    </div>
+                </div>
+
+                <div class="project-card orange">
+                    <div class="project-header">
+                        <i class="fa-solid fa-bolt folder-icon"></i>
+                    </div>
+                    <h3 class="project-title">Superpowers Protocol</h3>
+                    <p class="project-desc">Integrated open-source operational methodology used to bring strict order to AI agents (Claude, Antigravity), ensuring reliable orchestration.</p>
+                    <div class="tech-list">
+                        <span>Agent Orchestration</span><span>Methodology</span>
+                    </div>
+                </div>
+
+                <div class="project-card orange">
+                    <div class="project-header">
+                        <i class="fa-solid fa-shield-halved folder-icon"></i>
+                    </div>
+                    <h3 class="project-title">OpenMythos</h3>
+                    <p class="project-desc">An open-source zero-trust simulation layer integrated for prompt engineering, red-teaming, and bringing structure to synthetic data generation pipelines.</p>
+                    <div class="tech-list">
+                        <span>Zero-Trust</span><span>Simulation</span><span>Data Gen</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- CATEGORY 2: FINANCIAL INTELLIGENCE -->
+        <!-- ============================================== -->
+        <section id="finance">
+            <div class="category-header">Sector II</div>
+            <h2 class="section-title"><span>03.</span> Financial Intelligence (Retail Alpha)</h2>
+            <div class="projects-grid">
+                
+                <div class="project-card">
+                    <div class="project-header">
+                        <i class="fa-regular fa-folder folder-icon"></i>
+                    </div>
+                    <div class="project-image" style="background-image: url('assets/darkpool_flyer.png');"></div>
+                    <h3 class="project-title">SqueezeOS</h3>
+                    <p class="project-desc">Institutional AI Trading Intelligence. Built with an autonomous Council Engine, 33 dynamic MCP tools, Beast Mode architecture, and an automated Stripe micropayments loop.</p>
+                    <div class="tech-list">
+                        <span>Python</span><span>Anthropic</span><span>Stripe</span><span>Polygon</span>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-header">
+                        <i class="fa-solid fa-chart-line folder-icon"></i>
+                    </div>
+                    <h3 class="project-title">Reactive Trader</h3>
+                    <p class="project-desc">Physical simulation drills & high-performance reactive interface designed for ultra-low latency execution and state synchronization.</p>
+                    <div class="tech-list">
+                        <span>Trading Engine</span><span>WebSockets</span><span>Quant Execution</span>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-header">
+                        <i class="fa-solid fa-chess-knight folder-icon"></i>
+                    </div>
+                    <h3 class="project-title">The Rigged Game</h3>
+                    <p class="project-desc">Institutional market intelligence brought to retail operators. Decodes dark pool prints, option flows, and market maker dealer positioning.</p>
+                    <div class="tech-list">
+                        <span>Market Intel</span><span>Flow Analysis</span>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-header">
+                        <i class="fa-solid fa-satellite-dish folder-icon"></i>
+                    </div>
+                    <h3 class="project-title">Signal Auction Loom</h3>
+                    <p class="project-desc">High-frequency signal routing layer. Ingests, processes, and distributes complex trading signals with extremely low latency across Vercel edge networks.</p>
+                    <div class="tech-list">
+                        <span>Edge Compute</span><span>Vercel</span><span>Signal Routing</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- CATEGORY 3: WEB3 & SOVEREIGN -->
+        <!-- ============================================== -->
+        <section id="web3">
+            <div class="category-header">Sector III</div>
+            <h2 class="section-title"><span>04.</span> Web3 & Sovereign Architecture</h2>
+            <div class="projects-grid">
+                
+                <div class="project-card purple">
+                    <div class="project-header">
+                        <i class="fa-brands fa-hive folder-icon"></i>
+                    </div>
+                    <h3 class="project-title">x402 Protocol (Proof402)</h3>
+                    <p class="project-desc">Autonomous machine-to-machine payment protocol layer. Enables AI agents to frictionlessly negotiate and settle micro-transactions using RLUSD on the XRPL.</p>
+                    <div class="tech-list">
+                        <span>Agentic</span><span>XRPL</span><span>RLUSD</span><span>API Middleware</span>
+                    </div>
+                </div>
+
+                <div class="project-card purple">
+                    <div class="project-header">
+                        <i class="fa-solid fa-ghost folder-icon"></i>
+                    </div>
+                    <div class="project-image" style="background-image: url('assets/blockchain_flyer.png');"></div>
+                    <h3 class="project-title">Ghost Layer Sovereign</h3>
+                    <p class="project-desc">A sovereign treasury architecture and operational dashboard for managing tokens and smart contracts on the XRP Ledger. Real-time metrics and dynamic routing.</p>
+                    <div class="tech-list">
+                        <span>XRPL</span><span>Web3 Dashboards</span><span>Treasury</span>
+                    </div>
+                </div>
+
+                <div class="project-card purple">
+                    <div class="project-header">
+                        <i class="fa-solid fa-money-bill-transfer folder-icon"></i>
+                    </div>
+                    <div class="project-image" style="background-image: url('assets/exobrain_flyer.png');"></div>
+                    <h3 class="project-title">SML XRPL Fee Forge (TipHawk)</h3>
+                    <p class="project-desc">A zero-custody tipping and automated fee distribution engine running on the XRPL. Intercepts transaction flow and seamlessly routes micropayments to creators.</p>
+                    <div class="tech-list">
+                        <span>RLUSD</span><span>Node.js</span><span>Discord API</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- CATEGORY 4: ENTERPRISE SAAS & UTILITIES -->
+        <!-- ============================================== -->
+        <section id="saas">
+            <div class="category-header">Sector IV</div>
+            <h2 class="section-title"><span>05.</span> Enterprise SaaS & Utilities</h2>
+            <div class="projects-grid">
+                
+                <div class="project-card green">
+                    <div class="project-header">
+                        <i class="fa-solid fa-eye folder-icon"></i>
+                    </div>
+                    <div class="project-image" style="background-image: url('assets/pulltracker_flyer.png');"></div>
+                    <h3 class="project-title">Argus Complete System</h3>
+                    <p class="project-desc">The ultimate AI monetization and operational pipeline. Centralized organization for series bibles, marketing execution, and multi-channel publication across Amazon KDP and Google Books.</p>
+                    <div class="tech-list">
+                        <span>Amazon KDP</span><span>Google Books</span><span>Python</span>
+                    </div>
+                </div>
+
+                <div class="project-card green">
+                    <div class="project-header">
+                        <i class="fa-solid fa-file-invoice-dollar folder-icon"></i>
+                    </div>
+                    <h3 class="project-title">VA Ratings Org</h3>
+                    <p class="project-desc">Dedicated Veteran disability rating calculator and resource platform. Helping service-disabled veterans accurately assess and navigate claims.</p>
+                    <div class="tech-list">
+                        <span>Vercel</span><span>React</span><span>Calculator Engine</span>
+                    </div>
+                </div>
+
+                <div class="project-card green">
+                    <div class="project-header">
+                        <i class="fa-solid fa-basketball folder-icon"></i>
+                    </div>
+                    <div class="project-image" style="background-image: url('assets/aau_feature.png'); background-position: center;"></div>
+                    <h3 class="project-title">NC Wizards AAU</h3>
+                    <p class="project-desc">A robust mobile and web ecosystem and API infrastructure rebuilt from the ground up for a premier AAU basketball program (formerly DKN-API).</p>
+                    <div class="tech-list">
+                        <span>Python</span><span>FastAPI</span><span>Sports Tech</span>
+                    </div>
+                </div>
+
+                <div class="project-card green">
+                    <div class="project-header">
+                        <i class="fa-solid fa-table folder-icon"></i>
+                    </div>
+                    <div class="project-image" style="background-image: url('assets/lifesheets.png'); background-position: center;"></div>
+                    <h3 class="project-title">MasterSheets™ Tactical OS</h3>
+                    <p class="project-desc">Cognitive command center for life and business management. Includes massive automated data pipelines capable of bulk-processing outputs for scale publishing on Amazon KDP and Google Play Books.</p>
+                    <div class="tech-list">
+                        <span>Data Automation</span><span>KDP / Google Books</span><span>Productivity</span>
+                    </div>
+                </div>
+
+                <div class="project-card green">
+                    <div class="project-header">
+                        <i class="fa-solid fa-mask folder-icon"></i>
+                    </div>
+                    <h3 class="project-title">Nexus Veil</h3>
+                    <p class="project-desc">Secure digital enclave and operational front-end deployed seamlessly to edge networks.</p>
+                    <div class="tech-list">
+                        <span>Security</span><span>Edge</span><span>Vercel</span>
+                    </div>
+                </div>
+
+                <div class="project-card green">
+                    <div class="project-header">
+                        <i class="fa-solid fa-mobile-screen folder-icon"></i>
+                    </div>
+                    <div class="project-image" style="background-image: url('assets/neural_os.png');"></div>
+                    <h3 class="project-title">Utility & Mobile Ecosystem</h3>
+                    <p class="project-desc">A diverse suite of mobile applications published directly to Google Play, including PullTracker, LifeSheets, Neural OS, AAU Coach Blueprint, and Echo Forge.</p>
+                    <div class="tech-list">
+                        <span>Google Play</span><span>Android</span><span>Java</span>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" style="text-align: center; max-width: 600px; margin: 0 auto;">
+            <div class="mono-intro" style="color: var(--accent-cyan);">06. Mission Control</div>
+            <h2 style="font-size: 3rem; margin-bottom: 1.5rem; color: #fff;">Get In Touch</h2>
+            <p style="color: var(--text-muted); margin-bottom: 2rem;">
+                My inbox is always open. Whether you have a question about zero-trust AI deployments, Web3 integration, or want to deploy an autonomous SDVO infrastructure, say hello.
+            </p>
+            <a href="mailto:scriptmasterlabs@gmail.com" class="btn btn-primary" style="padding: 1.25rem 2.5rem; font-size: 1rem;">
+                Say Hello
+            </a>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>Built by Timothy Walton &copy; 2026</p>
+        <p style="margin-top: 5px; font-size: 0.75rem;">Powered by ScriptMasterLabs | SDVO Enterprise</p>
+    </footer>
+
+    <!-- Interactive Scripts -->
+    <script>
+        const observerOptions = { threshold: 0.1, rootMargin: "0px 0px -50px 0px" };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('section').forEach(section => observer.observe(section));
+
+        setTimeout(() => document.querySelector('.hero').classList.add('visible'), 100);
+
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height, particles;
+
+        function initCanvas() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            particles = [];
+            const numParticles = Math.min(width * height / 15000, 100);
+            
+            for (let i = 0; i < numParticles; i++) {
+                particles.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    vx: (Math.random() - 0.5) * 0.5,
+                    vy: (Math.random() - 0.5) * 0.5,
+                    size: Math.random() * 2,
+                    color: Math.random() > 0.5 ? '#00f0ff' : '#8892b0'
+                });
+            }
+        }
+
+        function drawParticles() {
+            ctx.clearRect(0, 0, width, height);
+            for (let i = 0; i < particles.length; i++) {
+                let p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+
+                if (p.x < 0 || p.x > width) p.vx *= -1;
+                if (p.y < 0 || p.y > height) p.vy *= -1;
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = 0.5;
+                ctx.fill();
+
+                for (let j = i + 1; j < particles.length; j++) {
+                    let p2 = particles[j];
+                    let dx = p.x - p2.x;
+                    let dy = p.y - p2.y;
+                    let dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < 150) {
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.strokeStyle = p.color;
+                        ctx.globalAlpha = 1 - (dist / 150);
+                        ctx.lineWidth = 0.5;
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(drawParticles);
+        }
+
+        window.addEventListener('resize', initCanvas);
+        initCanvas();
+        drawParticles();
+    </script>
+</body>
+</html>
