@@ -1,0 +1,20 @@
+# ScriptMasterLabs
+
+> Payment rails and AI-native tools for the agentic web. ScriptMasterLabs builds x402 / HTTP-402 micropayment infrastructure that lets autonomous AI agents pay per request in USDC on Base, payment rails on XRPL and Xahau (via Xahau Hooks), and AI-native software. Service-Disabled Veteran-Owned (SDVO), Kinston, NC. Founder: Timothy Walton.
+
+## Core products
+- [x402 Paywall (@relayos/mcp-paywall)](https://www.scriptmasterlabs.com/x402-paywall.html): x402 / HTTP-402 paywall middleware. AI agents pay per request in USDC on Base. Drop-in monetization for MCP servers and APIs. Published on npm.
+- [MasterSheets](https://www.scriptmasterlabs.com/mastersheets.html): AI-native spreadsheet that replaces Google Sheets. Bring your own AI key, no subscription, purchaser owns 100% of their data.
+- [Trading Indicators](https://www.scriptmasterlabs.com/indicators.html): Invite-only Pine Script v6 indicators for squeeze detection and institutional flow analysis (AMC, GME, 0DTE).
+
+## Agentic payments
+- Fast path: x402 / HTTP-402, USDC on Base, via CDP facilitator.
+- Settlement rails: XRPL and Xahau (Xahau Hooks-based routing).
+- Built for autonomous agent-to-agent and agent-to-API payments.
+
+## Books
+- [Books by Timothy Walton](https://www.scriptmasterlabs.com/books.html): trading, neurodivergent survival systems, fiction, and modern-English ancient texts.
+
+## Contact / about
+- Site: https://www.scriptmasterlabs.com/
+- Structured data: https://www.scriptmasterlabs.com/sitemap.xml

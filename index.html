@@ -412,6 +412,90 @@
             .section-title::after { margin-left: 1rem; }
         }
     </style>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://www.scriptmasterlabs.com/#org",
+      "name": "ScriptMasterLabs",
+      "legalName": "ScriptMasterLabs",
+      "url": "https://www.scriptmasterlabs.com/",
+      "slogan": "Payment rails and AI-native tools for the agentic web.",
+      "description": "ScriptMasterLabs builds blockchain payment infrastructure on XRPL and Xahau, x402 / HTTP-402 micropayment systems that let autonomous AI agents pay per request in USDC on Base, and AI-native software. A Service-Disabled Veteran-Owned (SDVO) business.",
+      "foundingDate": "2024",
+      "founder": { "@id": "https://www.scriptmasterlabs.com/#timmy" },
+      "knowsAbout": [
+        "x402", "HTTP-402 micropayments", "AI agent payments", "XRPL", "Xahau",
+        "Xahau Hooks", "USDC on Base", "Model Context Protocol", "MCP servers",
+        "agentic web", "generative engine optimization", "AI-native spreadsheets",
+        "Pine Script", "algorithmic trading indicators"
+      ],
+      "areaServed": "Worldwide",
+      "address": { "@type": "PostalAddress", "addressLocality": "Kinston", "addressRegion": "NC", "addressCountry": "US" },
+      "sameAs": [
+        "https://www.npmjs.com/package/@relayos/mcp-paywall",
+        "https://x.com/ScriptMasterLabs",
+        "https://github.com/Timwal78",
+        "https://www.tradingview.com/u/TIMMY741/"
+      ]
+    },
+    {
+      "@type": "Person",
+      "@id": "https://www.scriptmasterlabs.com/#timmy",
+      "name": "Timothy Walton",
+      "alternateName": "Timmy",
+      "jobTitle": "Founder",
+      "worksFor": { "@id": "https://www.scriptmasterlabs.com/#org" },
+      "knowsAbout": ["x402 payments", "XRPL", "Xahau", "AI agents", "options trading", "Pine Script"]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://www.scriptmasterlabs.com/#website",
+      "url": "https://www.scriptmasterlabs.com/",
+      "name": "ScriptMasterLabs",
+      "publisher": { "@id": "https://www.scriptmasterlabs.com/#org" },
+      "inLanguage": "en-US",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": { "@type": "EntryPoint", "urlTemplate": "https://www.scriptmasterlabs.com/ask?q={query}" },
+        "query-input": "required name=query"
+      }
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://www.scriptmasterlabs.com/#webpage",
+      "url": "https://www.scriptmasterlabs.com/",
+      "name": "ScriptMasterLabs — Agentic Payment Rails & AI-Native Tools",
+      "isPartOf": { "@id": "https://www.scriptmasterlabs.com/#website" },
+      "about": { "@id": "https://www.scriptmasterlabs.com/#org" },
+      "speakable": { "@type": "SpeakableSpecification", "cssSelector": ["h1", ".lead", ".eyebrow"] }
+    },
+    {
+      "@type": "OfferCatalog",
+      "@id": "https://www.scriptmasterlabs.com/#catalog",
+      "name": "ScriptMasterLabs Products",
+      "itemListElement": [
+        { "@type": "SoftwareApplication", "@id": "https://www.scriptmasterlabs.com/#mcp-paywall" },
+        { "@type": "SoftwareApplication", "@id": "https://www.scriptmasterlabs.com/mastersheets.html#app" },
+        { "@type": "Service", "@id": "https://www.scriptmasterlabs.com/#x402-infra" }
+      ]
+    },
+    {
+      "@type": "Service",
+      "@id": "https://www.scriptmasterlabs.com/#x402-infra",
+      "name": "Agentic Payment Infrastructure (x402 / XRPL / Xahau)",
+      "provider": { "@id": "https://www.scriptmasterlabs.com/#org" },
+      "serviceType": "AI agent payment infrastructure",
+      "areaServed": "Worldwide",
+      "description": "x402 / HTTP-402 micropayment routing for autonomous AI agents, plus XRPL and Xahau Hooks-based payment rails. Lets agents pay per request in USDC on Base or settle on XRPL/Xahau.",
+      "keywords": "x402, HTTP-402, XRPL, Xahau, Xahau Hooks, USDC, Base, AI agent payments, micropayments, MCP"
+    }
+  ]
+}
+</script>
 </head>
 <body>
 
@@ -789,5 +873,57 @@
         initCanvas();
         drawParticles();
     </script>
+
+<!-- ===================================================================
+     MASTERSHEETS / SML — NLWeb chat widget
+     Paste before </body> on scriptmasterlabs.com. Calls your /ask endpoint.
+     Replace NLWEB_ENDPOINT with your deployed Render URL.
+     =================================================================== -->
+<div id="sml-ask"></div>
+<style>
+#sml-ask{position:fixed;right:20px;bottom:20px;z-index:9999;font-family:'JetBrains Mono',monospace}
+.sa-fab{background:#00ff88;color:#000;border:none;font-weight:800;padding:14px 18px;border-radius:40px;cursor:pointer;box-shadow:0 0 24px rgba(0,255,136,.5);font-family:inherit}
+.sa-panel{display:none;flex-direction:column;width:340px;max-width:88vw;height:440px;background:#0b0d0e;border:1px solid rgba(243,239,230,.14);border-radius:14px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.sa-panel.open{display:flex}
+.sa-head{padding:13px 15px;border-bottom:1px solid rgba(243,239,230,.12);color:#f3efe6;font-weight:800;font-size:13px;display:flex;justify-content:space-between}
+.sa-head b{color:#00ff88}
+.sa-x{cursor:pointer;color:rgba(243,239,230,.5)}
+.sa-log{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
+.sa-msg{font-size:12.5px;line-height:1.55;padding:9px 12px;border-radius:9px;max-width:88%}
+.sa-u{align-self:flex-end;background:#00ff88;color:#000;font-weight:600}
+.sa-a{align-self:flex-start;background:#101314;color:#f3efe6;border:1px solid rgba(243,239,230,.1)}
+.sa-in{display:flex;border-top:1px solid rgba(243,239,230,.12)}
+.sa-in input{flex:1;background:#000;border:none;color:#f3efe6;padding:13px 14px;font-family:inherit;font-size:13px;outline:none}
+.sa-in button{background:#00ff88;color:#000;border:none;padding:0 18px;font-weight:800;cursor:pointer}
+</style>
+<script>
+const NLWEB_ENDPOINT = "https://YOUR-NLWEB.onrender.com/ask"; // <-- set after deploy
+(function(){
+  const root=document.getElementById("sml-ask");
+  root.innerHTML=`<button class="sa-fab">Ask ✦</button>
+  <div class="sa-panel">
+    <div class="sa-head">Ask <b>SML</b><span class="sa-x">✕</span></div>
+    <div class="sa-log"><div class="sa-msg sa-a">Ask about x402, MasterSheets, the indicators, or anything on the site.</div></div>
+    <div class="sa-in"><input placeholder="Type a question…"/><button>→</button></div>
+  </div>`;
+  const fab=root.querySelector(".sa-fab"),panel=root.querySelector(".sa-panel"),log=root.querySelector(".sa-log"),input=root.querySelector("input"),send=root.querySelector(".sa-in button");
+  fab.onclick=()=>panel.classList.add("open");
+  root.querySelector(".sa-x").onclick=()=>panel.classList.remove("open");
+  function add(t,cls){const d=document.createElement("div");d.className="sa-msg "+cls;d.textContent=t;log.appendChild(d);log.scrollTop=log.scrollHeight;}
+  async function ask(){
+    const q=input.value.trim(); if(!q)return; input.value="";
+    add(q,"sa-u"); add("…","sa-a"); const thinking=log.lastChild;
+    try{
+      const r=await fetch(NLWEB_ENDPOINT+"?query="+encodeURIComponent(q));
+      const data=await r.json();
+      // NLWeb returns Schema.org JSON; show the best summary it gives back
+      const txt=data.summary||data.answer||(data.results&&data.results[0]&&(data.results[0].description||data.results[0].name))||"No answer found.";
+      thinking.textContent=txt;
+    }catch(e){thinking.textContent="Couldn't reach the answer service.";}
+  }
+  send.onclick=ask; input.addEventListener("keydown",e=>{if(e.key==="Enter")ask();});
+})();
+</script>
+
 </body>
 </html>

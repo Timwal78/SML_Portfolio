@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>ScriptMasterLabs</title>
+    <link>https://www.scriptmasterlabs.com/</link>
+    <description>Payment rails and AI-native tools for the agentic web. x402 / HTTP-402, XRPL, Xahau, AI agents.</description>
+    <language>en-us</language>
+
+    <item>
+      <title>x402 Paywall — @relayos/mcp-paywall</title>
+      <link>https://www.scriptmasterlabs.com/x402-paywall.html</link>
+      <guid>https://www.scriptmasterlabs.com/x402-paywall.html</guid>
+      <description>x402 / HTTP-402 paywall middleware. Autonomous AI agents pay per request in USDC on Base. Drop-in monetization for MCP servers and APIs. XRPL and Xahau rails supported.</description>
+    </item>
+
+    <item>
+      <title>MasterSheets — AI spreadsheet you own</title>
+      <link>https://www.scriptmasterlabs.com/mastersheets.html</link>
+      <guid>https://www.scriptmasterlabs.com/mastersheets.html</guid>
+      <description>AI-native spreadsheet replacing Google Sheets. Bring your own key, no subscription, purchaser owns 100% of their data.</description>
+    </item>
+
+    <item>
+      <title>Trading Indicators — invite-only Pine Script v6</title>
+      <link>https://www.scriptmasterlabs.com/indicators.html</link>
+      <guid>https://www.scriptmasterlabs.com/indicators.html</guid>
+      <description>Invite-only Pine Script v6 indicators for squeeze detection and institutional flow analysis on AMC, GME, and 0DTE setups.</description>
+    </item>
+
+    <item>
+      <title>Books by Timothy Walton</title>
+      <link>https://www.scriptmasterlabs.com/books.html</link>
+      <guid>https://www.scriptmasterlabs.com/books.html</guid>
+      <description>Trading, neurodivergent survival systems, fiction, and modern-English ancient texts.</description>
+    </item>
+  </channel>
+</rss>

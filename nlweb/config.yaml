@@ -1,0 +1,40 @@
+# NLWeb config for ScriptMasterLabs
+# BYOK ethos: all keys come from environment variables you set in Render.
+# Never hardcode keys here.
+
+site:
+  name: "ScriptMasterLabs"
+  url: "https://www.scriptmasterlabs.com"
+
+# --- LLM provider (bring your own key) ---
+# NLWeb supports multiple providers. OpenRouter lets you route to many models on one key.
+llm:
+  provider: "openrouter"        # or "openai" / "anthropic"
+  model: "anthropic/claude-3.5-sonnet"
+  api_key_env: "OPENROUTER_API_KEY"
+
+# --- Vector store / retrieval backend ---
+# Qdrant runs as a sibling service on Render (free/low tier). Local fallback also works.
+retrieval:
+  backend: "qdrant"
+  url_env: "QDRANT_URL"
+  api_key_env: "QDRANT_API_KEY"
+  collection: "sml"
+
+# --- Data sources NLWeb ingests + indexes ---
+# It reads your Schema.org JSON-LD, sitemap, and RSS — the files in this package.
+data_sources:
+  - type: "sitemap"
+    url: "https://www.scriptmasterlabs.com/sitemap.xml"
+  - type: "rss"
+    url: "https://www.scriptmasterlabs.com/feed.xml"
+
+# --- Endpoints ---
+endpoints:
+  ask: true     # /ask  — REST, returns Schema.org JSON answers (humans + agents)
+  mcp: true     # /mcp  — Model Context Protocol, for agent-to-agent access
+
+# --- CORS so your site widget can call /ask ---
+cors:
+  allow_origins:
+    - "https://www.scriptmasterlabs.com"
