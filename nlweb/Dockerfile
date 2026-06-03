@@ -15,8 +15,7 @@ RUN git clone --depth 1 https://github.com/microsoft/NLWeb.git .
 RUN pip install --no-cache-dir -r AskAgent/python/requirements.txt
 
 # Your config (mounted/copied below) tells NLWeb what data to ingest + which LLM/vector store to use
-# The aiohttp_server defaults to config/config_webserver.yaml relative to the repo root
-COPY config.yaml /app/config/config_webserver.yaml
+COPY config.yaml /app/config.yaml
 
 ENV PORT=8000
 EXPOSE 8000
