@@ -4,7 +4,7 @@
 
 ## Core products
 - [Nexus-402](https://www.nexus-402.com): Autonomous AI agent layer and x402 payment infrastructure.
-- [NeuralOS](https://www.scriptmasterlabs.com): Agentic operating system available as a Web App and on Google Play.
+- [NeuralOS](https://www.neuralosagent.com): Agentic operating system available as a Web App and on Google Play.
 - [x402 Paywall (@relayos/mcp-paywall)](https://www.scriptmasterlabs.com/x402-paywall.html): x402 / HTTP-402 paywall middleware. AI agents pay per request in USDC on Base. Drop-in monetization for MCP servers and APIs. Published on npm.
 - [MasterSheets](https://www.scriptmasterlabs.com/mastersheets.html): AI-native spreadsheet that replaces Google Sheets. Bring your own AI key, no subscription, purchaser owns 100% of their data.
 - [Trading Indicators](https://www.scriptmasterlabs.com/indicators.html): Invite-only Pine Script v6 indicators for squeeze detection and institutional flow analysis (AMC, GME, 0DTE).
