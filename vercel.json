@@ -1,3 +1,14 @@
 {
-  "name": "sml-portfolio"
+  "name": "sml-portfolio",
+  "redirects": [
+    { "source": "/store", "destination": "/", "permanent": true },
+    { "source": "/apps/exo-brain", "destination": "/", "permanent": true },
+    { "source": "/neurospark", "destination": "/", "permanent": true },
+    { "source": "/enoch-adhd", "destination": "/books.html", "permanent": true },
+    { "source": "/NeuroStack/?", "destination": "/", "permanent": true },
+    { "source": "/MasterSheets/?", "destination": "/mastersheets.html", "permanent": true },
+    { "source": "/apps/fee-forge", "destination": "/", "permanent": true },
+    { "source": "/trading-indicators", "destination": "/indicators.html", "permanent": true },
+    { "source": "/books/book-of-enoch", "destination": "/books.html", "permanent": true }
+  ]
 }
