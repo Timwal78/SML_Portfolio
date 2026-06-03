@@ -40,3 +40,9 @@ Allow: /
 Sitemap: https://www.scriptmasterlabs.com/sitemap.xml
 # Agent-readable site summary:
 # https://www.scriptmasterlabs.com/llms.txt
+
+# AGENTIC PROTOCOLS & DATA SOVEREIGNTY
+Allow: /ai.txt
+Allow: /llms-full.txt
+Allow: /AGENTS.md
+Sitemap: https://www.scriptmasterlabs.com/llms-full.txt
