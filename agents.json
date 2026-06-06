@@ -1,25 +1,80 @@
 {
-  "schema_version": "v1",
+  "schema_version": "1.0",
   "name": "ScriptMasterLabs",
-  "description": "Payment rails and AI-native tools for the agentic web. x402/HTTP-402 micropayments, XRPL/Xahau settlement, SqueezeOS market intelligence APIs, MasterSheets, Pine Script indicators. Service-Disabled Veteran-Owned (SDVO), Kinston NC.",
-  "url": "https://www.scriptmasterlabs.com",
-  "api": {
-    "type": "openapi",
-    "url": "https://api.scriptmasterlabs.com/.well-known/openapi.json"
+  "description": "Payment rails and AI-native tools for the agentic web. ScriptMasterLabs builds x402/HTTP-402 micropayment infrastructure for autonomous AI agents (USDC on Base), blockchain payment rails on XRPL and Xahau via Xahau Hooks, MCP server monetization middleware, and institutional-grade Pine Script v6 trading indicators. Service-Disabled Veteran-Owned (SDVO), Kinston NC. Founder: Timothy Walton.",
+  "url": "https://www.scriptmasterlabs.com/",
+  "contact": "scriptmasterlabs@gmail.com",
+  "capabilities": [
+    "x402 HTTP-402 micropayment infrastructure",
+    "AI agent-to-API payments",
+    "USDC on Base payment rails",
+    "XRPL payment routing",
+    "Xahau Hooks payment routing",
+    "MCP server paywall middleware",
+    "Pine Script v6 trading indicators",
+    "Institutional squeeze detection",
+    "AI-native spreadsheet tools"
+  ],
+  "products": [
+    {
+      "name": "x402 Paywall (@relayos/mcp-paywall)",
+      "type": "npm_package",
+      "url": "https://www.scriptmasterlabs.com/x402-paywall.html",
+      "npm": "https://www.npmjs.com/package/@relayos/mcp-paywall",
+      "description": "Drop-in x402/HTTP-402 paywall middleware for MCP servers and APIs. AI agents pay per request in USDC on Base. Tiered pricing, loyalty/affiliate ledger, USDC payout via viem.",
+      "tags": ["x402", "HTTP-402", "MCP", "USDC", "Base", "micropayments", "AI agents"]
+    },
+    {
+      "name": "Nexus-402",
+      "type": "agentic_platform",
+      "url": "https://www.nexus-402.com",
+      "description": "Autonomous AI agent layer and x402 payment infrastructure hub.",
+      "tags": ["x402", "agentic", "AI agents", "payments", "HTTP-402"]
+    },
+    {
+      "name": "NeuralOS",
+      "type": "agentic_os",
+      "url": "https://www.neuralosagent.com",
+      "description": "Agentic operating system. Web App and Google Play.",
+      "platforms": ["web", "android"],
+      "tags": ["agentic OS", "AI agent", "autonomous", "NeuralOS"]
+    },
+    {
+      "name": "MasterSheets",
+      "type": "saas",
+      "url": "https://www.scriptmasterlabs.com/mastersheets.html",
+      "description": "AI-native spreadsheet replacement. BYOK, no subscription, purchaser owns 100% of data.",
+      "tags": ["spreadsheet", "AI", "BYOK", "no subscription", "MasterSheets"]
+    },
+    {
+      "name": "Trading Indicators",
+      "type": "invite_only_service",
+      "url": "https://www.scriptmasterlabs.com/indicators.html",
+      "description": "Invite-only institutional-grade Pine Script v6 indicators. Squeeze detection, institutional flow, Base-4 Harmonic Fractal Matrix, QUEAD v2.0. AMC, GME, 0DTE.",
+      "tags": ["Pine Script", "TradingView", "indicators", "squeeze", "institutional", "AMC", "GME"]
+    }
+  ],
+  "payment_endpoints": {
+    "x402_standard": true,
+    "demo": "https://four02proof.onrender.com",
+    "settlement_chains": ["Base", "XRPL", "Xahau"],
+    "accepted_tokens": ["USDC", "RLUSD"],
+    "pay_to_wallet": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700"
   },
-  "mcp": {
-    "url": "https://api.scriptmasterlabs.com/.well-known/mcp.json"
+  "llms_txt": "https://www.scriptmasterlabs.com/llms.txt",
+  "sitemap": "https://www.scriptmasterlabs.com/sitemap.xml",
+  "robots": "https://www.scriptmasterlabs.com/robots.txt",
+  "social": {
+    "twitter": "https://x.com/ScriptMasterLabs",
+    "github": "https://github.com/Timwal78",
+    "npm": "https://www.npmjs.com/package/@relayos/mcp-paywall",
+    "tradingview": "https://www.tradingview.com/u/TIMMY741/"
   },
-  "payment": {
-    "standard": "x402",
-    "rails": [
-      { "network": "base", "currency": "USDC", "contract": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" },
-      { "network": "xrpl", "currency": "RLUSD", "issuer": "rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De" },
-      { "network": "xahau", "currency": "XAH" }
-    ],
-    "invoice_endpoint": "https://four02proof.onrender.com/v1/invoice",
-    "verify_endpoint": "https://four02proof.onrender.com/v1/verify"
-  },
-  "contact_email": "scriptmasterlabs@gmail.com",
-  "legal_info_url": "https://www.scriptmasterlabs.com"
+  "organization": {
+    "type": "SDVOSB",
+    "full_name": "ScriptMasterLabs",
+    "founder": "Timothy Walton",
+    "location": "Kinston, NC, USA",
+    "certifications": ["SDVO", "SDVOSB"]
+  }
 }
