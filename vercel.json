@@ -75,5 +75,7 @@
     "deploymentEnabled": {
       "main": true
     }
-  }
+  },
+  "cleanUrls": false,
+  "trailingSlash": false
 }
