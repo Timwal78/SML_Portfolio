@@ -1,29 +1,79 @@
 {
   "name": "sml-portfolio",
   "redirects": [
-    { "source": "/store", "destination": "/", "permanent": true },
-    { "source": "/apps/exo-brain", "destination": "/", "permanent": true },
-    { "source": "/neurospark", "destination": "/", "permanent": true },
-    { "source": "/enoch-adhd", "destination": "/books.html", "permanent": true },
-    { "source": "/NeuroStack/?", "destination": "/", "permanent": true },
-    { "source": "/MasterSheets/?", "destination": "/mastersheets.html", "permanent": true },
-    { "source": "/apps/fee-forge", "destination": "/", "permanent": true },
-    { "source": "/trading-indicators", "destination": "/indicators.html", "permanent": true },
-    { "source": "/books/book-of-enoch", "destination": "/books.html", "permanent": true }
+    {
+      "source": "/store",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/apps/exo-brain",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/neurospark",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/enoch-adhd",
+      "destination": "/books.html",
+      "permanent": true
+    },
+    {
+      "source": "/NeuroStack/?",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/MasterSheets/?",
+      "destination": "/mastersheets.html",
+      "permanent": true
+    },
+    {
+      "source": "/apps/fee-forge",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/trading-indicators",
+      "destination": "/indicators.html",
+      "permanent": true
+    },
+    {
+      "source": "/books/book-of-enoch",
+      "destination": "/books.html",
+      "permanent": true
+    }
   ],
   "headers": [
     {
       "source": "/agents.json",
       "headers": [
-        { "key": "Content-Type", "value": "application/json" },
-        { "key": "Cache-Control", "value": "public, max-age=3600" }
+        {
+          "key": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600"
+        }
       ]
     },
     {
       "source": "/sitemap.xml",
       "headers": [
-        { "key": "Content-Type", "value": "application/xml" }
+        {
+          "key": "Content-Type",
+          "value": "application/xml"
+        }
       ]
     }
-  ]
+  ],
+  "git": {
+    "deploymentEnabled": {
+      "main": true
+    }
+  }
 }
