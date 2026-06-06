@@ -47,3 +47,8 @@ Allow: /llms-full.txt
 Allow: /AGENTS.md
 Sitemap: https://www.scriptmasterlabs.com/llms-full.txt
 # DEPLOY-TEST-1780766652
+
+# Agent discovery (canonical):
+# https://www.scriptmasterlabs.com/agents.json
+# Agent discovery (live mirror):
+# https://timwal78.github.io/SML_Portfolio/agents.json
