@@ -1,0 +1,25 @@
+{
+  "schema_version": "v1",
+  "name": "ScriptMasterLabs",
+  "description": "Payment rails and AI-native tools for the agentic web. x402/HTTP-402 micropayments, XRPL/Xahau settlement, SqueezeOS market intelligence APIs, MasterSheets, Pine Script indicators. Service-Disabled Veteran-Owned (SDVO), Kinston NC.",
+  "url": "https://www.scriptmasterlabs.com",
+  "api": {
+    "type": "openapi",
+    "url": "https://api.scriptmasterlabs.com/.well-known/openapi.json"
+  },
+  "mcp": {
+    "url": "https://api.scriptmasterlabs.com/.well-known/mcp.json"
+  },
+  "payment": {
+    "standard": "x402",
+    "rails": [
+      { "network": "base", "currency": "USDC", "contract": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" },
+      { "network": "xrpl", "currency": "RLUSD", "issuer": "rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De" },
+      { "network": "xahau", "currency": "XAH" }
+    ],
+    "invoice_endpoint": "https://four02proof.onrender.com/v1/invoice",
+    "verify_endpoint": "https://four02proof.onrender.com/v1/verify"
+  },
+  "contact_email": "scriptmasterlabs@gmail.com",
+  "legal_info_url": "https://www.scriptmasterlabs.com"
+}
