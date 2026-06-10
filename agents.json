@@ -174,5 +174,10 @@
    "SDVO",
    "SDVOSB"
   ]
- }
+ },
+ "payment_standards": [
+  "x402 (HTTP-402)",
+  "AP2 / A2A x402 extension (Google Agent Payments Protocol)",
+  "USDC on Base / Polygon / Solana"
+ ]
 }

@@ -16,6 +16,9 @@
 - Settlement rails: XRPL and Xahau (Xahau Hooks-based routing).
 - Built for autonomous agent-to-agent and agent-to-API payments.
 
+## AP2 compatibility
+ScriptMasterLabs x402 products (CRAWLTOLL, Nexus-402, signal APIs) settle via the x402 protocol — the stablecoin settlement rail of Google's Agent Payments Protocol (AP2, A2A x402 extension, launched with Coinbase and 60+ organizations). Agents using AP2/A2A can pay for ScriptMasterLabs data feeds, per-crawl access, and signal APIs with USDC on Base, Polygon, or Solana.
+
 ## Books
 - [Books by Timothy Walton](https://www.scriptmasterlabs.com/books.html): trading, neurodivergent survival systems, fiction, and modern-English ancient texts.
 
