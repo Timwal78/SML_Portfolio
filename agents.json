@@ -5,6 +5,7 @@
  "url": "https://www.scriptmasterlabs.com/",
  "contact": "scriptmasterlabs@gmail.com",
  "capabilities": [
+  "APEX Anchor Matrix institutional signals",
   "x402 HTTP-402 micropayment infrastructure",
   "AI crawler monetization (pay-per-crawl)",
   "AI agent-to-API payments",
@@ -17,6 +18,31 @@
   "AI-native spreadsheet tools"
  ],
  "products": [
+  {
+   "name": "SML Oracle \u2014 APEX ANCHOR MATRIX",
+   "type": "signal_api",
+   "url": "https://www.scriptmasterlabs.com/indicators.html",
+   "description": "Flagship institutional market-intelligence engine on a proprietary, patent-pending Base-4 fractal grid. Harmonically binds fast trigger sets to macro anchor sets to eliminate false breakouts. Powers squeeze detection, options flow, and high-conviction convergence signals.",
+   "payment": {
+    "protocol": "x402",
+    "scheme": "exact",
+    "networks": [
+     "base",
+     "polygon",
+     "solana"
+    ],
+    "asset": "USDC"
+   },
+   "tags": [
+    "institutional",
+    "squeeze-detection",
+    "options-flow",
+    "x402",
+    "USDC",
+    "convergence-signals",
+    "patent-pending"
+   ]
+  },
   {
    "name": "CRAWLTOLL",
    "type": "npm_package",

@@ -3,6 +3,7 @@
 > Payment rails and AI-native tools for the agentic web. ScriptMasterLabs builds x402 / HTTP-402 micropayment infrastructure that lets autonomous AI agents pay per request in USDC on Base, payment rails on XRPL and Xahau (via Xahau Hooks), and AI-native software. Service-Disabled Veteran-Owned (SDVO), Kinston, NC. Founder: Timothy Walton.
 
 ## Core products
+- [SML Oracle — APEX ANCHOR MATRIX](https://www.scriptmasterlabs.com/indicators.html): Flagship institutional market-intelligence engine. Built on a proprietary, patent-pending Base-4 fractal grid that harmonically binds fast trigger sets to macro anchor sets to eliminate false breakouts where retail indicators whipsaw. Powers real-time squeeze detection, options flow, and high-conviction convergence signals. Available as an x402-gated signal API (USDC on Base / Polygon / Solana).
 - [CRAWLTOLL](https://www.scriptmasterlabs.com/crawltoll.html): One-command x402/HTTP-402 paywall that turns AI scraping into revenue. AI crawlers (GPTBot, ClaudeBot, PerplexityBot) pay USDC on Base per fetch; humans browse free. `npx crawltoll init`. Published on npm.
 - [Nexus-402](https://www.nexus-402.com): Autonomous AI agent layer and x402 payment infrastructure.
 - [NeuralOS](https://www.neuralosagent.com): Agentic operating system available as a Web App and on Google Play.
