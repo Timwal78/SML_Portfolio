@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRAWLTOLL™ — Turn AI Scraping Into Revenue | x402 Toll Booth | ScriptMasterLabs</title>
+    <meta name="description" content="CRAWLTOLL is a one-command x402 (HTTP-402) paywall that makes AI crawlers like GPTBot, ClaudeBot, and PerplexityBot pay USDC per fetch while humans browse free. npm install crawltoll. By ScriptMasterLabs.">
+    <meta name="keywords" content="x402, HTTP-402, AI crawler monetization, GPTBot paywall, ClaudeBot, pay per crawl, USDC, Base, llms.txt, agents.json, agentic web, machine payments, AI scraping revenue">
+    <link rel="canonical" href="https://www.scriptmasterlabs.com/crawltoll.html">
+    <meta property="og:title" content="CRAWLTOLL™ — Turn AI Scraping Into Revenue">
+    <meta property="og:description" content="AI crawlers pay USDC per fetch via x402. Humans browse free. One command: npx crawltoll init">
+    <meta property="og:url" content="https://www.scriptmasterlabs.com/crawltoll.html">
+    <meta property="og:type" content="website">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://www.scriptmasterlabs.com/#crawltoll",
+      "name": "CRAWLTOLL",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Node.js",
+      "url": "https://www.scriptmasterlabs.com/crawltoll.html",
+      "downloadUrl": "https://www.npmjs.com/package/crawltoll",
+      "installUrl": "https://www.npmjs.com/package/crawltoll",
+      "codeRepository": "https://github.com/Timwal78/crawltoll",
+      "softwareVersion": "1.0.0",
+      "publisher": { "@id": "https://www.scriptmasterlabs.com/#org" },
+      "description": "One-command x402 (HTTP-402) paywall that turns AI scraping into revenue. AI crawlers like GPTBot, ClaudeBot, and PerplexityBot pay USDC on Base per fetch; human visitors browse free. Includes CLI generator for llms.txt, agents.json, and robots.txt payment terms, plus a built-in revenue ledger.",
+      "keywords": "x402, HTTP-402, AI crawler monetization, pay per crawl, GPTBot, ClaudeBot, USDC, Base, llms.txt, agents.json, micropayments, agentic web",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD", "description": "Free open-source middleware; site owners set their own per-fetch USDC toll." },
+      "isAccessibleForFree": true
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.scriptmasterlabs.com/" },
+        { "@type": "ListItem", "position": 2, "name": "CRAWLTOLL", "item": "https://www.scriptmasterlabs.com/crawltoll.html" }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        { "@type": "Question", "name": "What is CRAWLTOLL?", "acceptedAnswer": { "@type": "Answer", "text": "CRAWLTOLL is open-source x402 (HTTP-402) middleware that makes AI crawlers and agents pay USDC per fetch to access your content, while human visitors browse free. Install with npm install crawltoll and run npx crawltoll init to generate payment terms in llms.txt and agents.json." } },
+        { "@type": "Question", "name": "How do AI crawlers pay with CRAWLTOLL?", "acceptedAnswer": { "@type": "Answer", "text": "When a bot requests a page, CRAWLTOLL returns HTTP 402 Payment Required with machine-readable x402 payment requirements (USDC on Base). The agent sends an X-PAYMENT header, payment is verified and settled via a facilitator, and the content unlocks instantly. No human is in the loop." } },
+        { "@type": "Question", "name": "Which AI bots does CRAWLTOLL detect?", "acceptedAnswer": { "@type": "Answer", "text": "GPTBot, ClaudeBot, PerplexityBot, Google-Extended, Bytespider, CCBot, Amazonbot, Applebot-Extended, Meta crawlers, plus generic automation like curl, python-requests, axios, and headless browsers — over 30 patterns. Any client already sending an X-PAYMENT header is treated as an agent." } },
+        { "@type": "Question", "name": "Do human visitors have to pay?", "acceptedAnswer": { "@type": "Answer", "text": "No. By default humans browse free and only automated AI traffic is tolled. Discovery files like robots.txt, llms.txt, and agents.json always stay open so agents can read your payment terms." } }
+      ]
+    }
+  ]
+}
+</script>
+<style>
+:root{--bg:#000000;--green:#39FF14;--green2:#00FF7F;--pink:#FF1493;--gold:#FFD700;--orange:#FF6B00;}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:#f1f1f1;font-family:'JetBrains Mono','Courier New',monospace;line-height:1.6}
+.wrap{max-width:860px;margin:0 auto;padding:40px 20px}
+h1{color:var(--green);font-size:2.4rem;text-shadow:0 0 20px rgba(57,255,20,.4)}
+h2{color:var(--pink);margin:36px 0 12px;font-size:1.3rem}
+.tag{color:var(--gold);font-size:1.05rem;margin:10px 0 24px}
+.cmd{background:#0a0a0a;border:1px solid var(--green);border-radius:8px;padding:16px;color:var(--green2);overflow-x:auto;margin:14px 0;font-size:.95rem}
+.flow{border:1px solid var(--orange);border-radius:8px;padding:18px;margin:14px 0}
+.flow b{color:var(--orange)}
+a{color:var(--gold)}
+.btn{display:inline-block;background:var(--green);color:#000;font-weight:800;padding:12px 22px;border-radius:8px;text-decoration:none;margin:8px 8px 8px 0}
+.btn.alt{background:var(--pink);color:#fff}
+ul{margin:8px 0 8px 22px}
+.foot{margin-top:50px;color:var(--orange);font-size:.85rem;border-top:1px solid #222;padding-top:18px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p><a href="/">← ScriptMasterLabs</a></p>
+  <h1>CRAWLTOLL™</h1>
+  <p class="tag">Turn AI scraping into revenue. AI crawlers pay USDC per fetch. Humans browse free.</p>
+
+  <a class="btn" href="https://www.npmjs.com/package/crawltoll">npm install crawltoll</a>
+  <a class="btn alt" href="https://github.com/Timwal78/crawltoll">GitHub</a>
+
+  <h2>// THE PROBLEM</h2>
+  <p>GPTBot, ClaudeBot, PerplexityBot, and thousands of AI agents fetch your content millions of times — and pay you nothing. Blocking them makes you invisible to the agentic web. CRAWLTOLL is the third option: <b style="color:var(--green)">let them in, make them pay.</b></p>
+
+  <h2>// ONE COMMAND</h2>
+  <div class="cmd">npx crawltoll init</div>
+  <p>Generates your <b>crawltoll.config.json</b>, <b>llms.txt</b>, <b>agents.json</b>, and robots.txt payment terms. Then:</p>
+  <div class="cmd">const crawltoll = require("crawltoll");<br>app.use(crawltoll());</div>
+
+  <h2>// HOW THE TOLL WORKS</h2>
+  <div class="flow">
+    <b>1.</b> Bot requests a page → <b>HTTP 402</b> + machine-readable x402 payment terms<br>
+    <b>2.</b> Agent sends <b>X-PAYMENT</b> header (USDC on Base)<br>
+    <b>3.</b> Payment verified + settled via facilitator → content unlocks instantly<br>
+    <b>4.</b> Every fetch = USDC in your wallet. Built-in revenue ledger + <b>npx crawltoll stats</b>
+  </div>
+
+  <h2>// FEATURES</h2>
+  <ul>
+    <li>30+ AI bot patterns detected (GPTBot, ClaudeBot, Perplexity, headless, curl…)</li>
+    <li>Humans always pass free — discovery files stay open</li>
+    <li>x402 standard: scheme <i>exact</i>, USDC on Base, facilitator verify + settle</li>
+    <li>Standalone toll server + render.yaml included — deploy in minutes</li>
+    <li>Zero dependencies. Node 18+. MIT licensed.</li>
+  </ul>
+
+  <h2>// PART OF THE SML x402 STACK</h2>
+  <p>CRAWLTOLL joins <a href="/x402-paywall.html">@relayos/mcp-paywall</a>, <a href="https://www.nexus-402.com">Nexus-402</a>, and ScriptMasterLabs payment rails on Base, XRPL, and Xahau (Hooks) — full-spectrum monetization for the agentic web.</p>
+
+  <p class="foot">CRAWLTOLL™ — Script Master Labs LLC · Service-Disabled Veteran-Owned · Kinston, NC · The toll booth of the agentic web</p>
+</div>
+</body>
+</html>
