@@ -1,6 +1,11 @@
 {
   "redirects": [
     {
+      "source": "/stack",
+      "destination": "/stack.html",
+      "permanent": false
+    },
+    {
       "source": "/store",
       "destination": "/",
       "permanent": true
