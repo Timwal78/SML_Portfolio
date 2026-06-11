@@ -1,0 +1,108 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://www.scriptmasterlabs.com/#org",
+      "name": "Script Master Labs LLC",
+      "alternateName": "ScriptMasterLabs",
+      "url": "https://www.scriptmasterlabs.com/",
+      "email": "scriptmasterlabs@gmail.com",
+      "founder": { "@type": "Person", "name": "Timothy Walton" },
+      "address": { "@type": "PostalAddress", "addressLocality": "Kinston", "addressRegion": "NC", "addressCountry": "US" },
+      "description": "x402/HTTP-402 micropayment infrastructure for autonomous AI agents (USDC on Base), payment rails on XRPL and Xahau via Xahau Hooks, MCP server monetization middleware, and institutional-grade AI market intelligence. Service-Disabled Veteran-Owned Small Business.",
+      "sameAs": [
+        "https://github.com/Timwal78",
+        "https://www.nexus-402.com/",
+        "https://www.neuralosagent.com/"
+      ],
+      "knowsAbout": ["x402 protocol", "HTTP 402", "agentic payments", "USDC on Base", "XRPL", "Xahau Hooks", "RLUSD", "MCP servers", "Generative Engine Optimization", "Pine Script v6", "short squeeze detection"]
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://www.scriptmasterlabs.com/crawltoll.html#app",
+      "name": "CRAWLTOLL",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Node.js",
+      "url": "https://www.scriptmasterlabs.com/crawltoll.html",
+      "installUrl": "https://www.npmjs.com/package/crawltoll",
+      "description": "One-command x402/HTTP-402 paywall that turns AI crawling into revenue. AI crawlers pay USDC on Base per fetch via the X-PAYMENT header; humans browse free. Generates llms.txt, agents.json, and robots.txt payment terms.",
+      "offers": { "@type": "Offer", "priceCurrency": "USD", "price": "0", "description": "Free to install; site owners earn USDC per crawl." },
+      "provider": { "@id": "https://www.scriptmasterlabs.com/#org" }
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://www.scriptmasterlabs.com/x402-paywall.html#app",
+      "name": "@relayos/mcp-paywall",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Node.js",
+      "url": "https://www.scriptmasterlabs.com/x402-paywall.html",
+      "installUrl": "https://www.npmjs.com/package/@relayos/mcp-paywall",
+      "description": "Drop-in x402/HTTP-402 paywall middleware for MCP servers and APIs. AI agents pay per request in USDC on Base. Tiered pricing, loyalty/affiliate ledger, USDC payout.",
+      "provider": { "@id": "https://www.scriptmasterlabs.com/#org" }
+    },
+    {
+      "@type": "WebAPI",
+      "@id": "https://squeezeos-api.onrender.com/#api",
+      "name": "SqueezeOS x402 API",
+      "url": "https://squeezeos-api.onrender.com/",
+      "description": "x402-gated institutional market-intelligence API: council verdicts, squeeze scanner, options flow, IWM 0DTE, and oracle feeds (SEC 8-K, FDA, USPTO). Agents pay per signal in USDC (Base/Polygon/Solana) or RLUSD (XRPL).",
+      "termsOfService": "https://www.scriptmasterlabs.com/stack",
+      "provider": { "@id": "https://www.scriptmasterlabs.com/#org" }
+    },
+    {
+      "@type": "WebAPI",
+      "@id": "https://four02proof.onrender.com/#api",
+      "name": "402Proof",
+      "url": "https://four02proof.onrender.com/",
+      "description": "Agent payment firewall and proof rail: RLUSD settlement on XRPL plus an agent credit bureau with a discount curve for trusted agents.",
+      "provider": { "@id": "https://www.scriptmasterlabs.com/#org" }
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://www.nexus-402.com/#app",
+      "name": "Nexus-402",
+      "applicationCategory": "BusinessApplication",
+      "url": "https://www.nexus-402.com/",
+      "description": "Autonomous AI-agent layer and x402 payment marketplace with retrieval-augmented generation (RAG).",
+      "provider": { "@id": "https://www.scriptmasterlabs.com/#org" }
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://www.neuralosagent.com/#app",
+      "name": "NeuralOS",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Web, Android",
+      "url": "https://www.neuralosagent.com/",
+      "description": "Agentic operating system available as a Web App and on Google Play.",
+      "provider": { "@id": "https://www.scriptmasterlabs.com/#org" }
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://www.scriptmasterlabs.com/mastersheets.html#app",
+      "name": "MasterSheets",
+      "applicationCategory": "BusinessApplication",
+      "url": "https://www.scriptmasterlabs.com/mastersheets.html",
+      "description": "AI-native spreadsheet replacing Google Sheets. Bring-your-own AI key, no subscription, purchaser owns 100% of their data.",
+      "provider": { "@id": "https://www.scriptmasterlabs.com/#org" }
+    },
+    {
+      "@type": "Service",
+      "@id": "https://www.scriptmasterlabs.com/indicators.html#service",
+      "name": "SML Oracle — APEX Anchor Matrix",
+      "serviceType": "Institutional market intelligence",
+      "url": "https://www.scriptmasterlabs.com/indicators.html",
+      "description": "Flagship institutional market-intelligence engine on a proprietary, patent-pending Base-4 fractal grid. Squeeze detection, options flow, and high-conviction convergence signals, delivered via x402-gated API and invite-only Pine Script v6 indicators.",
+      "provider": { "@id": "https://www.scriptmasterlabs.com/#org" }
+    },
+    {
+      "@type": "Dataset",
+      "@id": "https://www.scriptmasterlabs.com/agent.md#graph",
+      "name": "ScriptMasterLabs Agent Capability Graph",
+      "url": "https://www.scriptmasterlabs.com/agent.md",
+      "description": "Machine-readable entity and capability graph for AI agents: payment rails, live endpoints, product graph, and discovery files.",
+      "encodingFormat": "text/markdown",
+      "creator": { "@id": "https://www.scriptmasterlabs.com/#org" }
+    }
+  ]
+}
