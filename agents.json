@@ -1,183 +1,115 @@
 {
- "schema_version": "1.0",
- "name": "ScriptMasterLabs",
- "description": "Payment rails and AI-native tools for the agentic web. ScriptMasterLabs builds x402/HTTP-402 micropayment infrastructure for autonomous AI agents (USDC on Base), blockchain payment rails on XRPL and Xahau via Xahau Hooks, MCP server monetization middleware, and institutional-grade Pine Script v6 trading indicators. Service-Disabled Veteran-Owned (SDVO), Kinston NC. Founder: Timothy Walton.",
- "url": "https://www.scriptmasterlabs.com/",
- "contact": "scriptmasterlabs@gmail.com",
- "capabilities": [
-  "APEX Anchor Matrix institutional signals",
-  "x402 HTTP-402 micropayment infrastructure",
-  "AI crawler monetization (pay-per-crawl)",
-  "AI agent-to-API payments",
-  "USDC on Base payment rails",
-  "XRPL payment routing",
-  "Xahau Hooks payment routing",
-  "MCP server paywall middleware",
-  "Pine Script v6 trading indicators",
-  "Institutional squeeze detection",
-  "AI-native spreadsheet tools"
- ],
- "products": [
-  {
-   "name": "SML Oracle \u2014 APEX ANCHOR MATRIX",
-   "type": "signal_api",
-   "url": "https://www.scriptmasterlabs.com/indicators.html",
-   "description": "Flagship institutional market-intelligence engine on a proprietary, patent-pending Base-4 fractal grid. Harmonically binds fast trigger sets to macro anchor sets to eliminate false breakouts. Powers squeeze detection, options flow, and high-conviction convergence signals.",
-   "payment": {
-    "protocol": "x402",
-    "scheme": "exact",
-    "networks": [
-     "base",
-     "polygon",
-     "solana"
-    ],
-    "asset": "USDC"
-   },
-   "tags": [
-    "institutional",
-    "squeeze-detection",
-    "options-flow",
-    "x402",
-    "USDC",
-    "convergence-signals",
-    "patent-pending"
-   ]
-  },
-  {
-   "name": "CRAWLTOLL",
-   "type": "npm_package",
-   "url": "https://www.scriptmasterlabs.com/crawltoll.html",
-   "npm": "https://www.npmjs.com/package/crawltoll",
-   "repository": "https://github.com/Timwal78/crawltoll",
-   "description": "One-command x402/HTTP-402 paywall that turns AI scraping into revenue. AI crawlers pay USDC on Base per fetch via X-PAYMENT header; humans browse free. CLI generates llms.txt, agents.json, and robots.txt payment terms. Built-in revenue ledger.",
-   "payment": {
-    "protocol": "x402",
-    "scheme": "exact",
-    "network": "base",
-    "asset": "USDC"
-   },
-   "tags": [
-    "x402",
-    "HTTP-402",
-    "crawler-monetization",
-    "pay-per-crawl",
-    "USDC",
-    "Base",
-    "llms.txt",
-    "agents.json",
-    "AI agents"
-   ]
-  },
-  {
-   "name": "x402 Paywall (@relayos/mcp-paywall)",
-   "type": "npm_package",
-   "url": "https://www.scriptmasterlabs.com/x402-paywall.html",
-   "npm": "https://www.npmjs.com/package/@relayos/mcp-paywall",
-   "description": "Drop-in x402/HTTP-402 paywall middleware for MCP servers and APIs. AI agents pay per request in USDC on Base. Tiered pricing, loyalty/affiliate ledger, USDC payout via viem.",
-   "tags": [
-    "x402",
-    "HTTP-402",
-    "MCP",
-    "USDC",
-    "Base",
-    "micropayments",
-    "AI agents"
-   ]
-  },
-  {
-   "name": "Nexus-402",
-   "type": "agentic_platform",
-   "url": "https://www.nexus-402.com",
-   "description": "Autonomous AI agent layer and x402 payment infrastructure hub.",
-   "tags": [
-    "x402",
-    "agentic",
-    "AI agents",
-    "payments",
-    "HTTP-402"
-   ]
-  },
-  {
-   "name": "NeuralOS",
-   "type": "agentic_os",
-   "url": "https://www.neuralosagent.com",
-   "description": "Agentic operating system. Web App and Google Play.",
-   "platforms": [
-    "web",
-    "android"
-   ],
-   "tags": [
-    "agentic OS",
-    "AI agent",
-    "autonomous",
-    "NeuralOS"
-   ]
-  },
-  {
-   "name": "MasterSheets",
-   "type": "saas",
-   "url": "https://www.scriptmasterlabs.com/mastersheets.html",
-   "description": "AI-native spreadsheet replacement. BYOK, no subscription, purchaser owns 100% of data.",
-   "tags": [
-    "spreadsheet",
-    "AI",
-    "BYOK",
-    "no subscription",
-    "MasterSheets"
-   ]
-  },
-  {
-   "name": "Trading Indicators",
-   "type": "invite_only_service",
-   "url": "https://www.scriptmasterlabs.com/indicators.html",
-   "description": "Invite-only institutional-grade Pine Script v6 indicators. Squeeze detection, institutional flow, Base-4 Harmonic Fractal Matrix, QUEAD v2.0. AMC, GME, 0DTE.",
-   "tags": [
-    "Pine Script",
-    "TradingView",
-    "indicators",
-    "squeeze",
-    "institutional",
-    "AMC",
-    "GME"
-   ]
+  "schema_version": "1.0",
+  "name": "ScriptMasterLabs",
+  "description": "x402/HTTP-402 micropayment infrastructure for autonomous AI agents. Pay per signal in USDC on Base or RLUSD on XRPL. 44 live MCP tools across institutional market intelligence, agent credit bureau, and autonomous settlement.",
+  "url": "https://www.scriptmasterlabs.com",
+  "contact": "scriptmasterlabs@gmail.com",
+  "entity": "Script Master Labs LLC (SDVOSB)",
+  "payment_protocol": "x402",
+  "payment_networks": ["base", "xrpl", "xahau", "solana", "polygon"],
+  "payment_asset": "USDC / RLUSD",
+  "pay_to_base": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+  "pay_to_solana": "C9rk2tzM92WxSoMWD32A5wZLgL3z1uN7FSVDExioahfF",
+  "xrpl_gateway": "rUJhaK2ibfTFVdAn8m9jMCcJQ1xo6FmNPZ",
+  "rlusd_issuer": "rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De",
+  "mcp_servers": [
+    {
+      "name": "SqueezeOS",
+      "description": "33-tool institutional market intelligence MCP server. Council verdicts, squeeze scanner, options flow, oracle data, futures, settlement, forge economy, autopilot.",
+      "url": "https://squeezeos-api.onrender.com/mcp",
+      "protocol": "MCP JSON-RPC 2.0",
+      "smithery": "https://smithery.ai/server/squeezeos",
+      "tools": 33
+    },
+    {
+      "name": "402Proof",
+      "description": "11-tool x402 payment firewall and agent credit bureau MCP server. Invoices, payment verification, FICO-style bureau scores, attestations, passports.",
+      "url": "https://four02proof.onrender.com/mcp",
+      "protocol": "MCP JSON-RPC 2.0",
+      "tools": 11
+    }
+  ],
+  "live_services": [
+    {
+      "name": "SqueezeOS x402 API",
+      "url": "https://squeezeos-api.onrender.com",
+      "description": "Institutional market intelligence: council verdicts, squeeze scanner, options flow, IWM 0DTE, oracle feeds, futures, settlement, forge economy. x402-gated.",
+      "x402": true,
+      "endpoints": [
+        {"path": "/api/scan",             "price": "0.01 RLUSD", "description": "Full squeeze scanner"},
+        {"path": "/api/council",          "price": "0.05 RLUSD", "description": "Council verdict: BUY/SELL/HOLD"},
+        {"path": "/api/engine/signal/{symbol}", "price": "0.25 USDC", "description": "Oracle Engine: aggregated BUY/SELL/HOLD/SHIELD"},
+        {"path": "/api/engine/batch",     "price": "0.50 USDC", "description": "Oracle batch: GME+AMC+IWM"},
+        {"path": "/api/ftd/series/{symbol}", "price": "0.02 RLUSD", "description": "SEC Reg SHO FTD time series"},
+        {"path": "/api/ftd/ratio/{symbol}", "price": "0.01 RLUSD", "description": "FTD ratio + pressure context"},
+        {"path": "/api/oracle/latest/{feed}", "price": "0.02 RLUSD", "description": "Oracle data feed: SEC 8-K, FDA, USPTO"},
+        {"path": "/api/futures",          "price": "free browse / 0.10 RLUSD create", "description": "Signal Futures marketplace"},
+        {"path": "/api/settlement",       "price": "0.01 RLUSD", "description": "Agent-to-agent conditional escrow"},
+        {"path": "/api/stigmergy/stake",  "price": "0.005 RLUSD", "description": "RLUSD pheromone trail coordination"},
+        {"path": "/api/forge/register",   "price": "free", "description": "Register wallet in Stellar Forge economy"},
+        {"path": "/api/forge/quote/{wallet}", "price": "free", "description": "Loyalty tier + fee discount quote"},
+        {"path": "/mcp",                  "price": "varies", "description": "MCP JSON-RPC 2.0 — 33 tools"}
+      ]
+    },
+    {
+      "name": "402Proof",
+      "url": "https://four02proof.onrender.com",
+      "description": "x402 payment firewall: invoice → verify → JWT access token. FICO-style agent credit bureau (300-850). RLUSD on XRPL + Xahau.",
+      "x402": true,
+      "endpoints": [
+        {"path": "/v1/invoice",           "price": "free", "description": "Generate payment invoice"},
+        {"path": "/v1/verify",            "price": "free", "description": "Verify tx_hash → JWT access token"},
+        {"path": "/v1/bureau/score/{wallet}", "price": "free", "description": "Public credit score teaser"},
+        {"path": "/v1/bureau/report/{wallet}", "price": "0.01 RLUSD", "description": "Full credit report"},
+        {"path": "/v1/bureau/attest/{wallet}", "price": "0.01 RLUSD", "description": "Portable attestation JWT"},
+        {"path": "/v1/agent/{wallet}",    "price": "free", "description": "Full agent passport"},
+        {"path": "/mcp",                  "price": "varies", "description": "MCP JSON-RPC 2.0 — 11 tools"}
+      ]
+    },
+    {
+      "name": "CRAWLTOLL",
+      "url": "https://www.scriptmasterlabs.com/crawltoll.html",
+      "npm": "crawltoll",
+      "description": "One-command x402 paywall for AI crawlers. npx crawltoll init. Crawlers pay USDC per fetch; humans browse free.",
+      "x402": true
+    },
+    {
+      "name": "@relayos/mcp-paywall",
+      "url": "https://www.scriptmasterlabs.com/x402-paywall.html",
+      "npm": "@relayos/mcp-paywall",
+      "description": "Drop-in x402 middleware for MCP servers. Pay-per-call in USDC on Base.",
+      "x402": true
+    },
+    {
+      "name": "Ghost Layer",
+      "url": "https://ghost-layer.onrender.com",
+      "description": "x402 bridge, stealth routing, chain attestation, notary.",
+      "x402": true
+    },
+    {
+      "name": "PNE Gateway",
+      "url": "https://pne-gateway.onrender.com",
+      "description": "Rust Axum micropayment proxy — 5ms auction window, sub-millisecond routing.",
+      "x402": true
+    },
+    {
+      "name": "Shadow Desk",
+      "url": "https://shadow-desk.onrender.com",
+      "description": "Dark pool surveillance — institutional order flow monitoring.",
+      "x402": true
+    },
+    {
+      "name": "Nexus-402 / NeuralOS",
+      "url": "https://www.nexus-402.com",
+      "description": "Autonomous AI-agent x402 marketplace with RAG. Google Play: NeuralOS.",
+      "x402": true
+    }
+  ],
+  "discovery": {
+    "agent_md": "https://www.scriptmasterlabs.com/agent.md",
+    "graph_json": "https://www.scriptmasterlabs.com/graph.json",
+    "llms_txt": "https://www.scriptmasterlabs.com/llms.txt",
+    "sitemap": "https://www.scriptmasterlabs.com/sitemap.xml",
+    "robots": "https://www.scriptmasterlabs.com/robots.txt"
   }
- ],
- "payment_endpoints": {
-  "x402_standard": true,
-  "demo": "https://four02proof.onrender.com",
-  "settlement_chains": [
-   "Base",
-   "XRPL",
-   "Xahau"
-  ],
-  "accepted_tokens": [
-   "USDC",
-   "RLUSD"
-  ],
-  "pay_to_wallet": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700"
- },
- "llms_txt": "https://www.scriptmasterlabs.com/llms.txt",
- "sitemap": "https://www.scriptmasterlabs.com/sitemap.xml",
- "robots": "https://www.scriptmasterlabs.com/robots.txt",
- "social": {
-  "twitter": "https://x.com/ScriptMasterLabs",
-  "github": "https://github.com/Timwal78",
-  "npm": "https://www.npmjs.com/package/@relayos/mcp-paywall",
-  "tradingview": "https://www.tradingview.com/u/TIMMY741/"
- },
- "organization": {
-  "type": "SDVOSB",
-  "full_name": "ScriptMasterLabs",
-  "founder": "Timothy Walton",
-  "location": "Kinston, NC, USA",
-  "certifications": [
-   "SDVO",
-   "SDVOSB"
-  ]
- },
- "payment_standards": [
-  "x402 (HTTP-402)",
-  "AP2 / A2A x402 extension (Google Agent Payments Protocol)",
-  "USDC on Base / Polygon / Solana"
- ]
 }
