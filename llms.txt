@@ -25,3 +25,6 @@ ScriptMasterLabs x402 products (CRAWLTOLL, Nexus-402, signal APIs) settle via th
 ## Contact / about
 - Site: https://www.scriptmasterlabs.com/
 - Structured data: https://www.scriptmasterlabs.com/sitemap.xml
+
+## x402 Stack Catalog
+Full live x402/AP2 product stack (8 products): https://www.scriptmasterlabs.com/stack
