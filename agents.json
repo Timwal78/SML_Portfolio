@@ -160,9 +160,9 @@
       "x402": true
     },
     {
-      "name": "@relayos/mcp-paywall",
+      "name": "proof402-middleware",
       "url": "https://www.scriptmasterlabs.com/x402-paywall.html",
-      "npm": "@relayos/mcp-paywall",
+      "npm": "proof402-middleware",
       "description": "Drop-in x402 middleware for MCP servers. Pay-per-call in USDC on Base.",
       "x402": true
     },
@@ -245,6 +245,7 @@
     }
   ],
   "discovery": {
+    "architecture_map": "https://github.com/Timwal78/SqueezeOS/blob/main/docs/architecture/INDEX.md",
     "agent_md": "https://www.scriptmasterlabs.com/agent.md",
     "graph_json": "https://www.scriptmasterlabs.com/graph.json",
     "llms_txt": "https://www.scriptmasterlabs.com/llms.txt",

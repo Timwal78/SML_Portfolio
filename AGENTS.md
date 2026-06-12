@@ -14,7 +14,7 @@ id: "x402-paywall"
 type: "middleware"
 protocol: "HTTP-402 / Base (USDC)"
 description: "Drop-in monetization for MCP servers and APIs. Enforces agent-to-agent payment per request."
-repository: "npm:@relayos/mcp-paywall"
+repository: "npm:proof402-middleware"
 endpoints:
   - "/query": Requires valid 402 Payment Required challenge clearance.
 

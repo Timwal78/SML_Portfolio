@@ -33,11 +33,11 @@
     {
       "@type": "SoftwareApplication",
       "@id": "https://www.scriptmasterlabs.com/x402-paywall.html#app",
-      "name": "@relayos/mcp-paywall",
+      "name": "proof402-middleware",
       "applicationCategory": "DeveloperApplication",
       "operatingSystem": "Node.js",
       "url": "https://www.scriptmasterlabs.com/x402-paywall.html",
-      "installUrl": "https://www.npmjs.com/package/@relayos/mcp-paywall",
+      "installUrl": "https://www.npmjs.com/package/proof402-middleware",
       "description": "Drop-in x402/HTTP-402 paywall middleware for MCP servers and APIs. AI agents pay per request in USDC on Base. Tiered pricing, loyalty/affiliate ledger, USDC payout.",
       "provider": { "@id": "https://www.scriptmasterlabs.com/#org" }
     },

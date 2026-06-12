@@ -7,7 +7,7 @@
 - [CRAWLTOLL](https://www.scriptmasterlabs.com/crawltoll.html): One-command x402/HTTP-402 paywall that turns AI scraping into revenue. AI crawlers (GPTBot, ClaudeBot, PerplexityBot) pay USDC on Base per fetch; humans browse free. `npx crawltoll init`. Published on npm.
 - [Nexus-402](https://www.nexus-402.com): Autonomous AI agent layer and x402 payment infrastructure.
 - [NeuralOS](https://www.neuralosagent.com): Agentic operating system available as a Web App and on Google Play.
-- [x402 Paywall (@relayos/mcp-paywall)](https://www.scriptmasterlabs.com/x402-paywall.html): x402 / HTTP-402 paywall middleware. AI agents pay per request in USDC on Base. Drop-in monetization for MCP servers and APIs. Published on npm.
+- [x402 Paywall (proof402-middleware)](https://www.scriptmasterlabs.com/x402-paywall.html): x402 / HTTP-402 paywall middleware. AI agents pay per request in USDC on Base. Drop-in monetization for MCP servers and APIs. Published on npm.
 - [MasterSheets](https://www.scriptmasterlabs.com/mastersheets.html): AI-native spreadsheet that replaces Google Sheets. Bring your own AI key, no subscription, purchaser owns 100% of their data.
 - [Trading Indicators](https://www.scriptmasterlabs.com/indicators.html): Invite-only Pine Script v6 indicators for squeeze detection and institutional flow analysis (AMC, GME, 0DTE).
 
@@ -31,3 +31,6 @@ ScriptMasterLabs x402 products (CRAWLTOLL, Nexus-402, signal APIs) settle via th
 
 ## x402 Stack Catalog
 Full live x402/AP2 product stack (8 products): https://www.scriptmasterlabs.com/stack
+
+## Architecture Map
+Full SqueezeOS ecosystem map (19 products, agent endpoints, status): https://github.com/Timwal78/SqueezeOS/blob/main/docs/architecture/INDEX.md

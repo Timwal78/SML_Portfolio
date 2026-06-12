@@ -20,10 +20,10 @@ export default function handler(req, res) {
     ],
     "products": [
       {
-        "name": "x402 Paywall (@relayos/mcp-paywall)",
+        "name": "x402 Paywall (proof402-middleware)",
         "type": "npm_package",
         "url": "https://www.scriptmasterlabs.com/x402-paywall.html",
-        "npm": "https://www.npmjs.com/package/@relayos/mcp-paywall",
+        "npm": "https://www.npmjs.com/package/proof402-middleware",
         "description": "Drop-in x402/HTTP-402 paywall middleware for MCP servers and APIs. AI agents pay per request in USDC on Base."
       },
       {
@@ -62,7 +62,7 @@ export default function handler(req, res) {
     "sitemap": "https://www.scriptmasterlabs.com/sitemap.xml",
     "social": {
       "twitter": "https://x.com/ScriptMasterLabs",
-      "npm": "https://www.npmjs.com/package/@relayos/mcp-paywall"
+      "npm": "https://www.npmjs.com/package/proof402-middleware"
     },
     "organization": {
       "type": "SDVOSB",

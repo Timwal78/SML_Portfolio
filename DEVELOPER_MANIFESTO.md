@@ -89,7 +89,7 @@ x402 payment flow in 3 steps:
 | Smithery | Listed (timothy-walton45/squeezeos) | https://smithery.ai/server/squeezeos |
 | Glama | In review | https://glama.ai/mcp/servers |
 | npm (crawltoll) | Live | https://npmjs.com/package/crawltoll |
-| npm (mcp-paywall) | Live | https://npmjs.com/package/@relayos/mcp-paywall |
+| npm (mcp-paywall) | Live | https://npmjs.com/package/proof402-middleware |
 | OpenAPI | Live | https://squeezeos-api.onrender.com/.well-known/openapi.json |
 | agents.json | Live | https://www.scriptmasterlabs.com/agents.json |
 | MCP server-card | Live | https://squeezeos-api.onrender.com/.well-known/mcp/server-card.json |

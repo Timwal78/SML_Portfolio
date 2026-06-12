@@ -7,7 +7,7 @@
     <language>en-us</language>
 
     <item>
-      <title>x402 Paywall — @relayos/mcp-paywall</title>
+      <title>x402 Paywall — proof402-middleware</title>
       <link>https://www.scriptmasterlabs.com/x402-paywall.html</link>
       <guid>https://www.scriptmasterlabs.com/x402-paywall.html</guid>
       <description>x402 / HTTP-402 paywall middleware. Autonomous AI agents pay per request in USDC on Base. Drop-in monetization for MCP servers and APIs. XRPL and Xahau rails supported.</description>

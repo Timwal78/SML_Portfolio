@@ -16,6 +16,7 @@
 | Primary domain | https://www.scriptmasterlabs.com |
 | Contact | scriptmasterlabs@gmail.com |
 | GitHub | https://github.com/Timwal78 |
+| Architecture Map (19 products, agent endpoints, status) | https://github.com/Timwal78/SqueezeOS/blob/main/docs/architecture/INDEX.md |
 | Nonprofit (separate entity) | https://va-ratings.org — VA-Ratings.org, 501(c)(3), free veteran disability-rating tools. No commercial cross-promotion. |
 
 ## 2. Live Properties (all verified HTTP 200, 2026-06-11)
@@ -56,7 +57,7 @@
 7. **XRPL Fee Forge** — XRPL fee/settlement tooling.
 8. **BEAST Orchestrator** — Multi-service orchestration layer.
 
-Also shipped: **x402 Paywall (`@relayos/mcp-paywall`)** — drop-in x402 middleware for MCP servers/APIs (npm), and **MasterSheets** — BYOK AI-native spreadsheet, no subscription, user owns 100% of data. https://www.scriptmasterlabs.com/mastersheets.html
+Also shipped: **x402 Paywall (`proof402-middleware`)** — drop-in x402 middleware for MCP servers/APIs (npm), and **MasterSheets** — BYOK AI-native spreadsheet, no subscription, user owns 100% of data. https://www.scriptmasterlabs.com/mastersheets.html
 
 ## 5. Architecture Modules (internal spec index, 18 modules)
 

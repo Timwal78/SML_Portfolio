@@ -48,4 +48,4 @@ Sitemap: https://www.scriptmasterlabs.com/sitemap.xml
 # Agent catalog (JSON): https://timwal78.github.io/SML_Portfolio/agents.json
 # LLM context: https://www.scriptmasterlabs.com/llms.txt
 # x402 payments: https://www.scriptmasterlabs.com/x402-paywall.html
-# npm: https://www.npmjs.com/package/@relayos/mcp-paywall
+# npm: https://www.npmjs.com/package/proof402-middleware

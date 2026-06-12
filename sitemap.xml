@@ -11,4 +11,9 @@
   <url><loc>https://www.scriptmasterlabs.com/graph.json</loc><changefreq>weekly</changefreq><priority>0.85</priority><lastmod>2026-06-11</lastmod></url>
   <url><loc>https://www.scriptmasterlabs.com/llms.txt</loc><changefreq>weekly</changefreq><priority>0.85</priority><lastmod>2026-06-11</lastmod></url>
   <url><loc>https://www.scriptmasterlabs.com/agents.json</loc><changefreq>weekly</changefreq><priority>0.85</priority><lastmod>2026-06-12</lastmod></url>
+  <!-- Builds hub pages added 2026-06-12 -->
+  <url><loc>https://www.scriptmasterlabs.com/builds/</loc><changefreq>weekly</changefreq><priority>0.9</priority><lastmod>2026-06-12</lastmod></url>
+  <url><loc>https://www.scriptmasterlabs.com/builds/x402/</loc><changefreq>weekly</changefreq><priority>0.9</priority><lastmod>2026-06-12</lastmod></url>
+  <url><loc>https://www.scriptmasterlabs.com/builds/x402/nexus-402</loc><changefreq>weekly</changefreq><priority>0.85</priority><lastmod>2026-06-12</lastmod></url>
+  <url><loc>https://www.scriptmasterlabs.com/builds/xah-pay/</loc><changefreq>weekly</changefreq><priority>0.85</priority><lastmod>2026-06-12</lastmod></url>
 </urlset>
