@@ -1,6 +1,17 @@
 {
   "redirects": [
     {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "scriptmasterlabs.com"
+        }
+      ],
+      "destination": "https://www.scriptmasterlabs.com/:path*",
+      "permanent": true
+    },
+    {
       "source": "/stack",
       "destination": "/stack.html",
       "permanent": false
