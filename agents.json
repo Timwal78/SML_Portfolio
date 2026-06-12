@@ -6,7 +6,13 @@
   "contact": "scriptmasterlabs@gmail.com",
   "entity": "Script Master Labs LLC (SDVOSB)",
   "payment_protocol": "x402",
-  "payment_networks": ["base", "xrpl", "xahau", "solana", "polygon"],
+  "payment_networks": [
+    "base",
+    "xrpl",
+    "xahau",
+    "solana",
+    "polygon"
+  ],
   "payment_asset": "USDC / RLUSD",
   "pay_to_base": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
   "pay_to_solana": "C9rk2tzM92WxSoMWD32A5wZLgL3z1uN7FSVDExioahfF",
@@ -36,34 +42,114 @@
       "description": "Institutional market intelligence: council verdicts, squeeze scanner, options flow, IWM 0DTE, oracle feeds, futures, settlement, forge economy. x402-gated.",
       "x402": true,
       "endpoints": [
-        {"path": "/api/scan",             "price": "0.01 RLUSD", "description": "Full squeeze scanner"},
-        {"path": "/api/council",          "price": "0.05 RLUSD", "description": "Council verdict: BUY/SELL/HOLD"},
-        {"path": "/api/engine/signal/{symbol}", "price": "0.25 USDC", "description": "Oracle Engine: aggregated BUY/SELL/HOLD/SHIELD"},
-        {"path": "/api/engine/batch",     "price": "0.50 USDC", "description": "Oracle batch: GME+AMC+IWM"},
-        {"path": "/api/ftd/series/{symbol}", "price": "0.02 RLUSD", "description": "SEC Reg SHO FTD time series"},
-        {"path": "/api/ftd/ratio/{symbol}", "price": "0.01 RLUSD", "description": "FTD ratio + pressure context"},
-        {"path": "/api/oracle/latest/{feed}", "price": "0.02 RLUSD", "description": "Oracle data feed: SEC 8-K, FDA, USPTO"},
-        {"path": "/api/futures",          "price": "free browse / 0.10 RLUSD create", "description": "Signal Futures marketplace"},
-        {"path": "/api/settlement",       "price": "0.01 RLUSD", "description": "Agent-to-agent conditional escrow"},
-        {"path": "/api/stigmergy/stake",  "price": "0.005 RLUSD", "description": "RLUSD pheromone trail coordination"},
-        {"path": "/api/forge/register",   "price": "free", "description": "Register wallet in Stellar Forge economy"},
-        {"path": "/api/forge/quote/{wallet}", "price": "free", "description": "Loyalty tier + fee discount quote"},
-        {"path": "/mcp",                  "price": "varies", "description": "MCP JSON-RPC 2.0 — 33 tools"}
+        {
+          "path": "/api/scan",
+          "price": "0.01 RLUSD",
+          "description": "Full squeeze scanner"
+        },
+        {
+          "path": "/api/council",
+          "price": "0.05 RLUSD",
+          "description": "Council verdict: BUY/SELL/HOLD"
+        },
+        {
+          "path": "/api/engine/signal/{symbol}",
+          "price": "0.25 USDC",
+          "description": "Oracle Engine: aggregated BUY/SELL/HOLD/SHIELD"
+        },
+        {
+          "path": "/api/engine/batch",
+          "price": "0.50 USDC",
+          "description": "Oracle batch: GME+AMC+IWM"
+        },
+        {
+          "path": "/api/ftd/series/{symbol}",
+          "price": "0.02 RLUSD",
+          "description": "SEC Reg SHO FTD time series"
+        },
+        {
+          "path": "/api/ftd/ratio/{symbol}",
+          "price": "0.01 RLUSD",
+          "description": "FTD ratio + pressure context"
+        },
+        {
+          "path": "/api/oracle/latest/{feed}",
+          "price": "0.02 RLUSD",
+          "description": "Oracle data feed: SEC 8-K, FDA, USPTO"
+        },
+        {
+          "path": "/api/futures",
+          "price": "free browse / 0.10 RLUSD create",
+          "description": "Signal Futures marketplace"
+        },
+        {
+          "path": "/api/settlement",
+          "price": "0.01 RLUSD",
+          "description": "Agent-to-agent conditional escrow"
+        },
+        {
+          "path": "/api/stigmergy/stake",
+          "price": "0.005 RLUSD",
+          "description": "RLUSD pheromone trail coordination"
+        },
+        {
+          "path": "/api/forge/register",
+          "price": "free",
+          "description": "Register wallet in Stellar Forge economy"
+        },
+        {
+          "path": "/api/forge/quote/{wallet}",
+          "price": "free",
+          "description": "Loyalty tier + fee discount quote"
+        },
+        {
+          "path": "/mcp",
+          "price": "varies",
+          "description": "MCP JSON-RPC 2.0 \u2014 33 tools"
+        }
       ]
     },
     {
       "name": "402Proof",
       "url": "https://four02proof.onrender.com",
-      "description": "x402 payment firewall: invoice → verify → JWT access token. FICO-style agent credit bureau (300-850). RLUSD on XRPL + Xahau.",
+      "description": "x402 payment firewall: invoice \u2192 verify \u2192 JWT access token. FICO-style agent credit bureau (300-850). RLUSD on XRPL + Xahau.",
       "x402": true,
       "endpoints": [
-        {"path": "/v1/invoice",           "price": "free", "description": "Generate payment invoice"},
-        {"path": "/v1/verify",            "price": "free", "description": "Verify tx_hash → JWT access token"},
-        {"path": "/v1/bureau/score/{wallet}", "price": "free", "description": "Public credit score teaser"},
-        {"path": "/v1/bureau/report/{wallet}", "price": "0.01 RLUSD", "description": "Full credit report"},
-        {"path": "/v1/bureau/attest/{wallet}", "price": "0.01 RLUSD", "description": "Portable attestation JWT"},
-        {"path": "/v1/agent/{wallet}",    "price": "free", "description": "Full agent passport"},
-        {"path": "/mcp",                  "price": "varies", "description": "MCP JSON-RPC 2.0 — 11 tools"}
+        {
+          "path": "/v1/invoice",
+          "price": "free",
+          "description": "Generate payment invoice"
+        },
+        {
+          "path": "/v1/verify",
+          "price": "free",
+          "description": "Verify tx_hash \u2192 JWT access token"
+        },
+        {
+          "path": "/v1/bureau/score/{wallet}",
+          "price": "free",
+          "description": "Public credit score teaser"
+        },
+        {
+          "path": "/v1/bureau/report/{wallet}",
+          "price": "0.01 RLUSD",
+          "description": "Full credit report"
+        },
+        {
+          "path": "/v1/bureau/attest/{wallet}",
+          "price": "0.01 RLUSD",
+          "description": "Portable attestation JWT"
+        },
+        {
+          "path": "/v1/agent/{wallet}",
+          "price": "free",
+          "description": "Full agent passport"
+        },
+        {
+          "path": "/mcp",
+          "price": "varies",
+          "description": "MCP JSON-RPC 2.0 \u2014 11 tools"
+        }
       ]
     },
     {
@@ -89,13 +175,13 @@
     {
       "name": "PNE Gateway",
       "url": "https://pne-gateway.onrender.com",
-      "description": "Rust Axum micropayment proxy — 5ms auction window, sub-millisecond routing.",
+      "description": "Rust Axum micropayment proxy \u2014 5ms auction window, sub-millisecond routing.",
       "x402": true
     },
     {
       "name": "Shadow Desk",
       "url": "https://shadow-desk.onrender.com",
-      "description": "Dark pool surveillance — institutional order flow monitoring.",
+      "description": "Dark pool surveillance \u2014 institutional order flow monitoring.",
       "x402": true
     },
     {
@@ -103,6 +189,59 @@
       "url": "https://www.nexus-402.com",
       "description": "Autonomous AI-agent x402 marketplace with RAG. Google Play: NeuralOS.",
       "x402": true
+    },
+    {
+      "name": "SML Leviathan Matrix API",
+      "url": "https://sml-x402-signal-api.onrender.com",
+      "description": "Institutional equity short-squeeze signal pulls (Leviathan Matrix) for 70 high-volatility US equities (GME, AMC, IWM + small-caps). x402 pay-per-call: free delayed Shadow tier, $250/30-day Standard real-time, $1000/30-day VIP zero-hop. Multi-chain: USDC on Base, Polygon, Solana. ed25519-signed responses, loyalty + 15% affiliate program.",
+      "x402": true,
+      "endpoints": [
+        {
+          "path": "/matrix/:feed/delayed",
+          "price": "free",
+          "description": "65-min delayed Shadow tier \u2014 backtesting"
+        },
+        {
+          "path": "/matrix/:feed/live",
+          "price": "$250 / 30-day token",
+          "description": "Real-time squeeze matrix pull"
+        },
+        {
+          "path": "/matrix/:feed/vip",
+          "price": "$1000 / 30-day token",
+          "description": "Zero-hop VIP real-time pull"
+        },
+        {
+          "path": "/matrix/subscribe/standard",
+          "price": "$250 USDC",
+          "description": "Buy 30-day Standard token (Base)"
+        },
+        {
+          "path": "/matrix/subscribe/vip",
+          "price": "$1000 USDC",
+          "description": "Buy 30-day VIP token (Base)"
+        },
+        {
+          "path": "/poly/matrix/subscribe/standard",
+          "price": "$250 USDC",
+          "description": "Standard token via Polygon"
+        },
+        {
+          "path": "/sol/matrix/subscribe/standard",
+          "price": "$250 USDC",
+          "description": "Standard token via Solana"
+        },
+        {
+          "path": "/loyalty/:wallet",
+          "price": "free",
+          "description": "Loyalty credit status"
+        },
+        {
+          "path": "/affiliate/:wallet",
+          "price": "free",
+          "description": "Affiliate stats \u2014 15% USDC revenue share"
+        }
+      ]
     }
   ],
   "discovery": {
