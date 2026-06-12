@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://www.scriptmasterlabs.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority><lastmod>2026-06-11</lastmod></url>
-  <url><loc>https://www.scriptmasterlabs.com/stack</loc><changefreq>weekly</changefreq><priority>0.95</priority><lastmod>2026-06-11</lastmod></url>
+  <url><loc>https://www.scriptmasterlabs.com/stack</loc><changefreq>weekly</changefreq><priority>0.95</priority><lastmod>2026-06-12</lastmod></url>
   <url><loc>https://www.scriptmasterlabs.com/x402-paywall.html</loc><changefreq>weekly</changefreq><priority>0.95</priority><lastmod>2026-06-11</lastmod></url>
   <url><loc>https://www.scriptmasterlabs.com/crawltoll.html</loc><changefreq>weekly</changefreq><priority>0.95</priority><lastmod>2026-06-11</lastmod></url>
   <url><loc>https://www.scriptmasterlabs.com/mastersheets.html</loc><changefreq>weekly</changefreq><priority>0.9</priority><lastmod>2026-06-11</lastmod></url>
@@ -10,5 +10,5 @@
   <url><loc>https://www.scriptmasterlabs.com/agent.md</loc><changefreq>weekly</changefreq><priority>0.9</priority><lastmod>2026-06-11</lastmod></url>
   <url><loc>https://www.scriptmasterlabs.com/graph.json</loc><changefreq>weekly</changefreq><priority>0.85</priority><lastmod>2026-06-11</lastmod></url>
   <url><loc>https://www.scriptmasterlabs.com/llms.txt</loc><changefreq>weekly</changefreq><priority>0.85</priority><lastmod>2026-06-11</lastmod></url>
-  <url><loc>https://www.scriptmasterlabs.com/agents.json</loc><changefreq>weekly</changefreq><priority>0.85</priority><lastmod>2026-06-11</lastmod></url>
+  <url><loc>https://www.scriptmasterlabs.com/agents.json</loc><changefreq>weekly</changefreq><priority>0.85</priority><lastmod>2026-06-12</lastmod></url>
 </urlset>
