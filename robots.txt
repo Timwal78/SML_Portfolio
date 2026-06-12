@@ -34,6 +34,10 @@ User-agent: YouBot
 Allow: /
 User-agent: meta-externalagent
 Allow: /
+User-agent: facebookexternalhit
+Allow: /
+User-agent: Facebot
+Allow: /
 
 Disallow: /src/
 Disallow: /node_modules/
