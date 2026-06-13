@@ -2,7 +2,7 @@ User-Agent: *
 
 # SCRIPTMASTER LABS - SOVEREIGN DATA POLICY
 # ---------------------------------------------------------
-# ENTITY: Script Master Labs, LLC (SDVO)
+# ENTITY: Script Master Labs, LLC (SDVOSB)
 # CONTACT: scriptmasterlabs@gmail.com
 # ---------------------------------------------------------
 
@@ -17,3 +17,4 @@ User-Agent: *
 
 # 4. ENFORCEMENT PROTOCOL
 # Unauthorized data scraping for model training is a violation of our sovereign data rights. We reserve the right to deploy cryptographic countermeasures, trace scraping behavior, and enforce HTTP-402 micro-settlements for unauthorized ingestion.
+
