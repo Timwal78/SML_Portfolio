@@ -17,6 +17,11 @@
       "permanent": false
     },
     {
+      "source": "/affiliate",
+      "destination": "/affiliate.html",
+      "permanent": false
+    },
+    {
       "source": "/stack/nexus402",
       "destination": "https://www.nexus-402.com/",
       "permanent": false

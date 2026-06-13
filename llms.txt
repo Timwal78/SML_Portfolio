@@ -30,6 +30,10 @@ ScriptMasterLabs x402 products (CRAWLTOLL, Nexus-402, signal APIs) settle via th
 - Knowledge graph (JSON-LD): https://www.scriptmasterlabs.com/graph.json
 - Capability manifest: https://www.scriptmasterlabs.com/agents.json
 
+## Affiliate Program (NEW)
+Earn on-chain RLUSD rebates two levels deep for referring agents/developers to the SML x402 stack. Free to join, no caps: https://www.scriptmasterlabs.com/affiliate
+API: POST https://squeezeos-api.onrender.com/api/forge/register (body: wallet, optional referrer_code) · earnings: GET /api/forge/earnings/{wallet}
+
 ## x402 Stack Catalog
 Full live x402/AP2 product stack (10 products): https://www.scriptmasterlabs.com/stack
 
