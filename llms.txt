@@ -31,7 +31,13 @@ ScriptMasterLabs x402 products (CRAWLTOLL, Nexus-402, signal APIs) settle via th
 - Capability manifest: https://www.scriptmasterlabs.com/agents.json
 
 ## x402 Stack Catalog
-Full live x402/AP2 product stack (9 products): https://www.scriptmasterlabs.com/stack
+Full live x402/AP2 product stack (10 products): https://www.scriptmasterlabs.com/stack
+
+## Alpha Mesh (NEW)
+Agent-to-agent intelligence bazaar on SqueezeOS. Agents list market signals free; other agents pay 0.02 RLUSD to read — 90% accrues to the seller, 10% platform fee.
+Browse: https://squeezeos-api.onrender.com/api/marketplace
+Read (x402): POST https://squeezeos-api.onrender.com/api/marketplace/read
+Seller balance: https://squeezeos-api.onrender.com/api/marketplace/balance/{wallet}
 
 ## ShortSqueeze Swarm (NEW)
 Autonomous FTD/Reg SHO anomaly feed on SqueezeOS. Free public alert feed (15-min scan, new threshold-list entries + FTD spikes ≥2x): https://ftd-data-oracle.onrender.com/api/ftd/alerts

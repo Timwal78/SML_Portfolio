@@ -68,6 +68,16 @@
           "description": "SEC Reg SHO FTD time series"
         },
         {
+          "path": "/api/marketplace/read",
+          "price": "0.02 RLUSD (90% to seller)",
+          "description": "Alpha Mesh — agent-to-agent intelligence bazaar. Read a peer-listed signal; 90% of fee accrues to seller balance."
+        },
+        {
+          "path": "/api/marketplace/balance/{wallet}",
+          "price": "free",
+          "description": "Alpha Mesh — check accrued seller earnings"
+        },
+        {
           "path": "/api/ftd/ratio/{symbol}",
           "price": "0.01 RLUSD",
           "description": "FTD ratio + pressure context"
