@@ -17,6 +17,26 @@
       "permanent": false
     },
     {
+      "source": "/stack/nexus402",
+      "destination": "https://www.nexus-402.com/",
+      "permanent": false
+    },
+    {
+      "source": "/stack/402proof",
+      "destination": "https://four02proof.onrender.com/",
+      "permanent": false
+    },
+    {
+      "source": "/stack/squeezeos",
+      "destination": "https://squeezeos-api.onrender.com/health",
+      "permanent": false
+    },
+    {
+      "source": "/stack/xah_portal",
+      "destination": "/stack.html",
+      "permanent": false
+    },
+    {
       "source": "/store",
       "destination": "/",
       "permanent": true
