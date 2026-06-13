@@ -180,8 +180,8 @@
     },
     {
       "name": "Shadow Desk",
-      "url": "https://shadow-desk.onrender.com",
-      "description": "Dark pool surveillance \u2014 institutional order flow monitoring.",
+      "url": "https://shadow-desk.onrender.com/.well-known/mcp.json",
+      "description": "Institutional trading alpha \u2014 real-time Pine Script signals, gamma walls, and block flow imbalances. x402 pay-per-call: 0.005 USDC on Base, zero signups, zero API keys. MCP-discoverable.",
       "x402": true
     },
     {
