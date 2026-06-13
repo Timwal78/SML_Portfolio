@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GHOST: Ephemeral Execution Layer for AI Agents | Script Master Labs</title>
+    <meta name="description" content="GHOST is the spectral execution layer for autonomous AI agents. Ephemeral credentials, cryptographic residue, and patent-pending infrastructure for secure agent execution.">
+    <meta name="keywords" content="AI agents, autonomous execution, ephemeral credentials, infrastructure, x402, Script Master Labs, XRPL, Xahau">
+    <meta name="author" content="Script Master Labs LLC">
+    <meta property="og:title" content="GHOST: Ephemeral Execution Layer for AI Agents">
+    <meta property="og:description" content="Give your AI agent a body that vanishes. Ephemeral execution proxy with cryptographic proof.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.scriptmasterlabs.com/stack/ghost">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <link rel="canonical" href="https://www.scriptmasterlabs.com/stack/ghost">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "GHOST",
+      "alternateName": "Ghost Layer",
+      "description": "Ephemeral execution proxy for autonomous AI agents with cryptographic residue tracking",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Linux, macOS, Windows",
+      "author": { "@type": "Organization", "name": "Script Master Labs LLC", "url": "https://www.scriptmasterlabs.com" },
+      "url": "https://www.scriptmasterlabs.com/stack/ghost",
+      "downloadUrl": "https://github.com/timwal78/ghost-layer",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "keywords": "AI agents, autonomous execution, ephemeral credentials, infrastructure, cryptography, x402, XRPL, Xahau",
+      "version": "0.1.0-alpha"
+    }
+    </script>
+    <style>
+      :root{--bg:#000000;--panel:#0A0E0A;--panel2:#10140F;--line:#1C241C;--green:#39FF14;--green2:#00FF7F;--pink:#FF1493;--gold:#FFD700;--orange:#FF6B00;--white:#F5F7F5;--mute:#8A958C;--mute2:#5A6560;--mono:'JetBrains Mono','SF Mono',ui-monospace,Menlo,monospace;--sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
+      *{margin:0;padding:0;box-sizing:border-box;}
+      html{scroll-behavior:smooth;}
+      body{background:var(--bg);color:var(--white);font-family:var(--sans);line-height:1.5;-webkit-font-smoothing:antialiased;}
+      a{color:var(--green);text-decoration:none;}
+      a:hover{color:var(--green2);}
+      .wrap{max-width:1080px;margin:0 auto;padding:0 24px;}
+      header{padding:64px 0 36px;border-bottom:1px solid var(--line);position:relative;}
+      .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:3px;color:var(--green);text-transform:uppercase;margin-bottom:16px;}
+      h1{font-size:clamp(40px,8vw,72px);font-weight:800;letter-spacing:-2px;line-height:1;color:var(--green);text-shadow:0 0 30px rgba(57,255,20,.4);}
+      .sub{margin-top:18px;font-size:clamp(15px,2.2vw,19px);color:var(--mute);max-width:680px;}
+      .live-row{margin-top:24px;display:flex;flex-wrap:wrap;gap:10px;}
+      .chip{font-family:var(--mono);font-size:11px;padding:6px 12px;border:1px solid var(--line);border-radius:20px;color:var(--white);display:flex;align-items:center;gap:7px;}
+      .dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);}
+      .layer{padding:40px 0 8px;}
+      .layer-head{display:flex;align-items:baseline;gap:14px;margin-bottom:22px;border-bottom:1px solid var(--line);padding-bottom:12px;}
+      .layer-title{font-size:20px;font-weight:700;letter-spacing:-.3px;}
+      .layer-num{font-family:var(--mono);font-size:13px;color:var(--green);}
+      p.body{font-size:15px;color:var(--mute);margin-bottom:14px;max-width:760px;}
+      ul{margin:8px 0 18px 22px;color:var(--mute);}
+      li{margin-bottom:8px;font-size:15px;}
+      li b{color:var(--white);font-weight:600;}
+      .term{background:var(--panel);border:1px solid var(--green);border-radius:12px;padding:22px;font-family:var(--mono);font-size:13.5px;color:var(--green);overflow-x:auto;box-shadow:0 0 28px rgba(57,255,20,.12);margin:18px 0;line-height:1.7;}
+      .term .pink{color:var(--pink);} .term .gold{color:var(--gold);} .term .org{color:var(--orange);} .term .mut{color:var(--mute2);}
+      .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0;}
+      @media(max-width:720px){.grid{grid-template-columns:1fr;}}
+      .card{border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:22px;transition:.2s;}
+      .card:hover{border-color:var(--green);transform:translateY(-2px);}
+      .card h3{font-size:17px;font-weight:700;margin-bottom:6px;}
+      .card .role{font-family:var(--mono);font-size:10px;letter-spacing:1px;color:var(--mute2);text-transform:uppercase;}
+      .card p{font-size:13.5px;color:var(--mute);margin-top:10px;}
+      .cta{margin:48px 0 24px;padding:32px;border:1.5px solid var(--green);border-radius:16px;background:linear-gradient(180deg,var(--panel) 0%,#000 100%);text-align:center;}
+      .cta h2{font-size:24px;font-weight:800;letter-spacing:-.5px;}
+      .cta p{color:var(--mute);margin-top:10px;max-width:560px;margin-left:auto;margin-right:auto;font-size:14.5px;}
+      .cta-row{margin-top:22px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+      .btn{font-family:var(--mono);font-size:13px;padding:12px 24px;border-radius:10px;font-weight:600;}
+      .btn-primary{background:var(--green);color:#000;}
+      .btn-ghost{border:1px solid var(--line);color:var(--white);}
+      footer{border-top:1px solid var(--line);padding:28px 0 56px;color:var(--mute2);font-size:12px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-top:32px;}
+      footer a{color:var(--gold);}
+    </style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Script Master Labs · The SML Stack</div>
+    <h1>GHOST</h1>
+    <p class="sub">The ephemeral execution layer for autonomous AI agents. Scoped, short-lived credentials with Ed25519-signed, tamper-evident residue — give your agent a body that vanishes the moment its task is done.</p>
+    <div class="live-row">
+      <div class="chip"><span class="dot"></span>v0.1.0-alpha · live</div>
+      <div class="chip"><span class="dot"></span>Ed25519 signed residue</div>
+      <div class="chip"><span class="dot"></span>x402 · XRPL · Xahau</div>
+    </div>
+  </header>
+
+  <section class="layer">
+    <div class="layer-head"><span class="layer-num">01</span><span class="layer-title">What GHOST is</span></div>
+    <p class="body">GHOST is the execution-safety layer beneath the x402 agentic web. Where NEXUS-402, 402PROOF and the XAH Portal handle discovery and payment, GHOST handles the dangerous part: actually running the task. It hands an agent a short-lived, scoped credential, supervises the execution, signs a tamper-evident record of everything that happened, and then evaporates — leaving cryptographic residue instead of a standing attack surface.</p>
+  </section>
+
+  <section class="layer">
+    <div class="layer-head"><span class="layer-num">02</span><span class="layer-title">Why it matters</span></div>
+    <ul>
+      <li><b>No standing secrets.</b> Credentials are minted per task, scoped to exactly what the agent needs, and expire on completion. Nothing lingers in a .env file to leak.</li>
+      <li><b>Cryptographic residue.</b> Every action is Ed25519-signed and tamper-evident. You get proof of what ran without trusting the runtime.</li>
+      <li><b>Ephemeral by default.</b> The execution body self-destructs — memory, state, and logic wiped after the receipt is fired.</li>
+      <li><b>Stack-native.</b> Drops directly beneath NEXUS-402, 402PROOF, SqueezeOS and the XAH Portal.</li>
+    </ul>
+  </section>
+
+  <section class="layer">
+    <div class="layer-head"><span class="layer-num">03</span><span class="layer-title">Lifecycle</span></div>
+    <div class="term">
+<span class="pink">$</span> ghost <span class="gold">spawn</span>      <span class="mut"># mint scoped, short-lived credential</span><br>
+<span class="pink">$</span> ghost <span class="gold">possess</span>    <span class="mut"># attach agent to the ephemeral body</span><br>
+<span class="pink">$</span> ghost <span class="gold">act</span>        <span class="mut"># execute task under supervision</span><br>
+<span class="pink">$</span> ghost <span class="gold">evaporate</span>  <span class="mut"># wipe state, fire signed receipt</span><br>
+<span class="pink">$</span> ghost <span class="gold">replay</span>     <span class="mut"># verify residue offline, anytime</span><br>
+<span class="org">→</span> <span class="green2">execution proven · zero standing surface</span>
+    </div>
+  </section>
+
+  <section class="layer">
+    <div class="layer-head"><span class="layer-num">04</span><span class="layer-title">Install</span></div>
+    <div class="term">
+<span class="pink">$</span> pip install ghost-layer<br>
+<span class="mut"># CLI: ghost spawn | possess | act | evaporate | replay</span>
+    </div>
+  </section>
+
+  <section class="layer">
+    <div class="layer-head"><span class="layer-num">05</span><span class="layer-title">The rest of the stack</span></div>
+    <div class="grid">
+      <a class="card" href="https://www.scriptmasterlabs.com/stack"><h3>The SML Stack</h3><div class="role">Catalog</div><p>All live x402 / XRPL / Xahau pay rails for autonomous agents.</p></a>
+      <a class="card" href="https://www.nexus-402.com/"><h3>NEXUS-402</h3><div class="role">Gateway</div><p>HTTP-402 native payment gateway. Agents pay per request, no keys.</p></a>
+      <a class="card" href="https://four02proof.onrender.com/"><h3>402PROOF</h3><div class="role">Receipts</div><p>Verifiable, tamper-evident proof-of-payment for every transaction.</p></a>
+      <a class="card" href="https://squeezeos-api.onrender.com/health"><h3>SqueezeOS</h3><div class="role">Signal Engine</div><p>Real-time institutional signal OS feeding off the stack.</p></a>
+    </div>
+  </section>
+
+  <div class="cta">
+    <h2>Give your agent a body that vanishes.</h2>
+    <p>GHOST is open-source and free. Ephemeral credentials, cryptographic proof, zero standing attack surface.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="https://github.com/timwal78/ghost-layer">GitHub repo →</a>
+      <a class="btn btn-ghost" href="https://www.scriptmasterlabs.com/stack">View full stack</a>
+    </div>
+  </div>
+
+  <footer>
+    <div>Script Master Labs LLC · SDVOSB · Kinston NC</div>
+    <div><a href="https://www.scriptmasterlabs.com/stack">← Stack</a> · <a href="https://www.scriptmasterlabs.com/">Home</a> · <a href="mailto:hello@scriptmasterlabs.com">Contact</a></div>
+  </footer>
+</div>
+</body>
+  </html>
+
