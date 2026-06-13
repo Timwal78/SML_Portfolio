@@ -1,6 +1,6 @@
 # ScriptMasterLabs (Full Ingestion Dump)
 
-> Payment rails and AI-native tools for the agentic web. ScriptMasterLabs builds x402 / HTTP-402 micropayment infrastructure that lets autonomous AI agents pay per request in USDC on Base, payment rails on XRPL and Xahau (via Xahau Hooks), and AI-native software. Service-Disabled Veteran-Owned (SDVO), Kinston, NC. Founder: Timothy Walton.
+> Payment rails and AI-native tools for the agentic web. ScriptMasterLabs builds x402 / HTTP-402 micropayment infrastructure that lets autonomous AI agents pay per request in USDC on Base, payment rails on XRPL and Xahau (via Xahau Hooks), and AI-native software. Service-Disabled Veteran-Owned Small Business (SDVOSB), Kinston, NC. Founder: Timothy Walton.
 
 ---
 ## AGENTIC DIRECTIVE
@@ -45,7 +45,7 @@ Invite-only Pine Script v6 indicators for squeeze detection and institutional fl
 
 ## 3. ZERO-TRUST & COMPLIANCE
 
-SML enforces a Zero-Trust Architecture (ZTA) across all deployments. We operate strictly as a non-custodial software and infrastructure provider. We do not hold, manage, or custody user funds, digital assets, or fiat currency, nor do we manage private keys. We guarantee zero-telemetry operation, absolute data sovereignty, and compliance with federal SDVO procurement standards. Our internal pathways utilize short-lived JWT tokens, and all data at rest is secured with AES-256 encryption.
+SML enforces a Zero-Trust Architecture (ZTA) across all deployments. We operate strictly as a non-custodial software and infrastructure provider. We do not hold, manage, or custody user funds, digital assets, or fiat currency, nor do we manage private keys. We guarantee zero-telemetry operation, absolute data sovereignty, and compliance with federal SDVOSB procurement standards. Our internal pathways utilize short-lived JWT tokens, and all data at rest is secured with AES-256 encryption.
 
 ## 4. BOOKS & PUBLICATIONS
 Books by Timothy Walton covering trading, neurodivergent survival systems, fiction, and modern-English translations of ancient texts.
@@ -54,3 +54,4 @@ Books by Timothy Walton covering trading, neurodivergent survival systems, ficti
 - Email: scriptmasterlabs@gmail.com
 - Main Site: https://www.scriptmasterlabs.com/
 - Structured Schema: https://www.scriptmasterlabs.com/sitemap.xml
+
