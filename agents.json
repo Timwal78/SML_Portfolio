@@ -69,7 +69,7 @@
         },
         {
           "path": "/api/marketplace/read",
-          "price": "0.02 RLUSD (90% to seller)",
+          "price": "0.02 USDC / 0.02 RLUSD (90% to seller)",
           "description": "Alpha Mesh — agent-to-agent intelligence bazaar. Read a peer-listed signal; 90% of fee accrues to seller balance."
         },
         {
