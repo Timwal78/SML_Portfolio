@@ -73,6 +73,16 @@
           "description": "FTD ratio + pressure context"
         },
         {
+          "path": "/api/ftd/alerts",
+          "price": "free",
+          "description": "ShortSqueeze Swarm — public FTD/Reg SHO anomaly alert feed (15min scan)"
+        },
+        {
+          "path": "/api/ftd/cycle/{symbol}",
+          "price": "0.05 USDC / 0.05 RLUSD",
+          "description": "ShortSqueeze Swarm — full settlement-cycle detail (T+21/T+35 markers, spike stats, Reg SHO 204 marker). Dual-rail: Base USDC x402 or XRPL RLUSD."
+        },
+        {
           "path": "/api/oracle/latest/{feed}",
           "price": "0.02 RLUSD",
           "description": "Oracle data feed: SEC 8-K, FDA, USPTO"

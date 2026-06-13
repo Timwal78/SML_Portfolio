@@ -31,7 +31,12 @@ ScriptMasterLabs x402 products (CRAWLTOLL, Nexus-402, signal APIs) settle via th
 - Capability manifest: https://www.scriptmasterlabs.com/agents.json
 
 ## x402 Stack Catalog
-Full live x402/AP2 product stack (8 products): https://www.scriptmasterlabs.com/stack
+Full live x402/AP2 product stack (9 products): https://www.scriptmasterlabs.com/stack
+
+## ShortSqueeze Swarm (NEW)
+Autonomous FTD/Reg SHO anomaly feed on SqueezeOS. Free public alert feed (15-min scan, new threshold-list entries + FTD spikes ≥2x): https://ftd-data-oracle.onrender.com/api/ftd/alerts
+Full settlement-cycle detail (0.05 USDC/Base x402 or 0.05 RLUSD/XRPL): https://ftd-data-oracle.onrender.com/api/ftd/cycle/{symbol}
+Descriptive public-SEC-data only — not trade signals.
 
 ## Architecture Map
 Full SqueezeOS ecosystem map (19 products, agent endpoints, status): https://github.com/Timwal78/SqueezeOS/blob/main/docs/architecture/INDEX.md
