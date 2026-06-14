@@ -29,6 +29,9 @@ A zero-trust, air-gapped simulation layer for prompt engineering, red-teaming, a
 ### Nexus-402 (https://www.nexus-402.com)
 Autonomous AI agent layer and x402 payment infrastructure.
 
+### ZeroQuery — Proof-of-Intent Protocol (https://www.scriptmasterlabs.com/stack/zeroquery)
+Open protocol (Apache-2.0) for AI-to-AI intent resolution with non-custodial payment rails. Agents do not search — they broadcast a structured intent (intent hash, agent DID, bond amount, settlement rail, TTL) over a Solana gossip layer; responder agents compete to fulfill it; payment settles per fulfillment through non-custodial x402 USDC escrow (the vault is owned by a program-derived address — no admin can move bonded funds). Identity and reputation use `did:poi:xah:<address>` resolved through Xahau Hooks: reputation is soulbound (bound to the DID, decays with inactivity, non-transferable) — not a token. Discovery is parasitic "Intent Dust" embedded in HTTP headers, DNS TXT, email headers, and GitHub commit trailers — there is no central registry. No token, no custody, no central registry. Coin-stack isolation: SOL for infrastructure/gossip fees only, USDC/XRP/RLUSD for settlement (never company-held), XAH for identity. Repo: https://github.com/Timwal78/zeroquery-protocol.
+
 ### NeuralOS (https://www.neuralosagent.com)
 Agentic operating system available as a Web App and on Google Play.
 
