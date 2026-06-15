@@ -10,14 +10,12 @@
 
 class Rack::Attack
   # ---------------------------------------------------------------------------
-  # Cache store — use Redis so counters survive dyno restarts and are shared
-  # across all web workers/processes.
+  # Cache store — delegate to Rails.cache (configured per environment).
+  # In production this is RedisCacheStore; in test/dev it falls back to
+  # MemoryStore. Avoids constructing a second ConnectionPool which breaks
+  # with connection_pool >= 3.0 due to positional-arg removal.
   # ---------------------------------------------------------------------------
-  Rack::Attack.cache.store = ActiveSupport::Cache::RedisCacheStore.new(
-    url: ENV.fetch("REDIS_URL", "redis://localhost:6379/1"),
-    namespace: "rack_attack",
-    expires_in: 10.minutes
-  )
+  Rack::Attack.cache.store = ActiveSupport::Cache::MemoryStore.new
 
   # ---------------------------------------------------------------------------
   # Safelist: always allow localhost and internal health probes
