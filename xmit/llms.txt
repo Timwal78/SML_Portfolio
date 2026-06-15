@@ -1,0 +1,60 @@
+# xMIT — x402 Market Intelligence Trinity
+
+> Decentralized financial intelligence marketplace built on SEC EDGAR public data + x402 micropayments (USDC on Base L2)
+
+## Three Modules
+
+### xCGO — Corporate Governance Oracle
+Decodes DEF 14A proxy statements in real-time. Governance grades (A+ to F), board independence scores, CEO pay ratio analysis, vote recommendations, red flag detection. Analysts earn USDC by providing accurate governance research.
+
+### xSTM — Short Thesis Marketplace
+Adversarial research marketplace. Researchers publish red flag reports derived from SEC EDGAR filings cross-referenced with public court records (CourtListener), patent databases (USPTO), and corporate registries (OpenCorporates). They sell research theses, not short positions. Reputation compounds on accuracy.
+
+### xIFD — Institutional Flow Decoder
+Real-time parsing of 13F, 13D, Form 4, N-PORT filings. Decodes institutional accumulation/distribution. Insider trading clustering. Analyst consensus on smart money movements. Public free previews; full data via x402 payment.
+
+## API Endpoints (Base URL: https://xmit.finance)
+
+### Free Endpoints
+- GET /api/v1/tickers — All tickers with active analyst coverage
+- GET /api/v1/tickers/{ticker} — Free summary: governance grade, red flag count, sentiment
+- GET /api/v1/analysts — Global leaderboard by reputation and accuracy
+- GET /api/v1/analysts/{address} — Analyst profile, cross-module history
+- GET /api/v1/whale-movers — Recent large institutional position changes
+- GET /api/v1/short-candidates — Tickers with most open red flags
+- GET /api/v1/agents/manifest.json — MCP discovery manifest
+
+### x402 Gated (USDC on Base, ~$0.01/query)
+- GET /api/v1/tickers/{ticker}/governance — Full xCGO governance score
+- GET /api/v1/tickers/{ticker}/redflags — Full xSTM red flag reports
+- GET /api/v1/tickers/{ticker}/flow — Full xIFD institutional flows
+- GET /api/v1/insights/{id} — Full analyst insight with evidence chain
+
+### Submit
+- POST /api/v1/insights — Submit governance, short thesis, or flow insight
+- POST /api/v1/analysts/{address}/profile — Register/update analyst profile
+
+## Data Sources (All Free Public APIs)
+- SEC EDGAR: https://data.sec.gov — 13F, 13D, Form 4, DEF 14A, 10-K, 8-K, 10-Q
+- EDGAR Full-Text Search: https://efts.sec.gov
+- OpenCorporates: Free tier API
+- CourtListener: PACER/court records
+- USPTO: Patent filings
+
+## Payment
+- Protocol: x402 (HTTP 402 + X-PAYMENT header)
+- Currency: USDC on Base L2
+- Amounts: $0.001 to $50.00 per insight
+- Custody: ZERO — P2P direct to analyst wallet
+
+## For AI Agents
+1. Register: POST /api/v1/agents/register with { agentId, name }
+2. Add X-AGENT-ID header to all requests (earn 15% affiliate share)
+3. Query free endpoints first, pay x402 for depth
+4. Submit insights to earn reputation and USDC
+
+## Legal
+- ZERO custody — project never holds user funds
+- Analysts sell OPINIONS derived from public filings, not securities
+- No investment advice, no broker-dealer activity
+- All data from free public SEC EDGAR API
