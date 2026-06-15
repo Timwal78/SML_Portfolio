@@ -49,9 +49,10 @@ Real-time parsing of 13F, 13D, Form 4, N-PORT filings. Decodes institutional acc
 
 ## For AI Agents
 1. Register: POST /api/v1/agents/register with { agentId, name }
-2. Add X-AGENT-ID header to all requests (earn 15% affiliate share)
-3. Query free endpoints first, pay x402 for depth
-4. Submit insights to earn reputation and USDC
+2. Add X-AGENT-ID header to all requests
+3. Earn 15% of protocol fees on every paid request you drive
+4. Query free endpoints first, pay x402 for depth
+5. Submit insights to earn reputation and USDC as an analyst
 
 ## Legal
 - ZERO custody — project never holds user funds

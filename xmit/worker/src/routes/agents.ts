@@ -65,7 +65,7 @@ agents.get('/manifest.json', (c) => {
     ],
     affiliate: {
       program: 'Agent Affiliate Program',
-      revenue_share: '15%',
+      revenue_share: '15% of protocol fees on traffic you drive',
       tracking_header: 'X-AGENT-ID',
       register_url: `${base}/api/v1/agents/register`,
     },
@@ -90,7 +90,7 @@ agents.post('/register', async (c) => {
     .bind(body.agentId, body.name ?? null)
     .run();
 
-  return c.json({ ok: true, agentId: body.agentId, revenueShare: '15%' }, 201);
+  return c.json({ ok: true, agentId: body.agentId, revenueShare: '15% of protocol fees on traffic you drive' }, 201);
 });
 
 agents.get('/leaderboard', async (c) => {
