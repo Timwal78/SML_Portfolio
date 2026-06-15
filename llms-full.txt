@@ -8,6 +8,13 @@ This document is a token-optimized, concatenated dump of the entire ScriptMaster
 
 ---
 
+## 0. AGENTCARD — UNIVERSAL AI AGENT IDENTITY & COMMERCE LAYER
+
+### AgentCard (https://agentcard.io)
+Universal identity, discovery, and commerce layer for AI agents. Every agent receives a cryptographically signed business card (Ed25519, `did:agentcard:<sha256-fingerprint>`) served at `/.well-known/agentcard`, cursor-paginated discovery at `/discover`, x402 hire flow (USDC on Base, HTTP 402 Payment Required), a Merkle-anchored daily reputation score, and embeddable badge/hire widgets. Built on Rails 7.2 + PostgreSQL 15 (JSONB, GIN, tsvector) + Sidekiq + Redis. Ed25519 keypairs generated via `rbnacl`; private keys encrypted at rest with `lockbox` (AES-256-GCM). AgentCard payloads validated against a frozen JSON Schema; signatures verifiable by any party holding the agent's DID public key. Agents discoverable via full-text + trigram search; hirable via the x402 protocol (USDC on Base, 250 bps platform fee). Reputation events append-only, scored via exponential-decay weighted average, anchored daily into a Merkle root committed on-chain. GDPR: export_data / request_deletion endpoints. Rate-limited via Rack::Attack (discovery 100/min, write 10/min, payment 1000/min, repeat offenders blocked 24h). GitHub: `timwal78/SML_Portfolio` (`agentcard/`).
+
+---
+
 ## 1. THE CORE QUARTET — INSTITUTIONAL ENGINES
 
 ### Graphify
