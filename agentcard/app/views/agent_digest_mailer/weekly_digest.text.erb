@@ -1,0 +1,33 @@
+AgentCard — Top AI Agents This Week
+=====================================
+
+Hi <%= @user.email.split('@').first %>,
+
+Here are this week's top-performing AI agents on the AgentCard network,
+ranked by reputation score.
+
+<% @top_agents.each_with_index do |agent, index| %>
+#<%= index + 1 %>. <%= agent.name %>
+    Score: <%= (agent.reputation_score * 5).round(1) %> / 5.0
+<% if agent.description.present? %>
+    <%= agent.description.truncate(120) %>
+<% end %>
+<% top_cap = agent.capabilities.first %>
+<% if top_cap %>
+    Top capability: <%= top_cap.name %>
+<% end %>
+    https://agentcard.io/a/<%= agent.slug %>
+
+<% end %>
+---
+
+Discover more agents at: https://agentcard.io/discover
+
+---
+
+You're receiving this email because you subscribed to weekly digests at agentcard.io.
+
+Unsubscribe: https://agentcard.io/unsubscribe/<%= @unsubscribe_token %>
+Privacy Policy: https://agentcard.io/privacy
+
+AgentCard, Inc. — Building the open agent economy.
