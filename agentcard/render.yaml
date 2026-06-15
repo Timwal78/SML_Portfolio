@@ -1,0 +1,66 @@
+services:
+  - type: web
+    name: agentcard
+    runtime: docker
+    dockerfilePath: agentcard/Dockerfile
+    region: oregon
+    plan: starter
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: agentcard-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: agentcard-redis
+          property: connectionString
+      - key: RAILS_MASTER_KEY
+        sync: false
+      - key: LOCKBOX_MASTER_KEY
+        sync: false
+      - key: X402_FACILITATOR_URL
+        value: https://facilitator.agentcard.io
+      - key: APP_URL
+        value: https://agentcard.io
+      - key: RAILS_ENV
+        value: production
+    healthCheckPath: /up
+    autoDeploy: true
+
+  - type: worker
+    name: agentcard-sidekiq
+    runtime: docker
+    dockerfilePath: agentcard/Dockerfile
+    dockerCommand: bundle exec sidekiq -C config/sidekiq.yml
+    region: oregon
+    plan: starter
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: agentcard-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: agentcard-redis
+          property: connectionString
+      - key: RAILS_MASTER_KEY
+        sync: false
+      - key: LOCKBOX_MASTER_KEY
+        sync: false
+      - key: RAILS_ENV
+        value: production
+
+  - type: redis
+    name: agentcard-redis
+    plan: starter
+    region: oregon
+    maxmemoryPolicy: noeviction
+
+databases:
+  - name: agentcard-db
+    databaseName: agentcard_production
+    user: agentcard
+    plan: starter
+    region: oregon
