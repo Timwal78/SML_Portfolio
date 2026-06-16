@@ -26,7 +26,7 @@ class Agent < ApplicationRecord
 
   accepts_nested_attributes_for :capabilities, allow_destroy: true
 
-  before_create :generate_did, :generate_keypair, :generate_slug
+  before_validation :generate_did, :generate_keypair, :generate_slug, on: :create
   after_commit :enqueue_card_rebuild
   after_commit :update_search_vector, on: %i[create update]
 
@@ -182,7 +182,6 @@ class Agent < ApplicationRecord
     weighted_sum = 0.0
 
     events.each_with_index do |event, index|
-      # More recent events get higher weight (exponential decay)
       recency_weight = Math.exp(-index * 0.05)
       event_weight = (weights[event.event_type] || 0.10).abs * recency_weight
 
@@ -193,7 +192,6 @@ class Agent < ApplicationRecord
     return 0.0 if total_weight.zero?
 
     raw_score = weighted_sum / total_weight
-    # Clamp to [-1.0, 1.0] then normalize to [0.0, 1.0]
     normalized = (raw_score.clamp(-1.0, 1.0) + 1.0) / 2.0
     normalized.round(2)
   end
