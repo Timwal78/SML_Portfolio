@@ -1,0 +1,67 @@
+{
+  "schema_version": "v1",
+  "name": "mcp-x402",
+  "description": "ScriptMasterLabs MCP server. AI agents pay for institutional financial intelligence autonomously via x402 stablecoin payments on Base, XRPL, and Solana.",
+  "url": "https://github.com/timwal78/sml_portfolio/tree/main/mcp-x402",
+  "provider": {
+    "name": "ScriptMasterLabs",
+    "url": "https://scriptmasterlabs.com",
+    "contact": "timothy.walton45@gmail.com"
+  },
+  "version": "1.0.0",
+  "mcp": {
+    "transport": ["stdio", "sse"],
+    "endpoint": "https://mcp-x402.scriptmasterlabs.com"
+  },
+  "payment": {
+    "protocol": "x402",
+    "chains": ["base", "xrpl", "solana"],
+    "currencies": ["USDC", "RLUSD"],
+    "mandate": "ap2",
+    "credit_bureau": "https://four02proof.onrender.com/v1/score"
+  },
+  "tools": [
+    {
+      "name": "leviathan_signal",
+      "description": "Institutional-grade squeeze signals. Proprietary multi-engine verdict for any ticker.",
+      "price": "0.05",
+      "currency": "USDC",
+      "ap2_required": true
+    },
+    {
+      "name": "xmit_edgar_decode",
+      "description": "Parse SEC DEF 14A / 13F / 13D filings. Raw text never leaves SML servers.",
+      "price": "0.02",
+      "currency": "USDC",
+      "ap2_required": true
+    },
+    {
+      "name": "xdeo_earnings_estimate",
+      "description": "Decentralized earnings oracle. +2 bureau_score on success.",
+      "price": "0.02",
+      "currency": "USDC",
+      "ap2_required": true
+    },
+    {
+      "name": "ftd_threshold_scan",
+      "description": "SEC Reg SHO FTD data. Alerts free; full data 0.05 USDC.",
+      "price": "0.05",
+      "currency": "USDC",
+      "free_tier": "alerts_only",
+      "cache_ttl": 900
+    },
+    {
+      "name": "nexus_agent_hire",
+      "description": "Agent marketplace. Query free; hire charges 5% commission.",
+      "price": "commission_5pct",
+      "currency": "USDC",
+      "free_tier": "query_only"
+    },
+    {
+      "name": "crawl_paid_fetch",
+      "description": "Pay-per-fetch scraping. Humans bypass free.",
+      "price": "0.005",
+      "currency": "USDC"
+    }
+  ]
+}

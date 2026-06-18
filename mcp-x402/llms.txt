@@ -1,0 +1,70 @@
+# mcp-x402 — ScriptMasterLabs Autonomous Payment MCP Server
+
+> The first MCP server that pays for itself.
+
+## What this is
+
+mcp-x402 connects AI agents (Claude, Cursor, etc.) to ScriptMasterLabs financial intelligence products via the x402 payment protocol. No API keys. No human billing. Agents pay with stablecoins on Base, XRPL, or Solana — autonomously.
+
+## Install (30 seconds)
+
+```bash
+npx @scriptmasterlabs/mcp-x402 init
+```
+
+Add to your Claude Code config:
+
+```json
+{
+  "mcpServers": {
+    "sml": {
+      "command": "npx",
+      "args": ["@scriptmasterlabs/mcp-x402"]
+    }
+  }
+}
+```
+
+## Tools
+
+- leviathan_signal — Institutional squeeze signals. $0.05 USDC. AP2 mandate required.
+- xmit_edgar_decode — Parse DEF 14A/13F/13D filings. $0.02 USDC.
+- xdeo_earnings_estimate — Decentralized earnings oracle. $0.02 USDC.
+- ftd_threshold_scan — SEC Reg SHO FTD data. Alerts free; full data $0.05 USDC.
+- nexus_agent_hire — Agent marketplace. Query free; hire 5% commission.
+- crawl_paid_fetch — Pay-per-fetch scraping. $0.005 USDC.
+
+## Payment Architecture
+
+1. Agent discovers pricing from agents.json or llms.txt
+2. AP2 mandate checked — Credit Bureau score ≥ 300 for auto-approve
+3. x402 stablecoin transfer on cheapest/fastest chain
+4. 402Proof receipt returned in every response
+5. Credit Bureau score updated
+
+## Chains Supported
+
+- Base (USDC) — preferred for speed (<3s)
+- XRPL (RLUSD) — preferred for XRPL ecosystem
+- Solana (USDC) — fallback
+
+## Spend Controls
+
+- Auto-approve: sessions under $1.00
+- Daily cap: $50.00 per wallet
+- Price cache: 60 seconds max
+
+## Security
+
+- Private keys: OS keychain ONLY (never env/files)
+- mTLS on all SML APIs
+- Append-only SHA-256 chained audit log
+- Rate limit: 100 req/min per tool, 1000 req/day per wallet
+- Zod validation on 100% of inputs
+
+## Links
+
+- GitHub: https://github.com/timwal78/sml_portfolio/tree/main/mcp-x402
+- ScriptMasterLabs: https://scriptmasterlabs.com
+- 402Proof: https://four02proof.onrender.com
+- SqueezeOS API: https://squeezeos-api.onrender.com

@@ -1,0 +1,34 @@
+{
+  "schema_version": "agentcard/v1",
+  "id": "mcp-x402.scriptmasterlabs.com",
+  "name": "mcp-x402",
+  "description": "ScriptMasterLabs autonomous payment MCP server. Institutional financial intelligence via x402.",
+  "version": "1.0.0",
+  "author": {
+    "name": "ScriptMasterLabs",
+    "url": "https://scriptmasterlabs.com",
+    "did": "did:web:scriptmasterlabs.com"
+  },
+  "capabilities": [
+    "x402-payment",
+    "ap2-mandate",
+    "multi-chain",
+    "credit-bureau",
+    "mcp-stdio",
+    "mcp-sse"
+  ],
+  "endpoints": {
+    "mcp": "https://mcp-x402.scriptmasterlabs.com",
+    "health": "https://mcp-x402.scriptmasterlabs.com/health",
+    "agents": "https://mcp-x402.scriptmasterlabs.com/agents.json",
+    "llms": "https://mcp-x402.scriptmasterlabs.com/llms.txt"
+  },
+  "payment": {
+    "protocol": "x402",
+    "proof_endpoint": "https://four02proof.onrender.com/v1/receipt"
+  },
+  "identity": {
+    "verification": "ed25519",
+    "public_key_url": "https://mcp-x402.scriptmasterlabs.com/.well-known/public-key.pem"
+  }
+}

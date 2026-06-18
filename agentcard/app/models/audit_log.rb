@@ -1,14 +1,15 @@
 # frozen_string_literal: true
 
 class AuditLog < ApplicationRecord
-  # Audit logs are append-only — no updated_at column
-  self.record_timestamps = false
-
-  # ApplicationRecord includes Auditable globally; skip here to prevent
-  # AuditLog.create! from triggering audit_create in an infinite loop.
+  # AuditLog must not audit itself — ApplicationRecord includes Auditable
+  # and without this guard, creating any audited record causes infinite recursion:
+  #   audit_create -> AuditLog.create! -> audit_create -> ...
   skip_callback :create, :after, :audit_create
   skip_callback :update, :after, :audit_update
   skip_callback :destroy, :after, :audit_destroy
+
+  # Audit logs are append-only — no updated_at column
+  self.record_timestamps = false
 
   belongs_to :actor, polymorphic: true, optional: true
 
