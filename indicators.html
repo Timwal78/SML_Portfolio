@@ -17,11 +17,6 @@
 <body style="background: #050507; color: #f1f1f1; font-family: sans-serif; text-align: center; padding-top: 20%;">
     <h1>ScriptMasterLabs | Indicators</h1>
     <p>Content coming soon.</p>
-<!-- ===================================================================
-     MASTERSHEETS / SML — NLWeb chat widget
-     Paste before </body> on scriptmasterlabs.com. Calls your /ask endpoint.
-     Replace NLWEB_ENDPOINT with your deployed Render URL.
-     =================================================================== -->
 <div id="sml-ask"></div>
 <style>
 #sml-ask{position:fixed;right:20px;bottom:20px;z-index:9999;font-family:'JetBrains Mono',monospace}
@@ -40,7 +35,7 @@
 .sa-in button{background:#00ff88;color:#000;border:none;padding:0 18px;font-weight:800;cursor:pointer}
 </style>
 <script>
-const NLWEB_ENDPOINT = "https://sml-nlweb.onrender.com/ask"; // <-- set after deploy
+const NLWEB_ENDPOINT = "https://sml-nlweb.onrender.com/ask";
 (function(){
   const root=document.getElementById("sml-ask");
   root.innerHTML=`<button class="sa-fab">Ask ✦</button>
@@ -59,7 +54,6 @@ const NLWEB_ENDPOINT = "https://sml-nlweb.onrender.com/ask"; // <-- set after de
     try{
       const r=await fetch(NLWEB_ENDPOINT+"?query="+encodeURIComponent(q));
       const data=await r.json();
-      // NLWeb returns Schema.org JSON; show the best summary it gives back
       const txt=data.summary||data.answer||(data.results&&data.results[0]&&(data.results[0].description||data.results[0].name))||"No answer found.";
       thinking.textContent=txt;
     }catch(e){thinking.textContent="Couldn't reach the answer service.";}

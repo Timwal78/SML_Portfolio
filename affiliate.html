@@ -205,7 +205,6 @@ async function loadEarnings(wallet){
     const r = await fetch(`${API}/earnings/${encodeURIComponent(wallet)}`);
     if(!r.ok) return;
     const d = await r.json();
-    // earnings shape is implementation-defined; read defensively
     const bal = d.balance_rlusd ?? d.pending_rlusd ?? d.accrued_rlusd ?? 0;
     const life = d.lifetime_rlusd ?? d.total_rlusd ?? bal;
     const refs = d.referral_count ?? d.referrals ?? (Array.isArray(d.referred)?d.referred.length:0) ?? 0;
@@ -251,7 +250,6 @@ $("join").addEventListener("click", async () => {
   }
 });
 
-// copy buttons
 document.querySelectorAll(".copy").forEach(b => {
   b.addEventListener("click", () => {
     const txt = $(b.dataset.copy).textContent;
@@ -261,7 +259,6 @@ document.querySelectorAll(".copy").forEach(b => {
   });
 });
 
-// prefill referrer code from ?ref=
 const params = new URLSearchParams(location.search);
 if(params.get("ref")) $("refcode").value = params.get("ref");
 </script>
