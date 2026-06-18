@@ -31,30 +31,12 @@
       "operatingSystem": "Node.js",
       "url": "https://www.scriptmasterlabs.com/crawltoll.html",
       "downloadUrl": "https://www.npmjs.com/package/crawltoll",
-      "installUrl": "https://www.npmjs.com/package/crawltoll",
       "codeRepository": "https://github.com/Timwal78/crawltoll",
       "softwareVersion": "1.0.0",
       "publisher": { "@id": "https://www.scriptmasterlabs.com/#org" },
-      "description": "One-command x402 (HTTP-402) paywall that turns AI scraping into revenue. AI crawlers like GPTBot, ClaudeBot, and PerplexityBot pay USDC on Base per fetch; human visitors browse free. Includes CLI generator for llms.txt, agents.json, and robots.txt payment terms, plus a built-in revenue ledger.",
-      "keywords": "x402, HTTP-402, AP2, Agent Payments Protocol, AI crawler monetization, pay per crawl, GPTBot, ClaudeBot, USDC, Base, llms.txt, agents.json, micropayments, agentic web",
-      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD", "description": "Free open-source middleware; site owners set their own per-fetch USDC toll." },
+      "description": "One-command x402 (HTTP-402) paywall that turns AI scraping into revenue.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
       "isAccessibleForFree": true
-    },
-    {
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.scriptmasterlabs.com/" },
-        { "@type": "ListItem", "position": 2, "name": "CRAWLTOLL", "item": "https://www.scriptmasterlabs.com/crawltoll.html" }
-      ]
-    },
-    {
-      "@type": "FAQPage",
-      "mainEntity": [
-        { "@type": "Question", "name": "What is CRAWLTOLL?", "acceptedAnswer": { "@type": "Answer", "text": "CRAWLTOLL is open-source x402 (HTTP-402) middleware that makes AI crawlers and agents pay USDC per fetch to access your content, while human visitors browse free. Install with npm install crawltoll and run npx crawltoll init to generate payment terms in llms.txt and agents.json." } },
-        { "@type": "Question", "name": "How do AI crawlers pay with CRAWLTOLL?", "acceptedAnswer": { "@type": "Answer", "text": "When a bot requests a page, CRAWLTOLL returns HTTP 402 Payment Required with machine-readable x402 payment requirements (USDC on Base). The agent sends an X-PAYMENT header, payment is verified and settled via a facilitator, and the content unlocks instantly. No human is in the loop." } },
-        { "@type": "Question", "name": "Which AI bots does CRAWLTOLL detect?", "acceptedAnswer": { "@type": "Answer", "text": "GPTBot, ClaudeBot, PerplexityBot, Google-Extended, Bytespider, CCBot, Amazonbot, Applebot-Extended, Meta crawlers, plus generic automation like curl, python-requests, axios, and headless browsers — over 30 patterns. Any client already sending an X-PAYMENT header is treated as an agent." } },
-        { "@type": "Question", "name": "Do human visitors have to pay?", "acceptedAnswer": { "@type": "Answer", "text": "No. By default humans browse free and only automated AI traffic is tolled. Discovery files like robots.txt, llms.txt, and agents.json always stay open so agents can read your payment terms." } }
-      ]
     }
   ]
 }
