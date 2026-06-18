@@ -51,8 +51,7 @@ end
 # Use AES-256-GCM (the Lockbox default). Each encrypted value gets a unique
 # random nonce — do NOT set a fixed nonce globally.
 Lockbox.default_options = {
-  encode:    true,   # store as Base64 string (compatible with text/string DB columns)
-  encode_iv: true    # store IV alongside ciphertext
+  encode: true   # store as Base64 string (compatible with text/string DB columns)
 }
 
 # ---------------------------------------------------------------------------
