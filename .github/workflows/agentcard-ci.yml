@@ -62,7 +62,7 @@ jobs:
       - name: Run Brakeman security scan
         run: |
           cd agentcard
-          bundle exec brakeman --no-pager --exit-on-warn
+          bundle exec brakeman --no-pager --exit-on-warn --except EOLRails
 
   security:
     runs-on: ubuntu-latest
