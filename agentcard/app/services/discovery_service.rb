@@ -48,9 +48,10 @@ class DiscoveryService
       scope = scope.where('capabilities.price_amount <= ?', @max_price) if @max_price
       scope = scope.where('capabilities.price_currency = ?', @currency) if @currency
       scope = scope.where('capabilities.capability_id = ?', @capability_type) if @capability_type
+      scope = scope.distinct
     end
 
-    scope.distinct
+    scope
   end
 
   def apply_sort(scope)
