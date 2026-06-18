@@ -1,0 +1,50 @@
+version: '3.9'
+
+services:
+  mcp-x402:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mcp-x402:latest
+    container_name: mcp-x402
+    restart: always  # Auto-restart on crash, reboot, or OOM
+    environment:
+      NODE_ENV: production
+      MCP_TRANSPORT: sse
+      MCP_SSE_PORT: "3402"
+      DAILY_SPEND_CAP_USD: "50"
+      AUTO_APPROVE_THRESHOLD_USD: "1"
+      PRICE_CACHE_TTL_MS: "60000"
+      PROOF402_URL: https://four02proof.onrender.com
+      TESTNET: "false"
+      # Secrets — supply via .env file or secrets manager; NEVER hardcode
+      # SML_API_BASE:
+      # BASE_RPC_URL:
+      # XRPL_RPC_URL:
+      # SOLANA_RPC_URL:
+    ports:
+      - "3402:3402"
+    volumes:
+      - ./certs:/app/certs:ro         # mTLS certs (read-only)
+      - audit_logs:/app/audit_logs    # Persistent audit log volume
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3402/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "7"
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+        reservations:
+          memory: 128m
+
+volumes:
+  audit_logs:
+    driver: local

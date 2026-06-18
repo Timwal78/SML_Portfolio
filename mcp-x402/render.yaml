@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: mcp-x402
+    runtime: docker
+    dockerfilePath: ./mcp-x402/Dockerfile
+    plan: starter
+    region: oregon
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MCP_TRANSPORT
+        value: sse
+      - key: MCP_SSE_PORT
+        value: 3402
+      - key: SML_API_BASE
+        sync: false
+      - key: BASE_RPC_URL
+        sync: false
+      - key: XRPL_RPC_URL
+        sync: false
+      - key: SOLANA_RPC_URL
+        sync: false
+      - key: DAILY_SPEND_CAP_USD
+        value: "50"
+      - key: AUTO_APPROVE_THRESHOLD_USD
+        value: "1"
+      - key: PRICE_CACHE_TTL_MS
+        value: "60000"
+      - key: PROOF402_URL
+        value: https://four02proof.onrender.com
+      - key: TESTNET
+        value: "false"
+    autoDeploy: true
+    # Render restarts the service automatically on crash
+    # healthCheckPath triggers restart if /health returns non-2xx
