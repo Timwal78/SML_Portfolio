@@ -1,20 +1,18 @@
-# mcp-x402 — ScriptMasterLabs Autonomous Payment MCP Server
-
-> The first MCP server that pays for itself.
+# mcp-x402 — ScriptMasterLabs Unified AI Payment Gateway
+# The Amazon for agentic payrails. One endpoint. Every SML product. Autonomous x402 payments.
+# 43 tools · 11 products · 3 chains · 0 API keys required
 
 ## What this is
 
-mcp-x402 connects AI agents (Claude, Cursor, etc.) to ScriptMasterLabs financial intelligence products via the x402 payment protocol. No API keys. No human billing. Agents pay with stablecoins on Base, XRPL, or Solana — autonomously.
+AI agents connect to one MCP server and get access to every ScriptMasterLabs product.
+Pay per call in USDC (Base), RLUSD (XRPL), or USDC (Solana).
+No API keys. No subscriptions. No human billing loop.
 
-## Install (30 seconds)
+## Quick Start (30 seconds)
 
-```bash
-npx @scriptmasterlabs/mcp-x402 init
-```
+npm i -g @scriptmasterlabs/mcp-x402
 
-Add to your Claude Code config:
-
-```json
+Add to Claude Code / Cursor / any MCP client:
 {
   "mcpServers": {
     "sml": {
@@ -23,48 +21,109 @@ Add to your Claude Code config:
     }
   }
 }
-```
 
-## Tools
+## Agent Instructions
 
-- leviathan_signal — Institutional squeeze signals. $0.05 USDC. AP2 mandate required.
-- xmit_edgar_decode — Parse DEF 14A/13F/13D filings. $0.02 USDC.
-- xdeo_earnings_estimate — Decentralized earnings oracle. $0.02 USDC.
-- ftd_threshold_scan — SEC Reg SHO FTD data. Alerts free; full data $0.05 USDC.
-- nexus_agent_hire — Agent marketplace. Query free; hire 5% commission.
-- crawl_paid_fetch — Pay-per-fetch scraping. $0.005 USDC.
+1. Call sml_discover first (FREE) — get full product catalog, all tools, all prices
+2. Call sml_status (FREE) — verify backends are online before paid calls
+3. Call any tool — free tools respond instantly, paid tools auto-collect via x402
+4. Every paid response includes _meta.receipt_id for your audit trail
 
-## Payment Architecture
+## Payment Error Handling
 
-1. Agent discovers pricing from agents.json or llms.txt
-2. AP2 mandate checked — Credit Bureau score ≥ 300 for auto-approve
-3. x402 stablecoin transfer on cheapest/fastest chain
-4. 402Proof receipt returned in every response
-5. Credit Bureau score updated
+If a paid call returns { error: "payment_required" }, the response includes:
+  next.call        — which tool to call (usually proof_invoice)
+  next.endpoint_id — the endpoint UUID
+  next.amount_usdc — exact amount required
+  next.chain       — recommended chain
 
-## Chains Supported
+This lets you self-heal: call proof_invoice → pay → proof_verify → retry.
 
-- Base (USDC) — preferred for speed (<3s)
-- XRPL (RLUSD) — preferred for XRPL ecosystem
-- Solana (USDC) — fallback
+## All 43 Tools
+
+### Discovery & Health [FREE]
+sml_discover           — Full product catalog, all tools, all prices. START HERE.
+sml_status             — Real-time health of all 8 SML backends. Check before paid calls.
+
+### SqueezeOS — Institutional Equity Intelligence (squeezeos-api.onrender.com)
+[FREE]       squeezeos_preview            — Signal bias preview for any ticker (15-min cache)
+[FREE]       squeezeos_history            — Signal history, up to 200 events per symbol
+[FREE]       squeezeos_oracle             — Oracle directive: aggregated multi-engine signal
+[FREE]       squeezeos_ftd                — SEC FTD registry for threshold securities
+[FREE]       squeezeos_status             — SqueezeOS system health
+[FREE]       squeezeos_demo               — Free IWM council verdict sample
+[FREE]       squeezeos_marketplace_browse — Browse peer signal marketplace listings
+[FREE]       squeezeos_futures_leaderboard— Top signal prediction market performers
+[PAID $0.10] squeezeos_council            — Multi-engine AI council verdict for any symbol
+[PAID $0.05] squeezeos_scan               — Full $1–$50 squeeze candidate scanner
+[PAID $0.05] squeezeos_options            — Institutional options flow + dark pool sweeps
+[PAID $0.03] squeezeos_iwm                — IWM 0DTE contract scorer with live Greeks
+[PAID $0.02] squeezeos_marketplace_read   — Full signal thesis from peer marketplace
+
+### Ghost Layer — Dual-Chain Routing (ghost-layer.onrender.com)
+[FREE]       ghost_status — Service health and active routes
+[PAID $0.01] ghost_route  — Route tx through dual-chain XRPL+Base gateway
+
+### 402Proof — Payment Infrastructure (four02proof.onrender.com)
+[FREE] proof_invoice      — Generate x402 payment invoice (amount, chain, wallet)
+[FREE] proof_verify       — Verify payment tx_hash, get receipt
+[FREE] proof_credit_score — Agent credit score 300–850 by wallet address
+
+### RLUSD Rails — XRP Remittance (sml-rails.onrender.com)
+[FREE]       rails_status   — RLUSD Rails health and network status
+[PAID $0.01] rails_transfer — Initiate RLUSD or XRP transfer, returns tx_hash
+
+### XRPL Copy-Trader — Whale Following (sml-copytrader.onrender.com)
+[FREE]       copytrader_status    — Service health and subscription count
+[FREE]       copytrader_whales    — List tracked whales with recent moves and P&L
+[PAID $0.05] copytrader_subscribe — Subscribe to mirror a whale wallet automatically
+
+### Memecoin Launchpad — XRPL Token Launch (sml-launchpad.onrender.com)
+[FREE]       launchpad_status — Launchpad health and total tokens launched
+[FREE]       launchpad_list   — Browse live memecoins: price, volume, holders
+[PAID $0.10] launchpad_create — Create new memecoin with bonding curve
+[PAID $0.01] launchpad_buy    — Buy tokens on bonding curve, get executed price
+
+### Shadow Desk — Signal Intelligence (shadow-desk.onrender.com)
+[PAID $0.02] shadow_query  — Query alpha signal intelligence feed
+[PAID $0.01] shadow_ingest — Ingest alpha signal data for distribution
+
+### Forge Gateway — LLM Proxy (forge-gateway-a822.onrender.com)
+[FREE]       forge_status — Gateway health and supported models
+[PAID $0.02] forge_llm    — BYOK LLM proxy — any AI model, pay per request via x402
+
+### agentcard — A2A Identity
+[FREE]       agentcard_lookup — Lookup agent identity card by wallet or DID
+[FREE]       agentcard_verify — Verify Ed25519 agent signature
+[PAID $0.01] agentcard_mint   — Create new Ed25519 agent identity card, get DID
+
+### Core SML Intelligence
+[PAID $0.05]         leviathan_signal      — Institutional squeeze signals, multi-engine verdict
+[PAID $0.02]         xmit_edgar_decode     — Parse SEC DEF 14A / 13F / 13D filings
+[PAID $0.02]         xdeo_earnings_estimate— Decentralized earnings oracle
+[FREE|PAID $0.05]    ftd_threshold_scan    — SEC Reg SHO FTD data (alerts free, full scanner paid)
+[FREE|PAID 5% comm]  nexus_agent_hire      — Agent marketplace (browse free, hire costs commission)
+[PAID $0.005]        crawl_paid_fetch      — Pay-per-fetch web scraping
+
+### echo-forge — Historical Patterns [COMING SOON]
+[PAID $0.05] echo_pattern_match — Historical equity pattern similarity search (ML/Polygon.io)
 
 ## Spend Controls
-
-- Auto-approve: sessions under $1.00
-- Daily cap: $50.00 per wallet
-- Price cache: 60 seconds max
+Daily cap:          $50.00 per wallet — hard limit, no exceptions
+Auto-approve:       Sessions under $1.00
+Price cache:        60 seconds max — stale prices rejected
+Credit Bureau min:  Score 300 for auto-approve
 
 ## Security
-
-- Private keys: OS keychain ONLY (never env/files)
-- mTLS on all SML APIs
-- Append-only SHA-256 chained audit log
-- Rate limit: 100 req/min per tool, 1000 req/day per wallet
-- Zod validation on 100% of inputs
+Private keys:       OS keychain ONLY — never disk, never env vars
+API connections:    mTLS with pinned certs
+Audit log:          Append-only SHA-256 chained, 7-day local + cloud backup
+Input validation:   Zod on 100% of inputs
+Rate limits:        100 req/min per tool, 1000 req/day per wallet
 
 ## Links
-
-- GitHub: https://github.com/timwal78/sml_portfolio/tree/main/mcp-x402
-- ScriptMasterLabs: https://scriptmasterlabs.com
-- 402Proof: https://four02proof.onrender.com
-- SqueezeOS API: https://squeezeos-api.onrender.com
+GitHub:        https://github.com/timwal78/sml_portfolio/tree/main/mcp-x402
+ScriptMasterLabs: https://scriptmasterlabs.com
+SqueezeOS:     https://squeezeos-api.onrender.com
+402Proof:      https://four02proof.onrender.com
+Ghost Layer:   https://ghost-layer.onrender.com

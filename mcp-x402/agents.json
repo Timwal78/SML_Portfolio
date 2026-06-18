@@ -1,14 +1,14 @@
 {
   "schema_version": "v1",
   "name": "mcp-x402",
-  "description": "ScriptMasterLabs MCP server. AI agents pay for institutional financial intelligence autonomously via x402 stablecoin payments on Base, XRPL, and Solana.",
+  "description": "ScriptMasterLabs unified MCP gateway — 43 tools across 11 products. The Amazon for agentic payrails. Pay autonomously via x402 on Base (USDC), XRPL (RLUSD), or Solana (USDC). No API keys. No subscriptions. Call sml_discover first.",
   "url": "https://github.com/timwal78/sml_portfolio/tree/main/mcp-x402",
   "provider": {
     "name": "ScriptMasterLabs",
     "url": "https://scriptmasterlabs.com",
     "contact": "timothy.walton45@gmail.com"
   },
-  "version": "1.0.0",
+  "version": "2.0.0",
   "mcp": {
     "transport": ["stdio", "sse"],
     "endpoint": "https://mcp-x402.scriptmasterlabs.com"
@@ -18,50 +18,56 @@
     "chains": ["base", "xrpl", "solana"],
     "currencies": ["USDC", "RLUSD"],
     "mandate": "ap2",
-    "credit_bureau": "https://four02proof.onrender.com/v1/score"
+    "credit_bureau": "https://four02proof.onrender.com/v1/score",
+    "daily_cap_usd": 50,
+    "auto_approve_under_usd": 1.00,
+    "min_credit_score": 300,
+    "price_cache_seconds": 60
   },
+  "agent_instructions": "Call sml_discover first to get the full product catalog. Call sml_status to verify backends are online. Free tools need no payment. Paid tools auto-collect via x402. Every paid response includes _meta.receipt_id.",
   "tools": [
-    {
-      "name": "leviathan_signal",
-      "description": "Institutional-grade squeeze signals. Proprietary multi-engine verdict for any ticker.",
-      "price": "0.05",
-      "currency": "USDC",
-      "ap2_required": true
-    },
-    {
-      "name": "xmit_edgar_decode",
-      "description": "Parse SEC DEF 14A / 13F / 13D filings. Raw text never leaves SML servers.",
-      "price": "0.02",
-      "currency": "USDC",
-      "ap2_required": true
-    },
-    {
-      "name": "xdeo_earnings_estimate",
-      "description": "Decentralized earnings oracle. +2 bureau_score on success.",
-      "price": "0.02",
-      "currency": "USDC",
-      "ap2_required": true
-    },
-    {
-      "name": "ftd_threshold_scan",
-      "description": "SEC Reg SHO FTD data. Alerts free; full data 0.05 USDC.",
-      "price": "0.05",
-      "currency": "USDC",
-      "free_tier": "alerts_only",
-      "cache_ttl": 900
-    },
-    {
-      "name": "nexus_agent_hire",
-      "description": "Agent marketplace. Query free; hire charges 5% commission.",
-      "price": "commission_5pct",
-      "currency": "USDC",
-      "free_tier": "query_only"
-    },
-    {
-      "name": "crawl_paid_fetch",
-      "description": "Pay-per-fetch scraping. Humans bypass free.",
-      "price": "0.005",
-      "currency": "USDC"
-    }
+    { "name": "sml_discover",              "type": "FREE",       "description": "Full SML product catalog — all 43 tools, all prices. Start here." },
+    { "name": "sml_status",                "type": "FREE",       "description": "Real-time health of all 8 SML backends. Check before paid calls." },
+    { "name": "squeezeos_preview",          "type": "FREE",       "description": "Signal bias preview for any ticker" },
+    { "name": "squeezeos_history",          "type": "FREE",       "description": "Signal history up to 200 events per symbol" },
+    { "name": "squeezeos_oracle",           "type": "FREE",       "description": "Oracle directive — aggregated multi-engine signal" },
+    { "name": "squeezeos_ftd",              "type": "FREE",       "description": "SEC FTD registry for threshold securities" },
+    { "name": "squeezeos_status",           "type": "FREE",       "description": "SqueezeOS system health" },
+    { "name": "squeezeos_demo",             "type": "FREE",       "description": "Free IWM council verdict sample" },
+    { "name": "squeezeos_marketplace_browse","type": "FREE",      "description": "Browse peer signal marketplace" },
+    { "name": "squeezeos_futures_leaderboard","type": "FREE",     "description": "Top signal prediction market performers" },
+    { "name": "squeezeos_council",          "type": "PAID",       "price_usdc": "0.10", "description": "Multi-engine AI council verdict for any symbol" },
+    { "name": "squeezeos_scan",             "type": "PAID",       "price_usdc": "0.05", "description": "Full $1–$50 squeeze candidate scanner" },
+    { "name": "squeezeos_options",          "type": "PAID",       "price_usdc": "0.05", "description": "Institutional options flow + dark pool sweeps" },
+    { "name": "squeezeos_iwm",              "type": "PAID",       "price_usdc": "0.03", "description": "IWM 0DTE contract scorer" },
+    { "name": "squeezeos_marketplace_read", "type": "PAID",       "price_usdc": "0.02", "description": "Full signal thesis from peer marketplace" },
+    { "name": "ghost_status",               "type": "FREE",       "description": "Ghost Layer service health" },
+    { "name": "ghost_route",                "type": "PAID",       "price_usdc": "0.01", "description": "Route tx through dual-chain XRPL+Base gateway" },
+    { "name": "proof_invoice",              "type": "FREE",       "description": "Generate x402 payment invoice" },
+    { "name": "proof_verify",               "type": "FREE",       "description": "Verify payment tx_hash, get receipt" },
+    { "name": "proof_credit_score",         "type": "FREE",       "description": "Agent credit score 300–850 by wallet" },
+    { "name": "rails_status",               "type": "FREE",       "description": "RLUSD Rails health" },
+    { "name": "rails_transfer",             "type": "PAID",       "price_usdc": "0.01", "description": "Initiate RLUSD/XRP transfer" },
+    { "name": "copytrader_status",          "type": "FREE",       "description": "Copy-Trader health" },
+    { "name": "copytrader_whales",          "type": "FREE",       "description": "List tracked whale wallets with P&L" },
+    { "name": "copytrader_subscribe",       "type": "PAID",       "price_usdc": "0.05", "description": "Subscribe to mirror a whale wallet" },
+    { "name": "launchpad_status",           "type": "FREE",       "description": "Launchpad health" },
+    { "name": "launchpad_list",             "type": "FREE",       "description": "Browse live memecoins on bonding curve" },
+    { "name": "launchpad_create",           "type": "PAID",       "price_usdc": "0.10", "description": "Create new memecoin with bonding curve" },
+    { "name": "launchpad_buy",              "type": "PAID",       "price_usdc": "0.01", "description": "Buy tokens on bonding curve" },
+    { "name": "shadow_query",               "type": "PAID",       "price_usdc": "0.02", "description": "Query alpha signal intelligence" },
+    { "name": "shadow_ingest",              "type": "PAID",       "price_usdc": "0.01", "description": "Ingest alpha signal data" },
+    { "name": "forge_status",               "type": "FREE",       "description": "Forge Gateway health" },
+    { "name": "forge_llm",                  "type": "PAID",       "price_usdc": "0.02", "description": "BYOK LLM proxy via x402" },
+    { "name": "agentcard_lookup",           "type": "FREE",       "description": "Lookup agent identity card" },
+    { "name": "agentcard_verify",           "type": "FREE",       "description": "Verify Ed25519 agent signature" },
+    { "name": "agentcard_mint",             "type": "PAID",       "price_usdc": "0.01", "description": "Create new Ed25519 agent identity card" },
+    { "name": "leviathan_signal",           "type": "PAID",       "price_usdc": "0.05", "description": "Institutional squeeze signals" },
+    { "name": "xmit_edgar_decode",          "type": "PAID",       "price_usdc": "0.02", "description": "Parse SEC DEF 14A/13F/13D filings" },
+    { "name": "xdeo_earnings_estimate",     "type": "PAID",       "price_usdc": "0.02", "description": "Decentralized earnings oracle" },
+    { "name": "ftd_threshold_scan",         "type": "FREE|PAID",  "price_usdc": "0.05", "description": "SEC Reg SHO FTD data — alerts free, full scanner paid" },
+    { "name": "nexus_agent_hire",           "type": "FREE|PAID",  "price_usdc": "5% commission", "description": "Agent marketplace — browse free, hire costs commission" },
+    { "name": "crawl_paid_fetch",           "type": "PAID",       "price_usdc": "0.005", "description": "Pay-per-fetch web scraping" },
+    { "name": "echo_pattern_match",         "type": "PAID",       "price_usdc": "0.05", "status": "coming_soon", "description": "Historical equity pattern similarity search" }
   ]
 }
