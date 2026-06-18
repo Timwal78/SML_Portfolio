@@ -27,6 +27,8 @@
   body{background:var(--bg);color:var(--ink);font-family:var(--disp);line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
   a{color:inherit}
   .wrap{max-width:980px;margin:0 auto;padding:0 20px}
+
+  /* ── Hero ── */
   header.hero{position:relative;padding:64px 0 40px;border-bottom:1px solid var(--line);overflow:hidden}
   .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--green);margin-bottom:18px}
   h1{font-size:clamp(34px,8vw,68px);font-weight:700;line-height:.98;letter-spacing:-.02em}
@@ -34,9 +36,13 @@
   h1 .grad{background:linear-gradient(90deg,var(--green),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
   .sub{margin-top:20px;max-width:620px;color:var(--muted);font-size:clamp(15px,2.4vw,18px)}
   .sub b{color:var(--ink);font-weight:500}
+
+  /* payout ticker */
   .ticker{margin-top:28px;display:flex;gap:10px;flex-wrap:wrap}
   .chip{font-family:var(--mono);font-size:12px;padding:7px 12px;border:1px solid var(--line);border-radius:999px;color:var(--muted)}
   .chip b{color:var(--green2)}
+
+  /* ── Tiers / how it works ── */
   section{padding:46px 0;border-bottom:1px solid var(--line)}
   .stitle{font-family:var(--mono);font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin-bottom:24px}
   .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
@@ -44,6 +50,7 @@
   .step .n{font-family:var(--mono);color:var(--orange);font-size:13px;margin-bottom:12px}
   .step h3{font-size:18px;margin-bottom:8px}
   .step p{color:var(--muted);font-size:14px}
+
   .levels{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:26px}
   @media(max-width:560px){.levels{grid-template-columns:1fr}}
   .lvl{border:1px solid var(--line);border-radius:12px;padding:22px;background:linear-gradient(180deg,#0c0c0c,#070707)}
@@ -52,6 +59,8 @@
   .lvl.l2 .rate{color:var(--gold)}
   .lvl .lab{font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.18em;color:var(--muted);margin-top:6px}
   .lvl p{margin-top:12px;color:var(--muted);font-size:14px}
+
+  /* ── Signup card ── */
   .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:30px;margin-top:8px}
   label{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
   input[type=text]{width:100%;background:#050505;border:1px solid var(--line);border-radius:10px;color:var(--ink);font-family:var(--mono);font-size:15px;padding:14px 14px}
@@ -61,6 +70,9 @@
   .btn{appearance:none;cursor:pointer;width:100%;border:none;border-radius:10px;padding:16px;font-family:var(--disp);font-weight:700;font-size:16px;letter-spacing:.01em;background:linear-gradient(90deg,var(--green),var(--green2));color:#001b00;transition:filter .15s}
   .btn:hover{filter:brightness(1.08)}
   .btn:disabled{opacity:.5;cursor:wait}
+  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+
+  /* result */
   .result{display:none;margin-top:22px}
   .result.show{display:block}
   .codebox{display:flex;gap:8px;align-items:stretch;margin-top:8px}
@@ -73,6 +85,7 @@
   .earn .k{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin-top:4px}
   .err{display:none;margin-top:16px;border:1px solid var(--pink);border-radius:10px;padding:14px;color:var(--pink);font-family:var(--mono);font-size:13px}
   .err.show{display:block}
+
   footer{padding:40px 0 60px;color:var(--muted);font-family:var(--mono);font-size:12px}
   footer a{color:var(--green2);text-decoration:none}
   .api{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:10px;word-break:break-all}
@@ -99,13 +112,34 @@
   <div class="wrap">
     <div class="stitle">How it works</div>
     <div class="steps">
-      <div class="step"><div class="n">01</div><h3>Drop your wallet</h3><p>Enter an XRPL wallet address below. We mint your unique referral code instantly — no account, no email required.</p></div>
-      <div class="step"><div class="n">02</div><h3>Share your link</h3><p>Anyone who registers with your code is attributed to you permanently. Post it, embed it, hand it to other builders.</p></div>
-      <div class="step"><div class="n">03</div><h3>Earn on settlement</h3><p>Every time a referred agent pays through the rails, a rebate posts to your balance — and a slice of their referrals' too.</p></div>
+      <div class="step">
+        <div class="n">01</div>
+        <h3>Drop your wallet</h3>
+        <p>Enter an XRPL wallet address below. We mint your unique referral code instantly — no account, no email required.</p>
+      </div>
+      <div class="step">
+        <div class="n">02</div>
+        <h3>Share your link</h3>
+        <p>Anyone who registers with your code is attributed to you permanently. Post it, embed it, hand it to other builders.</p>
+      </div>
+      <div class="step">
+        <div class="n">03</div>
+        <h3>Earn on settlement</h3>
+        <p>Every time a referred agent pays through the rails, a rebate posts to your balance — and a slice of their referrals' too.</p>
+      </div>
     </div>
+
     <div class="levels">
-      <div class="lvl l1"><div class="rate">L1</div><div class="lab">Direct referral</div><p>Agents you bring in directly. You earn a rebate on every settlement they make through the SML x402 rails.</p></div>
-      <div class="lvl l2"><div class="rate">L2</div><div class="lab">Second level</div><p>When your referrals refer others, you earn a smaller rebate on those settlements too — passive depth.</p></div>
+      <div class="lvl l1">
+        <div class="rate">L1</div>
+        <div class="lab">Direct referral</div>
+        <p>Agents you bring in directly. You earn a rebate on every settlement they make through the SML x402 rails.</p>
+      </div>
+      <div class="lvl l2">
+        <div class="rate">L2</div>
+        <div class="lab">Second level</div>
+        <p>When your referrals refer others, you earn a smaller rebate on those settlements too — passive depth.</p>
+      </div>
     </div>
   </div>
 </section>
@@ -114,15 +148,32 @@
   <div class="wrap">
     <div class="stitle">Join now</div>
     <div class="card">
-      <div class="row"><label for="wallet">Your XRPL wallet address</label><input id="wallet" type="text" placeholder="r..." autocomplete="off" spellcheck="false"><div class="hint">Rebates are paid to this address. Double-check it.</div></div>
-      <div class="row"><label for="refcode">Referred by (optional)</label><input id="refcode" type="text" placeholder="Referral code, if someone sent you" autocomplete="off" spellcheck="false"><div class="hint">Leave blank if you found us on your own.</div></div>
+      <div class="row">
+        <label for="wallet">Your XRPL wallet address</label>
+        <input id="wallet" type="text" placeholder="r..." autocomplete="off" spellcheck="false">
+        <div class="hint">Rebates are paid to this address. Double-check it.</div>
+      </div>
+      <div class="row">
+        <label for="refcode">Referred by (optional)</label>
+        <input id="refcode" type="text" placeholder="Referral code, if someone sent you" autocomplete="off" spellcheck="false">
+        <div class="hint">Leave blank if you found us on your own.</div>
+      </div>
       <button class="btn" id="join">Generate my referral link</button>
+
       <div class="err" id="err"></div>
+
       <div class="result" id="result">
         <label>Your referral code</label>
-        <div class="codebox"><div class="val" id="codeVal">—</div><button class="copy" data-copy="codeVal">Copy</button></div>
+        <div class="codebox">
+          <div class="val" id="codeVal">—</div>
+          <button class="copy" data-copy="codeVal">Copy</button>
+        </div>
         <label style="margin-top:18px">Your shareable link</label>
-        <div class="codebox"><div class="val" id="linkVal">—</div><button class="copy" data-copy="linkVal">Copy</button></div>
+        <div class="codebox">
+          <div class="val" id="linkVal">—</div>
+          <button class="copy" data-copy="linkVal">Copy</button>
+        </div>
+
         <div class="earn">
           <div><div class="v" id="eBal">0.00</div><div class="k">RLUSD balance</div></div>
           <div><div class="v" id="eRef">0</div><div class="k">Referrals</div></div>
@@ -134,13 +185,21 @@
   </div>
 </section>
 
-<footer><div class="wrap">Powered by Stellar Forge — the SML on-chain referral &amp; loyalty ledger. Rebates settle in RLUSD on XRPL. Anti-Sybil rate limiting applies to new registrations.<br><br><a href="/stack">← Back to the x402 stack</a> &nbsp;·&nbsp; <a href="https://www.scriptmasterlabs.com">scriptmasterlabs.com</a></div></footer>
+<footer>
+  <div class="wrap">
+    Powered by Stellar Forge — the SML on-chain referral &amp; loyalty ledger. Rebates settle in RLUSD on XRPL. Anti-Sybil rate limiting applies to new registrations.<br><br>
+    <a href="/stack">← Back to the x402 stack</a> &nbsp;·&nbsp; <a href="https://www.scriptmasterlabs.com">scriptmasterlabs.com</a>
+  </div>
+</footer>
 
 <script>
 const API = "https://squeezeos-api.onrender.com/api/forge";
+
 const $ = id => document.getElementById(id);
+
 function showErr(msg){ const e=$("err"); e.textContent=msg; e.classList.add("show"); }
 function clearErr(){ $("err").classList.remove("show"); }
+
 async function loadEarnings(wallet){
   try{
     const r = await fetch(`${API}/earnings/${encodeURIComponent(wallet)}`);
@@ -154,19 +213,30 @@ async function loadEarnings(wallet){
     $("eRef").textContent = refs;
   }catch(_){}
 }
+
 $("join").addEventListener("click", async () => {
   clearErr();
   const wallet = $("wallet").value.trim();
   const refcode = $("refcode").value.trim();
   if(!wallet){ showErr("Enter your XRPL wallet address first."); return; }
+
   const btn = $("join");
   btn.disabled = true; btn.textContent = "Minting your code…";
+
   try{
     const body = { wallet };
     if(refcode) body.referrer_code = refcode;
-    const r = await fetch(`${API}/register`, {method:"POST",headers:{"Content-Type":"application/json"},body: JSON.stringify(body)});
+    const r = await fetch(`${API}/register`, {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify(body)
+    });
     const d = await r.json();
-    if(!r.ok){ showErr(d.detail || d.error || "Registration failed. Try again in a moment."); btn.disabled=false; btn.textContent="Generate my referral link"; return; }
+    if(!r.ok){
+      showErr(d.detail || d.error || "Registration failed. Try again in a moment.");
+      btn.disabled=false; btn.textContent="Generate my referral link";
+      return;
+    }
     const code = d.referral_code || "";
     const link = `https://www.scriptmasterlabs.com/affiliate?ref=${encodeURIComponent(code)}`;
     $("codeVal").textContent = code;
@@ -174,14 +244,21 @@ $("join").addEventListener("click", async () => {
     $("result").classList.add("show");
     btn.textContent = d.new === false ? "Welcome back — code retrieved" : "You're in 🎉";
     loadEarnings(wallet);
-  }catch(e){ showErr("Network error reaching the rails. Check your connection and retry."); btn.disabled=false; btn.textContent="Generate my referral link"; }
+  }catch(e){
+    showErr("Network error reaching the rails. Check your connection and retry.");
+    btn.disabled=false; btn.textContent="Generate my referral link";
+  }
 });
+
 document.querySelectorAll(".copy").forEach(b => {
   b.addEventListener("click", () => {
     const txt = $(b.dataset.copy).textContent;
-    navigator.clipboard.writeText(txt).then(()=>{ const old=b.textContent; b.textContent="Copied"; setTimeout(()=>b.textContent=old,1200); });
+    navigator.clipboard.writeText(txt).then(()=>{
+      const old=b.textContent; b.textContent="Copied"; setTimeout(()=>b.textContent=old,1200);
+    });
   });
 });
+
 const params = new URLSearchParams(location.search);
 if(params.get("ref")) $("refcode").value = params.get("ref");
 </script>
