@@ -99,6 +99,7 @@ group :development, :test do
 
   # Test framework
   gem "rspec-rails", "~> 6.1"
+  gem "rspec_junit_formatter"
   gem "factory_bot_rails", "~> 6.4"
   gem "faker", "~> 3.2"
   gem "shoulda-matchers", "~> 6.0"
