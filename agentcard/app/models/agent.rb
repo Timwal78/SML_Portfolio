@@ -26,7 +26,7 @@ class Agent < ApplicationRecord
 
   accepts_nested_attributes_for :capabilities, allow_destroy: true
 
-  before_create :generate_did, :generate_keypair, :generate_slug
+  before_validation :generate_did, :generate_keypair, :generate_slug, on: :create
   after_commit :enqueue_card_rebuild
   after_commit :update_search_vector, on: %i[create update]
 
