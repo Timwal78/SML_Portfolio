@@ -1,0 +1,31 @@
+name: Smart Contract Tests
+
+on:
+  push:
+    paths: ['xaap/contracts/**']
+  pull_request:
+    paths: ['xaap/contracts/**']
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: xaap/contracts/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: xaap/contracts
+
+      - name: Compile contracts
+        run: npm run compile
+        working-directory: xaap/contracts
+
+      - name: Run tests
+        run: npm test
+        working-directory: xaap/contracts
