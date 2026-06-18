@@ -1,0 +1,60 @@
+{
+  "$schema": "https://registry.modelcontextprotocol.io/schemas/server.json",
+  "name": "@scriptmasterlabs/mcp-x402",
+  "display_name": "mcp-x402 — ScriptMasterLabs Unified Payrail",
+  "description": "The Amazon for all things payrail. 43 MCP tools spanning institutional trading intelligence (squeeze signals, options flow, AI council verdicts, SEC FTD data), SEC EDGAR parsing, decentralized earnings oracles, private XRPL/Base routing, agent identity cards, memecoin launchpad, XRPL copy-trading, dark-pool intelligence, BYOK LLM proxy, and agent commerce — all autonomously gated by x402 micropayments on Base USDC, XRPL RLUSD, and Solana USDC. No API keys. No subscriptions. Pay only for what you call.",
+  "version": "2.0.0",
+  "homepage": "https://scriptmasterlabs.com",
+  "repository": "https://github.com/timwal78/sml_portfolio/tree/main/mcp-x402",
+  "documentation": "https://github.com/timwal78/sml_portfolio/blob/main/mcp-x402/README.md",
+  "license": "MIT",
+  "author": {
+    "name": "ScriptMasterLabs",
+    "email": "timothy.walton45@gmail.com",
+    "url": "https://scriptmasterlabs.com"
+  },
+  "categories": ["finance", "payments", "trading", "web3", "ai-agents"],
+  "tags": ["x402", "xrpl", "rlusd", "usdc", "base", "solana", "micropayments", "trading-intelligence", "sec-data", "mcp", "autonomous-agents"],
+  "installation": {
+    "npm": "@scriptmasterlabs/mcp-x402",
+    "npx": "npx @scriptmasterlabs/mcp-x402",
+    "docker": "ghcr.io/timwal78/mcp-x402:latest"
+  },
+  "transports": [
+    {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@scriptmasterlabs/mcp-x402"]
+    },
+    {
+      "type": "sse",
+      "url": "https://mcp-x402.scriptmasterlabs.com/mcp"
+    },
+    {
+      "type": "streamable-http",
+      "url": "https://mcp-x402.scriptmasterlabs.com/mcp"
+    }
+  ],
+  "tools_count": 43,
+  "resources_count": 0,
+  "prompts_count": 0,
+  "payment": {
+    "protocol": "x402",
+    "chains": ["base", "xrpl", "solana"],
+    "currencies": ["USDC", "RLUSD"],
+    "mandate": "AP2",
+    "credit_bureau": "https://four02proof.onrender.com/v1/score",
+    "free_tools": 21,
+    "paid_tools": 22,
+    "price_range": "$0.005 - $0.10 USDC"
+  },
+  "environments": {
+    "production": {
+      "endpoint": "https://mcp-x402.scriptmasterlabs.com/mcp",
+      "health": "https://mcp-x402.scriptmasterlabs.com/health"
+    },
+    "testnet": {
+      "note": "Set TESTNET=true to use Base Sepolia + XRPL Testnet"
+    }
+  }
+}
