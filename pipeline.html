@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Kill Chain — VARRD × SqueezeOS × Ghost Layer</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cyan: #00fff7;
+    --magenta: #ff00ff;
+    --green: #00ff41;
+    --yellow: #ffe600;
+    --orange: #ff6600;
+    --bg: #02020f;
+    --panel: #080820;
+    --border: #1a1a4a;
+  }
+
+  body {
+    background: var(--bg);
+    color: #fff;
+    font-family: 'Share Tech Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── SCANLINES ── */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,247,0.015) 2px, rgba(0,255,247,0.015) 4px);
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* ── HEADER ── */
+  header {
+    text-align: center;
+    padding: 60px 20px 30px;
+    position: relative;
+  }
+
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 6px;
+    color: var(--cyan);
+    text-transform: uppercase;
+    opacity: 0.7;
+    margin-bottom: 16px;
+  }
+
+  h1 {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(28px, 5vw, 64px);
+    font-weight: 900;
+    letter-spacing: 2px;
+    line-height: 1.1;
+    text-transform: uppercase;
+    background: linear-gradient(90deg, var(--cyan), var(--magenta), var(--cyan));
+    background-size: 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 4s linear infinite;
+    filter: drop-shadow(0 0 30px rgba(0,255,247,0.5));
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 0% }
+    100% { background-position: 200% }
+  }
+
+  .tagline {
+    margin-top: 18px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 2px;
+  }
+
+  .tagline span { color: var(--green); }
+
+  /* ── PIPELINE ── */
+  .pipeline {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    padding: 60px 20px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+
+  .node {
+    flex-shrink: 0;
+    width: 220px;
+    border-radius: 12px;
+    padding: 28px 20px;
+    position: relative;
+    cursor: default;
+    transition: transform 0.3s;
+  }
+
+  .node:hover { transform: translateY(-6px); }
+
+  .node-varrd {
+    background: linear-gradient(135deg, #0a0a2a 0%, #0d0d35 100%);
+    border: 1px solid var(--cyan);
+    box-shadow: 0 0 30px rgba(0,255,247,0.25), inset 0 0 20px rgba(0,255,247,0.05);
+  }
+
+  .node-council {
+    background: linear-gradient(135deg, #150015 0%, #200020 100%);
+    border: 1px solid var(--magenta);
+    box-shadow: 0 0 30px rgba(255,0,255,0.25), inset 0 0 20px rgba(255,0,255,0.05);
+  }
+
+  .node-ghost {
+    background: linear-gradient(135deg, #001a08 0%, #002510 100%);
+    border: 1px solid var(--green);
+    box-shadow: 0 0 30px rgba(0,255,65,0.25), inset 0 0 20px rgba(0,255,65,0.05);
+  }
+
+  .node-badge {
+    font-family: 'Orbitron', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 3px;
+    display: inline-block;
+    margin-bottom: 14px;
+  }
+
+  .badge-cyan { background: rgba(0,255,247,0.15); color: var(--cyan); border: 1px solid rgba(0,255,247,0.3); }
+  .badge-magenta { background: rgba(255,0,255,0.15); color: var(--magenta); border: 1px solid rgba(255,0,255,0.3); }
+  .badge-green { background: rgba(0,255,65,0.15); color: var(--green); border: 1px solid rgba(0,255,65,0.3); }
+
+  .node-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .node-varrd .node-name { color: var(--cyan); text-shadow: 0 0 15px var(--cyan); }
+  .node-council .node-name { color: var(--magenta); text-shadow: 0 0 15px var(--magenta); }
+  .node-ghost .node-name { color: var(--green); text-shadow: 0 0 15px var(--green); }
+
+  .node-role {
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 16px;
+    text-transform: uppercase;
+  }
+
+  .node-tools {
+    list-style: none;
+    font-size: 11px;
+    line-height: 2;
+  }
+
+  .node-tools li::before { content: '› '; opacity: 0.5; }
+
+  .node-varrd .node-tools { color: rgba(0,255,247,0.75); }
+  .node-council .node-tools { color: rgba(255,0,255,0.75); }
+  .node-ghost .node-tools { color: rgba(0,255,65,0.75); }
+
+  /* ── CONNECTOR ── */
+  .connector {
+    flex-shrink: 0;
+    width: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    position: relative;
+  }
+
+  .connector-line {
+    width: 100%;
+    height: 2px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .connector-line-inner {
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    animation: flow 1.2s linear infinite;
+  }
+
+  .connector-1 .connector-line-inner {
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+  }
+  .connector-2 .connector-line-inner {
+    background: linear-gradient(90deg, transparent, var(--magenta), transparent);
+  }
+
+  @keyframes flow {
+    0% { left: -100%; }
+    100% { left: 100%; }
+  }
+
+  .connector-arrow {
+    font-size: 20px;
+    animation: pulse-arrow 1.5s ease-in-out infinite;
+  }
+
+  .connector-1 .connector-arrow { color: var(--cyan); }
+  .connector-2 .connector-arrow { color: var(--magenta); }
+
+  @keyframes pulse-arrow {
+    0%, 100% { opacity: 0.4; transform: translateX(-3px); }
+    50% { opacity: 1; transform: translateX(3px); }
+  }
+
+  .connector-label {
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    opacity: 0.4;
+    text-align: center;
+  }
+
+  /* ── AGENT LOOP CODE ── */
+  .code-section {
+    max-width: 900px;
+    margin: 0 auto 60px;
+    padding: 0 20px;
+  }
+
+  .code-section h2 {
+    font-family: 'Orbitron', monospace;
+    font-size: 12px;
+    letter-spacing: 4px;
+    color: var(--yellow);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    text-shadow: 0 0 10px var(--yellow);
+  }
+
+  .code-block {
+    background: #050515;
+    border: 1px solid #1a1a4a;
+    border-radius: 8px;
+    padding: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .code-block::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--yellow), transparent);
+    animation: scan 3s linear infinite;
+  }
+
+  @keyframes scan {
+    0% { opacity: 0; }
+    50% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  .code-block pre {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    line-height: 1.9;
+    white-space: pre-wrap;
+  }
+
+  .c-comment { color: rgba(255,255,255,0.25); }
+  .c-keyword { color: var(--magenta); }
+  .c-string { color: var(--green); }
+  .c-tool { color: var(--cyan); }
+  .c-value { color: var(--yellow); }
+  .c-result { color: var(--orange); }
+
+  /* ── STATS ROW ── */
+  .stats {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding: 0 20px 60px;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  .stat-card {
+    flex: 1;
+    min-width: 160px;
+    max-width: 200px;
+    background: var(--panel);
+    border-radius: 8px;
+    padding: 20px 16px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+  }
+
+  .stat-c::after { background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
+  .stat-m::after { background: var(--magenta); box-shadow: 0 0 8px var(--magenta); }
+  .stat-g::after { background: var(--green); box-shadow: 0 0 8px var(--green); }
+  .stat-y::after { background: var(--yellow); box-shadow: 0 0 8px var(--yellow); }
+
+  .stat-num {
+    font-family: 'Orbitron', monospace;
+    font-size: 28px;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .stat-c .stat-num { color: var(--cyan); text-shadow: 0 0 15px var(--cyan); }
+  .stat-m .stat-num { color: var(--magenta); text-shadow: 0 0 15px var(--magenta); }
+  .stat-g .stat-num { color: var(--green); text-shadow: 0 0 15px var(--green); }
+  .stat-y .stat-num { color: var(--yellow); text-shadow: 0 0 15px var(--yellow); }
+
+  .stat-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+  }
+
+  /* ── MOAT SECTION ── */
+  .moat {
+    max-width: 900px;
+    margin: 0 auto 80px;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  @media (max-width: 600px) { .moat { grid-template-columns: 1fr; } }
+
+  .moat-card {
+    background: var(--panel);
+    border-radius: 8px;
+    padding: 20px;
+    border-left: 3px solid;
+  }
+
+  .moat-card.mc { border-color: var(--cyan); }
+  .moat-card.mm { border-color: var(--magenta); }
+  .moat-card.mg { border-color: var(--green); }
+  .moat-card.my { border-color: var(--yellow); }
+
+  .moat-card h3 {
+    font-family: 'Orbitron', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .mc h3 { color: var(--cyan); }
+  .mm h3 { color: var(--magenta); }
+  .mg h3 { color: var(--green); }
+  .my h3 { color: var(--yellow); }
+
+  .moat-card p {
+    font-size: 12px;
+    line-height: 1.7;
+    color: rgba(255,255,255,0.55);
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    padding: 30px 20px 60px;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: rgba(255,255,255,0.15);
+    text-transform: uppercase;
+  }
+
+  footer a { color: var(--cyan); text-decoration: none; opacity: 0.6; }
+  footer a:hover { opacity: 1; }
+
+  /* ── BLINKING CURSOR ── */
+  .blink {
+    animation: blink 1s step-end infinite;
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  /* ── GLOW PULSE ON NODES ── */
+  .node-varrd { animation: glow-c 3s ease-in-out infinite; }
+  .node-council { animation: glow-m 3s ease-in-out infinite 1s; }
+  .node-ghost { animation: glow-g 3s ease-in-out infinite 2s; }
+
+  @keyframes glow-c {
+    0%, 100% { box-shadow: 0 0 30px rgba(0,255,247,0.2), inset 0 0 20px rgba(0,255,247,0.03); }
+    50% { box-shadow: 0 0 50px rgba(0,255,247,0.45), inset 0 0 30px rgba(0,255,247,0.08); }
+  }
+  @keyframes glow-m {
+    0%, 100% { box-shadow: 0 0 30px rgba(255,0,255,0.2), inset 0 0 20px rgba(255,0,255,0.03); }
+    50% { box-shadow: 0 0 50px rgba(255,0,255,0.45), inset 0 0 30px rgba(255,0,255,0.08); }
+  }
+  @keyframes glow-g {
+    0%, 100% { box-shadow: 0 0 30px rgba(0,255,65,0.2), inset 0 0 20px rgba(0,255,65,0.03); }
+    50% { box-shadow: 0 0 50px rgba(0,255,65,0.45), inset 0 0 30px rgba(0,255,65,0.08); }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="eyebrow">ScriptMasterLabs × VARRD — Agent Kill Chain</div>
+  <h1>Validate. Decide. Execute.</h1>
+  <p class="tagline">Backtest → AI Council → Cross-Chain Routing — <span>No Human. No Keys. No Permission.</span></p>
+</header>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat-card stat-c">
+    <div class="stat-num">7</div>
+    <div class="stat-label">VARRD Tools</div>
+  </div>
+  <div class="stat-card stat-m">
+    <div class="stat-num">43</div>
+    <div class="stat-label">SML Tools</div>
+  </div>
+  <div class="stat-card stat-g">
+    <div class="stat-num">&lt;3s</div>
+    <div class="stat-label">Base Settlement</div>
+  </div>
+  <div class="stat-card stat-y">
+    <div class="stat-num">$0</div>
+    <div class="stat-label">API Keys Required</div>
+  </div>
+</div>
+
+<!-- PIPELINE -->
+<div class="pipeline">
+
+  <!-- NODE 1: VARRD -->
+  <div class="node node-varrd">
+    <div class="node-badge badge-cyan">Layer 1 — Research</div>
+    <div class="node-name">VARRD</div>
+    <div class="node-role">Quant Validation Engine</div>
+    <ul class="node-tools">
+      <li>backtest_strategy</li>
+      <li>walk_forward_validate</li>
+      <li>bonferroni_correct</li>
+      <li>oos_lock</li>
+      <li>entry / stop / target</li>
+    </ul>
+  </div>
+
+  <!-- CONNECTOR 1 -->
+  <div class="connector connector-1">
+    <div class="connector-line"><div class="connector-line-inner"></div></div>
+    <div class="connector-arrow">▶</div>
+    <div class="connector-line"><div class="connector-line-inner"></div></div>
+    <div class="connector-label">validated<br>thesis</div>
+  </div>
+
+  <!-- NODE 2: SQUEEZEOS COUNCIL -->
+  <div class="node node-council">
+    <div class="node-badge badge-magenta">Layer 2 — Decision</div>
+    <div class="node-name">COUNCIL</div>
+    <div class="node-role">SqueezeOS AI Committee</div>
+    <ul class="node-tools">
+      <li>squeezeos_council</li>
+      <li>leviathan_signal</li>
+      <li>squeezeos_options</li>
+      <li>shadow_query</li>
+      <li>xdeo_earnings_estimate</li>
+    </ul>
+  </div>
+
+  <!-- CONNECTOR 2 -->
+  <div class="connector connector-2">
+    <div class="connector-line"><div class="connector-line-inner"></div></div>
+    <div class="connector-arrow">▶</div>
+    <div class="connector-line"><div class="connector-line-inner"></div></div>
+    <div class="connector-label">council<br>verdict</div>
+  </div>
+
+  <!-- NODE 3: GHOST LAYER -->
+  <div class="node node-ghost">
+    <div class="node-badge badge-green">Layer 3 — Execution</div>
+    <div class="node-name">GHOST</div>
+    <div class="node-role">Sovereign Routing Layer</div>
+    <ul class="node-tools">
+      <li>ghost_route</li>
+      <li>rails_transfer</li>
+      <li>x402 micropayment</li>
+      <li>XRPL ↔ Base bridge</li>
+      <li>ZK-shielded</li>
+    </ul>
+  </div>
+
+</div>
+
+<!-- AGENT LOOP CODE -->
+<div class="code-section">
+  <h2>// Agent Loop — Single Session, Zero Keys</h2>
+  <div class="code-block">
+    <pre>
+<span class="c-comment">// Step 1 — VARRD validates the setup statistically</span>
+<span class="c-keyword">const</span> thesis = <span class="c-keyword">await</span> <span class="c-tool">varrd.backtest_strategy</span>({
+  idea: <span class="c-string">"NVDA squeeze when short float &gt; 18% and options flow bullish"</span>,
+  instruments: [<span class="c-string">"NVDA"</span>],
+  lookback: <span class="c-string">"10y"</span>
+})
+<span class="c-comment">// → { edge: true, win_rate: 0.71, sharpe: 2.4, oos_locked: true }</span>
+
+<span class="c-comment">// Step 2 — SqueezeOS AI council votes on the live setup</span>
+<span class="c-keyword">const</span> verdict = <span class="c-keyword">await</span> <span class="c-tool">sml.squeezeos_council</span>({
+  symbol: <span class="c-string">"NVDA"</span>,
+  context: thesis,
+  payment_token: <span class="c-value">AP2_TOKEN</span>
+})
+<span class="c-comment">// → { directive: "BUY (IGNITION)", confidence: 91, engines: 7/7 }</span>
+
+<span class="c-comment">// Step 3 — If council confirms, Leviathan fires the signal</span>
+<span class="c-keyword">if</span> (verdict.confidence &gt; <span class="c-value">85</span>) {
+  <span class="c-keyword">const</span> signal = <span class="c-keyword">await</span> <span class="c-tool">sml.leviathan_signal</span>({ symbol: <span class="c-string">"NVDA"</span> })
+
+  <span class="c-comment">// Step 4 — Ghost Layer routes execution cross-chain, ZK-shielded</span>
+  <span class="c-keyword">const</span> route = <span class="c-keyword">await</span> <span class="c-tool">sml.ghost_route</span>({
+    from_chain: <span class="c-string">"xrpl"</span>,
+    to_chain: <span class="c-string">"base"</span>,
+    amount: signal.position_size,
+    asset: <span class="c-string">"RLUSD"</span>
+  })
+}
+
+<span class="c-result">// Total elapsed: ~4 seconds. Human involvement: 0.</span><span class="blink">█</span></pre>
+  </div>
+</div>
+
+<!-- MOAT CARDS -->
+<div class="moat">
+  <div class="moat-card mc">
+    <h3>Statistical Moat</h3>
+    <p>VARRD's Bonferroni correction + OOS lock means every signal has survived real quant scrutiny — not vibes. No other live trading MCP pipeline starts here.</p>
+  </div>
+  <div class="moat-card mm">
+    <h3>Committee Moat</h3>
+    <p>SqueezeOS runs 7 independent engines and requires supermajority confidence before firing. A statistically validated thesis hits a multi-model committee. That's institutional.</p>
+  </div>
+  <div class="moat-card mg">
+    <h3>Execution Moat</h3>
+    <p>Ghost Layer routes cross-chain in &lt;3s, ZK-shielded. No CEX. No counterparty. The signal goes from idea → capital movement without a human in the loop.</p>
+  </div>
+  <div class="moat-card my">
+    <h3>Payment Moat</h3>
+    <p>x402 micropayments — no API keys, no accounts, no subscriptions. An agent with a wallet can call the entire pipeline autonomously. That's machine-native finance.</p>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>
+    <a href="https://github.com/timwal78/sml_portfolio/tree/main/mcp-x402">mcp-x402</a>
+    &nbsp;·&nbsp;
+    <a href="https://squeezeos-api.onrender.com/mcp">SqueezeOS MCP</a>
+    &nbsp;·&nbsp;
+    <a href="https://scriptmasterlabs.com">ScriptMasterLabs</a>
+    &nbsp;·&nbsp;
+    <a href="https://varrd.com">VARRD</a>
+  </p>
+  <p style="margin-top:12px;">The only pipeline where a trade is statistically validated, voted on by an AI committee, and executed cross-chain — autonomously.</p>
+</footer>
+
+</body>
+</html>
