@@ -22,8 +22,18 @@
       "permanent": false
     },
     {
+      "source": "/stack/nexus-402",
+      "destination": "https://neuralosagent.com/",
+      "permanent": false
+    },
+    {
       "source": "/stack/nexus402",
-      "destination": "https://www.nexus-402.com/",
+      "destination": "https://neuralosagent.com/",
+      "permanent": false
+    },
+    {
+      "source": "/stack/proof402",
+      "destination": "https://four02proof.onrender.com/",
       "permanent": false
     },
     {
@@ -34,6 +44,21 @@
     {
       "source": "/stack/squeezeos",
       "destination": "https://squeezeos-api.onrender.com/health",
+      "permanent": false
+    },
+    {
+      "source": "/stack/ghost",
+      "destination": "/stack.html",
+      "permanent": false
+    },
+    {
+      "source": "/stack/zeroquery",
+      "destination": "/stack.html",
+      "permanent": false
+    },
+    {
+      "source": "/stack/xahpay",
+      "destination": "/stack.html",
       "permanent": false
     },
     {

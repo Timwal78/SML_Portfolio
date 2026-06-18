@@ -1,0 +1,31 @@
+name: EDGAR Monitor Health Check
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'   # Every 6 hours
+  workflow_dispatch:
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check xAAP status
+        run: |
+          STATUS=$(curl -sf https://xaap.scriptmasterlabs.com/api/v1/status | jq -r '.status')
+          if [ "$STATUS" != "operational" ]; then
+            echo "ERROR: xAAP API not operational: $STATUS"
+            exit 1
+          fi
+          echo "xAAP status: $STATUS"
+
+      - name: Check EDGAR pipeline
+        run: |
+          FILINGS=$(curl -sf 'https://xaap.scriptmasterlabs.com/api/v1/edgar/recent?limit=1' | jq '.filings | length')
+          echo "Recent filings indexed: $FILINGS"
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          curl -s -X POST "${{ secrets.DISCORD_WEBHOOK_OPS }}" \
+            -H 'Content-Type: application/json' \
+            -d '{"content": "⚠️ xAAP health check failed!"}'

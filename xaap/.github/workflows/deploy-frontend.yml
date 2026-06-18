@@ -1,0 +1,43 @@
+name: Deploy xAAP Frontend
+
+on:
+  push:
+    branches: [main]
+    paths: ['xaap/frontend/**']
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy to Vercel
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: xaap/frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: xaap/frontend
+
+      - name: Type check
+        run: npm run typecheck
+        working-directory: xaap/frontend
+
+      - name: Build
+        run: npm run build
+        working-directory: xaap/frontend
+        env:
+          NEXT_PUBLIC_API_URL: https://xaap.scriptmasterlabs.com
+
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_XAAP }}
+          working-directory: xaap/frontend
+          vercel-args: '--prod'

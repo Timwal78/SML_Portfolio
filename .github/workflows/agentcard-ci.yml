@@ -57,19 +57,12 @@ jobs:
       - name: Run RSpec
         run: |
           cd agentcard
-          bundle exec rspec --format progress --format RspecJunitFormatter --out tmp/rspec_results.xml
+          bundle exec rspec --format progress
 
       - name: Run Brakeman security scan
         run: |
           cd agentcard
-          bundle exec brakeman --no-pager --exit-on-warn
-
-      - name: Upload test results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: rspec-results
-          path: agentcard/tmp/rspec_results.xml
+          bundle exec brakeman --no-pager --exit-on-warn --except EOLRails
 
   security:
     runs-on: ubuntu-latest

@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "name": "xmit-mcp",
+  "display_name": "xMIT Market Intelligence Trinity",
+  "description": "MCP server for xMIT. Three-module decentralized financial intelligence platform: xCGO (Governance), xSTM (Short Thesis), xIFD (Institutional Flow). Decode SEC EDGAR filings and access adversarial research via x402 USDC micropayments.",
+  "version": "1.0.0",
+  "server_url": "https://xmit.finance",
+  "mcp_endpoint": "https://xmit.finance/mcp",
+  "payment_required": true,
+  "payment_protocol": "x402",
+  "payment_assets": ["USDC/Base"],
+  "tools": [
+    {
+      "name": "xcgo_query",
+      "description": "Corporate Governance Oracle (xCGO). Fetch governance scores, board effectiveness, and executive compensation red flags decoded from SEC EDGAR DEF 14A proxy statements.",
+      "endpoint": "GET https://xmit.finance/v1/xcgo/query",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "ticker": {"type": "string", "description": "Stock ticker symbol"}
+        },
+        "required": ["ticker"]
+      }
+    },
+    {
+      "name": "xstm_query",
+      "description": "Short Thesis Marketplace (xSTM). Query adversarial research and red flags derived from EDGAR, OpenCorporates, and CourtListener.",
+      "endpoint": "GET https://xmit.finance/v1/xstm/query",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "ticker": {"type": "string", "description": "Stock ticker symbol"}
+        },
+        "required": ["ticker"]
+      }
+    },
+    {
+      "name": "xifd_query",
+      "description": "Institutional Flow Decoder (xIFD). Real-time tracking of institutional money movement via 13F, 13D, 13G, and Form 4 filings.",
+      "endpoint": "GET https://xmit.finance/v1/xifd/query",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "ticker": {"type": "string", "description": "Stock ticker symbol"},
+          "form_type": {"type": "string", "description": "Optional: 13F, 13D, 13G, or 4"}
+        },
+        "required": ["ticker"]
+      }
+    }
+  ]
+}
