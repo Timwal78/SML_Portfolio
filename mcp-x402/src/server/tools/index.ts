@@ -16,6 +16,8 @@ import { registerRails } from './rails.js';
 import { registerShadow } from './shadow.js';
 import { registerForge } from './forge.js';
 import { registerLaunchpad } from './launchpad.js';
+import { registerBacktest } from './backtest.js';
+import { registerBrokers } from './brokers.js';
 
 export async function registerTools(server: McpServer): Promise<void> {
   // Discovery layer — always first so agents can orient
@@ -29,11 +31,17 @@ export async function registerTools(server: McpServer): Promise<void> {
   registerXmit(server);
   registerFtd(server);
 
+  // Backtest & validation engine
+  registerBacktest(server);
+
   // Agent commerce
   registerNexus(server);
   registerCrawl(server);
   registerEcho(server);
   registerAgentCard(server);
+
+  // Broker execution rails
+  registerBrokers(server);
 
   // Infrastructure rails
   registerGhost(server);
