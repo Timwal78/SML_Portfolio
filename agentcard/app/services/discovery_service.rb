@@ -82,10 +82,14 @@ class DiscoveryService
   end
 
   def build_facets(scope)
+    # Strip ORDER BY before using scope as a subquery — PostgreSQL rejects
+    # SELECT DISTINCT agents.id ... ORDER BY reputation_score because
+    # reputation_score isn't in the subquery SELECT list.
+    clean_scope = scope.except(:order)
     {
-      capabilities: Capability.joins(:agent).where(agent: scope)
+      capabilities: Capability.joins(:agent).where(agent: clean_scope)
                               .group(:capability_id).count,
-      currencies: Capability.joins(:agent).where(agent: scope)
+      currencies: Capability.joins(:agent).where(agent: clean_scope)
                             .group(:price_currency).count
     }
   end
