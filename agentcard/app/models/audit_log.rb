@@ -11,12 +11,6 @@ class AuditLog < ApplicationRecord
   # Audit logs are append-only — no updated_at column
   self.record_timestamps = false
 
-  # ApplicationRecord includes Auditable globally; skip here to prevent
-  # AuditLog.create! from triggering audit_create in an infinite loop.
-  skip_callback :create, :after, :audit_create
-  skip_callback :update, :after, :audit_update
-  skip_callback :destroy, :after, :audit_destroy
-
   belongs_to :actor, polymorphic: true, optional: true
 
   validates :table_name, presence: true
