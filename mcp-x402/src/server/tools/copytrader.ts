@@ -53,10 +53,10 @@ export function registerCopyTrader(server: McpServer): void {
   server.tool(
     'copytrader_subscribe',
     {
-      whale_address: { type: 'string', description: 'XRPL address of the whale to copy.' },
-      subscriber_address: { type: 'string', description: 'Your XRPL address that will mirror trades.' },
-      max_copy_amount_xrp: { type: 'number', description: 'Maximum XRP to allocate per copied trade.' },
-      wallet_address: { type: 'string', description: 'Agent wallet for x402 payment.' },
+      whale_address: z.string().describe('XRPL address of the whale to copy.'),
+      subscriber_address: z.string().describe('Your XRPL address that will mirror trades.'),
+      max_copy_amount_xrp: z.number().describe('Maximum XRP to allocate per copied trade.'),
+      wallet_address: z.string().describe('Agent wallet for x402 payment.'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(SubscribeSchema, rawArgs);

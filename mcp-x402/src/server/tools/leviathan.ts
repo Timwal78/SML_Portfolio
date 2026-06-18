@@ -18,10 +18,10 @@ export function registerLeviathan(server: McpServer): void {
   server.tool(
     'leviathan_signal',
     {
-      ticker: { type: 'string', description: 'Ticker symbol (e.g. TSLA, MSTR). Optional — omit for top signals.' },
-      signal_type: { type: 'string', enum: ['squeeze', 'momentum', 'dark_pool', 'all'], description: 'Signal category.' },
-      min_confidence: { type: 'number', description: 'Minimum confidence score 0-100. Default: 60.' },
-      wallet_address: { type: 'string', description: 'Agent wallet address for payment. Auto-provisioned if omitted.' },
+      ticker: z.string().describe('Ticker symbol (e.g. TSLA, MSTR). Optional — omit for top signals.'),
+      signal_type: z.enum(['squeeze', 'momentum', 'dark_pool', 'all']).describe('Signal category.'),
+      min_confidence: z.number().describe('Minimum confidence score 0-100. Default: 60.'),
+      wallet_address: z.string().describe('Agent wallet address for payment. Auto-provisioned if omitted.'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(InputSchema, rawArgs);
@@ -54,7 +54,7 @@ export function registerLeviathan(server: McpServer): void {
       const data = await client.getSignal({
         ticker: args.ticker,
         signalType: args.signal_type,
-        minConfidence: args.min_confidence,
+        minConfidence: args.min_confidence ?? 60,
       });
 
       audit.info('leviathan_success', { ticker: args.ticker ?? 'all', receiptId: payment.receiptId });

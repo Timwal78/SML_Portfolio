@@ -28,10 +28,10 @@ export function registerFtd(server: McpServer): void {
   server.tool(
     'ftd_threshold_scan',
     {
-      scan_type: { type: 'string', enum: ['alerts', 'full', 'spike_history'], description: '"alerts" is free. "full" and "spike_history" require 0.05 USDC.' },
-      ticker: { type: 'string', description: 'Filter by ticker. Optional.' },
-      min_spike_multiplier: { type: 'number', description: 'Minimum FTD spike multiplier vs baseline. Default: 2x.' },
-      wallet_address: { type: 'string', description: 'Agent wallet for paid scans.' },
+      scan_type: z.enum(['alerts', 'full', 'spike_history']).describe('"alerts" is free. "full" and "spike_history" require 0.05 USDC.'),
+      ticker: z.string().describe('Filter by ticker. Optional.'),
+      min_spike_multiplier: z.number().describe('Minimum FTD spike multiplier vs baseline. Default: 2x.'),
+      wallet_address: z.string().describe('Agent wallet for paid scans.'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(InputSchema, rawArgs);
@@ -52,7 +52,7 @@ export function registerFtd(server: McpServer): void {
         }
 
         const client = FtdClient.getInstance();
-        const data = await client.getAlerts({ ticker: args.ticker, minSpikeMultiplier: args.min_spike_multiplier });
+        const data = await client.getAlerts({ ticker: args.ticker, minSpikeMultiplier: args.min_spike_multiplier ?? 2 });
         alertCache.set(cacheKey, { data, ts: now });
         audit.info('ftd_alert_success', { ticker: args.ticker ?? 'all' });
         return { content: [{ type: 'text', text: JSON.stringify({ data, tier: 'free' }) }] };
@@ -78,7 +78,7 @@ export function registerFtd(server: McpServer): void {
       }
 
       const client = FtdClient.getInstance();
-      const data = await client.getFullScan({ ticker: args.ticker, scanType: args.scan_type, minSpikeMultiplier: args.min_spike_multiplier });
+      const data = await client.getFullScan({ ticker: args.ticker, scanType: args.scan_type, minSpikeMultiplier: args.min_spike_multiplier ?? 2 });
       fullCache.set(cacheKey, { data, ts: now });
 
       audit.info('ftd_paid_success', { ticker: args.ticker ?? 'all', receiptId: payment.receiptId });

@@ -93,7 +93,7 @@ export function registerSqueezeOS(server: McpServer): void {
   server.tool(
     'squeezeos_preview',
     {
-      symbol: { type: 'string', description: 'Ticker symbol (e.g. TSLA, IWM, MSTR).' },
+      symbol: z.string().describe('Ticker symbol (e.g. TSLA, IWM, MSTR).'),
     },
     async (rawArgs) => {
       const { symbol } = Sandbox.validate(SymbolSchema, rawArgs);
@@ -114,7 +114,7 @@ export function registerSqueezeOS(server: McpServer): void {
   server.tool(
     'squeezeos_history',
     {
-      symbol: { type: 'string', description: 'Ticker symbol. Omit to get all recent signals.' },
+      symbol: z.string().describe('Ticker symbol. Omit to get all recent signals.'),
     },
     async (rawArgs) => {
       const { symbol } = Sandbox.validate(OptionalSymbolSchema, rawArgs);
@@ -135,7 +135,7 @@ export function registerSqueezeOS(server: McpServer): void {
   server.tool(
     'squeezeos_oracle',
     {
-      symbol: { type: 'string', description: 'Ticker symbol. Omit for full oracle batch.' },
+      symbol: z.string().describe('Ticker symbol. Omit for full oracle batch.'),
     },
     async (rawArgs) => {
       const { symbol } = Sandbox.validate(OptionalSymbolSchema, rawArgs);
@@ -242,8 +242,8 @@ export function registerSqueezeOS(server: McpServer): void {
   server.tool(
     'squeezeos_council',
     {
-      symbol: { type: 'string', description: 'Ticker symbol to analyze (e.g. TSLA, GME, IWM).' },
-      wallet_address: { type: 'string', description: 'Agent wallet address for x402 payment.' },
+      symbol: z.string().describe('Ticker symbol to analyze (e.g. TSLA, GME, IWM).'),
+      wallet_address: z.string().describe('Agent wallet address for x402 payment.'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(CouncilSchema, rawArgs);
@@ -257,7 +257,7 @@ export function registerSqueezeOS(server: McpServer): void {
   server.tool(
     'squeezeos_scan',
     {
-      wallet_address: { type: 'string', description: 'Agent wallet address for x402 payment.' },
+      wallet_address: z.string().describe('Agent wallet address for x402 payment.'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(PaidSchema, rawArgs);
@@ -271,7 +271,7 @@ export function registerSqueezeOS(server: McpServer): void {
   server.tool(
     'squeezeos_options',
     {
-      wallet_address: { type: 'string', description: 'Agent wallet address for x402 payment.' },
+      wallet_address: z.string().describe('Agent wallet address for x402 payment.'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(PaidSchema, rawArgs);
@@ -285,7 +285,7 @@ export function registerSqueezeOS(server: McpServer): void {
   server.tool(
     'squeezeos_iwm',
     {
-      wallet_address: { type: 'string', description: 'Agent wallet address for x402 payment.' },
+      wallet_address: z.string().describe('Agent wallet address for x402 payment.'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(PaidSchema, rawArgs);
@@ -299,8 +299,8 @@ export function registerSqueezeOS(server: McpServer): void {
   server.tool(
     'squeezeos_marketplace_read',
     {
-      listing_id: { type: 'string', description: 'Listing ID from squeezeos_marketplace_browse.' },
-      wallet_address: { type: 'string', description: 'Agent wallet address for x402 payment.' },
+      listing_id: z.string().describe('Listing ID from squeezeos_marketplace_browse.'),
+      wallet_address: z.string().describe('Agent wallet address for x402 payment.'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(MarketplaceReadSchema, rawArgs);

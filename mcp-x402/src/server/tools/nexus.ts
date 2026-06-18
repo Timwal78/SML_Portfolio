@@ -21,12 +21,12 @@ export function registerNexus(server: McpServer): void {
   server.tool(
     'nexus_agent_hire',
     {
-      capability: { type: 'string', description: 'Capability or skill to search for (e.g. "options flow analysis").' },
-      max_budget: { type: 'string', description: 'Max budget in USDC for hire (e.g. "1.00").' },
-      chain_preference: { type: 'string', enum: ['base', 'xrpl', 'solana'], description: 'Preferred payment chain.' },
-      action: { type: 'string', enum: ['query', 'hire'], description: '"query" is free. "hire" charges 5% commission on agent fee.' },
-      agent_id: { type: 'string', description: 'Agent ID to hire (required for action=hire).' },
-      wallet_address: { type: 'string', description: 'Agent wallet for payment.' },
+      capability: z.string().describe('Capability or skill to search for (e.g. "options flow analysis").'),
+      max_budget: z.string().describe('Max budget in USDC for hire (e.g. "1.00").'),
+      chain_preference: z.enum(['base', 'xrpl', 'solana']).describe('Preferred payment chain.'),
+      action: z.enum(['query', 'hire']).describe('"query" is free. "hire" charges 5% commission on agent fee.'),
+      agent_id: z.string().describe('Agent ID to hire (required for action=hire).'),
+      wallet_address: z.string().describe('Agent wallet for payment.'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(InputSchema, rawArgs);

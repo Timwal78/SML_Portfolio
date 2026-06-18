@@ -25,7 +25,7 @@ export function registerProof402(server: McpServer): void {
   server.tool(
     'proof_invoice',
     {
-      endpoint_id: { type: 'string', description: 'UUID of the premium endpoint to get a payment invoice for.' },
+      endpoint_id: z.string().describe('UUID of the premium endpoint to get a payment invoice for.'),
     },
     async (rawArgs) => {
       const { endpoint_id } = Sandbox.validate(InvoiceSchema, rawArgs);
@@ -46,8 +46,8 @@ export function registerProof402(server: McpServer): void {
   server.tool(
     'proof_verify',
     {
-      tx_hash: { type: 'string', description: 'XRPL transaction hash to verify.' },
-      endpoint_id: { type: 'string', description: 'UUID of the endpoint the payment was for.' },
+      tx_hash: z.string().describe('XRPL transaction hash to verify.'),
+      endpoint_id: z.string().describe('UUID of the endpoint the payment was for.'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(VerifySchema, rawArgs);
@@ -68,7 +68,7 @@ export function registerProof402(server: McpServer): void {
   server.tool(
     'proof_credit_score',
     {
-      wallet_address: { type: 'string', description: 'Agent wallet address to look up credit score for (300-850 scale).' },
+      wallet_address: z.string().describe('Agent wallet address to look up credit score for (300-850 scale).'),
     },
     async (rawArgs) => {
       const { wallet_address } = Sandbox.validate(CreditSchema, rawArgs);

@@ -37,12 +37,12 @@ export function registerGhost(server: McpServer): void {
   server.tool(
     'ghost_route',
     {
-      from_chain: { type: 'string', enum: ['xrpl', 'base'], description: 'Source chain.' },
-      to_chain: { type: 'string', enum: ['xrpl', 'base'], description: 'Destination chain.' },
-      amount: { type: 'string', description: 'Amount to route (as string to preserve precision).' },
-      currency: { type: 'string', description: 'Token/currency symbol (e.g. RLUSD, XRP, ETH).' },
-      destination_address: { type: 'string', description: 'Recipient address on the destination chain.' },
-      wallet_address: { type: 'string', description: 'Agent wallet for x402 payment.' },
+      from_chain: z.enum(['xrpl', 'base']).describe('Source chain.'),
+      to_chain: z.enum(['xrpl', 'base']).describe('Destination chain.'),
+      amount: z.string().describe('Amount to route (as string to preserve precision).'),
+      currency: z.string().describe('Token/currency symbol (e.g. RLUSD, XRP, ETH).'),
+      destination_address: z.string().describe('Recipient address on the destination chain.'),
+      wallet_address: z.string().describe('Agent wallet for x402 payment.'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(RouteSchema, rawArgs);

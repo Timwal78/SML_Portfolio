@@ -35,10 +35,10 @@ export function registerForge(server: McpServer): void {
   server.tool(
     'forge_llm',
     {
-      model: { type: 'string', description: 'Model identifier (e.g. "claude-3-5-haiku-20241022", "gpt-4o-mini").' },
-      prompt: { type: 'string', description: 'Prompt to send to the LLM (max 32768 chars).' },
-      max_tokens: { type: 'number', description: 'Maximum tokens in the response (default: model max). Max: 8192.' },
-      wallet_address: { type: 'string', description: 'Agent wallet for x402 pay-per-token billing.' },
+      model: z.string().describe('Model identifier (e.g. "claude-3-5-haiku-20241022", "gpt-4o-mini").'),
+      prompt: z.string().describe('Prompt to send to the LLM (max 32768 chars).'),
+      max_tokens: z.number().describe('Maximum tokens in the response (default: model max). Max: 8192.'),
+      wallet_address: z.string().describe('Agent wallet for x402 pay-per-token billing.'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(LLMSchema, rawArgs);

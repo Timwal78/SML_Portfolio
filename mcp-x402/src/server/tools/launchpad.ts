@@ -63,13 +63,13 @@ export function registerLaunchpad(server: McpServer): void {
   server.tool(
     'launchpad_create',
     {
-      name: { type: 'string', description: 'Token name (e.g. "Moon Rocket").' },
-      symbol: { type: 'string', description: 'Ticker symbol (e.g. MNRKT, max 10 chars).' },
-      description: { type: 'string', description: 'Token description (max 512 chars).' },
-      creator_address: { type: 'string', description: 'XRPL address of the token creator.' },
-      initial_supply: { type: 'number', description: 'Total token supply (integer).' },
-      target_liquidity_xrp: { type: 'number', description: 'XRP target to graduate from bonding curve to DEX.' },
-      wallet_address: { type: 'string', description: 'Agent wallet for x402 payment.' },
+      name: z.string().describe('Token name (e.g. "Moon Rocket").'),
+      symbol: z.string().describe('Ticker symbol (e.g. MNRKT, max 10 chars).'),
+      description: z.string().describe('Token description (max 512 chars).'),
+      creator_address: z.string().describe('XRPL address of the token creator.'),
+      initial_supply: z.number().describe('Total token supply (integer).'),
+      target_liquidity_xrp: z.number().describe('XRP target to graduate from bonding curve to DEX.'),
+      wallet_address: z.string().describe('Agent wallet for x402 payment.'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(CreateSchema, rawArgs);
@@ -122,10 +122,10 @@ export function registerLaunchpad(server: McpServer): void {
   server.tool(
     'launchpad_buy',
     {
-      token_address: { type: 'string', description: 'Token contract/address on XRPL.' },
-      buyer_address: { type: 'string', description: 'XRPL address of the buyer.' },
-      xrp_amount: { type: 'number', description: 'Amount of XRP to spend on the bonding curve.' },
-      wallet_address: { type: 'string', description: 'Agent wallet for x402 payment.' },
+      token_address: z.string().describe('Token contract/address on XRPL.'),
+      buyer_address: z.string().describe('XRPL address of the buyer.'),
+      xrp_amount: z.number().describe('Amount of XRP to spend on the bonding curve.'),
+      wallet_address: z.string().describe('Agent wallet for x402 payment.'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(BuySchema, rawArgs);
