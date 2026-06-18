@@ -82,10 +82,11 @@ class DiscoveryService
   end
 
   def build_facets(scope)
+    base = scope.unscope(:order)
     {
-      capabilities: Capability.joins(:agent).where(agent: scope)
+      capabilities: Capability.joins(:agent).where(agent: base)
                               .group(:capability_id).count,
-      currencies: Capability.joins(:agent).where(agent: scope)
+      currencies: Capability.joins(:agent).where(agent: base)
                             .group(:price_currency).count
     }
   end
