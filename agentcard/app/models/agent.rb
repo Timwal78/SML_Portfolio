@@ -114,7 +114,7 @@ class Agent < ApplicationRecord
     pem = private_key_pem
     return nil if pem.nil?
 
-    raw_private_key = decode_key_bytes(pem)
+    raw_private_key = Base64.decode64(pem)
     signing_key = RbNaCl::SigningKey.new(raw_private_key)
     payload_str = payload_hash.is_a?(String) ? payload_hash : payload_hash.to_json
     signature_bytes = signing_key.sign(payload_str)

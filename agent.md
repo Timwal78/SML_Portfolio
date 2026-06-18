@@ -44,18 +44,19 @@
 - **Xahau (XAH):** Hooks-based payment routing (XahPay — in development).
 - **Flow for agents:** `GET resource → 402 + terms → pay USDC → retry with X-PAYMENT header → 200`.
 
-## 4. Product Graph — Live x402 Stack (8 products)
+## 4. Product Graph — Live x402 Stack (9 products)
 
-**TL;DR:** Eight shipped products let agents discover, pay for, and settle services autonomously.
+**TL;DR:** Nine shipped products let agents discover, pay for, and settle services autonomously.
 
-1. **CRAWLTOLL** — One-command x402 paywall turning AI crawling into revenue; crawlers pay USDC on Base per fetch, humans browse free. `npx crawltoll init`. npm: `crawltoll`. https://www.scriptmasterlabs.com/crawltoll.html
-2. **SqueezeOS x402 API** — Institutional market intelligence: council verdicts, squeeze scanner, options flow, IWM 0DTE, oracle feeds (SEC 8-K, FDA, USPTO), pay-per-signal. https://squeezeos-api.onrender.com
-3. **402Proof** — Agent payment firewall: RLUSD rail + agent credit bureau with discount curve. https://four02proof.onrender.com
-4. **Nexus-402** — x402 marketplace + autonomous agent layer with RAG. https://www.nexus-402.com
-5. **Ghost Layer** — Bridge, stealth routing, copy, hooks, notary, and marketplace sub-products.
-6. **Leviathan Matrix** — Execution matrix with on-chain dNFT state.
-7. **XRPL Fee Forge** — XRPL fee/settlement tooling.
-8. **BEAST Orchestrator** — Multi-service orchestration layer.
+1. **AgentCard** — Universal identity, discovery, and commerce layer for AI agents. Every agent receives a cryptographically signed business card (Ed25519 / `did:agentcard:<fingerprint>`) served at `/.well-known/agentcard`, full-text discovery via `/discover`, x402 hire flow (USDC on Base), and a Merkle-anchored daily reputation score. Rails 7.2 + PostgreSQL + Sidekiq. GitHub: `timwal78/SML_Portfolio` (`agentcard/`). https://agentcard.io
+2. **CRAWLTOLL** — One-command x402 paywall turning AI crawling into revenue; crawlers pay USDC on Base per fetch, humans browse free. `npx crawltoll init`. npm: `crawltoll`. https://www.scriptmasterlabs.com/crawltoll.html
+3. **SqueezeOS x402 API** — Institutional market intelligence: council verdicts, squeeze scanner, options flow, IWM 0DTE, oracle feeds (SEC 8-K, FDA, USPTO), pay-per-signal. https://squeezeos-api.onrender.com
+4. **402Proof** — Agent payment firewall: RLUSD rail + agent credit bureau with discount curve. https://four02proof.onrender.com
+5. **Nexus-402** — x402 marketplace + autonomous agent layer with RAG. https://www.nexus-402.com
+6. **Ghost Layer** — Bridge, stealth routing, copy, hooks, notary, and marketplace sub-products.
+7. **Leviathan Matrix** — Execution matrix with on-chain dNFT state.
+8. **XRPL Fee Forge** — XRPL fee/settlement tooling.
+9. **BEAST Orchestrator** — Multi-service orchestration layer.
 
 Also shipped: **x402 Paywall (`proof402-middleware`)** — drop-in x402 middleware for MCP servers/APIs (npm), and **MasterSheets** — BYOK AI-native spreadsheet, no subscription, user owns 100% of data. https://www.scriptmasterlabs.com/mastersheets.html
 
