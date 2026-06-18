@@ -1,7 +1,7 @@
 {
   "name": "@scriptmasterlabs/mcp-x402",
-  "version": "1.0.0",
-  "description": "The first MCP server that pays for itself. AI agents pay for ScriptMasterLabs data autonomously via x402.",
+  "version": "2.0.0",
+  "description": "The Amazon for all things payrail. 43 MCP tools across institutional trading intelligence, SEC data, XRPL/Base/Solana payments, agent commerce, and sovereign Web3 infrastructure — all gated by x402 micropayments.",
   "main": "dist/server/index.js",
   "types": "dist/server/index.d.ts",
   "bin": {
