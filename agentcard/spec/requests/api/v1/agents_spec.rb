@@ -53,7 +53,7 @@ RSpec.describe 'Api::V1::Agents', type: :request do
     end
 
     it 'returns 401 without authentication' do
-      json_post '/api/v1/agents', params:
+      json_post '/api/v1/agents', params: {}
       expect(response).to have_http_status(:unauthorized)
     end
   end
@@ -87,7 +87,7 @@ RSpec.describe 'Api::V1::Agents', type: :request do
   describe 'POST /api/v1/agents/:id/heartbeat' do
     it 'updates last_seen_at with valid HMAC' do
       headers = agent_hmac_headers(agent, 'POST', "/api/v1/agents/#{agent.id}/heartbeat")
-      post "/api/v1/agents/#{agent.id}/heartbeat", headers:
+      post "/api/v1/agents/#{agent.id}/heartbeat", headers: headers
       expect(response).to have_http_status(:ok)
       expect(json_response['status']).to eq('ok')
       expect(agent.reload.last_seen_at).to be_within(5.seconds).of(Time.current)
@@ -116,12 +116,12 @@ RSpec.describe 'Api::V1::Agents', type: :request do
       headers = auth_headers(user).merge('Idempotency-Key' => 'test-key-123')
       json_post "/api/v1/agents/#{agent.id}/hire",
                 params: { capability_id: capability.capability_id },
-                headers:
+                headers: headers
       tx_id = json_response['transaction_id']
 
       json_post "/api/v1/agents/#{agent.id}/hire",
                 params: { capability_id: capability.capability_id },
-                headers:
+                headers: headers
       expect(json_response['transaction_id']).to eq(tx_id)
     end
   end

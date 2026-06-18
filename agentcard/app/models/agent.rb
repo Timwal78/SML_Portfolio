@@ -51,8 +51,8 @@ class Agent < ApplicationRecord
     raw = self[:encrypted_private_key]
     return nil if raw.nil?
 
-    if defined?(Lockbox) && Lockbox.default_key.present?
-      box = Lockbox.new(key: Lockbox.default_key)
+    if defined?(Lockbox) && Lockbox.master_key.present?
+      box = Lockbox.new(key: Lockbox.master_key)
       @private_key_pem = box.decrypt(Base64.decode64(raw))
     else
       @private_key_pem = raw
@@ -69,8 +69,8 @@ class Agent < ApplicationRecord
       return
     end
 
-    if defined?(Lockbox) && Lockbox.default_key.present?
-      box = Lockbox.new(key: Lockbox.default_key)
+    if defined?(Lockbox) && Lockbox.master_key.present?
+      box = Lockbox.new(key: Lockbox.master_key)
       self[:encrypted_private_key] = Base64.strict_encode64(box.encrypt(value))
     else
       self[:encrypted_private_key] = value
