@@ -48,9 +48,14 @@ class DiscoveryService
       scope = scope.where('capabilities.price_amount <= ?', @max_price) if @max_price
       scope = scope.where('capabilities.price_currency = ?', @currency) if @currency
       scope = scope.where('capabilities.capability_id = ?', @capability_type) if @capability_type
+      # DISTINCT only needed here to deduplicate agents that match multiple
+      # capabilities. Applying it unconditionally breaks pg_search text search
+      # because pg_search adds ORDER BY rank (a join alias) which PostgreSQL
+      # rejects under DISTINCT when rank is not in the SELECT list.
+      scope = Agent.where(id: scope.reorder(nil).select(:id))
     end
 
-    scope.distinct
+    scope
   end
 
   def apply_sort(scope)
