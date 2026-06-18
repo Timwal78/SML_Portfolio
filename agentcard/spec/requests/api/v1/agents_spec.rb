@@ -53,7 +53,7 @@ RSpec.describe 'Api::V1::Agents', type: :request do
     end
 
     it 'returns 401 without authentication' do
-      json_post '/api/v1/agents', params: {}
+      json_post '/api/v1/agents', params: params
       expect(response).to have_http_status(:unauthorized)
     end
   end

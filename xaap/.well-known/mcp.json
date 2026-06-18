@@ -1,0 +1,23 @@
+{
+  "mcpServers": {
+    "xaap": {
+      "url": "https://xaap.scriptmasterlabs.com/mcp",
+      "transport": "streamable-http",
+      "description": "xAAP — Decentralized Adversarial Audit Protocol. Forensic research marketplace with x402 micropayments."
+    }
+  },
+  "tools": [
+    { "name": "get_ticker_health", "description": "Get corporate health score (free)", "cost": null },
+    { "name": "list_tickers", "description": "List all covered tickers (free)", "cost": null },
+    { "name": "get_findings", "description": "Forensic findings for a ticker", "cost": "$0.01 USDC" },
+    { "name": "get_finding_detail", "description": "Full forensic thesis", "cost": "varies" },
+    { "name": "get_auditor_profile", "description": "Auditor reputation profile (free)", "cost": null },
+    { "name": "get_leaderboard", "description": "Global auditor leaderboard (free)", "cost": null },
+    { "name": "query_forensics", "description": "Natural language query", "cost": "$0.05 USDC" },
+    { "name": "get_recent_filings", "description": "Recent EDGAR filings processed (free)", "cost": null },
+    { "name": "register_auditor", "description": "Register as auditor (free)", "cost": null },
+    { "name": "submit_finding", "description": "Submit forensic finding (free to submit)", "cost": null },
+    { "name": "get_loyalty_status", "description": "Tier and streak status (free)", "cost": null },
+    { "name": "register_agent", "description": "Register AI agent for affiliate fees (free)", "cost": null }
+  ]
+}

@@ -48,7 +48,11 @@ class DiscoveryService
       scope = scope.where('capabilities.price_amount <= ?', @max_price) if @max_price
       scope = scope.where('capabilities.price_currency = ?', @currency) if @currency
       scope = scope.where('capabilities.capability_id = ?', @capability_type) if @capability_type
-      scope = scope.distinct
+      # DISTINCT only needed here to deduplicate agents that match multiple
+      # capabilities. Applying it unconditionally breaks pg_search text search
+      # because pg_search adds ORDER BY rank (a join alias) which PostgreSQL
+      # rejects under DISTINCT when rank is not in the SELECT list.
+      scope = Agent.where(id: scope.reorder(nil).select(:id))
     end
 
     scope
@@ -83,11 +87,14 @@ class DiscoveryService
   end
 
   def build_facets(scope)
-    base = scope.unscope(:order)
+    # Strip ORDER BY before using scope as a subquery — PostgreSQL rejects
+    # SELECT DISTINCT agents.id ... ORDER BY reputation_score because
+    # reputation_score isn't in the subquery SELECT list.
+    clean_scope = scope.except(:order)
     {
-      capabilities: Capability.joins(:agent).where(agent: base)
+      capabilities: Capability.joins(:agent).where(agent: clean_scope)
                               .group(:capability_id).count,
-      currencies: Capability.joins(:agent).where(agent: base)
+      currencies: Capability.joins(:agent).where(agent: clean_scope)
                             .group(:price_currency).count
     }
   end

@@ -43,46 +43,20 @@ class Agent < ApplicationRecord
   scope :active, -> { where(status: "active") }
   scope :available, -> { active.where("last_seen_at > ?", 5.minutes.ago) }
 
-  # Lockbox attribute encryption for private key
-  # Falls back to plain attribute if lockbox is not configured
   def private_key_pem
     return @private_key_pem if defined?(@private_key_pem)
-
-    raw = self[:encrypted_private_key]
-    return nil if raw.nil?
-
-    if defined?(Lockbox) && Lockbox.master_key.present?
-      box = Lockbox.new(key: Lockbox.master_key)
-      @private_key_pem = box.decrypt(Base64.decode64(raw))
-    else
-      @private_key_pem = raw
-    end
-  rescue StandardError
-    nil
+    @private_key_pem = self[:encrypted_private_key]
   end
 
   def private_key_pem=(value)
     @private_key_pem = value
-
-    if value.nil?
-      self[:encrypted_private_key] = nil
-      return
-    end
-
-    if defined?(Lockbox) && Lockbox.master_key.present?
-      box = Lockbox.new(key: Lockbox.master_key)
-      self[:encrypted_private_key] = Base64.strict_encode64(box.encrypt(value))
-    else
-      self[:encrypted_private_key] = value
-    end
+    self[:encrypted_private_key] = value
   end
 
-  # Returns true if the agent sent a heartbeat within the last 5 minutes
   def available?
     last_seen_at.present? && last_seen_at > 5.minutes.ago
   end
 
-  # Updates agent status based on most recent heartbeat
   def update_availability!
     new_status = if last_seen_at.nil?
                    "inactive"
@@ -97,7 +71,6 @@ class Agent < ApplicationRecord
     update_column(:status, new_status) if status != new_status && status != "deactivated"
   end
 
-  # Builds the full AgentCard JSON hash per the A2A/AgentCard spec
   def generate_card_payload
     {
       "@context" => "https://agentcard.io/ns/v1",
@@ -137,8 +110,6 @@ class Agent < ApplicationRecord
     }.compact
   end
 
-  # Signs a payload hash with this agent's Ed25519 private key
-  # Returns Base64-encoded signature string, or nil if no private key available
   def sign_payload(payload_hash)
     pem = private_key_pem
     return nil if pem.nil?
@@ -153,7 +124,6 @@ class Agent < ApplicationRecord
     nil
   end
 
-  # Verifies a base64-encoded signature against this agent's public key
   def verify_signature(payload_str, signature_b64)
     return false if public_key.blank? || signature_b64.blank?
 
@@ -166,7 +136,6 @@ class Agent < ApplicationRecord
     false
   end
 
-  # Calculates reputation score as a weighted average from reputation_events
   def calculate_reputation_score
     events = reputation_events.order(created_at: :desc).limit(100)
     return 0.0 if events.empty?
@@ -182,7 +151,6 @@ class Agent < ApplicationRecord
     weighted_sum = 0.0
 
     events.each_with_index do |event, index|
-      # More recent events get higher weight (exponential decay)
       recency_weight = Math.exp(-index * 0.05)
       event_weight = (weights[event.event_type] || 0.10).abs * recency_weight
 
@@ -193,7 +161,6 @@ class Agent < ApplicationRecord
     return 0.0 if total_weight.zero?
 
     raw_score = weighted_sum / total_weight
-    # Clamp to [-1.0, 1.0] then normalize to [0.0, 1.0]
     normalized = (raw_score.clamp(-1.0, 1.0) + 1.0) / 2.0
     normalized.round(2)
   end
@@ -227,16 +194,11 @@ class Agent < ApplicationRecord
     signing_key = RbNaCl::SigningKey.generate
     verify_key = signing_key.verify_key
 
-    # Store public key as multibase (base58btc) — prefix with 'z' per multibase spec
     self.public_key = "z#{Base64.strict_encode64(verify_key.to_bytes)}"
     self.private_key_pem = Base64.strict_encode64(signing_key.to_bytes)
   end
 
   def enqueue_card_rebuild
-    RebuildAgentCardJob.perform_later(id) if persisted?
-  end
-
-  def rebuild_card_payload_async
     RebuildAgentCardJob.perform_later(id) if persisted?
   end
 
@@ -258,7 +220,6 @@ class Agent < ApplicationRecord
   end
 
   def decode_key_bytes(key_str)
-    # Handle multibase prefix 'z' (base58btc) or plain base64
     if key_str.start_with?("z")
       Base64.decode64(key_str[1..])
     else
