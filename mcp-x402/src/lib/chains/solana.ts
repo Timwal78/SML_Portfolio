@@ -6,9 +6,9 @@ import {
   sendAndConfirmTransaction,
 } from '@solana/web3.js';
 import { createTransferInstruction, getAssociatedTokenAddress } from '@solana/spl-token';
-import * as keytar from 'keytar';
 import { mnemonicToSeedSync } from 'bip39';
 import HDKey from 'hdkey';
+import { WalletManager } from '../../server/payments/wallet.js';
 import type { RouteParams } from '../../server/payments/router.js';
 
 // USDC mint on Solana mainnet
@@ -48,8 +48,7 @@ export class SolanaChain {
   }
 
   private async getKeypair(): Promise<Keypair> {
-    const mnemonic = await keytar.getPassword('mcp-x402', 'master-seed');
-    if (!mnemonic) throw new Error('Wallet not initialized');
+    const mnemonic = await WalletManager.getInstance().getSeed();
     const seed = mnemonicToSeedSync(mnemonic);
     const hdkey = HDKey.fromMasterSeed(seed);
     // BIP-44 for Solana: m/44'/501'/0'/0'

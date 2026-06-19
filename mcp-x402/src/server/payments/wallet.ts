@@ -46,7 +46,7 @@ export class WalletManager {
   // 2. WALLET_SEED env var (Render secret — cloud/Docker deployment)
   // 3. CI_WALLET_SEED env var (CI only, never production)
   // 4. Generate fresh and try to persist in keychain
-  private async getSeed(): Promise<string> {
+  async getSeed(): Promise<string> {
     if (this.cachedSeed) return this.cachedSeed;
 
     const audit = AuditLogger.getInstance();

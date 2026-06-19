@@ -1,5 +1,5 @@
 import { Client, Wallet, xrpToDrops } from 'xrpl';
-import * as keytar from 'keytar';
+import { WalletManager } from '../../server/payments/wallet.js';
 import type { RouteParams } from '../../server/payments/router.js';
 
 export class XRPLChain {
@@ -57,9 +57,7 @@ export class XRPLChain {
   }
 
   private async getWallet(): Promise<Wallet> {
-    const mnemonic = await keytar.getPassword('mcp-x402', 'master-seed');
-    if (!mnemonic) throw new Error('Wallet not initialized');
-    // BIP-44 path m/44'/144'/0'/0/0 via bip39 mnemonic encoding
+    const mnemonic = await WalletManager.getInstance().getSeed();
     return Wallet.fromMnemonic(mnemonic, { mnemonicEncoding: 'bip39' });
   }
 }

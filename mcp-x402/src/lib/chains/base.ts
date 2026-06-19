@@ -1,9 +1,9 @@
 import { createWalletClient, createPublicClient, http, parseUnits } from 'viem';
 import { base, baseSepolia } from 'viem/chains';
 import { privateKeyToAccount } from 'viem/accounts';
-import * as keytar from 'keytar';
 import { mnemonicToSeedSync } from 'bip39';
 import HDKey from 'hdkey';
+import { WalletManager } from '../../server/payments/wallet.js';
 import type { RouteParams } from '../../server/payments/router.js';
 
 // USDC contract on Base mainnet
@@ -67,8 +67,7 @@ export class BaseChain {
   }
 
   private async getPrivateKey(): Promise<`0x${string}`> {
-    const mnemonic = await keytar.getPassword('mcp-x402', 'master-seed');
-    if (!mnemonic) throw new Error('Wallet not initialized');
+    const mnemonic = await WalletManager.getInstance().getSeed();
     const seed = mnemonicToSeedSync(mnemonic);
     const hdkey = HDKey.fromMasterSeed(seed);
     const child = hdkey.derive("m/44'/60'/0'/0/0");
