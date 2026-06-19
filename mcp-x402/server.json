@@ -13,6 +13,9 @@
       "identifier": "@scriptmasterlabs/mcp-x402",
       "version": "2.0.1",
       "runtimeHint": "node",
+      "transport": {
+        "type": "stdio"
+      },
       "environmentVariables": [
         {
           "name": "MCP_TRANSPORT",
@@ -34,11 +37,11 @@
   ],
   "remotes": [
     {
-      "transport_type": "sse",
+      "type": "sse",
       "url": "https://mcp-x402.onrender.com/sse"
     },
     {
-      "transport_type": "streamable_http",
+      "type": "streamable-http",
       "url": "https://mcp-x402.onrender.com/mcp"
     }
   ]
