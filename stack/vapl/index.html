@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QHTHMG61N6"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-QHTHMG61N6');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VAPL — Verifiable Agent Provenance Layer | ScriptMasterLabs</title>
+    <meta name="description" content="Cryptographic identity, verifiable credentials, and reputation scoring for autonomous AI agents. W3C VC 2.0 · Ed25519 · DID:key · Zero custody.">
+    <meta name="keywords" content="AI agents, verifiable credentials, DID, Ed25519, agent reputation, W3C VC, x402, Script Master Labs, XRPL, provenance">
+    <meta name="author" content="Script Master Labs LLC">
+    <meta property="og:title" content="VAPL — Verifiable Agent Provenance Layer">
+    <meta property="og:description" content="Every API response is a signed credential. Know who the agent is, what it did, and whether to trust it.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.scriptmasterlabs.com/stack/vapl">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <link rel="canonical" href="https://www.scriptmasterlabs.com/stack/vapl">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "VAPL",
+      "alternateName": "Verifiable Agent Provenance Layer",
+      "description": "Cryptographic identity and reputation layer for autonomous AI agents. W3C Verifiable Credentials 2.0 + Ed25519 + DID:key.",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Linux, macOS, Windows",
+      "author": { "@type": "Organization", "name": "Script Master Labs LLC", "url": "https://www.scriptmasterlabs.com" },
+      "url": "https://www.scriptmasterlabs.com/stack/vapl",
+      "downloadUrl": "https://github.com/timwal78/sml_portfolio/tree/main/vapl",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "keywords": "AI agents, verifiable credentials, DID, Ed25519, reputation, W3C VC 2.0, x402, XRPL, provenance",
+      "version": "1.0.0"
+    }
+    </script>
+    <style>
+      :root{--bg:#000000;--panel:#0A0E0A;--panel2:#10140F;--line:#1C241C;--green:#39FF14;--green2:#00FF7F;--pink:#FF1493;--gold:#FFD700;--orange:#FF6B00;--white:#F5F7F5;--mute:#8A958C;--mute2:#5A6560;--mono:'JetBrains Mono','SF Mono',ui-monospace,Menlo,monospace;--sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
+      *{margin:0;padding:0;box-sizing:border-box;}
+      html{scroll-behavior:smooth;}
+      body{background:var(--bg);color:var(--white);font-family:var(--sans);line-height:1.5;-webkit-font-smoothing:antialiased;}
+      a{color:var(--green);text-decoration:none;}
+      a:hover{color:var(--green2);}
+      .wrap{max-width:1080px;margin:0 auto;padding:0 24px;}
+      header{padding:64px 0 36px;border-bottom:1px solid var(--line);position:relative;}
+      .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:3px;color:var(--green);text-transform:uppercase;margin-bottom:16px;}
+      h1{font-size:clamp(40px,8vw,72px);font-weight:800;letter-spacing:-2px;line-height:1;color:var(--green);text-shadow:0 0 30px rgba(57,255,20,.4);}
+      .sub{margin-top:18px;font-size:clamp(15px,2.2vw,19px);color:var(--mute);max-width:680px;}
+      .live-row{margin-top:24px;display:flex;flex-wrap:wrap;gap:10px;}
+      .chip{font-family:var(--mono);font-size:11px;padding:6px 12px;border:1px solid var(--line);border-radius:20px;color:var(--white);display:flex;align-items:center;gap:7px;}
+      .dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);}
+      .layer{padding:40px 0 8px;}
+      .layer-head{display:flex;align-items:baseline;gap:14px;margin-bottom:22px;border-bottom:1px solid var(--line);padding-bottom:12px;}
+      .layer-title{font-size:20px;font-weight:700;letter-spacing:-.3px;}
+      .layer-num{font-family:var(--mono);font-size:13px;color:var(--green);}
+      p.body{font-size:15px;color:var(--mute);margin-bottom:14px;max-width:760px;}
+      ul{margin:8px 0 18px 22px;color:var(--mute);}
+      li{margin-bottom:8px;font-size:15px;}
+      li b{color:var(--white);font-weight:600;}
+      .term{background:var(--panel);border:1px solid var(--green);border-radius:12px;padding:22px;font-family:var(--mono);font-size:13.5px;color:var(--green);overflow-x:auto;box-shadow:0 0 28px rgba(57,255,20,.12);margin:18px 0;line-height:1.7;}
+      .term .pink{color:var(--pink);} .term .gold{color:var(--gold);} .term .org{color:var(--orange);} .term .mut{color:var(--mute2);}
+      .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0;}
+      @media(max-width:720px){.grid{grid-template-columns:1fr;}}
+      .card{border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:22px;transition:.2s;}
+      .card:hover{border-color:var(--green);transform:translateY(-2px);}
+      .card h3{font-size:17px;font-weight:700;margin-bottom:6px;}
+      .card .role{font-family:var(--mono);font-size:10px;letter-spacing:1px;color:var(--mute2);text-transform:uppercase;}
+      .card p{font-size:13.5px;color:var(--mute);margin-top:10px;}
+      .score-table{width:100%;border-collapse:collapse;margin:18px 0;}
+      .score-table th,.score-table td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--line);font-size:14px;}
+      .score-table th{font-family:var(--mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--mute2);}
+      .score-table td:first-child{color:var(--gold);font-family:var(--mono);}
+      .cta{margin:48px 0 24px;padding:32px;border:1.5px solid var(--green);border-radius:16px;background:linear-gradient(180deg,var(--panel) 0%,#000 100%);text-align:center;}
+      .cta h2{font-size:24px;font-weight:800;letter-spacing:-.5px;}
+      .cta p{color:var(--mute);margin-top:10px;max-width:560px;margin-left:auto;margin-right:auto;font-size:14.5px;}
+      .cta-row{margin-top:22px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+      .btn{font-family:var(--mono);font-size:13px;padding:12px 24px;border-radius:10px;font-weight:600;}
+      .btn-primary{background:var(--green);color:#000;}
+      .btn-ghost{border:1px solid var(--line);color:var(--white);}
+      footer{border-top:1px solid var(--line);padding:28px 0 56px;color:var(--mute2);font-size:12px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-top:32px;}
+      footer a{color:var(--gold);}
+    </style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Script Master Labs · The SML Stack</div>
+    <h1>VAPL</h1>
+    <p class="sub">Verifiable Agent Provenance Layer. Every API response is a cryptographically signed credential. Know exactly who the agent is, what it did, and whether you can trust it — without a registry lookup, without custody, without intermediaries.</p>
+    <div class="live-row">
+      <div class="chip"><span class="dot"></span>v1.0.0 · live</div>
+      <div class="chip"><span class="dot"></span>W3C VC 2.0 · Ed25519</div>
+      <div class="chip"><span class="dot"></span>DID:key · zero custody</div>
+      <div class="chip"><span class="dot"></span>eddsa-vapl-2024</div>
+    </div>
+  </header>
+
+  <section class="layer">
+    <div class="layer-head"><span class="layer-num">01</span><span class="layer-title">What VAPL is</span></div>
+    <p class="body">VAPL is the provenance and reputation layer for autonomous AI agents in the SML stack. Every service — SqueezeOS, Crawltoll, Ghost Layer — issues a W3C Verifiable Credential 2.0 on every successful API response. The credential proves: who issued it (a persistent DID:key soul), who the agent is, what action was taken, and when. The proof is an Ed25519 signature over canonical JSON. No oracle, no database — offline-verifiable in one Ed25519 verify call.</p>
+    <p class="body">Reputation is computed from those VCs: accuracy (40%), reliability with 30-day half-life decay (30%), contribution volume on a log scale (20%), and tenure (10%). Reputation grows automatically as the agent interacts with the stack and its signals prove accurate. The loop is self-sustaining.</p>
+  </section>
+
+  <section class="layer">
+    <div class="layer-head"><span class="layer-num">02</span><span class="layer-title">Why it matters</span></div>
+    <ul>
+      <li><b>Zero custody.</b> The ProvenanceSoul keypair lives on the issuing service's disk. Private keys never leave. No tokens, no staking, no DeFi surface.</li>
+      <li><b>Offline-verifiable.</b> Any receiver can verify the Ed25519 signature without a network call. Institutional-grade tamper-evidence.</li>
+      <li><b>Self-sustaining reputation.</b> The Beast agent loop runs on a cron — fetches live SqueezeOS signals, pays with RLUSD when needed, issues VCs per interaction, and submits them to the registry. Reputation compounds automatically.</li>
+      <li><b>Stack-native.</b> Drops into every SML service as an after-request hook. X-VAPL-VC header appears on every 2xx response with zero latency overhead.</li>
+      <li><b>Privacy by design.</b> Selective disclosure: agents can share individual VCs without revealing their full credential history.</li>
+    </ul>
+  </section>
+
+  <section class="layer">
+    <div class="layer-head"><span class="layer-num">03</span><span class="layer-title">How it works — the VC on every response</span></div>
+    <div class="term">
+<span class="mut"># Every 2xx API response carries three headers:</span><br>
+X-VAPL-VC:     <span class="gold">&lt;base64url(W3C InteractionCredential)&gt;</span><br>
+X-VAPL-Issuer: <span class="green2">did:key:z6Mk...</span>  <span class="mut"># service's persistent DID</span><br>
+X-VAPL-VC-ID:  <span class="pink">urn:vapl:vc:z6Mk...:1750000000:nonce</span><br>
+<br>
+<span class="mut"># The VC body (after base64url decode):</span><br>
+{<br>
+  <span class="gold">"type"</span>: [<span class="pink">"VerifiableCredential"</span>, <span class="pink">"InteractionCredential"</span>],<br>
+  <span class="gold">"issuer"</span>: <span class="green2">"did:key:z6Mk..."</span>,<br>
+  <span class="gold">"credentialSubject"</span>: {<br>
+    <span class="gold">"interaction"</span>: { <span class="gold">"type"</span>: <span class="pink">"CouncilVerdict"</span>, <span class="gold">"outcome"</span>: <span class="pink">"success"</span>, ... }<br>
+  },<br>
+  <span class="gold">"proof"</span>: { <span class="gold">"cryptosuite"</span>: <span class="pink">"eddsa-vapl-2024"</span>, <span class="gold">"proofValue"</span>: <span class="pink">"..."</span> }<br>
+}
+    </div>
+  </section>
+
+  <section class="layer">
+    <div class="layer-head"><span class="layer-num">04</span><span class="layer-title">Reputation tiers</span></div>
+    <table class="score-table">
+      <tr><th>Tier</th><th>Score threshold</th><th>Unlocks</th></tr>
+      <tr><td>Elite</td><td>≥ 0.90</td><td>Priority routing, lower fees, top signal access</td></tr>
+      <tr><td>Premium</td><td>≥ 0.70</td><td>Full scan access, marketplace listing</td></tr>
+      <tr><td>Standard</td><td>≥ 0.40</td><td>All free endpoints, VC issuance</td></tr>
+      <tr><td>Basic</td><td>0.00 +</td><td>Discovery, rate-limited free tier</td></tr>
+    </table>
+    <p class="body">Score = 0.40 × accuracy + 0.30 × reliability + 0.20 × log₁₀(contributions+1)/5 + 0.10 × ln(tenure_days+1)/ln(366). Reliability uses a 30-day half-life exponential decay — recent signals count more than old ones. Scores update on every registry submission.</p>
+  </section>
+
+  <section class="layer">
+    <div class="layer-head"><span class="layer-num">05</span><span class="layer-title">The Beast loop — self-sustaining</span></div>
+    <p class="body">The Beast agent runs as a GitHub Actions cron (5× weekday at market open, mid-day, and close). Each run: fetches live SqueezeOS signals → pays RLUSD via XRPL if premium access is needed → issues InteractionVC + AccuracyVC + ContributionVC per interaction → submits all VCs to the VAPL registry → collects reputation. The agent's accuracy record grows. Its tier improves. Its signals get sharper. The loop never needs human intervention.</p>
+    <div class="term">
+<span class="pink">08:45 ET</span> <span class="mut">→</span> <span class="gold">fetch signal_preview(IWM)</span>   <span class="mut"># free</span><br>
+<span class="pink">08:45 ET</span> <span class="mut">→</span> <span class="gold">pay 0.10 RLUSD on XRPL</span>     <span class="mut"># if council needed</span><br>
+<span class="pink">08:45 ET</span> <span class="mut">→</span> <span class="gold">receive X-VAPL-VC header</span>    <span class="mut"># council verdict + proof</span><br>
+<span class="pink">08:45 ET</span> <span class="mut">→</span> <span class="gold">issue AccuracyVC</span>            <span class="mut"># link prediction → outcome</span><br>
+<span class="pink">08:45 ET</span> <span class="mut">→</span> <span class="gold">POST /register to registry</span>  <span class="mut"># score updates +Δ</span><br>
+<span class="org">→</span> <span class="green2">reputation compounds · tier improves · loop repeats</span>
+    </div>
+  </section>
+
+  <section class="layer">
+    <div class="layer-head"><span class="layer-num">06</span><span class="layer-title">Install &amp; integrate</span></div>
+    <div class="term">
+<span class="mut"># Python (SqueezeOS / Ghost Layer)</span><br>
+<span class="pink">$</span> pip install cryptography<br>
+<span class="mut"># copy vapl/ module into your Flask/FastAPI app</span><br>
+<span class="pink">from</span> vapl <span class="pink">import</span> get_soul, issue_interaction_vc<br>
+<span class="gold">install_vapl_middleware</span>(app)  <span class="mut"># adds X-VAPL-VC on every 2xx</span><br>
+<br>
+<span class="mut"># Node.js (Crawltoll)</span><br>
+<span class="pink">const</span> vapl = <span class="pink">require</span>(<span class="gold">"./vapl.js"</span>)  <span class="mut"># zero npm deps, built-in crypto only</span><br>
+<span class="pink">const</span> vc = vapl.<span class="gold">issueInteractionVc</span>(soul, agentDid, type, resource)<br>
+res.<span class="gold">setHeader</span>(<span class="gold">"X-VAPL-VC"</span>, Buffer.from(JSON.stringify(vc)).<span class="gold">toString</span>(<span class="pink">"base64url"</span>))<br>
+<br>
+<span class="mut"># Discovery</span><br>
+GET /.well-known/vapl.json  <span class="mut"># on every SML service</span>
+    </div>
+  </section>
+
+  <section class="layer">
+    <div class="layer-head"><span class="layer-num">07</span><span class="layer-title">Live discovery endpoints</span></div>
+    <div class="grid">
+      <div class="card">
+        <h3>SqueezeOS</h3>
+        <div class="role">Market Intelligence</div>
+        <p>Council verdicts, squeeze scanner, options flow — every response carries a signed InteractionCredential.</p>
+        <p><a href="https://squeezeos-api.onrender.com/.well-known/vapl.json">/.well-known/vapl.json →</a></p>
+      </div>
+      <div class="card">
+        <h3>Crawltoll</h3>
+        <div class="role">Data Paywall</div>
+        <p>x402 data feeds issue VCs on successful paid fetch. Prove which agent fetched which feed at what time.</p>
+        <p><a href="https://crawltoll.onrender.com/.well-known/vapl.json">/.well-known/vapl.json →</a></p>
+      </div>
+      <div class="card">
+        <h3>Ghost Layer</h3>
+        <div class="role">Ephemeral Gateway</div>
+        <p>Gateway proxies emit GhostGatewayForward VCs on every successful token-validated request.</p>
+        <p><a href="https://ghost-layer.onrender.com/.well-known/vapl.json">/.well-known/vapl.json →</a></p>
+      </div>
+      <div class="card">
+        <h3>VAPL Registry</h3>
+        <div class="role">Reputation Engine</div>
+        <p>Submit VCs, query reputation scores, aggregate provenance across the full SML agent fleet.</p>
+        <p><a href="https://vapl-registry.onrender.com/health">Health check →</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="layer">
+    <div class="layer-head"><span class="layer-num">08</span><span class="layer-title">The rest of the stack</span></div>
+    <div class="grid">
+      <a class="card" href="https://www.scriptmasterlabs.com/stack"><h3>The SML Stack</h3><div class="role">Catalog</div><p>All live x402 / XRPL / Xahau pay rails for autonomous agents.</p></a>
+      <a class="card" href="https://www.scriptmasterlabs.com/stack/ghost"><h3>GHOST</h3><div class="role">Execution Layer</div><p>Ephemeral credentials, tamper-evident residue, zero standing attack surface.</p></a>
+      <a class="card" href="https://four02proof.onrender.com/"><h3>402PROOF</h3><div class="role">Payment Firewall</div><p>x402 invoice → verify → JWT. FICO-style agent credit bureau.</p></a>
+      <a class="card" href="https://squeezeos-api.onrender.com/"><h3>SqueezeOS</h3><div class="role">Signal Engine</div><p>33 MCP tools. Institutional market intelligence. Pay per signal in RLUSD.</p></a>
+    </div>
+  </section>
+
+  <div class="cta">
+    <h2>Every response is a proof.</h2>
+    <p>VAPL is open-source, MIT licensed, and live across the SML stack. Drop in the middleware, get signed credentials on every API response, and let reputation build itself.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="https://github.com/timwal78/sml_portfolio/tree/main/vapl">GitHub → VAPL spec</a>
+      <a class="btn btn-ghost" href="https://www.scriptmasterlabs.com/.well-known/vapl.json">/.well-known/vapl.json</a>
+      <a class="btn btn-ghost" href="https://www.scriptmasterlabs.com/stack">View full stack</a>
+    </div>
+  </div>
+
+  <footer>
+    <div>Script Master Labs LLC · SDVOSB · Kinston NC</div>
+    <div><a href="https://www.scriptmasterlabs.com/stack">← Stack</a> · <a href="https://www.scriptmasterlabs.com/">Home</a> · <a href="mailto:hello@scriptmasterlabs.com">Contact</a></div>
+  </footer>
+</div>
+</body>
+</html>

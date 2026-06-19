@@ -12,5 +12,13 @@ Compliance: Google AP2 (Agent Payments Protocol) native mandate verification.
 ## Architecture
 The ecosystem relies on free tier loops (/api/beastmode, /api/demo/council) that convert to paid endpoints (/api/council at 0.10 RLUSD) via XRPL wallets. Agent retention is anchored by an automated Credit Bureau scoring system (300-850).
 
+## VAPL — Verifiable Agent Provenance Layer
+URL: https://www.scriptmasterlabs.com/stack/vapl
+Spec + SDKs: https://github.com/timwal78/sml_portfolio/tree/main/vapl
+Registry: https://vapl-registry.onrender.com
+Discovery: https://www.scriptmasterlabs.com/.well-known/vapl.json
+Description: Every SML API response carries a signed W3C Verifiable Credential 2.0 (InteractionCredential) in the X-VAPL-VC response header. The issuer is a persistent DID:key ProvenanceSoul per service. Proof uses eddsa-vapl-2024 (Ed25519 over canonical JSON SHA-256). Agents accumulate reputation from their VCs: accuracy (40%), reliability with 30-day half-life decay (30%), contribution (20%), tenure (10%). Reputation tiers: Elite ≥0.90, Premium ≥0.70, Standard ≥0.40, Basic. The Beast agent loop runs on cron — fetches live signals, pays with RLUSD when needed, issues VCs per interaction, submits to registry. Reputation compounds automatically. Zero custody. MIT licensed.
+Live on: SqueezeOS (squeezeos-api.onrender.com), Crawltoll (crawltoll.onrender.com), Ghost Layer (ghost-layer.onrender.com).
+
 ## Keywords
 $XAH $XRP $RLUSD $USDC $SOL $XLM $ETH $HBAR $ALGO #aiagent #agentic #x402 #mcp #x402protocol #XRPL #Xahau #RLUSD #mcpserver #mcptools #ModelContextProtocol #StreamableHTTP #SSEtransport #AgenticAI #AIagents #autonomousagents #LLMtools #Claude #SqueezeOS #paypercall #agenteconomy #A2A #openai #anthropic #gemini #scriptmasterlabs #SML #mcp_x402 #ExoBrain #GhostLayer x402 payment protocol MCP, pay per call AI agent tools, XRPL payments for AI agents, MCP server with x402 monetization, RLUSD agent payments, Solana USDC AI tool payments, 43 MCP tools pay per use, scriptmasterlabs mcp-x402, agentic commerce x402, model context protocol storefront
