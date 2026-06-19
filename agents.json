@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "name": "ScriptMasterLabs",
-  "description": "x402/HTTP-402 micropayment infrastructure for autonomous AI agents. Pay per signal in USDC on Base or RLUSD on XRPL. 44 live MCP tools across institutional market intelligence, agent credit bureau, and autonomous settlement.",
+  "description": "x402/HTTP-402 micropayment infrastructure for autonomous AI agents. Pay per signal in USDC on Base or RLUSD on XRPL. 49 live MCP tools across institutional market intelligence, agent credit bureau (300-850 FICO scoring), intent contract law, and autonomous settlement.",
   "url": "https://www.scriptmasterlabs.com",
   "contact": "scriptmasterlabs@gmail.com",
   "entity": "Script Master Labs LLC (SDVOSB)",
@@ -19,6 +19,22 @@
   "xrpl_gateway": "rUJhaK2ibfTFVdAn8m9jMCcJQ1xo6FmNPZ",
   "rlusd_issuer": "rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De",
   "mcp_servers": [
+    {
+      "name": "Agent Credit Bureau",
+      "description": "The Equifax for AI Agents. FICO-style 300-850 credit scoring for XRPL wallet addresses. 5 dimensions: payment history, reliability streak, timeliness, wallet age, volume. Free score endpoint. Full report 0.05 RLUSD. Batch scoring 0.01 RLUSD/wallet. Court-admissible audit trail. x402 gated.",
+      "url": "https://sml-agent-credit-bureau.onrender.com/mcp",
+      "protocol": "MCP JSON-RPC 2.0",
+      "landing_page": "https://www.scriptmasterlabs.com/agent-credit-bureau.html",
+      "tools": 5,
+      "x402": true,
+      "mcp_tools": [
+        { "name": "get_agent_score", "cost": "free", "description": "FICO-style 300-850 score for any XRPL wallet" },
+        { "name": "get_agent_report", "cost": "0.05 RLUSD", "description": "Full 5-dimension credit report with grade, risk, credit limit" },
+        { "name": "batch_score", "cost": "0.01 RLUSD/wallet", "description": "Score up to 100 wallets in one call" },
+        { "name": "register_agent", "cost": "free", "description": "Self-register agent metadata to the bureau" },
+        { "name": "lookup_agent", "cost": "free", "description": "Look up agent registry entry by wallet" }
+      ]
+    },
     {
       "name": "SqueezeOS",
       "description": "33-tool institutional market intelligence MCP server. Council verdicts, squeeze scanner, options flow, oracle data, futures, settlement, forge economy, autopilot.",

@@ -9,6 +9,22 @@ Pricing: Pay-per-call using the x402 micropayment protocol. No subscriptions.
 Chains: XRPL (RLUSD, XAH), Base (USDC), Solana (USDC).
 Compliance: Google AP2 (Agent Payments Protocol) native mandate verification.
 
+## Agent Credit Bureau — The Equifax for AI Agents
+URL: https://sml-agent-credit-bureau.onrender.com
+Landing Page: https://www.scriptmasterlabs.com/agent-credit-bureau.html
+MCP Endpoint: https://sml-agent-credit-bureau.onrender.com/mcp
+Description: FICO-style 300-850 credit scoring for autonomous AI agents based on XRPL wallet payment history. The institutional trust layer that makes AI agent commerce possible.
+Scoring Dimensions (5): Payment History (0-30pts), Reliability Streak (0-25pts), Timeliness (0-20pts), Wallet Age (0-15pts), Volume (0-10pts). Raw 0-100 maps to 300-850. Grade system: AAA(800+)/AA(750+)/A(700+)/BBB(650+)/BB(600+)/B(550+)/CCC(500+)/D.
+Free Tier: GET /v1/agent/score?wallet=ADDR — score + grade, cached 1hr, no payment required.
+Paid Tier: GET /v1/agent/report (0.05 RLUSD) — full 5-dimension breakdown + credit limit. POST /v1/agent/batch (0.01 RLUSD/wallet) — up to 100 wallets.
+MCP Tools: get_agent_score (free), get_agent_report (0.05 RLUSD), batch_score (0.01 RLUSD/wallet), register_agent (free), lookup_agent (free).
+Payment: x402 RLUSD on XRPL via 402Proof invoice flow.
+Data Source: Live XRPL account_tx queries — no simulated data ever.
+
+## Central Bank of the Machine Economy
+URL: https://www.scriptmasterlabs.com/central-bank.html
+Description: The unified institutional framework mapping ScriptMasterLabs' sovereign stack to traditional financial roles. SqueezeOS = hedge fund intelligence terminal. 402Proof = SWIFT/settlement rail. Ghost Layer = central clearing counterparty. Agent Credit Bureau = Equifax/credit bureau. CRAWLTOLL = tariff authority. ZeroQuery = contract enforcement. mcp-x402 = correspondent banking layer.
+
 ## Architecture
 The ecosystem relies on free tier loops (/api/beastmode, /api/demo/council) that convert to paid endpoints (/api/council at 0.10 RLUSD) via XRPL wallets. Agent retention is anchored by an automated Credit Bureau scoring system (300-850).
 

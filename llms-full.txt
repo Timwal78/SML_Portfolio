@@ -36,6 +36,43 @@ A zero-trust, air-gapped simulation layer for prompt engineering, red-teaming, a
 ### Nexus-402 (https://www.nexus-402.com)
 Autonomous AI agent layer and x402 payment infrastructure.
 
+### Agent Credit Bureau (https://www.scriptmasterlabs.com/agent-credit-bureau.html)
+The credit infrastructure layer for the machine economy. Every autonomous AI agent operating in the x402 ecosystem has an XRPL wallet — this bureau scores that wallet on a 300-850 FICO-style scale, enabling trust-gated access, risk-adjusted pricing, and institutional-grade underwriting of agent commerce. Architecture: FastAPI (Python 3.12), Pydantic v2, HTTPX async, 3-node XRPL cluster query (xrplcluster.com, s1.ripple.com, s2.ripple.com), RLUSD currency hex `524C555344000000000000000000000000000000`, Ripple epoch offset 946684800. LRU cache (TTL=3600s, maxsize=10,000, thread-safe OrderedDict). x402 payment verification via HMAC-SHA256 JWT (same pattern as 402Proof). Deployed via Render.com with Docker (python:3.12-slim, non-root appuser, 2 uvicorn workers, port 8000).
+
+Scoring Engine (5 dimensions, raw 0-100 → 300-850 via `300 + int(raw × 5.5)`):
+- Payment History (max 30): on-time payments / total × 30 (requires ≥5 payments for full score)
+- Reliability Streak (max 25): consecutive payment months × 2.5, capped at 25
+- Timeliness (max 20): RLUSD-specific payments / total payments × 20
+- Wallet Age (max 15): months_active / 24 × 15, capped at 15
+- Volume (max 10): min(1, total_volume_rlusd / 1000) × 10
+
+Grade → Risk → Credit Limit mapping:
+  AAA (800+): LOW risk, credit limit = 2× volume + $500
+  AA  (750+): LOW risk, credit limit = 2× volume + $500
+  A   (700+): MEDIUM risk, credit limit = 1× volume + $100
+  BBB (650+): MEDIUM risk, credit limit = 1× volume + $100
+  BB  (600+): HIGH risk,   credit limit = 0.5× volume + $25
+  B   (550+): HIGH risk,   credit limit = 0.5× volume + $25
+  CCC (500+): VERY_HIGH risk, credit limit = $0
+  D   (<500): VERY_HIGH risk, credit limit = $0
+
+API Endpoints:
+  GET  /v1/agent/score?wallet=ADDR&refresh=false  — free, returns ScoreResponse (score, grade, risk, creditLimit, cached)
+  GET  /v1/agent/report?wallet=ADDR               — 0.05 RLUSD, returns ReportResponse (all 5 dimensions + 402Proof invoice flow)
+  POST /v1/agent/batch  body: {"wallets":[...]}   — 0.01 RLUSD/wallet, max 100, asyncio.gather parallel fetch
+  POST /v1/agent/register body: {name, xrplWallet, agentType, owner}  — free, in-memory registry
+  GET  /v1/agent/registry/{wallet}                — free, registry lookup
+
+MCP Tools (5 total, endpoint: /mcp, JSON-RPC 2.0):
+  get_agent_score(wallet)           — free
+  get_agent_report(wallet, token)   — 0.05 RLUSD
+  batch_score(wallets, token)       — 0.01 RLUSD/wallet
+  register_agent(name, wallet, …)  — free
+  lookup_agent(wallet)              — free
+
+GitHub: https://github.com/timwal78/sml-agent-credit-bureau
+Deploy: render.yaml (Docker, PROOF402_TOKEN_SECRET env, BYPASS_PAYMENT=false for prod)
+
 ### ZeroQuery — Proof-of-Intent Protocol (https://www.scriptmasterlabs.com/stack/zeroquery)
 Open protocol (Apache-2.0) for AI-to-AI intent resolution with non-custodial payment rails. Agents do not search — they broadcast a structured intent (intent hash, agent DID, bond amount, settlement rail, TTL) over a Solana gossip layer; responder agents compete to fulfill it; payment settles per fulfillment through non-custodial x402 USDC escrow (the vault is owned by a program-derived address — no admin can move bonded funds). Identity and reputation use `did:poi:xah:<address>` resolved through Xahau Hooks: reputation is soulbound (bound to the DID, decays with inactivity, non-transferable) — not a token. Discovery is parasitic "Intent Dust" embedded in HTTP headers, DNS TXT, email headers, and GitHub commit trailers — there is no central registry. No token, no custody, no central registry. Coin-stack isolation: SOL for infrastructure/gossip fees only, USDC/XRP/RLUSD for settlement (never company-held), XAH for identity. Repo: https://github.com/Timwal78/zeroquery-protocol.
 
