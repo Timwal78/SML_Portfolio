@@ -1,0 +1,72 @@
+{
+  "@context": [
+    "https://www.w3.org/ns/credentials/v2",
+    "https://vapl.scriptmasterlabs.com/v1/context.jsonld"
+  ],
+  "type": "VAPLEcosystemManifest",
+  "name": "ScriptMasterLabs VAPL Ecosystem",
+  "description": "Verifiable Agent Provenance Layer — cryptographic identity and reputation for autonomous AI agents across the SML stack.",
+  "version": "1.0.0",
+  "operator": {
+    "name": "Script Master Labs LLC",
+    "did": "did:web:scriptmasterlabs.com",
+    "url": "https://www.scriptmasterlabs.com"
+  },
+  "registry": "https://vapl-registry.onrender.com",
+  "vcContextUrl": "https://vapl.scriptmasterlabs.com/v1/context.jsonld",
+  "cryptosuite": "eddsa-vapl-2024",
+  "vcHeader": "X-VAPL-VC",
+  "souls": [
+    {
+      "service": "SqueezeOS",
+      "endpoint": "https://squeezeos-api.onrender.com",
+      "vaplManifest": "https://squeezeos-api.onrender.com/.well-known/vapl.json",
+      "capabilities": [
+        "CouncilVerdict",
+        "SqueezeOSScan",
+        "OptionsFlowFetch",
+        "IWMScoreFetch",
+        "MarketplaceRead"
+      ]
+    },
+    {
+      "service": "Crawltoll",
+      "endpoint": "https://crawltoll.onrender.com",
+      "vaplManifest": "https://crawltoll.onrender.com/.well-known/vapl.json",
+      "capabilities": [
+        "CrawltollFetch",
+        "DataIngestion"
+      ]
+    },
+    {
+      "service": "GhostLayer",
+      "endpoint": "https://ghost-layer.onrender.com",
+      "vaplManifest": "https://ghost-layer.onrender.com/.well-known/vapl.json",
+      "capabilities": [
+        "GhostGatewayForward",
+        "EphemeralExecution",
+        "TokenValidation"
+      ]
+    }
+  ],
+  "reputationModel": {
+    "algorithm": "composite",
+    "weights": {
+      "accuracy": 0.40,
+      "reliability": 0.30,
+      "contribution": 0.20,
+      "tenure": 0.10
+    },
+    "decayHalfLifeDays": 30,
+    "tiers": {
+      "Elite": 0.90,
+      "Premium": 0.70,
+      "Standard": 0.40,
+      "Basic": 0.0
+    }
+  },
+  "privacyPolicy": "selective-disclosure",
+  "license": "MIT",
+  "sourceCode": "https://github.com/timwal78/sml_portfolio/tree/main/vapl",
+  "updatedAt": "2026-06-19T00:00:00Z"
+}

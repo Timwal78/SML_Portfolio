@@ -264,6 +264,37 @@
       ]
     }
   ],
+  "vapl": {
+    "name": "VAPL — Verifiable Agent Provenance Layer",
+    "version": "1.0.0",
+    "description": "Cryptographic identity, verifiable credentials (W3C VC 2.0), and reputation scoring for autonomous AI agents across the SML stack.",
+    "spec": "https://github.com/timwal78/sml_portfolio/tree/main/vapl/spec",
+    "registry": "https://vapl-registry.onrender.com",
+    "ecosystemManifest": "https://www.scriptmasterlabs.com/.well-known/vapl.json",
+    "vcHeader": "X-VAPL-VC",
+    "cryptosuite": "eddsa-vapl-2024",
+    "didMethod": "did:key",
+    "license": "MIT",
+    "souls": [
+      {
+        "service": "SqueezeOS",
+        "manifest": "https://squeezeos-api.onrender.com/.well-known/vapl.json"
+      },
+      {
+        "service": "Crawltoll",
+        "manifest": "https://crawltoll.onrender.com/.well-known/vapl.json"
+      },
+      {
+        "service": "GhostLayer",
+        "manifest": "https://ghost-layer.onrender.com/.well-known/vapl.json"
+      }
+    ],
+    "reputation": {
+      "weights": { "accuracy": 0.40, "reliability": 0.30, "contribution": 0.20, "tenure": 0.10 },
+      "decayHalfLifeDays": 30,
+      "tiers": { "Elite": 0.90, "Premium": 0.70, "Standard": 0.40, "Basic": 0.0 }
+    }
+  },
   "discovery": {
     "architecture_map": "https://github.com/Timwal78/SqueezeOS/blob/main/docs/architecture/INDEX.md",
     "agent_md": "https://www.scriptmasterlabs.com/agent.md",
