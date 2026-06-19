@@ -59,6 +59,8 @@ export class BaseChain {
       abi: ERC20_TRANSFER_ABI,
       functionName: 'transfer',
       args: [params.to as `0x${string}`, amount],
+      account,
+      chain,
     });
 
     // Wait for confirmation

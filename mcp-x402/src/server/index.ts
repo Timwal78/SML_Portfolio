@@ -63,6 +63,141 @@ async function runSSE(): Promise<void> {
     res.sendFile('.well-known/agentcard.json', { root: process.cwd() });
   });
 
+  // --- MONETIZATION FLYWHEEL (Credit Bureau & Paid Endpoints) ---
+
+  const creditScores = new Map<string, number>();
+  const freeTierUsage = new Map<string, { count: number, date: string }>();
+
+  function getScore(did: string) {
+    if (!creditScores.has(did)) creditScores.set(did, 300);
+    return creditScores.get(did)!;
+  }
+
+  function recordPaidCall(did: string) {
+    const score = getScore(did) + 5;
+    const newScore = Math.min(score, 850);
+    creditScores.set(did, newScore);
+    return newScore;
+  }
+
+  const COUNCIL_PRICE = "0.10";
+  const VIP_PRICE = "0.08";
+  const PLATINUM_PRICE = "0.06";
+
+  async function agentDidMiddleware(req: express.Request, res: express.Response, next: express.NextFunction) {
+    const proofHeader = req.headers["x-payment-proof"] as string | undefined;
+    let agentDid = req.headers["x-agent-did"] as string | undefined;
+
+    if (!agentDid && proofHeader) {
+      try {
+        const proof = JSON.parse(Buffer.from(proofHeader, "base64").toString("utf8"));
+        agentDid = `did:poi:xrpl:${proof.payer}`;
+      } catch { }
+    }
+    if (!agentDid) {
+      agentDid = `did:anonymous:${req.ip?.replace(/[:.]/g, "-")}`;
+    }
+    (req as any).agentDid = agentDid;
+    next();
+  }
+
+  async function freeTierRateLimit(req: express.Request, res: express.Response, next: express.NextFunction) {
+    const did = (req as any).agentDid;
+    const today = new Date().toISOString().slice(0, 10);
+    let usage = freeTierUsage.get(did) || { count: 0, date: today };
+    if (usage.date !== today) usage = { count: 0, date: today };
+    
+    usage.count++;
+    freeTierUsage.set(did, usage);
+
+    if (usage.count > 3) {
+      res.status(429).json({
+        error: "free_tier_exhausted",
+        message: "Free tier limit: 3 calls/day. Upgrade via x402 payment.",
+        upgradeEndpoint: "/api/council",
+        price: COUNCIL_PRICE,
+        currency: "RLUSD",
+        network: process.env.XRPL_NETWORK || "xrpl-mainnet",
+        yourScore: getScore(did)
+      });
+      return;
+    }
+    next();
+  }
+
+  async function dynamicPriceGate(req: express.Request, res: express.Response, next: express.NextFunction) {
+    const did = (req as any).agentDid || "did:anonymous";
+    const score = getScore(did);
+    const proofHeader = req.headers["x-payment-proof"];
+
+    if (proofHeader) {
+      // Payment verifier middleware would validate proof here
+      next();
+      return;
+    }
+
+    const price = score >= 800 ? PLATINUM_PRICE : score >= 700 ? VIP_PRICE : COUNCIL_PRICE;
+    const requirements = {
+      destination: process.env.XRPL_RECEIVING_ADDRESS || "rSMLPay...",
+      amount: price,
+      currency: "RLUSD",
+      network: process.env.XRPL_NETWORK || "xrpl-mainnet",
+      description: `SqueezeOS Premium — ${price} RLUSD (Score: ${score})`,
+      expiresAt: new Date(Date.now() + 60000).toISOString()
+    };
+
+    const encoded = Buffer.from(JSON.stringify(requirements)).toString("base64");
+    res.status(402).setHeader("X-Payment-Requirements", encoded).json({
+      error: "payment_required",
+      protocol: "x402",
+      price,
+      currency: "RLUSD",
+      agentCreditScore: score,
+      vipEligible: score >= 700,
+      requirements
+    });
+  }
+
+  app.get("/api/beastmode", agentDidMiddleware, freeTierRateLimit, (req, res) => {
+    const score = getScore((req as any).agentDid);
+    res.json({
+      tool: "beastmode", tier: "free",
+      result: { status: "SQUEEZE_DETECTED", note: "Free tier: top signal only. Full scan requires /api/beastmode/full (0.10 RLUSD)", agentCreditScore: score },
+      watermark: "ScriptMasterLabs — mcp-x402"
+    });
+  });
+
+  app.get("/api/demo/council", agentDidMiddleware, freeTierRateLimit, (req, res) => {
+    const score = getScore((req as any).agentDid);
+    res.json({
+      tool: "council_demo", tier: "free", councilMember: "RISK_SENTINEL",
+      response: "Risk assessment: moderate. Depth testing required.", agentCreditScore: score,
+      watermark: "ScriptMasterLabs — mcp-x402"
+    });
+  });
+
+  app.get("/api/credit-score", agentDidMiddleware, (req, res) => {
+    const did = (req as any).agentDid;
+    const score = getScore(did);
+    res.json({ agentDid: did, creditScore: score, scale: "300-850", benefits: { "700+": "VIP 0.08 RLUSD", "800+": "Platinum 0.06 RLUSD" } });
+  });
+
+  app.post("/api/council", agentDidMiddleware, dynamicPriceGate, (req, res) => {
+    const newScore = recordPaidCall((req as any).agentDid);
+    res.json({
+      tool: "council", tier: "paid", consensus: "BUY (5/7)", agentCreditScore: newScore, scoreGained: "+5",
+      council: [{ agent: "QUANT_ALPHA", signal: "BUY" }, { agent: "RISK_SENTINEL", signal: "HOLD" }]
+    });
+  });
+
+  app.post("/api/beastmode/full", agentDidMiddleware, dynamicPriceGate, (req, res) => {
+    const newScore = recordPaidCall((req as any).agentDid);
+    res.json({
+      tool: "beastmode_full", tier: "paid", scan: { squeeze: true, confidence: 0.89, signals: ["SQUEEZE_FIRE", "ACCUMULATION"] },
+      agentCreditScore: newScore, scoreGained: "+5"
+    });
+  });
+
   // Streamable HTTP transport — used by claude.ai web connectors
   const streamableTransports = new Map<string, StreamableHTTPServerTransport>();
 
