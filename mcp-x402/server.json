@@ -7,13 +7,13 @@
     "source": "github"
   },
   "version_detail": {
-    "version": "2.0.0"
+    "version": "2.0.1"
   },
   "packages": [
     {
       "registry_name": "npm",
       "name": "@scriptmasterlabs/mcp-x402",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "runtime_hint": "node",
       "package_arguments": [],
       "environment_variables": [
