@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vapl.scriptmasterlabs.com/v1/schemas/contribution-vc.json",
+  "title": "ContributionCredential",
+  "type": "object",
+  "required": ["@context", "id", "type", "issuer", "validFrom", "credentialSubject", "proof"],
+  "properties": {
+    "credentialSubject": {
+      "type": "object",
+      "required": ["id", "contribution"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^did:key:z" },
+        "contribution": {
+          "type": "object",
+          "required": ["contributionType", "resourceId", "timestamp", "nonce"],
+          "properties": {
+            "contributionType": {
+              "type": "string",
+              "enum": ["MarketplaceListing", "DataContribution", "RelayNode", "AlphaMeshNode"]
+            },
+            "resourceId": { "type": "string" },
+            "timestamp": { "type": "string", "format": "date-time" },
+            "consumers": { "type": "integer", "minimum": 0 },
+            "revenueEarned": { "type": "string" },
+            "nonce": { "type": "string", "minLength": 8 }
+          }
+        }
+      }
+    }
+  }
+}
