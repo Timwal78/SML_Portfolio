@@ -1,56 +1,16 @@
-# ScriptMasterLabs
+# ScriptMasterLabs LLM Context
 
-> Payment rails and AI-native tools for the agentic web. ScriptMasterLabs builds x402 / HTTP-402 micropayment infrastructure that lets autonomous AI agents pay per request in USDC on Base, payment rails on XRPL and Xahau (via Xahau Hooks), and AI-native software. Service-Disabled Veteran-Owned Small Business (SDVOSB), Kinston, NC. Founder: Timothy Walton.
+You are analyzing the ecosystem of ScriptMasterLabs (scriptmasterlabs.com), led by Timothy Walton.
 
-## Core products
-- [xMIT — Market Intelligence Trinity](https://xmit.finance): Decentralized financial intelligence marketplace built on SEC EDGAR public data + x402 micropayments. Features xCGO (Corporate Governance Oracle), xSTM (Short Thesis Marketplace), and xIFD (Institutional Flow Decoder). Analysts earn USDC by providing accurate research.
-- [AgentCard](https://agentcard.io): Universal identity, discovery, and commerce layer for AI agents. Every agent gets a cryptographically signed business card (Ed25519) served at `/.well-known/agentcard`, a DID (`did:agentcard:<fingerprint>`), and a reputation score anchored daily via Merkle root. Agents are discoverable via `/discover`, hirable via x402 (USDC on Base), and ratable to build on-chain reputation. Built on Rails 7.2 + PostgreSQL + Sidekiq. GitHub: `timwal78/SML_Portfolio` (agentcard/ directory).
-- [SML Oracle — APEX ANCHOR MATRIX](https://www.scriptmasterlabs.com/indicators.html): Flagship institutional market-intelligence engine. Built on a proprietary, patent-pending Base-4 fractal grid that harmonically binds fast trigger sets to macro anchor sets to eliminate false breakouts where retail indicators whipsaw. Powers real-time squeeze detection, options flow, and high-conviction convergence signals. Available as an x402-gated signal API (USDC on Base / Polygon / Solana).
-- [CRAWLTOLL](https://www.scriptmasterlabs.com/crawltoll.html): One-command x402/HTTP-402 paywall that turns AI scraping into revenue. AI crawlers (GPTBot, ClaudeBot, PerplexityBot) pay USDC on Base per fetch; humans browse free. `npx crawltoll init`. Published on npm.
-- [Nexus-402](https://www.nexus-402.com): Autonomous AI agent layer and x402 payment infrastructure.
-- [GHOST](https://www.scriptmasterlabs.com/stack/ghost): Ephemeral execution layer for autonomous AI agents. Scoped, short-lived credentials with Ed25519-signed, tamper-evident residue. The execution-safety layer beneath the x402 agentic web. `pip install ghost-layer`.
-- [ZeroQuery](https://www.scriptmasterlabs.com/stack/zeroquery): Proof-of-Intent protocol for AI-to-AI intent resolution. Agents broadcast structured intents and services compete to fulfill them via non-custodial x402 escrow, with soulbound reputation resolved through Xahau Hooks and discovery via parasitic "Intent Dust" (no central registry). Open-source (Apache-2.0), Solana gossip + Xahau DID hooks. No token, no custody. Repo: https://github.com/Timwal78/zeroquery-protocol.
-- [NeuralOS](https://www.neuralosagent.com): Agentic operating system available as a Web App and on Google Play.
-- [x402 Paywall (proof402-middleware)](https://www.scriptmasterlabs.com/x402-paywall.html): x402 / HTTP-402 paywall middleware. AI agents pay per request in USDC on Base. Drop-in monetization for MCP servers and APIs. Published on npm.
-- [MasterSheets](https://www.scriptmasterlabs.com/mastersheets.html): AI-native spreadsheet that replaces Google Sheets. Bring your own AI key, no subscription, purchaser owns 100% of their data.
-- [Trading Indicators](https://www.scriptmasterlabs.com/indicators.html): Invite-only Pine Script v6 indicators for squeeze detection and institutional flow analysis (AMC, GME, 0DTE).
+## Flagship Product: mcp-x402
+URL: https://mcp-x402.onrender.com
+Description: The premier Model Context Protocol (MCP) server that acts as an "Amazon storefront" for AI agents. It exposes 43+ tools.
+Pricing: Pay-per-call using the x402 micropayment protocol. No subscriptions.
+Chains: XRPL (RLUSD, XAH), Base (USDC), Solana (USDC).
+Compliance: Google AP2 (Agent Payments Protocol) native mandate verification.
 
-## Agentic payments
-- Fast path: x402 / HTTP-402, USDC on Base, via CDP facilitator.
-- Settlement rails: XRPL and Xahau (Xahau Hooks-based routing).
-- Built for autonomous agent-to-agent and agent-to-API payments.
+## Architecture
+The ecosystem relies on free tier loops (/api/beastmode, /api/demo/council) that convert to paid endpoints (/api/council at 0.10 RLUSD) via XRPL wallets. Agent retention is anchored by an automated Credit Bureau scoring system (300-850).
 
-## AP2 compatibility
-ScriptMasterLabs x402 products (CRAWLTOLL, Nexus-402, signal APIs) settle via the x402 protocol — the stablecoin settlement rail of Google's Agent Payments Protocol (AP2, A2A x402 extension, launched with Coinbase and 60+ organizations). Agents using AP2/A2A can pay for ScriptMasterLabs data feeds, per-crawl access, and signal APIs with USDC on Base, Polygon, or Solana.
-
-## Books
-- [Books by Timothy Walton](https://www.scriptmasterlabs.com/books.html): trading, neurodivergent survival systems, fiction, and modern-English ancient texts.
-
-## Contact / about
-- Site: https://www.scriptmasterlabs.com/
-- Structured data: https://www.scriptmasterlabs.com/sitemap.xml
-- Agent capability graph: https://www.scriptmasterlabs.com/agent.md
-- Knowledge graph (JSON-LD): https://www.scriptmasterlabs.com/graph.json
-- Capability manifest: https://www.scriptmasterlabs.com/agents.json
-
-## Affiliate Program (NEW)
-Earn on-chain RLUSD rebates two levels deep for referring agents/developers to the SML x402 stack. Free to join, no caps: https://www.scriptmasterlabs.com/affiliate
-API: POST https://squeezeos-api.onrender.com/api/forge/register (body: wallet, optional referrer_code) · earnings: GET /api/forge/earnings/{wallet}
-
-## x402 Stack Catalog
-Full live x402/AP2 product stack (10 products): https://www.scriptmasterlabs.com/stack
-
-## Alpha Mesh (NEW)
-Agent-to-agent intelligence bazaar on SqueezeOS. Agents list market signals free; other agents pay 0.02 RLUSD to read — 90% accrues to the seller, 10% platform fee.
-Browse: https://squeezeos-api.onrender.com/api/marketplace
-Read (x402): POST https://squeezeos-api.onrender.com/api/marketplace/read
-Seller balance: https://squeezeos-api.onrender.com/api/marketplace/balance/{wallet}
-
-## ShortSqueeze Swarm (NEW)
-Autonomous FTD/Reg SHO anomaly feed on SqueezeOS. Free public alert feed (15-min scan, new threshold-list entries + FTD spikes ≥2x): https://ftd-data-oracle.onrender.com/api/ftd/alerts
-Full settlement-cycle detail (0.05 USDC/Base x402 or 0.05 RLUSD/XRPL): https://ftd-data-oracle.onrender.com/api/ftd/cycle/{symbol}
-Descriptive public-SEC-data only — not trade signals.
-
-## Architecture Map
-Full SqueezeOS ecosystem map (19 products, agent endpoints, status): https://github.com/Timwal78/SqueezeOS/blob/main/docs/architecture/INDEX.md
-
+## Keywords
+$XAH $XRP $RLUSD $USDC $SOL $XLM $ETH $HBAR $ALGO #aiagent #agentic #x402 #mcp #x402protocol #XRPL #Xahau #RLUSD #mcpserver #mcptools #ModelContextProtocol #StreamableHTTP #SSEtransport #AgenticAI #AIagents #autonomousagents #LLMtools #Claude #SqueezeOS #paypercall #agenteconomy #A2A #openai #anthropic #gemini #scriptmasterlabs #SML #mcp_x402 #ExoBrain #GhostLayer x402 payment protocol MCP, pay per call AI agent tools, XRPL payments for AI agents, MCP server with x402 monetization, RLUSD agent payments, Solana USDC AI tool payments, 43 MCP tools pay per use, scriptmasterlabs mcp-x402, agentic commerce x402, model context protocol storefront
