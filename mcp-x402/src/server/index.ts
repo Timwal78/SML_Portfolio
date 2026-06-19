@@ -2,7 +2,9 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js';
+import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import express from 'express';
+import { randomUUID } from 'crypto';
 import cors from 'cors';
 import { registerTools } from './tools/index.js';
 import { AuditLogger } from './security/audit.js';
@@ -59,6 +61,41 @@ async function runSSE(): Promise<void> {
   });
   app.get('/.well-known/agentcard.json', (_req, res) => {
     res.sendFile('.well-known/agentcard.json', { root: process.cwd() });
+  });
+
+  // Streamable HTTP transport — used by claude.ai web connectors
+  const streamableTransports = new Map<string, StreamableHTTPServerTransport>();
+
+  app.post('/mcp', async (req, res) => {
+    const sessionId = req.headers['mcp-session-id'] as string | undefined;
+    let transport = sessionId ? streamableTransports.get(sessionId) : undefined;
+
+    if (!transport) {
+      transport = new StreamableHTTPServerTransport({ sessionIdGenerator: () => randomUUID() });
+      const server = await createServer();
+      await server.connect(transport);
+      if (transport.sessionId) {
+        streamableTransports.set(transport.sessionId, transport);
+        transport.onclose = () => streamableTransports.delete(transport!.sessionId!);
+      }
+      AuditLogger.getInstance().info('mcp_connect', { sessionId: transport.sessionId });
+    }
+
+    await transport.handleRequest(req, res, req.body);
+  });
+
+  app.get('/mcp', async (req, res) => {
+    const sessionId = req.headers['mcp-session-id'] as string | undefined;
+    const transport = sessionId ? streamableTransports.get(sessionId) : undefined;
+    if (!transport) { res.status(404).json({ error: 'session_not_found' }); return; }
+    await transport.handleRequest(req, res);
+  });
+
+  app.delete('/mcp', async (req, res) => {
+    const sessionId = req.headers['mcp-session-id'] as string | undefined;
+    const transport = sessionId ? streamableTransports.get(sessionId) : undefined;
+    if (!transport) { res.status(404).json({ error: 'session_not_found' }); return; }
+    await transport.handleRequest(req, res);
   });
 
   const transports = new Map<string, SSEServerTransport>();
