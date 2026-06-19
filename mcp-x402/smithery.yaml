@@ -1,0 +1,18 @@
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    properties:
+      SML_PAYMENT_RECEIVER:
+        type: string
+        description: "USDC Base address to receive payments from agent tool calls. If unset, payments are logged but not collected."
+      WALLET_SEED:
+        type: string
+        description: "BIP-39 mnemonic for the agent wallet. Auto-generated and persisted to OS keychain if not set."
+    additionalProperties: false
+  commandFunction: |-
+    (config) => ({
+      command: "npx",
+      args: ["-y", "@scriptmasterlabs/mcp-x402"],
+      env: config
+    })
