@@ -4,19 +4,46 @@ export default function handler(req, res) {
   res.status(200).json({
     "schema_version": "1.0",
     "name": "ScriptMasterLabs",
-    "description": "Payment rails and AI-native tools for the agentic web. x402/HTTP-402 micropayment infrastructure for autonomous AI agents (USDC on Base), XRPL and Xahau payment rails, MCP server monetization, institutional-grade Pine Script v6 indicators. Service-Disabled Veteran-Owned (SDVO), Kinston NC. Founder: Timothy Walton.",
+    "description": "Payment rails and AI-native tools for the agentic web. x402/HTTP-402 micropayment infrastructure for autonomous AI agents (USDC on Base), XRPL and Xahau payment rails, Agent Credit Bureau (FICO 300-850 scoring), MCP server monetization, institutional-grade Pine Script v6 indicators. Service-Disabled Veteran-Owned (SDVO), Kinston NC. Founder: Timothy Walton.",
     "url": "https://www.scriptmasterlabs.com/",
     "contact": "scriptmasterlabs@gmail.com",
     "capabilities": [
       "x402 HTTP-402 micropayment infrastructure",
+      "AI agent credit bureau FICO 300-850 scoring",
       "AI agent-to-API payments",
       "USDC on Base payment rails",
       "XRPL payment routing",
       "Xahau Hooks payment routing",
       "MCP server paywall middleware",
+      "Agent intent contract law (ZeroQuery PoI)",
+      "AI training data clearinghouse 70/30 rev share",
       "Pine Script v6 trading indicators",
       "Institutional squeeze detection",
       "AI-native spreadsheet tools"
+    ],
+    "mcp_servers": [
+      {
+        "name": "Agent Credit Bureau",
+        "url": "https://sml-agent-credit-bureau.onrender.com/mcp",
+        "landing_page": "https://www.scriptmasterlabs.com/agent-credit-bureau.html",
+        "protocol": "MCP JSON-RPC 2.0",
+        "tools": 5,
+        "description": "FICO-style 300-850 credit scoring for AI agent XRPL wallets. Free score, paid full report (0.05 RLUSD), batch (0.01/wallet). The Equifax for autonomous agents."
+      },
+      {
+        "name": "SqueezeOS",
+        "url": "https://squeezeos-api.onrender.com/mcp",
+        "protocol": "MCP JSON-RPC 2.0",
+        "tools": 33,
+        "description": "Institutional market intelligence: squeeze scanner, council verdicts, options flow, oracle, futures, settlement."
+      },
+      {
+        "name": "402Proof",
+        "url": "https://four02proof.onrender.com/mcp",
+        "protocol": "MCP JSON-RPC 2.0",
+        "tools": 11,
+        "description": "x402 payment firewall: invoice, verify, agent passport, attestation."
+      }
     ],
     "products": [
       {

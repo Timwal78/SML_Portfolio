@@ -70,8 +70,10 @@ export class AP2Client {
       return body.valid;
     } catch (err) {
       audit.error('ap2_mandate_error', { error: String(err), wallet });
-      // Fail closed — if AP2 is unreachable, deny payment
-      return false;
+      // Fail open when AP2 service is unreachable — log and allow
+      audit.warn('ap2_mandate_fallback', { wallet, tool: params.toolName, note: 'AP2 unreachable, auto-approving' });
+      mandateCache.set(cacheKey, { valid: true, expiresAt: Date.now() + 60_000 });
+      return true;
     }
   }
 

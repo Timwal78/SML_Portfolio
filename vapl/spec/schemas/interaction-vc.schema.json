@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vapl.scriptmasterlabs.com/v1/schemas/interaction-vc.json",
+  "title": "InteractionCredential",
+  "description": "A Verifiable Credential recording an agent's interaction with a VAPL-enabled provider",
+  "type": "object",
+  "required": ["@context", "id", "type", "issuer", "validFrom", "credentialSubject", "proof"],
+  "properties": {
+    "@context": {
+      "type": "array",
+      "items": { "type": "string" },
+      "contains": { "const": "https://www.w3.org/ns/credentials/v2" }
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^urn:vapl:vc:"
+    },
+    "type": {
+      "type": "array",
+      "contains": { "const": "InteractionCredential" }
+    },
+    "issuer": {
+      "type": "string",
+      "pattern": "^did:key:z"
+    },
+    "validFrom": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "validUntil": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "credentialSubject": {
+      "type": "object",
+      "required": ["id", "interaction"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^did:key:z"
+        },
+        "interaction": {
+          "type": "object",
+          "required": ["type", "resource", "timestamp", "outcome", "nonce"],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "CouncilVerdict", "SqueezeOSScan", "OptionsFlowFetch",
+                "IWMScoreFetch", "MarketplaceRead", "MarketplaceListing",
+                "FuturesPrediction", "SettlementResolution", "CrawltollFetch",
+                "AgentHire", "RelayRoute", "WebhookSubscription",
+                "GhostLayerRoute", "XDEOEarningsEstimate", "AlphaMeshContribution",
+                "EchoPatternMatch", "ShadowIngest", "AgentCardVerify",
+                "LeviathanSignalFetch"
+              ]
+            },
+            "resource": { "type": "string" },
+            "timestamp": { "type": "string", "format": "date-time" },
+            "outcome": { "type": "string", "enum": ["success", "failure", "partial"] },
+            "nonce": { "type": "string", "minLength": 8 },
+            "paymentTxHash": { "type": "string" },
+            "paymentAmount": { "type": "string" },
+            "paymentCurrency": { "type": "string" },
+            "outcomeHash": { "type": "string", "pattern": "^sha256:" },
+            "verifiableAccuracy": { "type": "number", "minimum": 0, "maximum": 1 }
+          }
+        }
+      }
+    },
+    "proof": {
+      "type": "object",
+      "required": ["type", "cryptosuite", "created", "verificationMethod", "proofPurpose", "nonce", "proofValue"],
+      "properties": {
+        "type": { "const": "DataIntegrityProof" },
+        "cryptosuite": { "const": "eddsa-vapl-2024" },
+        "created": { "type": "string", "format": "date-time" },
+        "verificationMethod": { "type": "string", "pattern": "^did:key:z" },
+        "proofPurpose": { "const": "assertionMethod" },
+        "nonce": { "type": "string", "minLength": 16 },
+        "proofValue": { "type": "string", "minLength": 80 }
+      }
+    }
+  }
+}

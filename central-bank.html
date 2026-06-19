@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QHTHMG61N6"></script>
+<script>
+  window.dataLayer=window.dataLayer||[];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js',new Date());
+  gtag('config','G-QHTHMG61N6');
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Central Bank of the Machine Economy — Script Master Labs</title>
+<meta name="description" content="ScriptMaster Labs is building the financial infrastructure of the agentic internet. 402Proof is SWIFT. RLUSD Rails is Fedwire. Agent Credit Bureau is Equifax. ZeroQuery is Contract Law.">
+<meta property="og:title" content="Central Bank of the Machine Economy — Script Master Labs">
+<meta property="og:description" content="The complete financial infrastructure stack for autonomous AI agents. Every layer the machine economy needs — settlement, credit, contract law, intelligence.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.scriptmasterlabs.com/central-bank">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Central Bank of the Machine Economy">
+<meta name="twitter:description" content="402Proof = SWIFT. RLUSD Rails = Fedwire. Agent Credit Bureau = Equifax. ZeroQuery = Contract Law. Ghost Layer = Offshore Banking. SqueezeOS = Bloomberg. Built by Script Master Labs.">
+<style>
+  :root{
+    --bg:#000000;--panel:#080C08;--panel2:#0D110D;--line:#1A221A;
+    --green:#39FF14;--green2:#00FF7F;--gold:#FFD700;--amber:#FF9500;
+    --blue:#00D4FF;--pink:#FF1493;--purple:#8B5CF6;
+    --white:#F5F7F5;--mute:#8A958C;--mute2:#4A554C;
+    --mono:'JetBrains Mono','SF Mono',ui-monospace,Menlo,monospace;
+    --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--white);font-family:var(--sans);line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:inherit;text-decoration:none}
+
+  .wrap{max-width:1100px;margin:0 auto;padding:0 28px}
+
+  /* ── NAV ── */
+  nav{border-bottom:1px solid var(--line);padding:18px 0}
+  nav .inner{display:flex;align-items:center;gap:28px}
+  nav .logo{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--green);letter-spacing:1px}
+  nav .links{display:flex;gap:22px;margin-left:auto}
+  nav .links a{font-size:13px;color:var(--mute);transition:color .2s}
+  nav .links a:hover{color:var(--white)}
+  nav .cta{font-family:var(--mono);font-size:11px;padding:8px 18px;border:1px solid var(--green);border-radius:6px;color:var(--green);transition:all .2s}
+  nav .cta:hover{background:var(--green);color:#000}
+
+  /* ── HERO ── */
+  .hero{padding:80px 0 56px;border-bottom:1px solid var(--line);position:relative;overflow:hidden}
+  .hero::before{content:'';position:absolute;top:-40%;left:50%;transform:translateX(-50%);width:900px;height:700px;background:radial-gradient(ellipse at center,rgba(57,255,20,.04) 0%,transparent 70%);pointer-events:none}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:3px;color:var(--green);text-transform:uppercase;margin-bottom:20px}
+  h1{font-size:clamp(36px,6.5vw,68px);font-weight:900;letter-spacing:-2px;line-height:1.0;max-width:900px}
+  h1 .accent-g{color:var(--green)}
+  h1 .accent-a{color:var(--amber)}
+  .hero-sub{margin-top:22px;font-size:clamp(15px,2vw,18px);color:var(--mute);max-width:740px;line-height:1.7}
+
+  .live-bar{margin-top:32px;display:flex;flex-wrap:wrap;gap:10px}
+  .chip{font-family:var(--mono);font-size:11px;padding:6px 14px;border:1px solid var(--line);border-radius:20px;color:var(--mute);display:flex;align-items:center;gap:7px}
+  .dot{width:7px;height:7px;border-radius:50%}
+  .chip.live .dot{background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+  .chip.gold{border-color:#3a2f08;color:var(--gold)} .chip.gold .dot{background:var(--gold)}
+  .chip.blue{border-color:#0a2030;color:var(--blue)} .chip.blue .dot{background:var(--blue)}
+
+  /* ── THESIS BLOCK ── */
+  .thesis{margin:56px 0;padding:32px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(135deg,var(--panel),#050805);position:relative;overflow:hidden}
+  .thesis::before{content:'$';position:absolute;right:32px;top:20px;font-size:120px;font-weight:900;color:rgba(57,255,20,.03);line-height:1;pointer-events:none;user-select:none}
+  .thesis-label{font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--mute2);text-transform:uppercase;margin-bottom:16px}
+  .thesis p{font-size:clamp(15px,2vw,18px);color:var(--white);line-height:1.8;max-width:820px}
+  .thesis p + p{margin-top:14px}
+  .thesis strong{color:var(--green2)}
+
+  /* ── COMPARISON TABLE ── */
+  .compare{margin:64px 0}
+  .section-head{margin-bottom:32px}
+  .section-head h2{font-size:clamp(24px,4vw,36px);font-weight:800;letter-spacing:-.8px}
+  .section-head .sh-sub{margin-top:8px;font-size:15px;color:var(--mute)}
+
+  .table-wrap{overflow-x:auto;border-radius:14px;border:1px solid var(--line)}
+  table{width:100%;border-collapse:collapse}
+  thead tr{background:var(--panel);border-bottom:1px solid var(--line)}
+  thead th{padding:14px 20px;text-align:left;font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute2)}
+  tbody tr{border-bottom:1px solid var(--line);transition:background .15s}
+  tbody tr:last-child{border-bottom:none}
+  tbody tr:hover{background:var(--panel)}
+  td{padding:18px 20px;font-size:14px;vertical-align:top}
+  td.trad{color:var(--mute);font-family:var(--mono);font-size:13px}
+  td.sml{font-weight:700;color:var(--green)}
+  td.sml a{color:var(--green);border-bottom:1px solid rgba(57,255,20,.3);transition:border-color .2s}
+  td.sml a:hover{border-color:var(--green)}
+  td.desc{color:#c8d0c8;font-size:13px;line-height:1.5}
+  td.status{text-align:center}
+  .badge{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:12px;letter-spacing:.5px}
+  .badge.live{background:rgba(57,255,20,.1);color:var(--green);border:1px solid rgba(57,255,20,.2)}
+  .badge.build{background:rgba(255,149,0,.08);color:var(--amber);border:1px solid rgba(255,149,0,.2)}
+
+  /* ── LAYER CARDS ── */
+  .layers{margin:64px 0}
+  .layer-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:18px}
+  .layer-card{padding:26px;border:1px solid var(--line);border-radius:14px;background:var(--panel);transition:border-color .2s,transform .15s}
+  .layer-card:hover{border-color:rgba(57,255,20,.25);transform:translateY(-2px)}
+  .lc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px}
+  .lc-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+  .lc-icon.g{background:rgba(57,255,20,.1)}
+  .lc-icon.a{background:rgba(255,149,0,.1)}
+  .lc-icon.b{background:rgba(0,212,255,.1)}
+  .lc-icon.p{background:rgba(139,92,246,.1)}
+  .lc-num{font-family:var(--mono);font-size:11px;color:var(--mute2)}
+  .lc-name{font-size:16px;font-weight:700;margin-bottom:4px}
+  .lc-analogy{font-family:var(--mono);font-size:11px;color:var(--amber);margin-bottom:12px}
+  .lc-desc{font-size:13px;color:var(--mute);line-height:1.6}
+  .lc-url{margin-top:14px;font-family:var(--mono);font-size:11px;color:var(--green2);border-top:1px solid var(--line);padding-top:12px}
+
+  /* ── FLYWHEEL ── */
+  .flywheel{margin:64px 0;padding:40px;border:1px solid var(--line);border-radius:16px;background:var(--panel)}
+  .flywheel h2{font-size:clamp(22px,3.5vw,30px);font-weight:800;letter-spacing:-.5px;margin-bottom:8px}
+  .flywheel-sub{font-size:14px;color:var(--mute);margin-bottom:32px}
+  .fw-steps{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
+  .fw-step{padding:18px;border:1px solid var(--line);border-radius:10px;background:var(--panel2);position:relative}
+  .fw-step .n{font-family:var(--mono);font-size:28px;font-weight:900;color:rgba(57,255,20,.15);line-height:1;margin-bottom:8px}
+  .fw-step .t{font-size:13px;font-weight:700;margin-bottom:6px}
+  .fw-step .d{font-size:12px;color:var(--mute);line-height:1.5}
+  .fw-arrow{text-align:center;color:var(--green);font-size:22px;display:none}
+
+  /* ── METRICS ── */
+  .metrics{margin:64px 0}
+  .metric-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px}
+  .metric-card{padding:24px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
+  .mc-val{font-family:var(--mono);font-size:28px;font-weight:900;color:var(--green);line-height:1}
+  .mc-label{font-size:12px;color:var(--mute);margin-top:8px;line-height:1.4}
+  .mc-note{font-family:var(--mono);font-size:10px;color:var(--mute2);margin-top:4px}
+
+  /* ── CTA ── */
+  .cta-block{margin:64px 0 80px;padding:48px;border:1px solid rgba(57,255,20,.15);border-radius:16px;background:linear-gradient(135deg,rgba(57,255,20,.04),transparent);text-align:center}
+  .cta-block h2{font-size:clamp(22px,4vw,36px);font-weight:800;letter-spacing:-.5px;margin-bottom:12px}
+  .cta-block p{font-size:15px;color:var(--mute);max-width:540px;margin:0 auto 28px}
+  .btn-row{display:flex;flex-wrap:wrap;gap:14px;justify-content:center}
+  .btn{font-family:var(--mono);font-size:12px;padding:12px 28px;border-radius:8px;transition:all .2s;cursor:pointer;letter-spacing:.5px}
+  .btn.primary{background:var(--green);color:#000;border:none;font-weight:700}
+  .btn.primary:hover{background:var(--green2);transform:translateY(-1px)}
+  .btn.outline{background:transparent;color:var(--white);border:1px solid var(--line)}
+  .btn.outline:hover{border-color:var(--white);transform:translateY(-1px)}
+
+  /* ── FOOTER ── */
+  footer{border-top:1px solid var(--line);padding:40px 0;font-size:12px;color:var(--mute2);display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:center}
+  footer .fl{font-family:var(--mono);color:var(--mute2)}
+  footer .links{display:flex;gap:18px}
+  footer .links a:hover{color:var(--mute)}
+
+  @media(max-width:720px){
+    .fw-steps{grid-template-columns:1fr}
+    .layer-grid{grid-template-columns:1fr}
+    .metric-grid{grid-template-columns:1fr 1fr}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap inner">
+    <div class="logo">SML ◈</div>
+    <div class="links">
+      <a href="/stack.html">Stack</a>
+      <a href="/central-bank.html" style="color:var(--green)">Central Bank</a>
+      <a href="https://squeezeos-api.onrender.com/docs" target="_blank">API</a>
+      <a href="https://four02proof.onrender.com" target="_blank">402Proof</a>
+    </div>
+    <a href="https://squeezeos-api.onrender.com/mcp" class="cta" target="_blank">Connect Agent</a>
+  </div>
+</nav>
+
+<main>
+<div class="wrap">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="eyebrow">Script Master Labs</div>
+    <h1>The <span class="accent-g">Central Bank</span><br>of the <span class="accent-a">Machine Economy</span></h1>
+    <p class="hero-sub">
+      Every financial institution the human economy needed took 300 years to build.
+      The machine economy needs all of it — payment rails, credit bureaus, contract law, market intelligence —
+      and it needs it now. We built it in eighteen months on the XRP Ledger.
+    </p>
+    <div class="live-bar">
+      <div class="chip live"><span class="dot"></span>9 services live</div>
+      <div class="chip gold"><span class="dot" style="background:var(--gold)"></span>RLUSD settlement</div>
+      <div class="chip blue"><span class="dot" style="background:var(--blue)"></span>x402 payment rails</div>
+      <div class="chip live"><span class="dot"></span>33 MCP tools</div>
+    </div>
+  </section>
+
+  <!-- THESIS -->
+  <section class="thesis">
+    <div class="thesis-label">The Thesis</div>
+    <p>
+      When AI agents transact autonomously — paying for data, hiring sub-agents, settling contracts, borrowing credit —
+      they need the same infrastructure the human economy runs on.
+      <strong>We didn't wait for someone else to build it.</strong>
+    </p>
+    <p>
+      ScriptMaster Labs is the first company to ship a complete financial-infrastructure stack
+      purpose-built for autonomous AI agents: settlement rails, credit scoring, contract law,
+      market intelligence, and a payment firewall — all connected, all live, all denominated in
+      <strong>RLUSD on the XRP Ledger</strong>.
+    </p>
+  </section>
+
+  <!-- COMPARISON TABLE -->
+  <section class="compare">
+    <div class="section-head">
+      <h2>The Analogy Table</h2>
+      <p class="sh-sub">Every institution the human economy runs on — mapped to the SML stack.</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Human Institution</th>
+            <th>Role</th>
+            <th>SML Equivalent</th>
+            <th>Description</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="trad">SWIFT</td>
+            <td class="desc">Global interbank messaging</td>
+            <td class="sml"><a href="https://four02proof.onrender.com" target="_blank">402Proof</a></td>
+            <td class="desc">x402 payment firewall — issues invoices, verifies RLUSD payments on XRPL, grants signed access tokens. Every agent payment in the SML ecosystem routes through it.</td>
+            <td class="status"><span class="badge live"><span class="dot" style="width:6px;height:6px;border-radius:50%;background:var(--green)"></span>LIVE</span></td>
+          </tr>
+          <tr>
+            <td class="trad">Fedwire / ACH</td>
+            <td class="desc">Settlement layer / wire transfers</td>
+            <td class="sml"><a href="https://sml-rails.onrender.com" target="_blank">RLUSD Rails</a></td>
+            <td class="desc">XRPL + Xahau remittance rails for RLUSD. Agents wire funds between wallets, across chains, and to human counterparties. Sub-second finality.</td>
+            <td class="status"><span class="badge live"><span class="dot" style="width:6px;height:6px;border-radius:50%;background:var(--green)"></span>LIVE</span></td>
+          </tr>
+          <tr>
+            <td class="trad">Equifax / Experian</td>
+            <td class="desc">Credit bureau — risk scoring</td>
+            <td class="sml"><a href="https://github.com/Timwal78/sml-agent-credit-bureau" target="_blank">Agent Credit Bureau</a></td>
+            <td class="desc">FICO-style 300–850 score for every XRPL agent wallet. Tracks payment history, timeliness, volume, streak, and wallet age across all SML services. Determines credit limits for AI-to-AI lending.</td>
+            <td class="status"><span class="badge live"><span class="dot" style="width:6px;height:6px;border-radius:50%;background:var(--green)"></span>LIVE</span></td>
+          </tr>
+          <tr>
+            <td class="trad">Contract Law</td>
+            <td class="desc">Intent declaration &amp; breach</td>
+            <td class="sml"><a href="https://github.com/Timwal78/zeroquery-protocol" target="_blank">ZeroQuery PoI</a></td>
+            <td class="desc">Proof-of-Intent protocol — agents declare structured, signed intents on-chain. Registry captures timestamps and parameters. Breach detection compares declared intent vs actual action for court-admissible audit trails.</td>
+            <td class="status"><span class="badge live"><span class="dot" style="width:6px;height:6px;border-radius:50%;background:var(--green)"></span>LIVE</span></td>
+          </tr>
+          <tr>
+            <td class="trad">Offshore Banking</td>
+            <td class="desc">Private, routing-agnostic transactions</td>
+            <td class="sml"><a href="https://ghost-layer.onrender.com" target="_blank">Ghost Layer</a></td>
+            <td class="desc">Dual-chain XRPL+Base toll gateway. Agents route payments through Ghost Layer for privacy-preserving, ZK-signed execution. Also handles Xahau Hooks URITokenMint.</td>
+            <td class="status"><span class="badge live"><span class="dot" style="width:6px;height:6px;border-radius:50%;background:var(--green)"></span>LIVE</span></td>
+          </tr>
+          <tr>
+            <td class="trad">Bloomberg Terminal</td>
+            <td class="desc">Institutional market intelligence</td>
+            <td class="sml"><a href="https://squeezeos-api.onrender.com" target="_blank">SqueezeOS</a></td>
+            <td class="desc">33-tool MCP server. Multi-engine AI oracle, gamma flow, options sweeps, whale stalker, fractal cascade signals. Pay-per-call in RLUSD. The market data layer for the machine economy.</td>
+            <td class="status"><span class="badge live"><span class="dot" style="width:6px;height:6px;border-radius:50%;background:var(--green)"></span>LIVE</span></td>
+          </tr>
+          <tr>
+            <td class="trad">Visa / Mastercard Network</td>
+            <td class="desc">Universal payment acceptance</td>
+            <td class="sml"><a href="/x402-paywall.html">MCP-x402 Server</a></td>
+            <td class="desc">Universal x402 payment acceptance layer. Any MCP-enabled agent can pay any SML service using a single standard. No API keys, no subscriptions — just RLUSD and a signed token.</td>
+            <td class="status"><span class="badge live"><span class="dot" style="width:6px;height:6px;border-radius:50%;background:var(--green)"></span>LIVE</span></td>
+          </tr>
+          <tr>
+            <td class="trad">Stock Exchange</td>
+            <td class="desc">Price discovery &amp; market making</td>
+            <td class="sml"><a href="https://squeezeos-api.onrender.com/api/marketplace" target="_blank">SqueezeOS Marketplace</a></td>
+            <td class="desc">Peer signal marketplace. Agents list trade theses, other agents pay 0.02 RLUSD to read full analysis. Signal futures market lets agents stake on next council verdict.</td>
+            <td class="status"><span class="badge live"><span class="dot" style="width:6px;height:6px;border-radius:50%;background:var(--green)"></span>LIVE</span></td>
+          </tr>
+          <tr>
+            <td class="trad">Customs / Border Control</td>
+            <td class="desc">Content access &amp; data toll</td>
+            <td class="sml"><a href="/crawltoll.html">crawltoll Clearinghouse</a></td>
+            <td class="desc">AI training data clearinghouse. Publishers register content. AI crawlers pay per fetch. 70% flows to publishers, 30% to SML. Tracks OpenAI, Anthropic, Google, Meta bots by user-agent.</td>
+            <td class="status"><span class="badge live"><span class="dot" style="width:6px;height:6px;border-radius:50%;background:var(--green)"></span>LIVE</span></td>
+          </tr>
+          <tr>
+            <td class="trad">Treasury / Escrow</td>
+            <td class="desc">Conditional fund custody</td>
+            <td class="sml"><a href="https://squeezeos-api.onrender.com/api/settlement" target="_blank">Conditional Settlement</a></td>
+            <td class="desc">Zero-custody escrow contracts. Agents stake RLUSD on conditional outcomes (bias match, price targets, time elapsed). Platform takes 1% on settlement. All intent tracked on-chain.</td>
+            <td class="status"><span class="badge live"><span class="dot" style="width:6px;height:6px;border-radius:50%;background:var(--green)"></span>LIVE</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- LAYER CARDS -->
+  <section class="layers">
+    <div class="section-head">
+      <h2>Every Layer, Built</h2>
+      <p class="sh-sub">From settlement to credit to intelligence. The full stack.</p>
+    </div>
+    <div class="layer-grid">
+      <div class="layer-card">
+        <div class="lc-top">
+          <div class="lc-icon g">⚡</div>
+          <div class="lc-num">Layer 1</div>
+        </div>
+        <div class="lc-name">Payment Rails</div>
+        <div class="lc-analogy">≡ Fedwire + ACH</div>
+        <div class="lc-desc">RLUSD on XRPL. Sub-second finality. No banks, no chargebacks, no human approval. Agents wire funds between wallets autonomously at any hour.</div>
+        <div class="lc-url">sml-rails.onrender.com</div>
+      </div>
+
+      <div class="layer-card">
+        <div class="lc-top">
+          <div class="lc-icon a">🔐</div>
+          <div class="lc-num">Layer 2</div>
+        </div>
+        <div class="lc-name">Payment Firewall</div>
+        <div class="lc-analogy">≡ SWIFT + KYC/AML</div>
+        <div class="lc-desc">402Proof verifies every RLUSD payment with HMAC-SHA256 signed tokens. No network call at verification — pure CPU, millisecond latency. Endpoint-scoped, expiry-bound access tokens.</div>
+        <div class="lc-url">four02proof.onrender.com</div>
+      </div>
+
+      <div class="layer-card">
+        <div class="lc-top">
+          <div class="lc-icon b">📊</div>
+          <div class="lc-num">Layer 3</div>
+        </div>
+        <div class="lc-name">Agent Credit Bureau</div>
+        <div class="lc-analogy">≡ Equifax + FICO</div>
+        <div class="lc-desc">Every XRPL wallet that pays a SML service builds a credit history. 5 scoring dimensions yield a 300–850 FICO-equivalent score. Grade AAA through D. Credit limits for AI-to-AI lending.</div>
+        <div class="lc-url">github.com/Timwal78/sml-agent-credit-bureau</div>
+      </div>
+
+      <div class="layer-card">
+        <div class="lc-top">
+          <div class="lc-icon p">⚖️</div>
+          <div class="lc-num">Layer 4</div>
+        </div>
+        <div class="lc-name">ZeroQuery Contract Law</div>
+        <div class="lc-analogy">≡ Legal Contract + Courts</div>
+        <div class="lc-desc">Agents declare Proof-of-Intent on-chain. Registry timestamps every declaration. Breach detection engine compares declared intent vs actual action. Audit trails in court-admissible format.</div>
+        <div class="lc-url">zeroquery.dev</div>
+      </div>
+
+      <div class="layer-card">
+        <div class="lc-top">
+          <div class="lc-icon g">🧠</div>
+          <div class="lc-num">Layer 5</div>
+        </div>
+        <div class="lc-name">Market Intelligence</div>
+        <div class="lc-analogy">≡ Bloomberg Terminal</div>
+        <div class="lc-desc">SqueezeOS: 33-tool MCP server delivering AI council verdicts, gamma flow, options sweeps, fractal cascade signals. Pay 0.05 RLUSD per council call. Real data only — no demo placeholders.</div>
+        <div class="lc-url">squeezeos-api.onrender.com</div>
+      </div>
+
+      <div class="layer-card">
+        <div class="lc-top">
+          <div class="lc-icon a">👻</div>
+          <div class="lc-num">Layer 6</div>
+        </div>
+        <div class="lc-name">Private Routing</div>
+        <div class="lc-analogy">≡ Offshore Banking</div>
+        <div class="lc-desc">Ghost Layer: dual-chain XRPL+Base toll gateway. ZK-signed ephemeral execution. Private cross-chain routing for agents that require confidentiality in their transaction graph.</div>
+        <div class="lc-url">ghost-layer.onrender.com</div>
+      </div>
+
+      <div class="layer-card">
+        <div class="lc-top">
+          <div class="lc-icon b">🌐</div>
+          <div class="lc-num">Layer 7</div>
+        </div>
+        <div class="lc-name">Data Clearinghouse</div>
+        <div class="lc-analogy">≡ Content Customs</div>
+        <div class="lc-desc">crawltoll: humans browse free, AI crawlers pay per fetch. Publisher revenue share 70/30. Tracks OpenAI, Anthropic, Google, Meta bots. RLUSD settlement to publisher wallets automatically.</div>
+        <div class="lc-url">github.com/Timwal78/crawltoll</div>
+      </div>
+
+      <div class="layer-card">
+        <div class="lc-top">
+          <div class="lc-icon p">🔄</div>
+          <div class="lc-num">Layer 8</div>
+        </div>
+        <div class="lc-name">Copy-Trading Engine</div>
+        <div class="lc-analogy">≡ Prime Brokerage</div>
+        <div class="lc-desc">XRPL Copy-Trader: subscribe to on-chain whale wallets and mirror positions in real time. Operator wallet seeds auto-follow. Tracks PnL per follower per whale. RLUSD performance fees.</div>
+        <div class="lc-url">sml-copytrader.onrender.com</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FLYWHEEL -->
+  <section class="flywheel">
+    <h2>The Machine Economy Flywheel</h2>
+    <p class="flywheel-sub">Each layer feeds the next. Agent activity generates credit history generates trust generates more activity.</p>
+    <div class="fw-steps">
+      <div class="fw-step">
+        <div class="n">01</div>
+        <div class="t">Agent Pays</div>
+        <div class="d">Agent sends RLUSD to 402Proof. Invoice verified. Access token issued.</div>
+      </div>
+      <div class="fw-step">
+        <div class="n">02</div>
+        <div class="t">History Builds</div>
+        <div class="d">Payment recorded in Agent Credit Bureau. Score updates. Grade improves.</div>
+      </div>
+      <div class="fw-step">
+        <div class="n">03</div>
+        <div class="t">Credit Extended</div>
+        <div class="d">High-score agents unlock credit limits. Can access services before paying.</div>
+      </div>
+      <div class="fw-step">
+        <div class="n">04</div>
+        <div class="t">Intent Logged</div>
+        <div class="d">ZeroQuery captures every agent action as a signed PoI declaration.</div>
+      </div>
+      <div class="fw-step">
+        <div class="n">05</div>
+        <div class="t">Market Signals</div>
+        <div class="d">SqueezeOS processes real market data. Agents buy signals, list theses, stake futures.</div>
+      </div>
+      <div class="fw-step">
+        <div class="n">06</div>
+        <div class="t">Revenue Flows</div>
+        <div class="d">crawltoll routes 70% to publishers. Copy-trader mirrors whale alpha. Ecosystem expands.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- METRICS -->
+  <section class="metrics">
+    <div class="section-head">
+      <h2>Live Infrastructure</h2>
+      <p class="sh-sub">What's built, running, and transacting today.</p>
+    </div>
+    <div class="metric-grid">
+      <div class="metric-card">
+        <div class="mc-val">9</div>
+        <div class="mc-label">Live services on Render + Vercel</div>
+        <div class="mc-note">All connected via RLUSD + x402</div>
+      </div>
+      <div class="metric-card">
+        <div class="mc-val">33</div>
+        <div class="mc-label">MCP tools in SqueezeOS</div>
+        <div class="mc-note">JSON-RPC 2.0 at /mcp</div>
+      </div>
+      <div class="metric-card">
+        <div class="mc-val">300–850</div>
+        <div class="mc-label">Agent credit score range</div>
+        <div class="mc-note">FICO-equivalent for XRPL wallets</div>
+      </div>
+      <div class="metric-card">
+        <div class="mc-val">70/30</div>
+        <div class="mc-label">Publisher revenue split</div>
+        <div class="mc-note">crawltoll clearinghouse</div>
+      </div>
+      <div class="metric-card">
+        <div class="mc-val">&lt;1s</div>
+        <div class="mc-label">XRPL settlement finality</div>
+        <div class="mc-note">No miners, no waiting</div>
+      </div>
+      <div class="metric-card">
+        <div class="mc-val">0</div>
+        <div class="mc-label">API keys required</div>
+        <div class="mc-note">Pay RLUSD, get access</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-block">
+    <h2>Plug Your Agent In</h2>
+    <p>One MCP endpoint. Every layer of the machine economy available in a single connection. RLUSD wallet required.</p>
+    <div class="btn-row">
+      <a href="https://squeezeos-api.onrender.com/mcp" class="btn primary" target="_blank">Connect via MCP →</a>
+      <a href="https://four02proof.onrender.com" class="btn outline" target="_blank">Get Payment Tokens</a>
+      <a href="/stack.html" class="btn outline">View Full Stack</a>
+    </div>
+  </section>
+
+</div>
+</main>
+
+<div class="wrap">
+  <footer>
+    <span class="fl">© 2026 Script Master Labs LLC</span>
+    <div class="links">
+      <a href="/privacy.html">Privacy</a>
+      <a href="/terms.html">Terms</a>
+      <a href="/stack.html">Stack</a>
+      <a href="https://squeezeos-api.onrender.com/docs" target="_blank">API Docs</a>
+    </div>
+  </footer>
+</div>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Central Bank of the Machine Economy — Script Master Labs",
+  "description": "ScriptMaster Labs is the first company to ship a complete financial infrastructure stack for autonomous AI agents: settlement rails, credit scoring, contract law, market intelligence, and a payment firewall.",
+  "url": "https://www.scriptmasterlabs.com/central-bank",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Script Master Labs LLC",
+    "url": "https://www.scriptmasterlabs.com"
+  }
+}
+</script>
+</body>
+</html>

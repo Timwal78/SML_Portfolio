@@ -1,0 +1,119 @@
+name: CI — Security & Link Checks
+
+on:
+  push:
+    branches: [main, 'claude/**']
+  pull_request:
+    branches: [main]
+
+jobs:
+  security-scan:
+    name: Secret & Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+
+      - name: Scan for hardcoded secrets (gitleaks)
+        uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+
+      - name: Check for hardcoded API key patterns
+        run: |
+          echo "Scanning for hardcoded credentials..."
+          FOUND=0
+          # Check for real API key patterns (not template references)
+          if grep -rn --include="*.html" --include="*.js" --include="*.ts" \
+            -E "(sk-[a-zA-Z0-9]{32,}|xp-[a-zA-Z0-9]{32,}|ghp_[a-zA-Z0-9]{36}|AIza[a-zA-Z0-9_-]{35})" \
+            . 2>/dev/null | grep -v "\.git\|node_modules"; then
+            echo "ERROR: Potential hardcoded API keys detected!"
+            FOUND=1
+          fi
+          # Check for private key material
+          if grep -rn --include="*.html" --include="*.js" --include="*.json" \
+            -E "-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----" \
+            . 2>/dev/null | grep -v "\.git\|node_modules\|vapl/docs"; then
+            echo "ERROR: Private key material detected!"
+            FOUND=1
+          fi
+          if [ $FOUND -eq 1 ]; then exit 1; fi
+          echo "No hardcoded credentials detected."
+
+  headers-check:
+    name: Security Headers Verification
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Verify vercel.json has security headers
+        run: |
+          echo "Checking vercel.json for required security headers..."
+          python3 - <<'EOF'
+          import json, sys
+
+          with open("vercel.json") as f:
+              cfg = json.load(f)
+
+          headers_dict = {}
+          for rule in cfg.get("headers", []):
+              if rule.get("source") == "/(.*)" or rule.get("source") == "/(.*)":
+                  for h in rule.get("headers", []):
+                      headers_dict[h["key"].lower()] = h["value"]
+
+          required = [
+              "x-frame-options",
+              "x-content-type-options",
+              "strict-transport-security",
+              "content-security-policy",
+              "referrer-policy",
+          ]
+          missing = [r for r in required if r not in headers_dict]
+          if missing:
+              print(f"FAIL: Missing security headers: {missing}")
+              sys.exit(1)
+          print("PASS: All required security headers present in vercel.json")
+          for k, v in headers_dict.items():
+              if k in required:
+                  print(f"  {k}: {v[:80]}...")
+          EOF
+
+      - name: Verify .well-known/security.txt exists
+        run: |
+          if [ ! -f ".well-known/security.txt" ]; then
+            echo "FAIL: .well-known/security.txt is missing"
+            exit 1
+          fi
+          echo "PASS: .well-known/security.txt exists"
+          cat .well-known/security.txt
+
+  link-check:
+    name: HTML Lint & Link Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '20'
+
+      - name: Install lychee (link checker)
+        run: |
+          curl -sL https://github.com/lycheeverse/lychee/releases/download/v0.15.1/lychee-v0.15.1-x86_64-unknown-linux-gnu.tar.gz | tar xz
+          chmod +x lychee
+          sudo mv lychee /usr/local/bin/
+
+      - name: Check internal links in HTML files
+        run: |
+          lychee \
+            --offline \
+            --include-fragments \
+            --exclude "https://.*" \
+            --exclude "mailto:.*" \
+            --format compact \
+            "*.html" "stack/**/*.html" "builds/**/*.html" \
+            || true
+          echo "Internal link check complete (warnings only, not blocking)"

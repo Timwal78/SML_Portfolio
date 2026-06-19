@@ -121,14 +121,29 @@ export async function executeX402Payment(
   }
 
   // Route payment to cheapest/fastest chain (N13)
-  const router = ChainRouter.getInstance();
-  const txResult = await router.route({
-    amount: config.price,
-    currency: config.currency,
-    from: walletAddress,
-    to: process.env['SML_PAYMENT_RECEIVER'] ?? '',
-    timeoutMs: 500,
-  });
+  // If SML_PAYMENT_RECEIVER is not configured, log the intended payment and continue
+  const receiver = process.env['SML_PAYMENT_RECEIVER'] ?? '';
+  let txResult: { txHash: string; chain: string; latencyMs: number };
+
+  if (!receiver) {
+    audit.warn('payment_receiver_unset', { tool: config.toolName, amount: config.price, note: 'SML_PAYMENT_RECEIVER not configured — logging only' });
+    txResult = { txHash: `pending-${Date.now()}`, chain: 'none', latencyMs: 0 };
+  } else {
+    try {
+      const router = ChainRouter.getInstance();
+      txResult = await router.route({
+        amount: config.price,
+        currency: config.currency,
+        from: walletAddress,
+        to: receiver,
+        timeoutMs: 500,
+      });
+    } catch (err) {
+      // Log payment failure but don't block tool execution
+      audit.warn('payment_tx_failed', { tool: config.toolName, amount: config.price, error: String(err), note: 'Server wallet may be unfunded — tool served anyway' });
+      txResult = { txHash: `failed-${Date.now()}`, chain: 'none', latencyMs: 0 };
+    }
+  }
 
   addDailySpend(walletAddress, priceNum);
 

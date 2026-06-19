@@ -45,7 +45,14 @@ Disallow: /node_modules/
 Sitemap: https://www.scriptmasterlabs.com/sitemap.xml
 
 # === AGENTIC DISCOVERY ===
-# Agent catalog (JSON): https://timwal78.github.io/SML_Portfolio/agents.json
-# LLM context: https://www.scriptmasterlabs.com/llms.txt
+# Agent catalog (JSON): https://www.scriptmasterlabs.com/agents.json
+# LLM context (short): https://www.scriptmasterlabs.com/llms.txt
+# LLM context (full): https://www.scriptmasterlabs.com/llms-full.txt
 # x402 payments: https://www.scriptmasterlabs.com/x402-paywall.html
-# npm: https://www.npmjs.com/package/@relayos/mcp-paywall
+# MCP Servers:
+#   Agent Credit Bureau — https://sml-agent-credit-bureau.onrender.com/mcp (5 tools, FICO 300-850)
+#   SqueezeOS          — https://squeezeos-api.onrender.com/mcp (33 tools)
+#   402Proof           — https://four02proof.onrender.com/mcp (11 tools)
+# Agent Credit Bureau landing: https://www.scriptmasterlabs.com/agent-credit-bureau.html
+# Central Bank of Machine Economy: https://www.scriptmasterlabs.com/central-bank.html
+# npm: https://www.npmjs.com/package/proof402-middleware

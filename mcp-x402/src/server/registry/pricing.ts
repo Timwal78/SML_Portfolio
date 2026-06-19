@@ -1,12 +1,69 @@
 const PRICE_CACHE_TTL = parseInt(process.env['PRICE_CACHE_TTL_MS'] ?? '60000', 10);
 
 const BASE_PRICES: Record<string, string> = {
+  // Discovery (free)
+  sml_discover: '0.00',
+  sml_status: '0.00',
+  // SqueezeOS signals
   leviathan_signal: '0.05',
+  squeezeos_council: '0.10',
+  squeezeos_scan: '0.05',
+  squeezeos_options: '0.05',
+  squeezeos_iwm: '0.03',
+  squeezeos_preview: '0.00',
+  squeezeos_status: '0.00',
+  // SEC / Earnings
   xmit_edgar_decode: '0.02',
   xdeo_earnings_estimate: '0.02',
+  // FTD
   ftd_threshold_scan: '0.05',
-  nexus_agent_hire: '0.00', // commission-based
+  // Crawl
   crawl_paid_fetch: '0.005',
+  // Agent marketplace
+  nexus_agent_hire: '0.00',
+  nexus_agent_list: '0.00',
+  nexus_agent_status: '0.00',
+  // Ghost Layer (cross-chain)
+  ghost_transfer: '0.02',
+  ghost_status: '0.00',
+  ghost_routes: '0.00',
+  // RLUSD Rails
+  rails_send: '0.01',
+  rails_status: '0.00',
+  // Launchpad
+  launchpad_create_token: '0.10',
+  launchpad_buy_token: '0.02',
+  launchpad_list: '0.00',
+  launchpad_status: '0.00',
+  // Copy-Trader
+  copytrader_subscribe: '0.05',
+  copytrader_status: '0.00',
+  // Backtest
+  backtest_run: '0.05',
+  backtest_validate: '0.05',
+  backtest_status: '0.00',
+  // Brokers (Tradier)
+  brokers_quote: '0.00',
+  brokers_options_chain: '0.01',
+  brokers_place_order: '0.05',
+  brokers_account: '0.01',
+  // Shadow Desk
+  shadow_query: '0.05',
+  shadow_ingest: '0.02',
+  shadow_status: '0.00',
+  // Forge (LLM gateway)
+  forge_complete: '0.02',
+  forge_status: '0.00',
+  // Proof402
+  proof402_get_invoice: '0.00',
+  proof402_verify: '0.00',
+  proof402_credit_score: '0.00',
+  // Echo (pattern matching)
+  echo_analogs: '0.05',
+  // Agent card / identity
+  agentcard_verify: '0.00',
+  agentcard_register: '0.01',
+  agentcard_lookup: '0.00',
 };
 
 interface CachedPrice {
@@ -20,7 +77,7 @@ export class PriceRegistry {
   private readonly baseUrl: string;
 
   private constructor() {
-    this.baseUrl = process.env['SML_API_BASE'] ?? 'https://api.scriptmasterlabs.com';
+    this.baseUrl = process.env['SML_API_BASE'] ?? 'https://squeezeos-api.onrender.com';
   }
 
   static getInstance(): PriceRegistry {
@@ -56,13 +113,13 @@ export class PriceRegistry {
     // Use hardcoded baseline if API unavailable
     const fallback = BASE_PRICES[toolName];
     if (fallback !== undefined) {
-      // Cache fallback for 30s (half normal TTL) to retry sooner
       this.cache.set(toolName, { price: fallback, fetchedAt: now - PRICE_CACHE_TTL / 2 });
       return fallback;
     }
 
-    // Price unknown and cache stale (N12) — reject
-    return null;
+    // Unknown tool — default to free rather than reject
+    this.cache.set(toolName, { price: '0.00', fetchedAt: now });
+    return '0.00';
   }
 
   seedDefaults(): void {

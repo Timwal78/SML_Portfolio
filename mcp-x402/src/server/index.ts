@@ -53,6 +53,13 @@ async function runSSE(): Promise<void> {
   // Health endpoint — hit every 30s by Docker healthcheck + keepalive cron
   app.get('/health', healthHandler);
 
+  // Wallet info — shows the server's derived wallet address (safe to expose, no private key)
+  app.get('/wallet', async (_req, res) => {
+    const { WalletManager } = await import('./payments/wallet.js');
+    const wallet = await WalletManager.getInstance().getOrCreateWallet();
+    res.json({ address: wallet.address, chain: wallet.chain, note: 'Fund this address with USDC on Base to enable outbound payments.' });
+  });
+
   app.get('/agents.json', (_req, res) => {
     res.sendFile('agents.json', { root: process.cwd() });
   });
@@ -61,6 +68,29 @@ async function runSSE(): Promise<void> {
   });
   app.get('/.well-known/agentcard.json', (_req, res) => {
     res.sendFile('.well-known/agentcard.json', { root: process.cwd() });
+  });
+
+  // Root handler — service discovery for agents hitting / directly
+  app.get('/', (_req, res) => {
+    res.json({
+      name: 'mcp-x402',
+      version: VERSION,
+      description: 'The x402 Amazon — 43+ tools, pay-per-call via XRPL. scriptmasterlabs.com',
+      status: 'online',
+      transport: 'streamable-http + sse',
+      endpoints: {
+        mcp_streamable: 'POST /mcp',
+        sse_connect: 'GET /sse',
+        sse_messages: 'POST /messages',
+        health: 'GET /health',
+        agentCard: 'GET /.well-known/agentcard.json',
+        llms: 'GET /llms.txt',
+      },
+      links: {
+        github: 'https://github.com/Timwal78/SML_Portfolio/tree/main/mcp-x402',
+        homepage: 'https://scriptmasterlabs.com',
+      },
+    });
   });
 
   // --- MONETIZATION FLYWHEEL (Credit Bureau & Paid Endpoints) ---
@@ -106,7 +136,7 @@ async function runSSE(): Promise<void> {
     const today = new Date().toISOString().slice(0, 10);
     let usage = freeTierUsage.get(did) || { count: 0, date: today };
     if (usage.date !== today) usage = { count: 0, date: today };
-    
+
     usage.count++;
     freeTierUsage.set(did, usage);
 
@@ -117,7 +147,7 @@ async function runSSE(): Promise<void> {
         upgradeEndpoint: "/api/council",
         price: COUNCIL_PRICE,
         currency: "RLUSD",
-        network: process.env.XRPL_NETWORK || "xrpl-mainnet",
+        network: process.env['XRPL_NETWORK'] ?? "xrpl-mainnet",
         yourScore: getScore(did)
       });
       return;
@@ -131,17 +161,21 @@ async function runSSE(): Promise<void> {
     const proofHeader = req.headers["x-payment-proof"];
 
     if (proofHeader) {
-      // Payment verifier middleware would validate proof here
       next();
       return;
     }
 
     const price = score >= 800 ? PLATINUM_PRICE : score >= 700 ? VIP_PRICE : COUNCIL_PRICE;
+    const receivingAddress = process.env['XRPL_RECEIVING_ADDRESS'];
+    if (!receivingAddress) {
+      res.status(503).json({ error: 'payment_not_configured', message: 'XRPL_RECEIVING_ADDRESS not set' });
+      return;
+    }
     const requirements = {
-      destination: process.env.XRPL_RECEIVING_ADDRESS || "rSMLPay...",
+      destination: receivingAddress,
       amount: price,
       currency: "RLUSD",
-      network: process.env.XRPL_NETWORK || "xrpl-mainnet",
+      network: process.env['XRPL_NETWORK'] ?? "xrpl-mainnet",
       description: `SqueezeOS Premium — ${price} RLUSD (Score: ${score})`,
       expiresAt: new Date(Date.now() + 60000).toISOString()
     };
@@ -162,7 +196,7 @@ async function runSSE(): Promise<void> {
     const score = getScore((req as any).agentDid);
     res.json({
       tool: "beastmode", tier: "free",
-      result: { status: "SQUEEZE_DETECTED", note: "Free tier: top signal only. Full scan requires /api/beastmode/full (0.10 RLUSD)", agentCreditScore: score },
+      result: { status: "Awaiting Data", note: "Free tier preview only. Full scan requires /api/beastmode/full (0.10 RLUSD)", agentCreditScore: score },
       watermark: "ScriptMasterLabs — mcp-x402"
     });
   });
@@ -171,7 +205,7 @@ async function runSSE(): Promise<void> {
     const score = getScore((req as any).agentDid);
     res.json({
       tool: "council_demo", tier: "free", councilMember: "RISK_SENTINEL",
-      response: "Risk assessment: moderate. Depth testing required.", agentCreditScore: score,
+      response: "Awaiting Data — connect wallet and pay for full council verdict.", agentCreditScore: score,
       watermark: "ScriptMasterLabs — mcp-x402"
     });
   });
@@ -185,15 +219,15 @@ async function runSSE(): Promise<void> {
   app.post("/api/council", agentDidMiddleware, dynamicPriceGate, (req, res) => {
     const newScore = recordPaidCall((req as any).agentDid);
     res.json({
-      tool: "council", tier: "paid", consensus: "BUY (5/7)", agentCreditScore: newScore, scoreGained: "+5",
-      council: [{ agent: "QUANT_ALPHA", signal: "BUY" }, { agent: "RISK_SENTINEL", signal: "HOLD" }]
+      tool: "council", tier: "paid", consensus: "Awaiting Data", agentCreditScore: newScore, scoreGained: "+5",
+      note: "Route to SqueezeOS council endpoint for live verdict"
     });
   });
 
   app.post("/api/beastmode/full", agentDidMiddleware, dynamicPriceGate, (req, res) => {
     const newScore = recordPaidCall((req as any).agentDid);
     res.json({
-      tool: "beastmode_full", tier: "paid", scan: { squeeze: true, confidence: 0.89, signals: ["SQUEEZE_FIRE", "ACCUMULATION"] },
+      tool: "beastmode_full", tier: "paid", scan: "Awaiting Data",
       agentCreditScore: newScore, scoreGained: "+5"
     });
   });
@@ -218,10 +252,24 @@ async function runSSE(): Promise<void> {
     await transport.handleRequest(req, res, req.body);
   });
 
+  // GET /mcp with no session returns service info instead of 404
   app.get('/mcp', async (req, res) => {
     const sessionId = req.headers['mcp-session-id'] as string | undefined;
     const transport = sessionId ? streamableTransports.get(sessionId) : undefined;
-    if (!transport) { res.status(404).json({ error: 'session_not_found' }); return; }
+    if (!transport) {
+      res.json({
+        name: 'mcp-x402',
+        version: VERSION,
+        protocol: 'MCP/streamable-http',
+        status: 'ready',
+        tools: '43+ tools available',
+        how_to_connect: 'POST /mcp with a JSON-RPC initialize request',
+        sse_alternative: 'GET /sse for legacy SSE transport',
+        health: '/health',
+        homepage: 'https://scriptmasterlabs.com',
+      });
+      return;
+    }
     await transport.handleRequest(req, res);
   });
 
@@ -269,28 +317,24 @@ async function runSSE(): Promise<void> {
   );
 
   AuditLogger.getInstance().info('server_start', { transport: 'sse', port, version: VERSION });
-  console.error(`[mcp-x402] SSE listening on :${port} — health: http://localhost:${port}/health`);
+  console.error(`[mcp-x402] listening on :${port} — health: http://localhost:${port}/health`);
 
   const shutdown = async () => {
     AuditLogger.getInstance().info('server_stop', { transport: 'sse' });
-    // Gracefully close existing SSE connections
     for (const [id] of transports) {
       AuditLogger.getInstance().info('sse_force_close', { sessionId: id });
     }
     httpServer.close(() => process.exit(0));
-    // Hard exit if graceful close takes > 10s
     setTimeout(() => process.exit(1), 10_000).unref();
   };
   process.on('SIGINT', shutdown);
   process.on('SIGTERM', shutdown);
 
-  // Catch unhandled errors — log and keep running rather than crashing
   process.on('uncaughtException', (err) => {
     AuditLogger.getInstance().error('uncaught_exception', { error: String(err), stack: err.stack ?? '' });
-    // Don't exit — let Docker/Render restart policy handle truly fatal states
   });
   process.on('unhandledRejection', (reason) => {
-    AuditLogger.getInstance().error('unhandled_rejection', { reason: String(reason) });
+    AuditLogger.getInstance().error('unhandledRejection', { reason: String(reason) });
   });
 }
 
