@@ -1,0 +1,53 @@
+# VAPL full-stack local development
+# Brings up the VAPL Registry service alongside a Redis cache.
+# For SqueezeOS integration, point SQUEEZEOS_BASE at your local instance.
+#
+# Usage:
+#   docker compose up
+#   docker compose up --build   # rebuild after code changes
+
+version: "3.9"
+
+services:
+  vapl-registry:
+    build:
+      context: ..          # repo root (vapl/)
+      dockerfile: deployment/Dockerfile
+    image: vapl-registry:local
+    ports:
+      - "8400:8400"
+    environment:
+      - PORT=8400
+      - VAPL_SOUL_FILE=/data/vapl_soul.json
+      # Optional: connect to live SqueezeOS for real signal VCs
+      - SQUEEZEOS_BASE=${SQUEEZEOS_BASE:-https://squeezeos-api.onrender.com}
+      - REDIS_URL=redis://redis:6379/0
+    volumes:
+      - vapl-data:/data
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request; urllib.request.urlopen('http://localhost:8400/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+volumes:
+  vapl-data:
+  redis-data:
