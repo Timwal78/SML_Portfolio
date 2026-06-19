@@ -1,8 +1,19 @@
-name: Beast VAPL Agent — Self-Sustaining Provenance Loop
+name: Beast VAPL Swarm — Autonomous Agent Economy
+
+# 5 specialized agents run in parallel 5× per weekday.
+# ARBI runs after all others have listed their signals — it buys from them
+# and relists a composite, closing the RLUSD revenue loop.
+#
+# Required GitHub secrets (one set per agent + shared):
+#   BEAST_IWM_XRPL_SEED / BEAST_IWM_XRPL_ADDRESS / BEAST_IWM_SOUL_B64
+#   BEAST_GME_XRPL_SEED / BEAST_GME_XRPL_ADDRESS / BEAST_GME_SOUL_B64
+#   BEAST_ORACLE_XRPL_SEED / BEAST_ORACLE_XRPL_ADDRESS / BEAST_ORACLE_SOUL_B64
+#   BEAST_FTD_XRPL_SEED  / BEAST_FTD_XRPL_ADDRESS  / BEAST_FTD_SOUL_B64
+#   BEAST_ARBI_XRPL_SEED / BEAST_ARBI_XRPL_ADDRESS / BEAST_ARBI_SOUL_B64
+#   ANTHROPIC_API_KEY
 
 on:
   schedule:
-    # 5× weekday: market open, mid-morning, noon, mid-afternoon, close (ET = UTC-4/5)
     - cron: '45 12 * * 1-5'   # 08:45 ET
     - cron: '35 13 * * 1-5'   # 09:35 ET
     - cron: '0  17 * * 1-5'   # 13:00 ET
@@ -10,41 +21,148 @@ on:
     - cron: '15 20 * * 1-5'   # 16:15 ET
   workflow_dispatch:
     inputs:
-      symbol:
-        description: 'Override symbol (default: IWM)'
+      strategy:
+        description: 'Run a single strategy (leave blank for full swarm)'
         required: false
-        default: 'IWM'
+        default: ''
       dry_run:
-        description: 'Dry run — fetch and issue VCs, skip registry submission'
+        description: 'Dry run — fetch and issue VCs, skip registry + withdraw'
         required: false
         default: 'false'
 
+env:
+  SQUEEZEOS_BASE_URL:  https://squeezeos-api.onrender.com
+  PROOF402_SERVER_URL: https://four02proof.onrender.com
+  VAPL_REGISTRY_URL:   https://vapl-registry.onrender.com
+  DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+
 jobs:
-  beast-vapl:
+
+  # ── IWM 0DTE Institutional Specialist ────────────────────────────────────────
+  beast-iwm:
+    name: Beast IWM — 0DTE Institutional
     runs-on: ubuntu-latest
     timeout-minutes: 15
-
+    if: >
+      github.event_name == 'schedule' ||
+      github.event.inputs.strategy == '' ||
+      github.event.inputs.strategy == 'IWM'
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-
       - name: Install deps
-        run: |
-          pip install --quiet requests cryptography xrpl-py anthropic
-
-      - name: Run Beast VAPL loop
+        run: pip install --quiet requests cryptography xrpl-py anthropic
+      - name: Run IWM Agent
         env:
-          SQUEEZEOS_BASE_URL: https://squeezeos-api.onrender.com
-          VAPL_REGISTRY_URL: https://vapl-registry.onrender.com
-          AGENT_XRPL_SEED: ${{ secrets.AGENT_XRPL_SEED }}
-          AGENT_XRPL_ADDRESS: ${{ secrets.AGENT_XRPL_ADDRESS }}
-          PROOF402_SERVER_URL: https://four02proof.onrender.com
+          STRATEGY:          IWM
+          AGENT_XRPL_SEED:   ${{ secrets.BEAST_IWM_XRPL_SEED }}
+          AGENT_XRPL_ADDRESS: ${{ secrets.BEAST_IWM_XRPL_ADDRESS }}
+          VAPL_SOUL_B64:     ${{ secrets.BEAST_IWM_SOUL_B64 }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          VAPL_SOUL_B64: ${{ secrets.VAPL_SOUL_B64 }}
-          SYMBOL: ${{ github.event.inputs.symbol || 'IWM' }}
-          DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+        run: python vapl/beast_agent/run.py
+
+  # ── GME/AMC Squeeze Specialist ───────────────────────────────────────────────
+  beast-gme:
+    name: Beast GME — Squeeze Specialist
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    if: >
+      github.event_name == 'schedule' ||
+      github.event.inputs.strategy == '' ||
+      github.event.inputs.strategy == 'GME'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install deps
+        run: pip install --quiet requests cryptography xrpl-py anthropic
+      - name: Run GME Agent
+        env:
+          STRATEGY:          GME
+          AGENT_XRPL_SEED:   ${{ secrets.BEAST_GME_XRPL_SEED }}
+          AGENT_XRPL_ADDRESS: ${{ secrets.BEAST_GME_XRPL_ADDRESS }}
+          VAPL_SOUL_B64:     ${{ secrets.BEAST_GME_SOUL_B64 }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python vapl/beast_agent/run.py
+
+  # ── Multi-Symbol Oracle Synthesizer ──────────────────────────────────────────
+  beast-oracle:
+    name: Beast ORACLE — Cross-Market Synthesis
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    if: >
+      github.event_name == 'schedule' ||
+      github.event.inputs.strategy == '' ||
+      github.event.inputs.strategy == 'ORACLE'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install deps
+        run: pip install --quiet requests cryptography xrpl-py anthropic
+      - name: Run Oracle Agent
+        env:
+          STRATEGY:          ORACLE
+          AGENT_XRPL_SEED:   ${{ secrets.BEAST_ORACLE_XRPL_SEED }}
+          AGENT_XRPL_ADDRESS: ${{ secrets.BEAST_ORACLE_XRPL_ADDRESS }}
+          VAPL_SOUL_B64:     ${{ secrets.BEAST_ORACLE_SOUL_B64 }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python vapl/beast_agent/run.py
+
+  # ── FTD / Reg SHO Anomaly Scanner ────────────────────────────────────────────
+  beast-ftd:
+    name: Beast FTD — Reg SHO Anomaly
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    if: >
+      github.event_name == 'schedule' ||
+      github.event.inputs.strategy == '' ||
+      github.event.inputs.strategy == 'FTD'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install deps
+        run: pip install --quiet requests cryptography xrpl-py anthropic
+      - name: Run FTD Agent
+        env:
+          STRATEGY:          FTD
+          AGENT_XRPL_SEED:   ${{ secrets.BEAST_FTD_XRPL_SEED }}
+          AGENT_XRPL_ADDRESS: ${{ secrets.BEAST_FTD_XRPL_ADDRESS }}
+          VAPL_SOUL_B64:     ${{ secrets.BEAST_FTD_SOUL_B64 }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python vapl/beast_agent/run.py
+
+  # ── Alpha Mesh Arbitrageur — runs AFTER all specialists list their signals ────
+  beast-arbi:
+    name: Beast ARBI — Alpha Mesh Arbitrageur
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: [beast-iwm, beast-gme, beast-oracle, beast-ftd]
+    if: >
+      always() &&
+      (
+        github.event_name == 'schedule' ||
+        github.event.inputs.strategy == '' ||
+        github.event.inputs.strategy == 'ARBI'
+      )
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install deps
+        run: pip install --quiet requests cryptography xrpl-py anthropic
+      - name: Run Arbitrageur Agent
+        env:
+          STRATEGY:          ARBI
+          AGENT_XRPL_SEED:   ${{ secrets.BEAST_ARBI_XRPL_SEED }}
+          AGENT_XRPL_ADDRESS: ${{ secrets.BEAST_ARBI_XRPL_ADDRESS }}
+          VAPL_SOUL_B64:     ${{ secrets.BEAST_ARBI_SOUL_B64 }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: python vapl/beast_agent/run.py
