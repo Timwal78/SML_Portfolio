@@ -129,14 +129,20 @@ export async function executeX402Payment(
     audit.warn('payment_receiver_unset', { tool: config.toolName, amount: config.price, note: 'SML_PAYMENT_RECEIVER not configured — logging only' });
     txResult = { txHash: `pending-${Date.now()}`, chain: 'none', latencyMs: 0 };
   } else {
-    const router = ChainRouter.getInstance();
-    txResult = await router.route({
-      amount: config.price,
-      currency: config.currency,
-      from: walletAddress,
-      to: receiver,
-      timeoutMs: 500,
-    });
+    try {
+      const router = ChainRouter.getInstance();
+      txResult = await router.route({
+        amount: config.price,
+        currency: config.currency,
+        from: walletAddress,
+        to: receiver,
+        timeoutMs: 500,
+      });
+    } catch (err) {
+      // Log payment failure but don't block tool execution
+      audit.warn('payment_tx_failed', { tool: config.toolName, amount: config.price, error: String(err), note: 'Server wallet may be unfunded — tool served anyway' });
+      txResult = { txHash: `failed-${Date.now()}`, chain: 'none', latencyMs: 0 };
+    }
   }
 
   addDailySpend(walletAddress, priceNum);
