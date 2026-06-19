@@ -6,12 +6,12 @@
     "url": "https://github.com/timwal78/SML_Portfolio",
     "source": "github"
   },
-  "version": "2.0.1",
+  "version": "2.0.2",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "@scriptmasterlabs/mcp-x402",
-      "version": "2.0.1",
+      "version": "2.0.2",
       "runtimeHint": "node",
       "transport": {
         "type": "stdio"

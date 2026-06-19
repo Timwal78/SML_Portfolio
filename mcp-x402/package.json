@@ -1,6 +1,6 @@
 {
   "name": "@scriptmasterlabs/mcp-x402",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "mcpName": "io.github.Timwal78/mcp-x402",
   "description": "The first MCP server that pays for itself. AI agents pay for ScriptMasterLabs data autonomously via x402.",
   "main": "dist/server/index.js",
