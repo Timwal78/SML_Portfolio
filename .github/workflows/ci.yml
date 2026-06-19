@@ -16,7 +16,7 @@ jobs:
           fetch-depth: 0
 
       - name: Scan for hardcoded secrets (gitleaks)
-        uses: gitleaks/gitleaks-action@b4baad8bfee17df938f2e9cff1f21fc20ad2ae3b # v2
+        uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
