@@ -26,9 +26,9 @@ export function registerShadow(server: McpServer): void {
   server.tool(
     'shadow_query',
     {
-      query: { type: 'string', description: 'Natural language query for signal intelligence (max 2048 chars).' },
-      context: { type: 'string', description: 'Optional context to refine the query (max 1024 chars).' },
-      wallet_address: { type: 'string', description: 'Agent wallet for x402 payment.' },
+      query: z.string().describe('Natural language query for signal intelligence (max 2048 chars).'),
+      context: z.string().describe('Optional context to refine the query (max 1024 chars).'),
+      wallet_address: z.string().describe('Agent wallet for x402 payment.'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(QuerySchema, rawArgs);
@@ -78,9 +78,9 @@ export function registerShadow(server: McpServer): void {
   server.tool(
     'shadow_ingest',
     {
-      source: { type: 'string', description: 'Source identifier for the data being ingested (e.g. "discord", "twitter", "on-chain").' },
-      payload: { type: 'object', description: 'Signal data payload as a JSON object.' },
-      wallet_address: { type: 'string', description: 'Agent wallet for x402 payment.' },
+      source: z.string().describe('Source identifier for the data being ingested (e.g. "discord", "twitter", "on-chain").'),
+      payload: z.record(z.unknown()).describe('Signal data payload as a JSON object.'),
+      wallet_address: z.string().describe('Agent wallet for x402 payment.'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(IngestSchema, rawArgs);

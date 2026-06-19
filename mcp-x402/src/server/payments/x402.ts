@@ -23,6 +23,7 @@ export interface PaymentResult {
   amountPaid: string;
   currency: string;
   timestamp: number;
+  walletAddress: string;
 }
 
 const AUTO_APPROVE_THRESHOLD = parseFloat(
@@ -156,5 +157,6 @@ export async function executeX402Payment(
     amountPaid: config.price,
     currency: config.currency,
     timestamp: Date.now(),
+    walletAddress,
   };
 }

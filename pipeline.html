@@ -89,31 +89,9 @@
     align-items: center;
     justify-content: center;
     gap: 0;
-    padding: 60px 40px;
+    padding: 60px 20px;
     flex-wrap: nowrap;
     overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scroll-snap-type: x mandatory;
-    scroll-padding-left: 40px;
-  }
-
-  /* extend scroll area so first/last cards fully visible */
-  .pipeline::before,
-  .pipeline::after {
-    content: '';
-    flex-shrink: 0;
-    width: 20px;
-  }
-
-  @media (max-width: 720px) {
-    .pipeline {
-      flex-direction: column;
-      align-items: center;
-      overflow-x: visible;
-      scroll-snap-type: none;
-      padding: 40px 20px;
-      gap: 0;
-    }
   }
 
   .node {
@@ -124,15 +102,9 @@
     position: relative;
     cursor: default;
     transition: transform 0.3s;
-    scroll-snap-align: center;
   }
 
   .node:hover { transform: translateY(-6px); }
-
-  @media (max-width: 720px) {
-    .node { width: 100%; max-width: 340px; scroll-snap-align: none; }
-    .node:hover { transform: none; }
-  }
 
   .node-varrd {
     background: linear-gradient(135deg, #0a0a2a 0%, #0d0d35 100%);
@@ -255,48 +227,6 @@
     text-transform: uppercase;
     opacity: 0.4;
     text-align: center;
-  }
-
-  /* mobile: rotate connectors to vertical */
-  @media (max-width: 720px) {
-    .connector {
-      width: 100%;
-      max-width: 340px;
-      flex-direction: row;
-      height: 48px;
-      justify-content: center;
-    }
-    .connector-line {
-      width: 2px;
-      height: 100%;
-    }
-    .connector-line-inner {
-      top: -100%; left: 0;
-      width: 100%; height: 100%;
-      animation: flow-v 1.2s linear infinite;
-    }
-    .connector-1 .connector-line-inner {
-      background: linear-gradient(180deg, transparent, var(--cyan), transparent);
-    }
-    .connector-2 .connector-line-inner {
-      background: linear-gradient(180deg, transparent, var(--magenta), transparent);
-    }
-    @keyframes flow-v {
-      0% { top: -100%; }
-      100% { top: 100%; }
-    }
-    .connector-arrow {
-      position: absolute;
-      font-size: 18px;
-    }
-    .connector-arrow::before { content: '▼'; }
-    .connector-arrow { font-size: 0; }
-    .connector-arrow::before { font-size: 18px; }
-    @keyframes pulse-arrow {
-      0%, 100% { opacity: 0.4; transform: translateY(-3px); }
-      50% { opacity: 1; transform: translateY(3px); }
-    }
-    .connector-label { display: none; }
   }
 
   /* ── AGENT LOOP CODE ── */

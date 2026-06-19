@@ -32,7 +32,7 @@ export function registerAgentCard(server: McpServer): void {
   server.tool(
     'agentcard_lookup',
     {
-      identifier: { type: 'string', description: 'Agent wallet address or DID to look up.' },
+      identifier: z.string().describe('Agent wallet address or DID to look up.'),
     },
     async (rawArgs) => {
       const { identifier } = Sandbox.validate(LookupSchema, rawArgs);
@@ -53,9 +53,9 @@ export function registerAgentCard(server: McpServer): void {
   server.tool(
     'agentcard_verify',
     {
-      wallet_address: { type: 'string', description: 'Agent wallet address that signed the message.' },
-      message: { type: 'string', description: 'Original message that was signed.' },
-      signature: { type: 'string', description: 'Ed25519 signature (hex or base64).' },
+      wallet_address: z.string().describe('Agent wallet address that signed the message.'),
+      message: z.string().describe('Original message that was signed.'),
+      signature: z.string().describe('Ed25519 signature (hex or base64).'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(VerifySchema, rawArgs);
@@ -80,11 +80,11 @@ export function registerAgentCard(server: McpServer): void {
   server.tool(
     'agentcard_mint',
     {
-      wallet_address: { type: 'string', description: 'XRPL wallet address for the new agent identity.' },
-      name: { type: 'string', description: 'Human-readable agent name (max 64 chars).' },
-      did: { type: 'string', description: 'Optional DID (decentralized identifier) for the agent.' },
-      metadata: { type: 'object', description: 'Optional metadata object (capabilities, version, etc.).' },
-      payment_wallet: { type: 'string', description: 'Wallet to pay x402 fee from (defaults to wallet_address).' },
+      wallet_address: z.string().describe('XRPL wallet address for the new agent identity.'),
+      name: z.string().describe('Human-readable agent name (max 64 chars).'),
+      did: z.string().describe('Optional DID (decentralized identifier) for the agent.'),
+      metadata: z.record(z.unknown()).describe('Optional metadata object (capabilities, version, etc.).'),
+      payment_wallet: z.string().describe('Wallet to pay x402 fee from (defaults to wallet_address).'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(MintSchema, rawArgs);

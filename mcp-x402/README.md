@@ -1,15 +1,8 @@
 # mcp-x402 — The First MCP Server That Pays for Itself
 
 [![npm](https://img.shields.io/npm/v/@scriptmasterlabs/mcp-x402)](https://www.npmjs.com/package/@scriptmasterlabs/mcp-x402)
-[![npm downloads](https://img.shields.io/npm/dm/@scriptmasterlabs/mcp-x402)](https://www.npmjs.com/package/@scriptmasterlabs/mcp-x402)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Tests](https://github.com/timwal78/sml_portfolio/actions/workflows/mcp-x402-ci.yml/badge.svg)](https://github.com/timwal78/sml_portfolio/actions)
-[![Glama](https://glama.ai/mcp/servers/timwal78/mcp-x402/badge)](https://glama.ai/mcp/servers/timwal78/mcp-x402)
-[![smithery badge](https://smithery.ai/badge/@scriptmasterlabs/mcp-x402)](https://smithery.ai/server/@scriptmasterlabs/mcp-x402)
-[![MCP Registry](https://img.shields.io/badge/MCP-Registry-blue)](https://registry.modelcontextprotocol.io/servers/timwal78-mcp-x402)
-[![x402 Protocol](https://img.shields.io/badge/x402-payment--gated-green)](https://x402.org)
-[![XRPL](https://img.shields.io/badge/XRPL-RLUSD-blue)](https://xrpl.org)
-[![scriptmasterlabs.com](https://img.shields.io/badge/built%20by-ScriptMasterLabs-FF1493)](https://www.scriptmasterlabs.com)
 
 > **Demo video:** [30-second walkthrough](#) — coming within 48h of launch.
 
@@ -38,15 +31,6 @@ This defeats the entire point of autonomous agents. If your agent has to stop an
 This is the infrastructure layer that makes truly autonomous AI agents possible.
 
 ---
-
-
-## Install via Smithery
-
-Install mcp-x402 for Claude Desktop automatically via [Smithery](https://smithery.ai/server/@scriptmasterlabs/mcp-x402):
-
-```bash
-npx -y @smithery/cli install @scriptmasterlabs/mcp-x402 --client claude
-```
 
 ## One-Line Install
 

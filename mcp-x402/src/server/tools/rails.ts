@@ -37,12 +37,12 @@ export function registerRails(server: McpServer): void {
   server.tool(
     'rails_transfer',
     {
-      from_address: { type: 'string', description: 'Sender XRPL address.' },
-      to_address: { type: 'string', description: 'Recipient XRPL or Xahau address.' },
-      amount: { type: 'string', description: 'Amount to transfer (as string to preserve precision).' },
-      currency: { type: 'string', enum: ['RLUSD', 'XRP'], description: 'Token to transfer.' },
-      memo: { type: 'string', description: 'Optional transfer memo (max 256 chars).' },
-      wallet_address: { type: 'string', description: 'Agent wallet for x402 payment.' },
+      from_address: z.string().describe('Sender XRPL address.'),
+      to_address: z.string().describe('Recipient XRPL or Xahau address.'),
+      amount: z.string().describe('Amount to transfer (as string to preserve precision).'),
+      currency: z.enum(['RLUSD', 'XRP']).describe('Token to transfer.'),
+      memo: z.string().describe('Optional transfer memo (max 256 chars).'),
+      wallet_address: z.string().describe('Agent wallet for x402 payment.'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(TransferSchema, rawArgs);

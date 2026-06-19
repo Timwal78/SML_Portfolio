@@ -52,7 +52,7 @@ export function registerBrokers(server: McpServer): void {
   server.tool(
     'tradier_quote',
     {
-      symbols: { type: 'string', description: 'Comma-separated ticker symbols (e.g. "NVDA,SPY,AAPL")' },
+      symbols: z.string().describe('Comma-separated ticker symbols (e.g. "NVDA,SPY,AAPL")'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(TradierQuoteSchema, rawArgs);
@@ -74,15 +74,15 @@ export function registerBrokers(server: McpServer): void {
   server.tool(
     'tradier_order',
     {
-      account_id: { type: 'string', description: 'Tradier brokerage account ID' },
-      symbol: { type: 'string', description: 'Ticker symbol (e.g. NVDA)' },
-      side: { type: 'string', description: '"buy" or "sell"' },
-      quantity: { type: 'number', description: 'Number of shares (integer)' },
-      type: { type: 'string', description: '"market" | "limit" | "stop" | "stop_limit"' },
-      duration: { type: 'string', description: '"day" | "gtc" | "pre" | "post"' },
-      price: { type: 'number', description: 'Limit price (required for limit/stop_limit orders)' },
-      stop: { type: 'number', description: 'Stop price (required for stop/stop_limit orders)' },
-      wallet_address: { type: 'string', description: 'Agent wallet for x402 payment (AP2 required)' },
+      account_id: z.string().describe('Tradier brokerage account ID'),
+      symbol: z.string().describe('Ticker symbol (e.g. NVDA)'),
+      side: z.string().describe('"buy" or "sell"'),
+      quantity: z.number().describe('Number of shares (integer)'),
+      type: z.string().describe('"market" | "limit" | "stop" | "stop_limit"'),
+      duration: z.string().describe('"day" | "gtc" | "pre" | "post"'),
+      price: z.number().describe('Limit price (required for limit/stop_limit orders)'),
+      stop: z.number().describe('Stop price (required for stop/stop_limit orders)'),
+      wallet_address: z.string().describe('Agent wallet for x402 payment (AP2 required)'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(TradierOrderSchema, rawArgs);
@@ -132,7 +132,7 @@ export function registerBrokers(server: McpServer): void {
   server.tool(
     'tradier_positions',
     {
-      account_id: { type: 'string', description: 'Tradier brokerage account ID' },
+      account_id: z.string().describe('Tradier brokerage account ID'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(AccountSchema, rawArgs);
@@ -155,7 +155,7 @@ export function registerBrokers(server: McpServer): void {
   server.tool(
     'robinhood_quote',
     {
-      symbol: { type: 'string', description: 'Ticker symbol (e.g. NVDA)' },
+      symbol: z.string().describe('Ticker symbol (e.g. NVDA)'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(RobinhoodQuoteSchema, rawArgs);
@@ -177,13 +177,13 @@ export function registerBrokers(server: McpServer): void {
   server.tool(
     'robinhood_order',
     {
-      symbol: { type: 'string', description: 'Ticker symbol (e.g. NVDA)' },
-      side: { type: 'string', description: '"buy" or "sell"' },
-      quantity: { type: 'number', description: 'Number of shares (integer)' },
-      type: { type: 'string', description: '"market" or "limit"' },
-      time_in_force: { type: 'string', description: '"gfd" (good for day) | "gtc" | "ioc" | "opg"' },
-      price: { type: 'number', description: 'Limit price (required for limit orders)' },
-      wallet_address: { type: 'string', description: 'Agent wallet for x402 payment (AP2 required)' },
+      symbol: z.string().describe('Ticker symbol (e.g. NVDA)'),
+      side: z.string().describe('"buy" or "sell"'),
+      quantity: z.number().describe('Number of shares (integer)'),
+      type: z.string().describe('"market" or "limit"'),
+      time_in_force: z.string().describe('"gfd" (good for day) | "gtc" | "ioc" | "opg"'),
+      price: z.number().describe('Limit price (required for limit orders)'),
+      wallet_address: z.string().describe('Agent wallet for x402 payment (AP2 required)'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(RobinhoodOrderSchema, rawArgs);

@@ -18,10 +18,10 @@ export function registerXmit(server: McpServer): void {
   server.tool(
     'xmit_edgar_decode',
     {
-      filing_url: { type: 'string', description: 'SEC EDGAR filing URL (DEF 14A, 13F, or 13D).' },
-      parse_target: { type: 'string', enum: ['executive_pay', 'holdings', 'ownership_changes', 'all'], description: 'What to extract.' },
-      format: { type: 'string', enum: ['json', 'markdown'], description: 'Output format. Default: json.' },
-      wallet_address: { type: 'string', description: 'Agent wallet for payment.' },
+      filing_url: z.string().describe('SEC EDGAR filing URL (DEF 14A, 13F, or 13D).'),
+      parse_target: z.enum(['executive_pay', 'holdings', 'ownership_changes', 'all']).describe('What to extract.'),
+      format: z.enum(['json', 'markdown']).describe('Output format. Default: json.'),
+      wallet_address: z.string().describe('Agent wallet for payment.'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(InputSchema, rawArgs);
@@ -54,7 +54,7 @@ export function registerXmit(server: McpServer): void {
       const data = await client.decode({
         filingUrl: args.filing_url,
         parseTarget: args.parse_target,
-        format: args.format,
+        format: args.format ?? 'json',
       });
 
       // Raw text NEVER returned (N3) — only structured parsed output

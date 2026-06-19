@@ -21,10 +21,10 @@ export function registerEcho(server: McpServer): void {
   server.tool(
     'echo_pattern_match',
     {
-      symbol: { type: 'string', description: 'Ticker symbol to find historical analogs for (e.g. TSLA, GME).' },
-      lookback_days: { type: 'number', description: 'Days of price history to encode as the query pattern (1-3650).' },
-      top_n: { type: 'number', description: 'Number of closest historical matches to return (1-20, default 5).' },
-      wallet_address: { type: 'string', description: 'Agent wallet for x402 payment.' },
+      symbol: z.string().describe('Ticker symbol to find historical analogs for (e.g. TSLA, GME).'),
+      lookback_days: z.number().describe('Days of price history to encode as the query pattern (1-3650).'),
+      top_n: z.number().describe('Number of closest historical matches to return (1-20, default 5).'),
+      wallet_address: z.string().describe('Agent wallet for x402 payment.'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(PatternMatchSchema, rawArgs);

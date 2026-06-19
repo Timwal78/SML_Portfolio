@@ -33,13 +33,13 @@ export function registerBacktest(server: McpServer): void {
   server.tool(
     'backtest_run',
     {
-      ticker: { type: 'string', description: 'Ticker symbol (e.g. NVDA, SPY, GME)' },
-      lookback_days: { type: 'number', description: 'Days of history to backtest (30–1260, default 252)' },
-      fees: { type: 'number', description: 'Round-trip commission rate (default 0.001 = 0.1%)' },
-      slippage: { type: 'number', description: 'Slippage per side (default 0.0005)' },
-      momentum_window: { type: 'number', description: 'Momentum rolling window in days (default 10)' },
-      momentum_threshold: { type: 'number', description: 'Minimum momentum to enter long (default 0.001)' },
-      wallet_address: { type: 'string', description: 'Agent wallet address (optional)' },
+      ticker: z.string().describe('Ticker symbol (e.g. NVDA, SPY, GME)'),
+      lookback_days: z.number().describe('Days of history to backtest (30–1260, default 252)'),
+      fees: z.number().describe('Round-trip commission rate (default 0.001 = 0.1%)'),
+      slippage: z.number().describe('Slippage per side (default 0.0005)'),
+      momentum_window: z.number().describe('Momentum rolling window in days (default 10)'),
+      momentum_threshold: z.number().describe('Minimum momentum to enter long (default 0.001)'),
+      wallet_address: z.string().describe('Agent wallet address (optional)'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(BacktestSchema, rawArgs);
@@ -68,12 +68,12 @@ export function registerBacktest(server: McpServer): void {
   server.tool(
     'backtest_validate',
     {
-      ticker: { type: 'string', description: 'Ticker symbol to validate' },
-      lookback_days: { type: 'number', description: 'Total history window (60–1260, default 504 = 2 years)' },
-      train_ratio: { type: 'number', description: 'Train/test split ratio (default 0.7 = 70% in-sample)' },
-      fees: { type: 'number', description: 'Round-trip commission rate (default 0.001)' },
-      slippage: { type: 'number', description: 'Slippage per side (default 0.0005)' },
-      wallet_address: { type: 'string', description: 'Agent wallet for x402 payment (AP2 required)' },
+      ticker: z.string().describe('Ticker symbol to validate'),
+      lookback_days: z.number().describe('Total history window (60–1260, default 504 = 2 years)'),
+      train_ratio: z.number().describe('Train/test split ratio (default 0.7 = 70% in-sample)'),
+      fees: z.number().describe('Round-trip commission rate (default 0.001)'),
+      slippage: z.number().describe('Slippage per side (default 0.0005)'),
+      wallet_address: z.string().describe('Agent wallet for x402 payment (AP2 required)'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(ValidateSchema, rawArgs);

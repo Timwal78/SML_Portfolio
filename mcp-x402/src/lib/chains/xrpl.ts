@@ -1,7 +1,5 @@
 import { Client, Wallet, xrpToDrops } from 'xrpl';
 import * as keytar from 'keytar';
-import { mnemonicToSeedSync } from 'bip39';
-import HDKey from 'hdkey';
 import type { RouteParams } from '../../server/payments/router.js';
 
 export class XRPLChain {
@@ -51,7 +49,8 @@ export class XRPLChain {
         }
       }
 
-      return tx.result.hash ?? tx.result.tx_json?.hash ?? 'unknown';
+      const txResult = tx.result as unknown as { hash?: string };
+      return txResult.hash ?? 'unknown';
     } finally {
       await client.disconnect();
     }
@@ -60,12 +59,7 @@ export class XRPLChain {
   private async getWallet(): Promise<Wallet> {
     const mnemonic = await keytar.getPassword('mcp-x402', 'master-seed');
     if (!mnemonic) throw new Error('Wallet not initialized');
-    const seed = mnemonicToSeedSync(mnemonic);
-    const hdkey = HDKey.fromMasterSeed(seed);
-    // BIP-44 for XRPL: m/44'/144'/0'/0/0
-    const child = hdkey.derive("m/44'/144'/0'/0/0");
-    if (!child.privateKey) throw new Error('XRPL key derivation failed');
-    const privateKeyHex = child.privateKey.toString('hex').toUpperCase();
-    return Wallet.fromPrivateKey(privateKeyHex);
+    // BIP-44 path m/44'/144'/0'/0/0 via bip39 mnemonic encoding
+    return Wallet.fromMnemonic(mnemonic, { mnemonicEncoding: 'bip39' });
   }
 }

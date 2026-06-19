@@ -18,10 +18,10 @@ export function registerCrawl(server: McpServer): void {
   server.tool(
     'crawl_paid_fetch',
     {
-      url: { type: 'string', description: 'URL to fetch and parse. Must be http or https.' },
-      extract: { type: 'string', enum: ['text', 'links', 'tables', 'structured', 'all'], description: 'What to extract. Default: text.' },
-      wallet_address: { type: 'string', description: 'Agent wallet for payment. Humans bypass automatically.' },
-      user_agent: { type: 'string', description: 'Custom user-agent string.' },
+      url: z.string().describe('URL to fetch and parse. Must be http or https.'),
+      extract: z.enum(['text', 'links', 'tables', 'structured', 'all']).describe('What to extract. Default: text.'),
+      wallet_address: z.string().describe('Agent wallet for payment. Humans bypass automatically.'),
+      user_agent: z.string().describe('Custom user-agent string.'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(InputSchema, rawArgs);
@@ -53,7 +53,7 @@ export function registerCrawl(server: McpServer): void {
       }
 
       const client = CrawlClient.getInstance();
-      const data = await client.fetch({ url: args.url, extract: args.extract, userAgent: args.user_agent });
+      const data = await client.fetch({ url: args.url, extract: args.extract ?? 'text', userAgent: args.user_agent });
 
       // Sanitize response to prevent prompt injection
       const safeContent = typeof data.content === 'string'

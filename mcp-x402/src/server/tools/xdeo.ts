@@ -20,10 +20,10 @@ export function registerXdeo(server: McpServer): void {
   server.tool(
     'xdeo_earnings_estimate',
     {
-      ticker: { type: 'string', description: 'Ticker symbol (e.g. NVDA).' },
-      fiscal_quarter: { type: 'string', description: 'Quarter in format Q1YYYY (e.g. Q12025).' },
-      estimate_type: { type: 'string', enum: ['eps', 'revenue', 'guidance', 'all'], description: 'What estimate to fetch.' },
-      wallet_address: { type: 'string', description: 'Agent wallet for payment.' },
+      ticker: z.string().describe('Ticker symbol (e.g. NVDA).'),
+      fiscal_quarter: z.string().describe('Quarter in format Q1YYYY (e.g. Q12025).'),
+      estimate_type: z.enum(['eps', 'revenue', 'guidance', 'all']).describe('What estimate to fetch.'),
+      wallet_address: z.string().describe('Agent wallet for payment.'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(InputSchema, rawArgs);
