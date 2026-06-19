@@ -71,14 +71,13 @@ async function runSSE(): Promise<void> {
     let transport = sessionId ? streamableTransports.get(sessionId) : undefined;
 
     if (!transport) {
-      transport = new StreamableHTTPServerTransport({ sessionIdGenerator: () => randomUUID() });
+      const newSessionId = randomUUID();
+      transport = new StreamableHTTPServerTransport({ sessionIdGenerator: () => newSessionId });
+      streamableTransports.set(newSessionId, transport);
+      transport.onclose = () => streamableTransports.delete(newSessionId);
       const server = await createServer();
       await server.connect(transport);
-      if (transport.sessionId) {
-        streamableTransports.set(transport.sessionId, transport);
-        transport.onclose = () => streamableTransports.delete(transport!.sessionId!);
-      }
-      AuditLogger.getInstance().info('mcp_connect', { sessionId: transport.sessionId });
+      AuditLogger.getInstance().info('mcp_connect', { sessionId: newSessionId });
     }
 
     await transport.handleRequest(req, res, req.body);
