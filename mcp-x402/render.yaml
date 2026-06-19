@@ -3,6 +3,7 @@ services:
     name: mcp-x402
     runtime: docker
     dockerfilePath: ./mcp-x402/Dockerfile
+    dockerContext: ./mcp-x402
     plan: starter
     region: oregon
     healthCheckPath: /health
