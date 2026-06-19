@@ -53,6 +53,13 @@ async function runSSE(): Promise<void> {
   // Health endpoint
   app.get('/health', healthHandler);
 
+  // Wallet info — shows the server's derived wallet address (safe to expose, no private key)
+  app.get('/wallet', async (_req, res) => {
+    const { WalletManager } = await import('./payments/wallet.js');
+    const wallet = await WalletManager.getInstance().getOrCreateWallet();
+    res.json({ address: wallet.address, chain: wallet.chain, note: 'Fund this address with USDC on Base to enable outbound payments.' });
+  });
+
   app.get('/agents.json', (_req, res) => {
     res.sendFile('agents.json', { root: process.cwd() });
   });
