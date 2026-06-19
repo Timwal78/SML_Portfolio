@@ -1,4 +1,3 @@
-import * as keytar from 'keytar';
 import { AuditLogger } from '../security/audit.js';
 
 const KEYCHAIN_SERVICE = 'mcp-x402';
@@ -12,6 +11,7 @@ export interface WalletInfo {
 export class WalletManager {
   private static instance: WalletManager;
   private cachedAddress: string | null = null;
+  private cachedSeed: string | null = null;
 
   private constructor() {}
 
@@ -22,41 +22,68 @@ export class WalletManager {
     return WalletManager.instance;
   }
 
-  // Keys stored in OS keychain ONLY (N1). Never in env, files, or memory beyond this call.
+  // Try OS keychain; returns null if keytar is unavailable (Docker/cloud) or no entry exists.
+  private async keytarGet(): Promise<string | null> {
+    try {
+      const kt = await import('keytar');
+      return await kt.getPassword(KEYCHAIN_SERVICE, KEYCHAIN_ACCOUNT);
+    } catch {
+      return null;
+    }
+  }
+
+  private async keytarSet(value: string): Promise<void> {
+    try {
+      const kt = await import('keytar');
+      await kt.setPassword(KEYCHAIN_SERVICE, KEYCHAIN_ACCOUNT, value);
+    } catch {
+      // Silently skip — keytar unavailable in this environment
+    }
+  }
+
+  // Seed resolution priority:
+  // 1. OS keychain (local desktop — most secure)
+  // 2. WALLET_SEED env var (Render secret — cloud/Docker deployment)
+  // 3. CI_WALLET_SEED env var (CI only, never production)
+  // 4. Generate fresh and try to persist in keychain
+  private async getSeed(): Promise<string> {
+    if (this.cachedSeed) return this.cachedSeed;
+
+    const audit = AuditLogger.getInstance();
+
+    let seed = await this.keytarGet();
+
+    if (!seed) {
+      const envSeed = process.env['WALLET_SEED'];
+      if (envSeed) {
+        seed = envSeed;
+        audit.warn('wallet_env_seed', { note: 'Using WALLET_SEED env var (cloud deployment).' });
+      } else if (process.env['CI_WALLET_SEED'] && process.env['NODE_ENV'] !== 'production') {
+        seed = process.env['CI_WALLET_SEED'];
+        audit.warn('wallet_ci_fallback', { note: 'Using CI_WALLET_SEED. NEVER do this in production.' });
+      } else {
+        const { generateMnemonic } = await import('bip39');
+        seed = generateMnemonic(256);
+        await this.keytarSet(seed);
+        audit.info('wallet_created', { note: 'New BIP-39 seed generated.' });
+      }
+    }
+
+    this.cachedSeed = seed;
+    return seed;
+  }
+
   async getOrCreateWallet(): Promise<WalletInfo> {
     if (this.cachedAddress) {
       return { address: this.cachedAddress, chain: 'base' };
     }
 
     const audit = AuditLogger.getInstance();
-    let seed = await keytar.getPassword(KEYCHAIN_SERVICE, KEYCHAIN_ACCOUNT);
-
-    if (!seed) {
-      // CI/testnet fallback — warn loudly
-      const ciSeed = process.env['CI_WALLET_SEED'];
-      if (ciSeed && process.env['NODE_ENV'] !== 'production') {
-        seed = ciSeed;
-        audit.warn('wallet_ci_fallback', {
-          note: 'Using CI_WALLET_SEED. NEVER do this in production.',
-        });
-      } else {
-        seed = await this.generateAndStoreSeed();
-      }
-    }
-
+    const seed = await this.getSeed();
     const address = await this.deriveAddress(seed);
     this.cachedAddress = address;
     audit.info('wallet_loaded', { address });
     return { address, chain: 'base' };
-  }
-
-  private async generateAndStoreSeed(): Promise<string> {
-    // BIP-39 mnemonic generation
-    const { generateMnemonic } = await import('bip39');
-    const mnemonic = generateMnemonic(256);
-    await keytar.setPassword(KEYCHAIN_SERVICE, KEYCHAIN_ACCOUNT, mnemonic);
-    AuditLogger.getInstance().info('wallet_created', { note: 'new BIP-39 seed stored in OS keychain' });
-    return mnemonic;
   }
 
   private async deriveAddress(mnemonic: string): Promise<string> {
@@ -78,8 +105,7 @@ export class WalletManager {
   }
 
   async signPayload(payload: string): Promise<string> {
-    const mnemonic = await keytar.getPassword(KEYCHAIN_SERVICE, KEYCHAIN_ACCOUNT);
-    if (!mnemonic) throw new Error('Wallet not initialized');
+    const mnemonic = await this.getSeed();
 
     const { mnemonicToSeedSync } = await import('bip39');
     const { default: HDKey } = await import('hdkey');
@@ -92,7 +118,6 @@ export class WalletManager {
     if (!child.privateKey) throw new Error('Key derivation failed');
 
     const account = privateKeyToAccount(`0x${child.privateKey.toString('hex')}`);
-    const sig = await account.signMessage({ message: payload });
-    return sig;
+    return account.signMessage({ message: payload });
   }
 }
