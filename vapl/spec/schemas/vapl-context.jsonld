@@ -1,0 +1,59 @@
+{
+  "@context": {
+    "@version": 1.1,
+    "@protected": true,
+
+    "vapl": "https://vapl.scriptmasterlabs.com/v1#",
+    "schema": "https://schema.org/",
+
+    "ProvenanceSoul": "vapl:ProvenanceSoul",
+    "InteractionCredential": "vapl:InteractionCredential",
+    "AccuracyCredential": "vapl:AccuracyCredential",
+    "ContributionCredential": "vapl:ContributionCredential",
+
+    "interaction": {
+      "@id": "vapl:interaction",
+      "@type": "@json"
+    },
+    "accuracy": {
+      "@id": "vapl:accuracy",
+      "@type": "@json"
+    },
+    "contribution": {
+      "@id": "vapl:contribution",
+      "@type": "@json"
+    },
+
+    "reputationScore": "vapl:reputationScore",
+    "reputationComponents": "vapl:reputationComponents",
+    "credentialCount": "vapl:credentialCount",
+    "capabilities": "vapl:capabilities",
+    "updatedAt": "vapl:updatedAt",
+    "provenanceSoulUrl": "vapl:provenanceSoulUrl",
+
+    "InteractionType": "vapl:InteractionType",
+    "OutcomeType": "vapl:OutcomeType",
+    "resource": "vapl:resource",
+    "outcome": "vapl:outcome",
+    "paymentTxHash": "vapl:paymentTxHash",
+    "paymentAmount": "vapl:paymentAmount",
+    "paymentCurrency": "vapl:paymentCurrency",
+    "outcomeHash": "vapl:outcomeHash",
+    "verifiableAccuracy": "vapl:verifiableAccuracy",
+    "nonce": "vapl:nonce",
+
+    "predictionId": "vapl:predictionId",
+    "predictionTimestamp": "vapl:predictionTimestamp",
+    "predictionValue": "vapl:predictionValue",
+    "verificationTimestamp": "vapl:verificationTimestamp",
+    "verificationSource": "vapl:verificationSource",
+    "actualValue": "vapl:actualValue",
+    "accuracyScore": "vapl:accuracyScore",
+    "methodology": "vapl:methodology",
+
+    "contributionType": "vapl:contributionType",
+    "resourceId": "vapl:resourceId",
+    "consumers": "vapl:consumers",
+    "revenueEarned": "vapl:revenueEarned"
+  }
+}
