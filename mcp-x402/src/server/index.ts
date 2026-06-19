@@ -36,7 +36,7 @@ async function runStdio(): Promise<void> {
   process.on('SIGINT', shutdown);
   process.on('SIGTERM', shutdown);
 
-  // Keep stdio process alive — reconnect on unexpected transport close
+  // Keep stdio process alive
   process.stdin.on('end', () => {
     AuditLogger.getInstance().warn('stdio_stdin_end', {});
     process.exit(0);
@@ -50,7 +50,7 @@ async function runSSE(): Promise<void> {
   app.use(cors({ origin: process.env['CORS_ORIGIN'] ?? '*' }));
   app.use(express.json({ limit: '1mb' }));
 
-  // Health endpoint — hit every 30s by Docker healthcheck + keepalive cron
+  // Health endpoint
   app.get('/health', healthHandler);
 
   app.get('/agents.json', (_req, res) => {
@@ -63,7 +63,30 @@ async function runSSE(): Promise<void> {
     res.sendFile('.well-known/agentcard.json', { root: process.cwd() });
   });
 
-  // Streamable HTTP transport — used by claude.ai web connectors
+  // FIX: Root handler — was 404, now returns service discovery
+  app.get('/', (_req, res) => {
+    res.json({
+      name: 'mcp-x402',
+      version: VERSION,
+      description: 'The x402 Amazon — 43+ tools, pay-per-call via XRPL. scriptmasterlabs.com',
+      status: 'online',
+      transport: 'streamable-http + sse',
+      endpoints: {
+        mcp_streamable: 'POST /mcp',
+        sse_connect: 'GET /sse',
+        sse_messages: 'POST /messages',
+        health: 'GET /health',
+        agentCard: 'GET /.well-known/agentcard.json',
+        llms: 'GET /llms.txt',
+      },
+      links: {
+        github: 'https://github.com/Timwal78/SML_Portfolio/tree/main/mcp-x402',
+        homepage: 'https://scriptmasterlabs.com',
+      },
+    });
+  });
+
+  // Streamable HTTP transport — claude.ai web connectors
   const streamableTransports = new Map<string, StreamableHTTPServerTransport>();
 
   app.post('/mcp', async (req, res) => {
@@ -83,10 +106,24 @@ async function runSSE(): Promise<void> {
     await transport.handleRequest(req, res, req.body);
   });
 
+  // FIX: GET /mcp with no session was 404, now returns service info
   app.get('/mcp', async (req, res) => {
     const sessionId = req.headers['mcp-session-id'] as string | undefined;
     const transport = sessionId ? streamableTransports.get(sessionId) : undefined;
-    if (!transport) { res.status(404).json({ error: 'session_not_found' }); return; }
+    if (!transport) {
+      res.json({
+        name: 'mcp-x402',
+        version: VERSION,
+        protocol: 'MCP/streamable-http',
+        status: 'ready',
+        tools: '43+ tools available',
+        how_to_connect: 'POST /mcp with a JSON-RPC initialize request',
+        sse_alternative: 'GET /sse for legacy SSE transport',
+        health: '/health',
+        homepage: 'https://scriptmasterlabs.com',
+      });
+      return;
+    }
     await transport.handleRequest(req, res);
   });
 
@@ -134,28 +171,24 @@ async function runSSE(): Promise<void> {
   );
 
   AuditLogger.getInstance().info('server_start', { transport: 'sse', port, version: VERSION });
-  console.error(`[mcp-x402] SSE listening on :${port} — health: http://localhost:${port}/health`);
+  console.error(`[mcp-x402] listening on :${port} — health: http://localhost:${port}/health`);
 
   const shutdown = async () => {
     AuditLogger.getInstance().info('server_stop', { transport: 'sse' });
-    // Gracefully close existing SSE connections
     for (const [id] of transports) {
       AuditLogger.getInstance().info('sse_force_close', { sessionId: id });
     }
     httpServer.close(() => process.exit(0));
-    // Hard exit if graceful close takes > 10s
     setTimeout(() => process.exit(1), 10_000).unref();
   };
   process.on('SIGINT', shutdown);
   process.on('SIGTERM', shutdown);
 
-  // Catch unhandled errors — log and keep running rather than crashing
   process.on('uncaughtException', (err) => {
     AuditLogger.getInstance().error('uncaught_exception', { error: String(err), stack: err.stack ?? '' });
-    // Don't exit — let Docker/Render restart policy handle truly fatal states
   });
   process.on('unhandledRejection', (reason) => {
-    AuditLogger.getInstance().error('unhandled_rejection', { reason: String(reason) });
+    AuditLogger.getInstance().error('unhandledRejection', { reason: String(reason) });
   });
 }
 
