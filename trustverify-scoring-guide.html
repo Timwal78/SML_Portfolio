@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Understanding the TrustScore — TrustVerify AI</title>
+<style>
+:root {
+  --bg: #000308; --panel: #050C14; --border: #0D2137;
+  --blue: #00D4FF; --text: #C8D8E8; --text-dim: #6A8099; --white: #FFFFFF;
+  --green: #00FF88; --yellow: #FFB800; --orange: #FF6B35; --red: #FF2D55;
+  --mono: 'Courier New', monospace; --sans: 'Inter', -apple-system, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.7; font-size: 16px; }
+nav { display: flex; align-items: center; justify-content: space-between; padding: 1rem 2rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(0,3,8,0.95); backdrop-filter: blur(10px); z-index: 100; }
+.nav-logo { font-family: var(--mono); color: var(--blue); font-size: 0.9rem; font-weight: bold; text-decoration: none; }
+.nav-links { display: flex; gap: 1.5rem; }
+.nav-links a { color: var(--text-dim); text-decoration: none; font-size: 0.85rem; transition: color 0.2s; }
+.nav-links a:hover { color: var(--blue); }
+.container { max-width: 860px; margin: 0 auto; padding: 4rem 2rem; }
+.doc-header { margin-bottom: 3rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border); }
+.doc-badge { display: inline-block; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.3); color: var(--blue); font-size: 0.75rem; font-family: var(--mono); padding: 0.3rem 0.8rem; border-radius: 2px; margin-bottom: 1rem; letter-spacing: 0.05em; text-transform: uppercase; }
+.doc-header h1 { font-size: 2rem; font-weight: 700; color: var(--white); margin-bottom: 0.5rem; line-height: 1.3; }
+.doc-meta { font-size: 0.8rem; color: var(--text-dim); font-family: var(--mono); display: flex; gap: 2rem; flex-wrap: wrap; margin-top: 1rem; }
+h2 { font-size: 1.2rem; font-weight: 700; color: var(--blue); margin: 2.5rem 0 1rem; padding-top: 2.5rem; border-top: 1px solid var(--border); font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.05em; }
+h2:first-of-type { border-top: none; padding-top: 0; }
+h3 { font-size: 1rem; font-weight: 600; color: var(--white); margin: 1.5rem 0 0.5rem; }
+p { margin-bottom: 1rem; color: var(--text); font-size: 0.95rem; }
+.compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; margin: 1.5rem 0; }
+.compare-col { background: var(--panel); padding: 1.5rem; }
+.compare-col.header { background: rgba(0,212,255,0.06); }
+.compare-col h4 { font-family: var(--mono); font-size: 0.78rem; color: var(--blue); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem; }
+.compare-col ul { list-style: none; }
+.compare-col ul li { padding: 0.4rem 0; border-bottom: 1px solid rgba(13,33,55,0.5); color: var(--text); font-size: 0.88rem; }
+.compare-col ul li:last-child { border-bottom: none; }
+.dimensions-grid { display: grid; gap: 1rem; margin: 1.5rem 0; }
+.dim-card { background: var(--panel); border: 1px solid var(--border); border-radius: 4px; padding: 1.5rem; display: grid; grid-template-columns: 48px 1fr; gap: 1rem; align-items: start; }
+.dim-number { background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.2); color: var(--blue); font-family: var(--mono); font-size: 1.1rem; font-weight: bold; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 4px; flex-shrink: 0; }
+.dim-content h3 { margin: 0 0 0.3rem; color: var(--white); font-size: 0.95rem; }
+.dim-weight { display: inline-block; background: rgba(0,212,255,0.08); color: var(--blue); font-size: 0.7rem; font-family: var(--mono); padding: 0.2rem 0.5rem; border-radius: 2px; margin-bottom: 0.5rem; }
+.dim-content p { font-size: 0.88rem; color: var(--text); margin: 0; }
+.score-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.88rem; }
+.score-table th { background: rgba(0,212,255,0.08); border: 1px solid var(--border); padding: 0.7rem 1rem; text-align: left; font-family: var(--mono); font-size: 0.72rem; text-transform: uppercase; color: var(--blue); letter-spacing: 0.05em; }
+.score-table td { border: 1px solid var(--border); padding: 0.7rem 1rem; vertical-align: middle; }
+.score-table tr:nth-child(even) td { background: rgba(5,12,20,0.5); }
+.badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 2px; font-size: 0.72rem; font-family: var(--mono); font-weight: bold; white-space: nowrap; }
+.b-ex { background: rgba(0,255,136,0.12); color: #00FF88; border: 1px solid rgba(0,255,136,0.3); }
+.b-el { background: rgba(0,212,255,0.12); color: #00D4FF; border: 1px solid rgba(0,212,255,0.3); }
+.b-gd { background: rgba(0,180,220,0.1); color: #00AACC; border: 1px solid rgba(0,180,220,0.25); }
+.b-fa { background: rgba(255,184,0,0.12); color: #FFB800; border: 1px solid rgba(255,184,0,0.3); }
+.b-mg { background: rgba(255,140,66,0.12); color: #FF8C42; border: 1px solid rgba(255,140,66,0.3); }
+.b-po { background: rgba(255,107,53,0.15); color: #FF6B35; border: 1px solid rgba(255,107,53,0.4); }
+.b-vp { background: rgba(255,45,85,0.12); color: #FF5577; border: 1px solid rgba(255,45,85,0.3); }
+.b-cr { background: rgba(255,45,85,0.2); color: #FF2D55; border: 1px solid rgba(255,45,85,0.5); }
+.signals-grid { display: grid; gap: 0.75rem; margin: 1.5rem 0; }
+.signal-card { background: var(--panel); border: 1px solid var(--border); border-radius: 4px; padding: 1rem 1.2rem; display: flex; align-items: flex-start; gap: 1rem; }
+.signal-icon { font-family: var(--mono); font-size: 0.88rem; font-weight: bold; width: 90px; flex-shrink: 0; padding-top: 0.1rem; }
+.s-pos { color: var(--green); } .s-warn { color: var(--yellow); } .s-dng { color: var(--orange); } .s-crit { color: var(--red); } .s-unk { color: var(--text-dim); }
+.signal-card p { margin: 0; font-size: 0.88rem; color: var(--text); }
+.signal-card strong { color: var(--white); }
+.callout { background: rgba(0,212,255,0.05); border: 1px solid rgba(0,212,255,0.2); border-left: 3px solid var(--blue); padding: 1.2rem 1.5rem; border-radius: 0 4px 4px 0; margin: 1.5rem 0; }
+.callout p { margin: 0; font-size: 0.9rem; }
+.policy-list { list-style: none; margin: 1rem 0; }
+.policy-list li { background: var(--panel); border: 1px solid var(--border); border-left: 3px solid var(--blue); padding: 0.75rem 1rem; margin-bottom: 0.5rem; border-radius: 0 4px 4px 0; font-family: var(--mono); font-size: 0.83rem; color: var(--text); }
+.cta-footer { margin-top: 4rem; padding: 2.5rem; background: var(--panel); border: 1px solid var(--border); border-top: 2px solid var(--blue); border-radius: 4px; text-align: center; }
+.cta-footer h3 { font-size: 1.3rem; color: var(--white); margin-bottom: 0.75rem; }
+.cta-footer p { color: var(--text-dim); font-size: 0.9rem; margin-bottom: 1.5rem; }
+.btn-primary { display: inline-block; background: var(--blue); color: #000; padding: 0.85rem 2rem; border-radius: 2px; font-weight: 700; font-size: 0.9rem; text-decoration: none; margin-right: 0.75rem; }
+.btn-secondary { display: inline-block; border: 1px solid rgba(0,212,255,0.4); color: var(--blue); padding: 0.85rem 2rem; border-radius: 2px; font-size: 0.9rem; text-decoration: none; }
+@media (max-width: 640px) {
+  .compare-grid { grid-template-columns: 1fr; }
+  .dim-card { grid-template-columns: 1fr; }
+  .btn-primary, .btn-secondary { display: block; margin: 0.5rem 0; text-align: center; }
+}
+</style>
+</head>
+<body>
+<nav>
+  <a href="trustverify.html" class="nav-logo">TrustVerify AI</a>
+  <div class="nav-links">
+    <a href="trustverify.html">Platform</a>
+    <a href="trustverify-integrations.html">Integrations</a>
+    <a href="trustverify-competitive-faq.html">FAQ</a>
+    <a href="trustverify-security.html">Security</a>
+  </div>
+</nav>
+<div class="container">
+  <div class="doc-header">
+    <div class="doc-badge">Scoring Guide</div>
+    <h1>Understanding the TrustScore</h1>
+    <p style="font-size:1.05rem;color:var(--text-dim);margin-top:0.75rem;">A guide for risk and procurement teams — no technical background required.</p>
+    <div class="doc-meta">
+      <span>AUDIENCE: CISOs &middot; CPOs &middot; Legal &middot; Board</span>
+      <span>VERSION: 1.0</span>
+      <span>UPDATED: 2026-06-20</span>
+    </div>
+  </div>
+
+  <h2>What Is a TrustScore?</h2>
+  <p>A TrustScore is a standardized rating (300&ndash;850) that measures the <strong style="color:var(--white)">operational reliability</strong> of an AI vendor. It works like a credit score for a company &mdash; but for AI agents.</p>
+  <p>AI agents don't have financial statements, credit histories, or human references. Traditional procurement can't evaluate them. The TrustScore fills that gap by measuring what vendors actually do, not what they claim.</p>
+
+  <h2>Why 300&ndash;850?</h2>
+  <p>This range is intentionally familiar. Everyone in finance, legal, and procurement understands credit scores. A 300 is high risk. An 850 is exceptional. A 650 is &ldquo;fair, needs monitoring.&rdquo; No training required.</p>
+
+  <h2>How Is It Different from a Credit Score?</h2>
+  <div class="compare-grid">
+    <div class="compare-col header"><h4>Credit Score (Company)</h4></div>
+    <div class="compare-col header"><h4>TrustScore (AI Vendor)</h4></div>
+    <div class="compare-col"><ul>
+      <li>Based on financial history</li>
+      <li>Updated monthly</li>
+      <li>Measures ability to repay debt</li>
+      <li>Uses bank and credit data</li>
+      <li>Static for months at a time</li>
+    </ul></div>
+    <div class="compare-col"><ul>
+      <li>Based on operational behavior</li>
+      <li>Updated daily</li>
+      <li>Measures ability to deliver securely</li>
+      <li>Uses API performance, security signals</li>
+      <li>Dynamic &mdash; changes in real time</li>
+    </ul></div>
+  </div>
+
+  <h2>The Five Dimensions</h2>
+  <p>Every TrustScore is the weighted sum of five observable dimensions. Each measures something different &mdash; and each matters for a different reason.</p>
+  <div class="dimensions-grid">
+    <div class="dim-card">
+      <div class="dim-number">1</div>
+      <div class="dim-content">
+        <h3>Payment Reliability</h3>
+        <span class="dim-weight">Weight: 25%</span>
+        <p>&ldquo;Does this vendor pay its own bills?&rdquo; An AI vendor that can't pay for its own compute or API subscriptions is a vendor that will shut down without warning. We monitor whether the vendor consistently settles its operational costs on time. Late or missed payments lower the score &mdash; just like a person who misses credit card payments.</p>
+      </div>
+    </div>
+    <div class="dim-card">
+      <div class="dim-number">2</div>
+      <div class="dim-content">
+        <h3>Uptime Consistency</h3>
+        <span class="dim-weight">Weight: 25%</span>
+        <p>&ldquo;Is this vendor actually working when we need it?&rdquo; We measure whether the vendor's API is available, how fast it responds, and how frequently it has outages. A vendor that's down 5% of the time will fail your customers 5% of the time. We catch that before your customers do.</p>
+      </div>
+    </div>
+    <div class="dim-card">
+      <div class="dim-number">3</div>
+      <div class="dim-content">
+        <h3>Security Posture</h3>
+        <span class="dim-weight">Weight: 20%</span>
+        <p>&ldquo;Has this vendor been careless with security?&rdquo; We check for exposed API keys, known vulnerabilities, breach history, and patch cadence. A vendor with exposed credentials is like a contractor who leaves your building keys at a bar. We monitor public repositories, breach databases, and security advisories in real time.</p>
+      </div>
+    </div>
+    <div class="dim-card">
+      <div class="dim-number">4</div>
+      <div class="dim-content">
+        <h3>Contract Adherence</h3>
+        <span class="dim-weight">Weight: 15%</span>
+        <p>&ldquo;Is this vendor doing what it promised?&rdquo; We monitor whether vendors stay within data handling agreements, geographic restrictions, usage limits, and termination clauses. A vendor that silently exceeds your data usage limits is a liability waiting to happen.</p>
+      </div>
+    </div>
+    <div class="dim-card">
+      <div class="dim-number">5</div>
+      <div class="dim-content">
+        <h3>Operational Longevity</h3>
+        <span class="dim-weight">Weight: 15%</span>
+        <p>&ldquo;How long has this vendor been around, and does it look stable?&rdquo; We measure the age of the vendor's infrastructure, consistency of operations, and historical continuity. A vendor that appeared last week has no track record. A vendor operating cleanly for two years has demonstrated stability. Pitch decks don't show this &mdash; operational history does.</p>
+      </div>
+    </div>
+  </div>
+
+  <h2>Score Ranges and What They Mean</h2>
+  <table class="score-table">
+    <thead><tr><th>Range</th><th>Rating</th><th>Recommended Action</th></tr></thead>
+    <tbody>
+      <tr><td style="font-family:var(--mono);color:var(--white)">800&ndash;850</td><td><span class="badge b-ex">Exceptional</span></td><td>Preferred vendor &mdash; fast-track procurement, auto-renewal eligible</td></tr>
+      <tr><td style="font-family:var(--mono);color:var(--white)">750&ndash;799</td><td><span class="badge b-el">Excellent</span></td><td>Standard onboarding, routine monitoring</td></tr>
+      <tr><td style="font-family:var(--mono);color:var(--white)">700&ndash;749</td><td><span class="badge b-gd">Good</span></td><td>Acceptable for most use cases, quarterly review</td></tr>
+      <tr><td style="font-family:var(--mono);color:var(--white)">650&ndash;699</td><td><span class="badge b-fa">Fair</span></td><td>Monitor closely, require enhanced SLA, monthly check-in</td></tr>
+      <tr><td style="font-family:var(--mono);color:var(--white)">600&ndash;649</td><td><span class="badge b-mg">Marginal</span></td><td>Restrict from sensitive data, monthly review required</td></tr>
+      <tr><td style="font-family:var(--mono);color:var(--white)">550&ndash;599</td><td><span class="badge b-po">Poor</span></td><td>Block from customer-facing systems, remediation plan required</td></tr>
+      <tr><td style="font-family:var(--mono);color:var(--white)">500&ndash;549</td><td><span class="badge b-vp">Very Poor</span></td><td>Immediate CISO escalation, consider vendor termination</td></tr>
+      <tr><td style="font-family:var(--mono);color:var(--white)">300&ndash;499</td><td><span class="badge b-cr">Critical</span></td><td>Block all access immediately, activate incident response</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Score Changes: What to Watch</h2>
+  <p>Point-in-time scores matter. Trends matter more. These signals drive automatic policy enforcement when configured.</p>
+  <div class="signals-grid">
+    <div class="signal-card">
+      <span class="signal-icon s-pos">+50 pts</span>
+      <p><strong>Vendor improving significantly.</strong> Good signal for contract renewal, expanded access, or removal from enhanced monitoring list.</p>
+    </div>
+    <div class="signal-card">
+      <span class="signal-icon s-warn">&minus;50 to &minus;100</span>
+      <p><strong>Warning sign.</strong> Investigate within 48 hours. Likely caused by a security finding or uptime degradation. Review vendor communications.</p>
+    </div>
+    <div class="signal-card">
+      <span class="signal-icon s-dng">&minus;100 pts</span>
+      <p><strong>Critical alert.</strong> Immediate CISO escalation. Possible breach, key exposure, or vendor financial instability. Consider temporary suspension.</p>
+    </div>
+    <div class="signal-card">
+      <span class="signal-icon s-crit">&minus;260 pts</span>
+      <p><strong>Catastrophic decline.</strong> Switch vendors. The platform will auto-block if policy is configured. Indicates a serious security or operational failure.</p>
+    </div>
+    <div class="signal-card">
+      <span class="signal-icon s-unk">N/A</span>
+      <p><strong>Score unavailable.</strong> Vendor not in our database. Requires manual review or vendor self-submission before access is granted.</p>
+    </div>
+  </div>
+
+  <h2>How We Protect Against Gaming</h2>
+  <p>Vendors cannot buy a better score. All inputs are derived from <strong style="color:var(--white)">observable operational behavior</strong>, not self-reported data.</p>
+  <div class="callout">
+    <p><strong style="color:var(--blue)">Anti-Gaming Policy:</strong> Our anomaly detection identifies artificial inflation attempts &mdash; manufactured transactions, hidden downtime, credential rotation purely for scoring purposes &mdash; and applies automatic penalties. The scoring algorithm is audited quarterly by an independent third party. Audit methodology is available to Enterprise customers under NDA.</p>
+  </div>
+
+  <h2>Your Role in the Process</h2>
+  <p>TrustVerify AI provides the score. <strong style="color:var(--white)">You set the policy.</strong> The platform enforces it automatically &mdash; but you control the thresholds.</p>
+  <ul class="policy-list">
+    <li>IF score &lt; 700 &rarr; block from customer PII data</li>
+    <li>IF score drops &gt; 100 points in 30 days &rarr; escalate to CISO, create P2 ticket</li>
+    <li>IF score &ge; 800 &rarr; eligible for automatic renewal without manual review</li>
+    <li>IF score &lt; 600 &rarr; require remediation plan before re-access</li>
+    <li>IF shadow AI detected &rarr; notify CISO, procurement, and Legal immediately</li>
+  </ul>
+  <p style="margin-top:1rem;">Thresholds are configurable by your team and tuned to your industry during onboarding.</p>
+
+  <div class="cta-footer">
+    <h3>See Your Vendors&rsquo; TrustScores</h3>
+    <p>30-day pilot. No upfront cost. Shadow AI discovery included.</p>
+    <a href="trustverify.html" class="btn-primary">Request Free Assessment</a>
+    <a href="trustverify-competitive-faq.html" class="btn-secondary">Read the FAQ</a>
+  </div>
+</div>
+</body>
+</html>
