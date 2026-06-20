@@ -352,8 +352,9 @@
   }
   footer a:hover { color: var(--green); }
 
-  .volumes-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 40px; }
-  @media (max-width: 760px) { .volumes-grid { grid-template-columns: 1fr; } }
+  .volumes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 40px; }
+  @media (max-width: 980px) { .volumes-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 640px) { .volumes-grid { grid-template-columns: 1fr; } }
   .volume-card {
     background: var(--black-card); border: 1px solid var(--border); border-radius: 12px;
     padding: 24px; display: flex; flex-direction: column; gap: 10px;
@@ -572,6 +573,16 @@
     <p class="section-sub">Buy the guide on Google Play Books, then download your spreadsheet template directly — no account, no waiting.</p>
 
     <div class="volumes-grid">
+      <div class="volume-card">
+        <span class="vol-num">VOL 1</span>
+        <h3>The Beastmode Command Center</h3>
+        <p>Revenue &amp; expenses, task pipeline, and quarterly goals — your entire business in one workbook, one dashboard.</p>
+        <div class="volume-links">
+          <a href="https://play.google.com/store/books" class="vol-link">Buy guide on Play Books</a>
+          <a href="downloads/smlsheets/SMLSheets_BeastmodeCommandCenter.xlsx" class="vol-link download" download>↓ Download spreadsheet</a>
+        </div>
+      </div>
+
       <div class="volume-card">
         <span class="vol-num">VOL 16</span>
         <h3>Grant Forge Beastmode</h3>
