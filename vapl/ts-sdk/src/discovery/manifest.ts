@@ -21,7 +21,8 @@ export function generateProvenanceSoulManifest(
   capabilities: string[] = [],
   options: { trustedIssuers?: string[] } = {},
 ): ProvenanceSoulManifest {
-  const score = computeReputationScore(credentials, did, { trustedIssuers: options.trustedIssuers });
+  const score = computeReputationScore(credentials, did,
+    options.trustedIssuers !== undefined ? { trustedIssuers: options.trustedIssuers } : {});
 
   return {
     '@context': [
@@ -57,9 +58,10 @@ export function matchProviders(
   return eligible
     .map(p => ({
       did: p.did,
-      endpoint: p.endpoint,
+      ...(p.endpoint !== undefined ? { endpoint: p.endpoint } : {}),
       capabilities: p.capabilities,
-      reputationScore: computeReputationScore(p.credentials, p.did, options),
+      reputationScore: computeReputationScore(p.credentials, p.did,
+        options.trustedIssuers !== undefined ? { trustedIssuers: options.trustedIssuers } : {}),
     }))
     .sort((a, b) => b.reputationScore.overall - a.reputationScore.overall);
 }

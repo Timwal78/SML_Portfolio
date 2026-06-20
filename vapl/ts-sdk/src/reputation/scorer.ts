@@ -55,7 +55,7 @@ export function computeReputationScore(
                contribution: w.contribution / totalW, tenure: w.tenure / totalW };
 
   const { valid: validVCs, invalid } = verifyVCBatch(credentials, {
-    trustedIssuers: options.trustedIssuers,
+    ...(options.trustedIssuers !== undefined ? { trustedIssuers: options.trustedIssuers } : {}),
     checkExpiry: false,
     now,
   });
