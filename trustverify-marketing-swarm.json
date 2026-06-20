@@ -1,0 +1,208 @@
+{
+  "schema_version": "1.0",
+  "product": "TrustVerify AI",
+  "campaign": {
+    "name": "Shadow AI Discovery",
+    "objective": "Generate 50 qualified enterprise leads in 60 days",
+    "budget_usd": 30000,
+    "duration_days": 60,
+    "target": {
+      "company_revenue_min_usd": "1000000000",
+      "employee_count_min": 10000,
+      "industries": ["healthcare", "finance", "energy", "government", "insurance"],
+      "buyer_titles": [
+        "Chief Information Security Officer",
+        "CISO",
+        "Chief Procurement Officer",
+        "CPO",
+        "Enterprise Architect",
+        "VP Risk",
+        "Director AI Governance",
+        "Director Vendor Risk"
+      ]
+    },
+    "success_metrics": {
+      "qualified_leads_target": 50,
+      "meetings_per_month_target": 8,
+      "cost_per_meeting_max_usd": 2000,
+      "response_rate_target": 0.15,
+      "unsubscribe_rate_max": 0.03,
+      "pilot_conversion_rate_target": 0.60
+    }
+  },
+  "agents": [
+    {
+      "id": "lead_scout",
+      "name": "Lead Scout Agent",
+      "mission": "Identify Fortune 1000 companies with acute AI vendor trust pain",
+      "budget_allocation_pct": 0.30,
+      "data_sources": [
+        "linkedin_sales_navigator",
+        "crunchbase",
+        "sec_edgar",
+        "news_apis",
+        "job_boards"
+      ],
+      "scoring_model": {
+        "signals": [
+          { "signal": "recent_ciso_hire_under_6mo", "weight": 0.20, "method": "linkedin_job_change" },
+          { "signal": "ai_governance_mention_earnings_call", "weight": 0.15, "method": "sec_filings_transcript" },
+          { "signal": "recent_security_incident", "weight": 0.25, "method": "news_apis_breach_db" },
+          { "signal": "ai_vendor_management_job_posting", "weight": 0.15, "method": "job_board_scraping" },
+          { "signal": "regulated_industry", "weight": 0.15, "method": "company_classification" },
+          { "signal": "employee_count_over_10k", "weight": 0.10, "method": "crunchbase_linkedin" }
+        ],
+        "qualified_threshold": 70,
+        "daily_output_target": 7
+      },
+      "output_schema": {
+        "lead_id": "string",
+        "company": "string",
+        "industry": "string",
+        "employees": "integer",
+        "propensity_score": "integer (0-100)",
+        "signals": "string[]",
+        "recommended_outreach_angle": "string",
+        "recommended_contact": "string",
+        "confidence": "high | medium | low"
+      },
+      "defund_trigger": {
+        "condition": "less_than_50pct_qualified_leads_accept_meeting",
+        "evaluation_window_days": 30
+      }
+    },
+    {
+      "id": "outreach_fabricator",
+      "name": "Outreach Fabricator Agent",
+      "mission": "Convert qualified leads into booked discovery meetings",
+      "budget_allocation_pct": 0.40,
+      "channels": [
+        {
+          "channel": "email",
+          "budget_pct": 0.60,
+          "sequence": {
+            "emails": 5,
+            "duration_days": 14,
+            "personalization_fields": ["company_name", "recent_signal", "industry_pain", "contact_name"]
+          },
+          "ab_test_elements": ["subject_lines", "send_times", "cta_placement"]
+        },
+        {
+          "channel": "linkedin_inmail",
+          "budget_pct": 0.30,
+          "tone": "casual",
+          "cta": "brief_chat"
+        },
+        {
+          "channel": "voice_outreach",
+          "budget_pct": 0.10,
+          "eligibility": "propensity_score >= 85",
+          "discloses_ai_assistance": true,
+          "voicemail_max_seconds": 30
+        }
+      ],
+      "compliance": ["CAN-SPAM", "GDPR", "CCPA"],
+      "defund_trigger": {
+        "condition": "cost_per_meeting_above_2500_usd",
+        "evaluation_window_weeks": 2,
+        "consecutive_violations": 2
+      }
+    },
+    {
+      "id": "closer_support",
+      "name": "Closer Support Agent",
+      "mission": "Maximize win rate on booked discovery meetings",
+      "budget_allocation_pct": 0.20,
+      "pre_call_brief": {
+        "delivery_minutes_before": 30,
+        "sections": [
+          "recent_company_signals",
+          "likely_pain_points",
+          "recommended_talking_points",
+          "objection_handling",
+          "recommended_demo_flow",
+          "materials_to_prepare"
+        ]
+      },
+      "post_call_followup": {
+        "delivery_hours_after": 1,
+        "includes": [
+          "conversation_recap",
+          "action_items",
+          "pilot_agreement",
+          "relevant_case_study",
+          "roi_calculator"
+        ]
+      },
+      "objection_map": {
+        "we_already_have_vendor_risk_tools": "Those were built for SaaS vendors, not AI agents. AI agents have no financial history, no human accountability, and no standard compliance docs. We measure what actually predicts failure.",
+        "we_dont_use_ai_vendors": "Shadow AI means you do — you just don't know it yet. Let us show you what's running on your network.",
+        "budget_is_tight": "The pilot is free. We invoice only if you see measurable value. Most customers find 10+ unauthorized agents in week one."
+      },
+      "success_metrics": {
+        "win_rate_target": 0.40,
+        "baseline_win_rate_unsupported": 0.25,
+        "avg_deal_size_usd": 80000,
+        "sales_cycle_days_max": 60
+      },
+      "defund_trigger": {
+        "condition": "win_rate_below_30pct",
+        "evaluation_window_months": 2,
+        "consecutive_violations": 2
+      }
+    },
+    {
+      "id": "analytics_optimizer",
+      "name": "Analytics Optimizer Agent",
+      "mission": "Maximize marketing ROI through continuous budget reallocation",
+      "budget_allocation_pct": 0.10,
+      "weekly_cycle": {
+        "monday": ["review_last_week_performance", "identify_underperformers", "reallocate_budget", "generate_agent_recommendations"],
+        "wednesday": ["midweek_checkpoint", "adjust_sequences_if_response_declining", "ab_test_new_angles"],
+        "friday": ["generate_weekly_report", "flag_anomalies", "recommend_next_week_budget"]
+      },
+      "budget_rules": [
+        { "condition": "cost_per_meeting_lt_1500 AND win_rate_gt_0.35", "action": "increase_budget_20pct" },
+        { "condition": "cost_per_meeting_gt_2500 OR win_rate_lt_0.25", "action": "decrease_budget_20pct" },
+        { "condition": "cost_per_meeting_gt_3000", "action": "defund_channel" },
+        { "condition": "else", "action": "maintain" }
+      ],
+      "report_sections": [
+        "budget_status",
+        "lead_generation",
+        "meeting_conversion",
+        "sales_pipeline",
+        "optimization_recommendations",
+        "next_week_budget_allocation"
+      ],
+      "defund_trigger": {
+        "condition": "no_measurable_cac_improvement",
+        "evaluation_window_days": 60
+      }
+    }
+  ],
+  "budget_breakdown": {
+    "total_usd": 30000,
+    "allocation": {
+      "lead_scout_pct": 0.30,
+      "outreach_fabricator_pct": 0.40,
+      "closer_support_pct": 0.20,
+      "analytics_optimizer_pct": 0.10
+    },
+    "billing": "fiat_usd",
+    "invoicing_terms": "net_30"
+  },
+  "governance": {
+    "human_oversight": "weekly_review_required",
+    "ai_disclosure_required_for": ["voice_outreach"],
+    "data_retention_days": 90,
+    "compliance_frameworks": ["CAN-SPAM", "GDPR", "CCPA"],
+    "escalation_contact": "ceo@scriptmasterlabs.com"
+  },
+  "pipeline_targets": {
+    "q3_2026_projected_revenue_usd": 240000,
+    "cac_target_usd": 15000,
+    "ltv_target_usd": 80000,
+    "ltv_cac_ratio_min": 5.0
+  }
+}

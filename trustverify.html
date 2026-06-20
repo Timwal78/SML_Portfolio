@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TrustVerify AI — Enterprise AI Vendor Risk Intelligence | Script Master Labs</title>
+<meta name="description" content="TrustVerify AI continuously scores every AI vendor in your ecosystem across reliability, security, financial stability, and operational integrity. Know who to trust before you give them your data.">
+<meta name="keywords" content="AI vendor risk, enterprise AI security, AI vendor scoring, CISO AI governance, shadow AI detection, vendor trust score, AI procurement, ServiceNow AI integration, Salesforce vendor management">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="author" content="Script Master Labs LLC">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.scriptmasterlabs.com/trustverify">
+<meta property="og:title" content="TrustVerify AI — Know Every AI Vendor Before You Trust Them">
+<meta property="og:description" content="Enterprise AI vendor risk intelligence. Continuously monitors 50+ AI vendors across 5 operational dimensions. Integrates with Salesforce, ServiceNow, and Slack.">
+<meta property="og:site_name" content="Script Master Labs">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="TrustVerify AI — Enterprise AI Vendor Risk Intelligence">
+<meta name="twitter:description" content="Know every AI vendor before you trust them. TrustScore 300-850 for every AI vendor in your ecosystem.">
+<meta name="twitter:site" content="@scriptmasterlabs">
+<link rel="canonical" href="https://www.scriptmasterlabs.com/trustverify">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QHTHMG61N6"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-QHTHMG61N6');</script>
+<style>
+  :root{
+    --bg:#000308;--panel:#050C14;--panel2:#080F1A;--line:#0E1E30;--line2:#162640;
+    --blue:#00D4FF;--blue2:#0099DD;--blue3:#0066AA;--blue-dim:rgba(0,212,255,.1);
+    --green:#39FF14;--gold:#FFD700;--amber:#FF9500;--red:#FF3B30;--purple:#8B5CF6;
+    --white:#F0F6FF;--mute:#7A8FA6;--mute2:#3A4F66;--mute3:#1A2F46;
+    --mono:'JetBrains Mono','SF Mono',ui-monospace,Menlo,monospace;
+    --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    --glow:0 0 20px rgba(0,212,255,.25);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--white);font-family:var(--sans);line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:inherit;text-decoration:none}
+  strong{color:var(--blue)}
+  code{font-family:var(--mono);font-size:.9em;color:var(--blue);background:rgba(0,212,255,.08);padding:2px 6px;border-radius:4px}
+  .wrap{max-width:1140px;margin:0 auto;padding:0 28px}
+
+  /* SCANLINE */
+  body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.12) 2px,rgba(0,0,0,.12) 4px);pointer-events:none;z-index:0;opacity:.25}
+
+  /* NAV */
+  nav{border-bottom:1px solid var(--line);padding:18px 0;position:relative;z-index:10;background:rgba(0,3,8,.85);backdrop-filter:blur(12px)}
+  .nav-inner{display:flex;align-items:center;gap:24px}
+  .nav-logo{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--blue);letter-spacing:1px;display:flex;align-items:center;gap:8px}
+  .nav-logo .pulse{width:8px;height:8px;border-radius:50%;background:var(--blue);box-shadow:0 0 12px var(--blue);animation:pulse 2s infinite}
+  .nav-links{display:flex;gap:20px;margin-left:auto}
+  .nav-links a{font-size:13px;color:var(--mute);transition:color .2s}
+  .nav-links a:hover,.nav-links a.active{color:var(--white)}
+  .nav-cta{font-family:var(--mono);font-size:11px;padding:8px 20px;border:1px solid var(--blue);border-radius:6px;color:var(--blue);transition:all .2s;letter-spacing:.5px}
+  .nav-cta:hover{background:var(--blue);color:#000;box-shadow:var(--glow)}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(.85)}}
+
+  /* HERO */
+  .hero{position:relative;z-index:1;padding:100px 0 72px;border-bottom:1px solid var(--line);overflow:hidden}
+  .hero-glow{position:absolute;top:-20%;left:50%;transform:translateX(-50%);width:1100px;height:800px;background:radial-gradient(ellipse,rgba(0,212,255,.05) 0%,transparent 65%);pointer-events:none}
+  .hero-grid{display:grid;grid-template-columns:1fr 420px;gap:56px;align-items:center}
+  .badge-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px}
+  .badge{font-family:var(--mono);font-size:10px;padding:4px 12px;border-radius:20px;letter-spacing:.8px;display:inline-flex;align-items:center;gap:6px}
+  .badge.enterprise{background:rgba(0,212,255,.1);color:var(--blue);border:1px solid rgba(0,212,255,.25)}
+  .badge.soc{background:rgba(57,255,20,.08);color:#39FF14;border:1px solid rgba(57,255,20,.2)}
+  .badge.gdpr{background:rgba(139,92,246,.1);color:var(--purple);border:1px solid rgba(139,92,246,.2)}
+  .hero-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:3px;color:var(--blue);text-transform:uppercase;margin-bottom:16px}
+  h1{font-size:clamp(36px,5.5vw,62px);font-weight:900;letter-spacing:-2px;line-height:.98;margin-bottom:24px}
+  h1 em{font-style:normal;color:var(--blue);text-shadow:0 0 40px rgba(0,212,255,.35)}
+  .hero-sub{font-size:clamp(15px,1.8vw,17px);color:var(--mute);line-height:1.8;max-width:580px;margin-bottom:32px}
+  .hero-actions{display:flex;flex-wrap:wrap;gap:14px}
+  .btn{font-family:var(--mono);font-size:12px;padding:13px 28px;border-radius:8px;transition:all .2s;cursor:pointer;letter-spacing:.5px;display:inline-flex;align-items:center;gap:8px}
+  .btn-primary{background:var(--blue);color:#000;border:none;font-weight:800}
+  .btn-primary:hover{background:#33DDFF;transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,212,255,.3)}
+  .btn-outline{background:transparent;color:var(--white);border:1px solid var(--line2)}
+  .btn-outline:hover{border-color:var(--blue);color:var(--blue);transform:translateY(-2px)}
+  .trust-badges{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+  .tb{font-family:var(--mono);font-size:10px;color:var(--mute2);display:flex;align-items:center;gap:6px}
+  .tb::before{content:'✓';color:var(--blue)}
+
+  /* DASHBOARD MOCKUP */
+  .dash-card{background:var(--panel);border:1px solid var(--line2);border-radius:16px;padding:24px;overflow:hidden;position:relative}
+  .dash-card::before{content:'';position:absolute;inset:-1px;border-radius:16px;background:linear-gradient(135deg,rgba(0,212,255,.1),transparent 50%);pointer-events:none}
+  .dash-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+  .dash-title{font-family:var(--mono);font-size:11px;color:var(--mute2);letter-spacing:1px}
+  .dash-alert{font-family:var(--mono);font-size:10px;padding:4px 10px;background:rgba(255,59,48,.12);color:#FF3B30;border:1px solid rgba(255,59,48,.2);border-radius:4px;animation:blink 2s infinite}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.6}}
+  .vendor-row{display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+  .vendor-row:last-child{border-bottom:none}
+  .vr-name{font-size:13px;font-weight:600}
+  .vr-cat{font-family:var(--mono);font-size:9px;color:var(--mute2);margin-top:2px}
+  .vr-score{font-family:var(--mono);font-size:16px;font-weight:900}
+  .vr-score.high{color:#39FF14}
+  .vr-score.med{color:var(--gold)}
+  .vr-score.low{color:#FF3B30}
+  .vr-trend{font-family:var(--mono);font-size:10px}
+  .vr-trend.down{color:#FF3B30}
+  .vr-trend.up{color:#39FF14}
+  .vr-trend.flat{color:var(--mute2)}
+
+  /* SECTION COMMON */
+  .section{position:relative;z-index:1;margin:80px 0}
+  .section-label{font-family:var(--mono);font-size:11px;letter-spacing:3px;color:var(--blue);text-transform:uppercase;margin-bottom:14px}
+  .section-title{font-size:clamp(26px,4vw,42px);font-weight:800;letter-spacing:-.8px;margin-bottom:12px}
+  .section-sub{font-size:15px;color:var(--mute);max-width:640px;line-height:1.75;margin-bottom:36px}
+
+  /* PAIN SECTION */
+  .pain-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+  .pain-card{padding:28px;border:1px solid var(--line2);border-radius:14px;background:var(--panel);transition:border-color .2s}
+  .pain-card:hover{border-color:rgba(0,212,255,.25)}
+  .pain-stat{font-family:var(--mono);font-size:36px;font-weight:900;color:var(--blue);line-height:1;margin-bottom:8px}
+  .pain-label{font-size:14px;font-weight:700;margin-bottom:6px}
+  .pain-desc{font-size:13px;color:var(--mute);line-height:1.6}
+
+  /* HOW IT WORKS */
+  .flow-steps{display:grid;grid-template-columns:repeat(5,1fr);gap:0;position:relative;margin-top:40px}
+  .flow-steps::before{content:'';position:absolute;top:28px;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,var(--blue),transparent);opacity:.3}
+  .flow-step{text-align:center;padding:0 12px;position:relative}
+  .fs-num{width:56px;height:56px;border-radius:50%;border:1px solid var(--blue);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-family:var(--mono);font-size:13px;font-weight:700;color:var(--blue);background:var(--panel);position:relative;z-index:1;transition:box-shadow .3s}
+  .flow-step:hover .fs-num{box-shadow:0 0 20px rgba(0,212,255,.4)}
+  .fs-icon{font-size:22px;margin-bottom:4px}
+  .fs-title{font-size:13px;font-weight:700;margin-bottom:6px}
+  .fs-desc{font-size:11px;color:var(--mute);line-height:1.5}
+
+  /* DIMENSIONS */
+  .dim-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:18px}
+  .dim-card{padding:28px;border:1px solid var(--line2);border-radius:14px;background:var(--panel);position:relative;overflow:hidden;transition:border-color .2s}
+  .dim-card:hover{border-color:rgba(0,212,255,.3)}
+  .dim-card::after{content:attr(data-weight);position:absolute;top:20px;right:20px;font-family:var(--mono);font-size:36px;font-weight:900;color:rgba(0,212,255,.04);pointer-events:none}
+  .dim-num{font-family:var(--mono);font-size:11px;color:var(--blue);letter-spacing:1px;margin-bottom:12px}
+  .dim-title{font-size:17px;font-weight:800;margin-bottom:6px}
+  .dim-wt{font-family:var(--mono);font-size:11px;color:var(--amber);margin-bottom:12px}
+  .dim-desc{font-size:13px;color:var(--mute);line-height:1.6;margin-bottom:16px}
+  .dim-bar{height:6px;background:var(--line2);border-radius:3px;overflow:hidden;margin-top:8px}
+  .dim-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--blue2),var(--blue))}
+
+  /* SCORE TABLE */
+  .score-table{width:100%;border-collapse:collapse;margin-top:24px;font-size:13px}
+  .score-table th{font-family:var(--mono);font-size:10px;letter-spacing:1px;color:var(--mute2);text-align:left;padding:10px 16px;border-bottom:1px solid var(--line2);text-transform:uppercase}
+  .score-table td{padding:12px 16px;border-bottom:1px solid var(--line)}
+  .score-table tr:last-child td{border-bottom:none}
+  .score-table tr:hover td{background:var(--panel2)}
+  .st-score{font-family:var(--mono);font-weight:700}
+  .st-score.exceptional{color:#39FF14}
+  .st-score.excellent{color:#00FF7F}
+  .st-score.good{color:#00CC44}
+  .st-score.fair{color:var(--gold)}
+  .st-score.marginal{color:var(--amber)}
+  .st-score.poor{color:#FF6B00}
+  .st-score.verypoor{color:#FF3B30}
+  .st-score.critical{color:#CC1A1A}
+  .st-action{font-size:12px;color:var(--mute)}
+
+  /* USE CASES */
+  .cases-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+  .case-card{padding:28px;border:1px solid var(--line2);border-radius:14px;background:var(--panel);transition:border-color .2s}
+  .case-card:hover{border-color:rgba(0,212,255,.25)}
+  .case-num{font-family:var(--mono);font-size:10px;color:var(--blue);letter-spacing:2px;margin-bottom:12px}
+  .case-title{font-size:16px;font-weight:800;margin-bottom:10px}
+  .case-body{font-size:13px;color:var(--mute);line-height:1.7;margin-bottom:14px}
+  .case-result{font-family:var(--mono);font-size:11px;padding:8px 14px;background:rgba(0,212,255,.07);border:1px solid rgba(0,212,255,.15);border-radius:6px;color:var(--blue)}
+
+  /* INTEGRATIONS */
+  .int-logos{display:flex;flex-wrap:wrap;gap:16px;margin-bottom:36px}
+  .int-logo{font-family:var(--mono);font-size:11px;padding:8px 16px;border:1px solid var(--line2);border-radius:8px;color:var(--mute2);background:var(--panel);transition:all .2s}
+  .int-logo:hover{border-color:rgba(0,212,255,.3);color:var(--blue)}
+  .int-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .int-card{padding:24px;border:1px solid var(--line2);border-radius:14px;background:var(--panel)}
+  .int-name{font-size:15px;font-weight:800;margin-bottom:6px}
+  .int-desc{font-size:13px;color:var(--mute);line-height:1.6;margin-bottom:16px}
+  .int-tag{font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px;background:rgba(0,212,255,.08);color:var(--blue);display:inline-block}
+
+  /* PRICING */
+  .pricing-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  .price-card{padding:24px;border:1px solid var(--line2);border-radius:16px;background:var(--panel);transition:transform .2s,border-color .2s;display:flex;flex-direction:column}
+  .price-card.featured{border-color:rgba(0,212,255,.35);background:linear-gradient(135deg,rgba(0,212,255,.05),var(--panel));box-shadow:0 0 40px rgba(0,212,255,.07)}
+  .price-card:hover{transform:translateY(-3px)}
+  .pc-badge{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;padding:3px 8px;background:rgba(0,212,255,.1);color:var(--blue);border:1px solid rgba(0,212,255,.2);border-radius:4px;display:inline-block;margin-bottom:10px}
+  .pc-tier{font-family:var(--mono);font-size:12px;font-weight:700;margin-bottom:8px}
+  .pc-price{font-family:var(--mono);font-size:28px;font-weight:900;line-height:1;margin-bottom:4px}
+  .pc-price .unit{font-size:12px;color:var(--mute);font-weight:400}
+  .pc-limit{font-family:var(--mono);font-size:11px;color:var(--blue);margin-bottom:14px}
+  .pc-features{list-style:none;display:flex;flex-direction:column;gap:7px;margin-bottom:20px;flex:1}
+  .pc-features li{font-size:12px;color:var(--mute);display:flex;align-items:flex-start;gap:7px;line-height:1.4}
+  .pc-features li::before{content:'→';color:var(--blue);flex-shrink:0;font-family:var(--mono)}
+  .pc-features li.hl{color:var(--white)}
+  .pc-cta{font-family:var(--mono);font-size:11px;padding:11px;border-radius:8px;cursor:pointer;letter-spacing:.5px;transition:all .2s;text-align:center;display:block;margin-top:auto}
+  .pc-cta.primary{background:var(--blue);color:#000;border:none;font-weight:700}
+  .pc-cta.primary:hover{background:#33DDFF}
+  .pc-cta.outline{background:transparent;color:var(--white);border:1px solid var(--line2)}
+  .pc-cta.outline:hover{border-color:var(--blue);color:var(--blue)}
+
+  /* SECURITY */
+  .sec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .sec-card{padding:22px;border:1px solid var(--line2);border-radius:12px;background:var(--panel)}
+  .sec-icon{font-size:24px;margin-bottom:10px}
+  .sec-title{font-size:14px;font-weight:700;margin-bottom:6px}
+  .sec-desc{font-size:12px;color:var(--mute);line-height:1.6}
+
+  /* FORM */
+  .cta-form{background:var(--panel);border:1px solid rgba(0,212,255,.2);border-radius:16px;padding:40px;max-width:560px;margin:40px auto 0}
+  .form-row{margin-bottom:16px}
+  .form-row label{display:block;font-family:var(--mono);font-size:10px;letter-spacing:1px;color:var(--mute2);margin-bottom:6px;text-transform:uppercase}
+  .form-row input,.form-row select{width:100%;background:var(--panel2);border:1px solid var(--line2);border-radius:8px;padding:12px 14px;color:var(--white);font-size:14px;transition:border-color .2s;font-family:var(--sans)}
+  .form-row input:focus,.form-row select:focus{outline:none;border-color:var(--blue)}
+  .form-row select option{background:var(--panel)}
+  .form-row input::placeholder{color:var(--mute2)}
+  .form-submit{width:100%;background:var(--blue);color:#000;border:none;border-radius:8px;padding:14px;font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .2s;margin-top:8px}
+  .form-submit:hover{background:#33DDFF}
+
+  /* FINAL CTA */
+  .cta-final{margin:80px 0 100px;text-align:center;padding:64px 40px;border:1px solid rgba(0,212,255,.12);border-radius:20px;background:linear-gradient(180deg,rgba(0,212,255,.03),transparent);position:relative;overflow:hidden}
+  .cta-final h2{font-size:clamp(28px,4.5vw,46px);font-weight:900;letter-spacing:-1.5px;margin-bottom:14px}
+  .cta-final p{font-size:16px;color:var(--mute);max-width:560px;margin:0 auto 32px;line-height:1.7}
+
+  /* CODE */
+  .code-block{position:relative;margin-top:24px;border-radius:12px;border:1px solid var(--line2);overflow:hidden}
+  .code-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--panel2);border-bottom:1px solid var(--line)}
+  .code-lang{font-family:var(--mono);font-size:10px;letter-spacing:1px;color:var(--mute2);text-transform:uppercase}
+  pre{background:var(--panel);padding:20px;font-family:var(--mono);font-size:12px;line-height:1.8;overflow-x:auto;color:#c8d4e0}
+  .kw{color:#79C0FF}.str{color:#A5D6FF}.fn{color:#56D364}.cm{color:#484F58}.num{color:#FF7B72}.key{color:var(--blue)}
+
+  /* FOOTER */
+  footer{border-top:1px solid var(--line);padding:40px 0;position:relative;z-index:1}
+  .footer-inner{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:16px}
+  .footer-brand{font-family:var(--mono);font-size:12px;color:var(--mute2)}
+  .footer-links{display:flex;flex-wrap:wrap;gap:20px}
+  .footer-links a{font-size:12px;color:var(--mute2);transition:color .2s}
+  .footer-links a:hover{color:var(--mute)}
+
+  /* TICKER */
+  .ticker{padding:14px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden;margin:60px 0}
+  .ticker-track{display:flex;gap:48px;animation:ticker 30s linear infinite;white-space:nowrap}
+  .ticker-item{font-family:var(--mono);font-size:11px;color:var(--mute);display:flex;align-items:center;gap:8px;flex-shrink:0}
+  .ticker-item .val{color:var(--blue)}
+  @keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+  @media(max-width:1000px){.pricing-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:900px){
+    .hero-grid,.int-grid,.cases-grid,.pain-grid{grid-template-columns:1fr}
+    .flow-steps{grid-template-columns:1fr 1fr}
+    .flow-steps::before{display:none}
+    .pricing-grid{grid-template-columns:1fr 1fr}
+    .sec-grid{grid-template-columns:repeat(2,1fr)}
+  }
+  @media(max-width:560px){
+    .pricing-grid,.sec-grid,.cases-grid{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="wrap nav-inner">
+    <div class="nav-logo"><span class="pulse"></span>SML ◈ TrustVerify</div>
+    <div class="nav-links">
+      <a href="/index.html">Home</a>
+      <a href="/agent-credit-bureau.html">Credit Bureau</a>
+      <a href="/stack.html">Stack</a>
+      <a href="/trustverify-integrations.html">Integrations</a>
+      <a href="/trustverify.html" class="active" style="color:var(--blue)">Enterprise</a>
+    </div>
+    <a href="#request-assessment" class="nav-cta">REQUEST ASSESSMENT →</a>
+  </div>
+</nav>
+
+<!-- ═══════════════════════ HERO ═══════════════════════ -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="badge-row">
+          <span class="badge enterprise">● ENTERPRISE</span>
+          <span class="badge soc">SOC 2 IN PROGRESS</span>
+          <span class="badge gdpr">GDPR COMPLIANT</span>
+        </div>
+        <div class="hero-eyebrow">TrustVerify AI — ACB-E</div>
+        <h1>Your AI Vendors<br>Are <em>Invisible.</em><br>We Make Them Visible.</h1>
+        <p class="hero-sub">
+          TrustVerify AI continuously scores every AI vendor in your ecosystem — authorized or shadow — across reliability, security, financial stability, and operational integrity. Know who to trust before you give them your data.
+        </p>
+        <div class="hero-actions">
+          <a href="#request-assessment" class="btn btn-primary">Request a Vendor Risk Assessment</a>
+          <a href="#how-it-works" class="btn btn-outline">See How It Works</a>
+        </div>
+        <div class="trust-badges">
+          <span class="tb">SOC 2 Type II In Progress</span>
+          <span class="tb">GDPR Compliant</span>
+          <span class="tb">No Data Retention of Customer Content</span>
+          <span class="tb">$5M E&O Coverage</span>
+        </div>
+      </div>
+
+      <!-- DASHBOARD MOCKUP -->
+      <div class="dash-card">
+        <div class="dash-header">
+          <div class="dash-title">VENDOR TRUST DASHBOARD · 52 VENDORS</div>
+          <div class="dash-alert">⚠ ALERT: 1 CRITICAL</div>
+        </div>
+        <div class="vendor-row">
+          <div><div class="vr-name">DocuBot AI</div><div class="vr-cat">Document Processing</div></div>
+          <div class="vr-score high">742</div>
+          <div class="vr-trend down">▼ -12</div>
+        </div>
+        <div class="vendor-row">
+          <div><div class="vr-name">CodeAssist Pro</div><div class="vr-cat">Coding Assistant</div></div>
+          <div class="vr-score high">811</div>
+          <div class="vr-trend up">▲ +8</div>
+        </div>
+        <div class="vendor-row">
+          <div><div class="vr-name">DataMind Analytics</div><div class="vr-cat">Analytics</div></div>
+          <div class="vr-score med">618</div>
+          <div class="vr-trend flat">— 0</div>
+        </div>
+        <div class="vendor-row">
+          <div><div class="vr-name">ChatFlow Ops</div><div class="vr-cat">Chatbot · SHADOW AI</div></div>
+          <div class="vr-score low">412</div>
+          <div class="vr-trend down">▼ -128</div>
+        </div>
+        <div class="vendor-row">
+          <div><div class="vr-name">VisionParse</div><div class="vr-cat">Document Processing</div></div>
+          <div class="vr-score high">779</div>
+          <div class="vr-trend up">▲ +3</div>
+        </div>
+        <div style="margin-top:16px;font-family:var(--mono);font-size:10px;color:var(--mute2);padding-top:12px;border-top:1px solid var(--line)">
+          API key leaked 6h ago · ChatFlow Ops score dropped 128 pts · CISO alerted
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-track">
+    <span class="ticker-item">TrustScore Range <span class="val">300–850</span></span>
+    <span class="ticker-item">Score Updates <span class="val">Daily · Real-Time on Enterprise</span></span>
+    <span class="ticker-item">Dimensions <span class="val">5</span></span>
+    <span class="ticker-item">Integrations <span class="val">Salesforce · ServiceNow · Slack · Okta · CrowdStrike</span></span>
+    <span class="ticker-item">Starter <span class="val">$2,000/mo</span></span>
+    <span class="ticker-item">Professional <span class="val">$8,000/mo</span></span>
+    <span class="ticker-item">Enterprise <span class="val">$25,000/mo</span></span>
+    <span class="ticker-item">Shadow AI Detection <span class="val">INCLUDED Pro+</span></span>
+    <span class="ticker-item">TrustScore Range <span class="val">300–850</span></span>
+    <span class="ticker-item">Score Updates <span class="val">Daily · Real-Time on Enterprise</span></span>
+    <span class="ticker-item">Dimensions <span class="val">5</span></span>
+    <span class="ticker-item">Integrations <span class="val">Salesforce · ServiceNow · Slack · Okta · CrowdStrike</span></span>
+    <span class="ticker-item">Starter <span class="val">$2,000/mo</span></span>
+    <span class="ticker-item">Professional <span class="val">$8,000/mo</span></span>
+    <span class="ticker-item">Enterprise <span class="val">$25,000/mo</span></span>
+    <span class="ticker-item">Shadow AI Detection <span class="val">INCLUDED Pro+</span></span>
+  </div>
+</div>
+
+<!-- ═══════════════════════ SECTION 2: THE PROBLEM ═══════════════════════ -->
+<section class="section">
+  <div class="wrap">
+    <div class="section-label">Enterprise Pain</div>
+    <h2 class="section-title">You Can't Audit What You Can't See</h2>
+    <p class="section-sub">The average enterprise now deploys 50+ AI vendors. Chatbots. Document processors. Coding assistants. Analytics agents. Most were onboarded in weeks, not months, because AI moves fast and procurement moves slow.</p>
+    <div class="pain-grid">
+      <div class="pain-card">
+        <div class="pain-stat">34%</div>
+        <div class="pain-label">of AI vendors experience unreported API downtime</div>
+        <div class="pain-desc">Your existing uptime dashboards don't cover external AI vendors. Failures are discovered by end users, not monitoring tools.</div>
+      </div>
+      <div class="pain-card">
+        <div class="pain-stat">12%</div>
+        <div class="pain-label">of AI vendors had security incidents in the past 12 months</div>
+        <div class="pain-desc">Exposed API keys. Model exfiltration. Data handling violations. Most incidents are never disclosed to enterprise customers.</div>
+      </div>
+      <div class="pain-card">
+        <div class="pain-stat">67%</div>
+        <div class="pain-label">of AI vendor contracts lack meaningful SLAs</div>
+        <div class="pain-desc">You signed a ToS, not an SLA. When the vendor goes down or gets breached, you have no contractual recourse and no early warning.</div>
+      </div>
+      <div class="pain-card">
+        <div class="pain-stat">40%</div>
+        <div class="pain-label">year-over-year growth in shadow AI deployments</div>
+        <div class="pain-desc">Employees are deploying unauthorized AI agents faster than procurement can review them. Your AI inventory is incomplete by definition.</div>
+      </div>
+    </div>
+    <div style="margin-top:24px;padding:20px;border:1px solid rgba(0,212,255,.15);border-radius:12px;background:rgba(0,212,255,.04)">
+      <p style="font-size:14px;color:var(--mute);line-height:1.7">Your existing vendor risk tools were built for <strong>Salesforce</strong> and <strong>ServiceNow</strong>. They don't work for AI agents that have no financial statements, no references, and no human accountability. <strong>Traditional procurement processes fail for AI vendors.</strong></p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ SECTION 3: HOW IT WORKS ═══════════════════════ -->
+<section class="section" id="how-it-works">
+  <div class="wrap">
+    <div class="section-label">The Process</div>
+    <h2 class="section-title">Five Dimensions. One Score. Zero Guesswork.</h2>
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="fs-num">01</div>
+        <div class="fs-icon">🔌</div>
+        <div class="fs-title">Connect</div>
+        <div class="fs-desc">API-first, webhook-ready. No agent installation. No code changes. Integrates with your existing procurement and security stack in under an hour.</div>
+      </div>
+      <div class="flow-step">
+        <div class="fs-num">02</div>
+        <div class="fs-icon">📡</div>
+        <div class="fs-title">Discover</div>
+        <div class="fs-desc">We identify every AI vendor — authorized through procurement and shadow AI through network traffic analysis. You can't protect what you don't know exists.</div>
+      </div>
+      <div class="flow-step">
+        <div class="fs-num">03</div>
+        <div class="fs-icon">🎯</div>
+        <div class="fs-title">Score</div>
+        <div class="fs-desc">Every vendor receives a TrustScore (300–850) across 5 operational dimensions. Updated daily, not annually. Real behavior, not self-reported compliance docs.</div>
+      </div>
+      <div class="flow-step">
+        <div class="fs-num">04</div>
+        <div class="fs-icon">🛡</div>
+        <div class="fs-title">Act</div>
+        <div class="fs-desc">Set automated policies: block vendors below 600 from customer data. Escalate vendors dropping 100+ points to CISO. Require quarterly review below 700.</div>
+      </div>
+      <div class="flow-step">
+        <div class="fs-num">05</div>
+        <div class="fs-icon">👁</div>
+        <div class="fs-title">Monitor</div>
+        <div class="fs-desc">Continuous monitoring with real-time alerts. When a vendor's score changes, you know immediately — not in next year's audit.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ SECTION 4: FIVE DIMENSIONS ═══════════════════════ -->
+<section class="section">
+  <div class="wrap">
+    <div class="section-label">Scoring Model</div>
+    <h2 class="section-title">What We Measure. Why It Matters.</h2>
+    <p class="section-sub">Every TrustScore is derived from five operational dimensions measured against observable vendor behavior — not self-reported questionnaires or annual audits.</p>
+    <div class="dim-grid">
+      <div class="dim-card" data-weight="25%">
+        <div class="dim-num">01 · DIMENSION</div>
+        <div class="dim-title">Payment Reliability</div>
+        <div class="dim-wt">Weight: 25% of TrustScore</div>
+        <div class="dim-desc">Does this vendor consistently fulfill its financial obligations? A vendor that can't pay its own infrastructure bills is a vendor that will disappear without warning. We track on-time payment rates, average payment delays, and transaction consistency.</div>
+        <div class="dim-bar"><div class="dim-bar-fill" style="width:25%"></div></div>
+      </div>
+      <div class="dim-card" data-weight="25%">
+        <div class="dim-num">02 · DIMENSION</div>
+        <div class="dim-title">Uptime Consistency</div>
+        <div class="dim-wt">Weight: 25% of TrustScore</div>
+        <div class="dim-desc">Is the vendor's service consistently available? We measure actual API response times, error rates, and declared vs. actual maintenance windows. A vendor at 99.9% uptime versus 95% — we catch the difference before your customers do.</div>
+        <div class="dim-bar"><div class="dim-bar-fill" style="width:25%"></div></div>
+      </div>
+      <div class="dim-card" data-weight="20%">
+        <div class="dim-num">03 · DIMENSION</div>
+        <div class="dim-title">Security Posture</div>
+        <div class="dim-wt">Weight: 20% of TrustScore</div>
+        <div class="dim-desc">Has the vendor had security incidents? Are their API keys exposed? Do they rotate credentials on schedule? We monitor public repositories, breach databases, and security advisories in real time — not once a year.</div>
+        <div class="dim-bar"><div class="dim-bar-fill" style="width:20%"></div></div>
+      </div>
+      <div class="dim-card" data-weight="15%">
+        <div class="dim-num">04 · DIMENSION</div>
+        <div class="dim-title">Contract Adherence</div>
+        <div class="dim-wt">Weight: 15% of TrustScore</div>
+        <div class="dim-desc">Does the vendor operate within the bounds of its contract? We monitor data handling terms, geographic restrictions, usage limits, and termination clauses — flagging deviations before they become liabilities.</div>
+        <div class="dim-bar"><div class="dim-bar-fill" style="width:15%"></div></div>
+      </div>
+      <div class="dim-card" data-weight="15%">
+        <div class="dim-num">05 · DIMENSION</div>
+        <div class="dim-title">Operational Longevity</div>
+        <div class="dim-wt">Weight: 15% of TrustScore</div>
+        <div class="dim-desc">How long has this vendor been operating? Infrastructure age, transaction history, and operational continuity tell the story that pitch decks don't. A flash-in-the-pan startup scores differently than a 2-year stable operation.</div>
+        <div class="dim-bar"><div class="dim-bar-fill" style="width:15%"></div></div>
+      </div>
+    </div>
+
+    <!-- SCORE RANGE TABLE -->
+    <div style="margin-top:48px">
+      <div class="section-label">Score Ranges</div>
+      <h3 style="font-size:22px;font-weight:800;letter-spacing:-.5px;margin-bottom:20px">What Your Score Means</h3>
+      <table class="score-table">
+        <thead>
+          <tr>
+            <th>Score Range</th>
+            <th>Rating</th>
+            <th>Recommended Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="st-score exceptional">800–850</span></td><td>Exceptional</td><td class="st-action">Preferred vendor status, fast-track procurement</td></tr>
+          <tr><td><span class="st-score excellent">750–799</span></td><td>Excellent</td><td class="st-action">Standard onboarding, routine monitoring</td></tr>
+          <tr><td><span class="st-score good">700–749</span></td><td>Good</td><td class="st-action">Acceptable for most use cases, quarterly review</td></tr>
+          <tr><td><span class="st-score fair">650–699</span></td><td>Fair</td><td class="st-action">Monitor closely, require enhanced SLA</td></tr>
+          <tr><td><span class="st-score marginal">600–649</span></td><td>Marginal</td><td class="st-action">Restrict from sensitive data, monthly review required</td></tr>
+          <tr><td><span class="st-score poor">550–599</span></td><td>Poor</td><td class="st-action">Block from customer-facing systems, remediation plan</td></tr>
+          <tr><td><span class="st-score verypoor">500–549</span></td><td>Very Poor</td><td class="st-action">Immediate escalation, consider termination</td></tr>
+          <tr><td><span class="st-score critical">300–499</span></td><td>Critical</td><td class="st-action">Block all access, incident response required</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ SECTION 5: USE CASES ═══════════════════════ -->
+<section class="section">
+  <div class="wrap">
+    <div class="section-label">Enterprise Outcomes</div>
+    <h2 class="section-title">What Our Customers Actually Do With It</h2>
+    <div class="cases-grid">
+      <div class="case-card">
+        <div class="case-num">USE CASE 01</div>
+        <div class="case-title">Shadow AI Detection</div>
+        <div class="case-body">A Fortune 500 healthcare company discovered 23 unauthorized AI agents processing patient data. TrustVerify AI flagged them through network traffic analysis, assigned scores, and auto-escalated to the CISO within 24 hours.</div>
+        <div class="case-result">→ Full AI inventory for the first time · 8 high-risk agents remediated immediately</div>
+      </div>
+      <div class="case-card">
+        <div class="case-num">USE CASE 02</div>
+        <div class="case-title">Procurement Acceleration</div>
+        <div class="case-body">A global bank reduced AI vendor onboarding from 12 weeks to 2 weeks by using TrustVerify AI scores as a first-pass filter. Vendors above 750 skip manual review. Vendors below 600 require enhanced due diligence.</div>
+        <div class="case-result">→ 80% faster onboarding · Zero security incidents in first 6 months</div>
+      </div>
+      <div class="case-card">
+        <div class="case-num">USE CASE 03</div>
+        <div class="case-title">Continuous Monitoring</div>
+        <div class="case-body">A SaaS company's primary AI document processor dropped from 780 to 520 in 48 hours. TrustVerify AI detected API key exposure on a public repository. The company switched vendors before the breach became public.</div>
+        <div class="case-result">→ Avoided estimated $2M in regulatory fines and customer notification costs</div>
+      </div>
+      <div class="case-card">
+        <div class="case-num">USE CASE 04</div>
+        <div class="case-title">Board Reporting</div>
+        <div class="case-body">A public company's risk committee now receives a quarterly "AI Vendor Trust Report" generated automatically by TrustVerify AI. It includes score distributions, trend analysis, and policy compliance metrics.</div>
+        <div class="case-result">→ Board confidence in AI governance · Audit preparation time reduced by 60%</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ SECTION 6: INTEGRATIONS ═══════════════════════ -->
+<section class="section">
+  <div class="wrap">
+    <div class="section-label">Integration Ecosystem</div>
+    <h2 class="section-title">Works With What You Already Have</h2>
+    <p class="section-sub">No rip-and-replace. TrustVerify AI integrates with your existing procurement, security, and collaboration tools through REST APIs and webhooks.</p>
+    <div class="int-logos">
+      <span class="int-logo">Salesforce</span>
+      <span class="int-logo">ServiceNow</span>
+      <span class="int-logo">SAP Ariba</span>
+      <span class="int-logo">Slack</span>
+      <span class="int-logo">Microsoft Teams</span>
+      <span class="int-logo">Okta</span>
+      <span class="int-logo">CrowdStrike</span>
+      <span class="int-logo">Splunk</span>
+    </div>
+    <div class="int-grid">
+      <div class="int-card">
+        <div class="int-name">Salesforce</div>
+        <div class="int-desc">Scores flow directly into your Salesforce Vendor object. Auto-create tasks when scores drop. Filter vendor lists by TrustScore threshold. Native Lightning component available.</div>
+        <span class="int-tag">REST API · Webhook</span>
+      </div>
+      <div class="int-card">
+        <div class="int-name">ServiceNow</div>
+        <div class="int-desc">Auto-create incidents when vendors drop below policy thresholds. Route to the right team by severity. Close tickets automatically when scores recover. GRC module integration included.</div>
+        <span class="int-tag">MID Server · REST</span>
+      </div>
+      <div class="int-card">
+        <div class="int-name">Slack</div>
+        <div class="int-desc">Real-time score drop alerts in your #security or #procurement channels. Slash commands to query any vendor score. Weekly digest summaries. Alert fatigue controls built in.</div>
+        <span class="int-tag">Webhooks · Bot API</span>
+      </div>
+    </div>
+    <div style="margin-top:16px;text-align:center">
+      <a href="/trustverify-integrations.html" class="btn btn-outline" style="display:inline-flex">View Full Integration Guides →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ SECTION 7: PRICING ═══════════════════════ -->
+<section class="section">
+  <div class="wrap">
+    <div class="section-label">Pricing</div>
+    <h2 class="section-title">Predictable Pricing for Predictable Risk</h2>
+    <p class="section-sub">All plans include a 30-day pilot, no upfront commitment, and annual contract with quarterly reviews.</p>
+    <div class="pricing-grid">
+      <div class="price-card">
+        <div class="pc-tier">Starter</div>
+        <div class="pc-price">$2,000<span class="unit">/month</span></div>
+        <div class="pc-limit">Up to 50 AI vendors</div>
+        <ul class="pc-features">
+          <li class="hl">50 AI vendors monitored</li>
+          <li>Daily score updates</li>
+          <li>Email alerts</li>
+          <li>Basic API access</li>
+          <li>Standard support (business hours)</li>
+          <li>30-day pilot included</li>
+        </ul>
+        <a href="#request-assessment" class="pc-cta outline">Start Pilot</a>
+      </div>
+      <div class="price-card featured">
+        <div class="pc-badge">MOST POPULAR</div>
+        <div class="pc-tier">Professional</div>
+        <div class="pc-price">$8,000<span class="unit">/month</span></div>
+        <div class="pc-limit">Up to 250 AI vendors</div>
+        <ul class="pc-features">
+          <li class="hl">250 AI vendors monitored</li>
+          <li class="hl">Real-time score updates</li>
+          <li class="hl">Shadow AI detection</li>
+          <li>Multi-channel alerts (email, Slack, ServiceNow)</li>
+          <li>Full API access + webhooks</li>
+          <li>Priority support (4-hour response)</li>
+          <li>Quarterly business reviews</li>
+        </ul>
+        <a href="#request-assessment" class="pc-cta primary">Start Pilot</a>
+      </div>
+      <div class="price-card">
+        <div class="pc-tier">Enterprise</div>
+        <div class="pc-price">$25,000<span class="unit">/month</span></div>
+        <div class="pc-limit">Unlimited AI vendors</div>
+        <ul class="pc-features">
+          <li class="hl">Unlimited vendors monitored</li>
+          <li class="hl">Custom scoring dimensions</li>
+          <li class="hl">Dedicated customer success manager</li>
+          <li>SOC 2 audit support</li>
+          <li>Custom integrations</li>
+          <li>24/7 support (1-hour response)</li>
+          <li>On-premise deployment option</li>
+          <li>Advanced analytics and reporting</li>
+        </ul>
+        <a href="#request-assessment" class="pc-cta outline">Contact Sales</a>
+      </div>
+      <div class="price-card">
+        <div class="pc-tier">Custom</div>
+        <div class="pc-price" style="font-size:18px;padding-top:6px">Contact<br>Us</div>
+        <div class="pc-limit">Multi-tenant · White-label</div>
+        <ul class="pc-features">
+          <li>Multi-tenant deployments</li>
+          <li>White-label options</li>
+          <li>Reseller partnerships</li>
+          <li>Government / compliance requirements</li>
+          <li>ITAR / FedRAMP pathways</li>
+          <li>Custom data residency</li>
+        </ul>
+        <a href="mailto:enterprise@scriptmasterlabs.com" class="pc-cta outline">Get in Touch</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ SECTION 8: TRUST & SECURITY ═══════════════════════ -->
+<section class="section">
+  <div class="wrap">
+    <div class="section-label">Security & Compliance</div>
+    <h2 class="section-title">Built for Institutions. Not Ideologues.</h2>
+    <div class="sec-grid">
+      <div class="sec-card">
+        <div class="sec-icon">🔐</div>
+        <div class="sec-title">SOC 2 Type II</div>
+        <div class="sec-desc">Audit in progress — completion Q4 2026. Controls covering security, availability, and confidentiality. Audit reports available to enterprise customers under NDA.</div>
+      </div>
+      <div class="sec-card">
+        <div class="sec-icon">🇪🇺</div>
+        <div class="sec-title">GDPR & CCPA Compliant</div>
+        <div class="sec-desc">No retention of customer content — metadata only. EU data residency option available. DPA available on request. Privacy-first architecture.</div>
+      </div>
+      <div class="sec-card">
+        <div class="sec-icon">🛡</div>
+        <div class="sec-title">$5M E&O Coverage</div>
+        <div class="sec-desc">Errors and omissions insurance covers AI vendor risk intelligence services. Certificate of insurance available for enterprise procurement requirements.</div>
+      </div>
+      <div class="sec-card">
+        <div class="sec-icon">🔒</div>
+        <div class="sec-title">AES-256 + TLS 1.3</div>
+        <div class="sec-desc">Encryption at rest (AES-256) and in transit (TLS 1.3 minimum). No legacy cipher suites. Certificate pinning available for enterprise deployments.</div>
+      </div>
+      <div class="sec-card">
+        <div class="sec-icon">🏛</div>
+        <div class="sec-title">SDVOSB · US-Based</div>
+        <div class="sec-desc">Script Master Labs LLC is an SDVOSB (Service-Disabled Veteran-Owned Small Business) based in Kinston, NC. US-only data residency by default.</div>
+      </div>
+      <div class="sec-card">
+        <div class="sec-icon">⚖️</div>
+        <div class="sec-title">Anti-Gaming Controls</div>
+        <div class="sec-desc">Vendors cannot buy a better score. All scores derived from observable operational behavior, not self-reported data. Anomaly detection flags manipulation attempts.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ REQUEST ASSESSMENT FORM ═══════════════════════ -->
+<section class="section" id="request-assessment">
+  <div class="wrap">
+    <div class="section-label">Get Started</div>
+    <h2 class="section-title" style="text-align:center">Request Your Free Vendor Risk Assessment</h2>
+    <p style="font-size:15px;color:var(--mute);text-align:center;max-width:480px;margin:0 auto 0">We'll analyze up to 10 AI vendors in your ecosystem at no cost. Results delivered within 48 hours.</p>
+    <form class="cta-form" onsubmit="handleAssessmentForm(event)">
+      <div class="form-row">
+        <label>Work Email</label>
+        <input type="email" placeholder="you@company.com" required id="form-email">
+      </div>
+      <div class="form-row">
+        <label>Company Name</label>
+        <input type="text" placeholder="Acme Corporation" required id="form-company">
+      </div>
+      <div class="form-row">
+        <label>Estimated AI Vendors</label>
+        <select id="form-vendors">
+          <option>1–10 vendors</option>
+          <option>10–50 vendors</option>
+          <option>50–250 vendors</option>
+          <option>250+ vendors</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>Primary Concern</label>
+        <select id="form-concern">
+          <option>Security / Breach Risk</option>
+          <option>Procurement Efficiency</option>
+          <option>Compliance / Audit</option>
+          <option>Shadow AI Detection</option>
+        </select>
+      </div>
+      <button type="submit" class="form-submit">REQUEST FREE ASSESSMENT →</button>
+      <p style="font-size:11px;color:var(--mute2);text-align:center;margin-top:12px">No credit card required. No sales call required. Results in 48 hours.</p>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap footer-inner">
+    <div class="footer-brand">© 2026 Script Master Labs LLC · SDVOSB · Kinston NC · TrustVerify AI (ACB-E)</div>
+    <div class="footer-links">
+      <a href="/index.html">Home</a>
+      <a href="/agent-credit-bureau.html">Credit Bureau (XRPL)</a>
+      <a href="/trustverify-integrations.html">Integrations</a>
+      <a href="/stack.html">Full Stack</a>
+      <a href="/privacy.html">Privacy</a>
+      <a href="/terms.html">Terms</a>
+      <a href="mailto:enterprise@scriptmasterlabs.com">enterprise@scriptmasterlabs.com</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+function handleAssessmentForm(e){
+  e.preventDefault();
+  const email=document.getElementById('form-email').value;
+  const company=document.getElementById('form-company').value;
+  const vendors=document.getElementById('form-vendors').value;
+  const concern=document.getElementById('form-concern').value;
+  const btn=e.target.querySelector('.form-submit');
+  btn.textContent='SUBMITTING...';
+  btn.disabled=true;
+  // Send to a mailto for now — replace with actual form endpoint
+  window.location.href=`mailto:enterprise@scriptmasterlabs.com?subject=TrustVerify+Assessment+Request+-+${encodeURIComponent(company)}&body=Company:+${encodeURIComponent(company)}%0AEmail:+${encodeURIComponent(email)}%0AVendors:+${encodeURIComponent(vendors)}%0AConcern:+${encodeURIComponent(concern)}`;
+  setTimeout(()=>{
+    btn.textContent='REQUEST SUBMITTED ✓';
+    btn.style.background='#39FF14';
+  },500);
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "TrustVerify AI",
+  "alternateName": "Agent Credit Bureau Enterprise",
+  "applicationCategory": "SecurityApplication",
+  "description": "Enterprise AI vendor risk intelligence platform. Continuously monitors AI vendors across 5 operational dimensions and assigns TrustScores (300-850). Integrates with Salesforce, ServiceNow, and Slack.",
+  "url": "https://www.scriptmasterlabs.com/trustverify",
+  "author": { "@type": "Organization", "name": "Script Master Labs LLC" },
+  "offers": [
+    { "@type": "Offer", "name": "Starter", "price": "2000", "priceCurrency": "USD", "billingIncrement": "P1M" },
+    { "@type": "Offer", "name": "Professional", "price": "8000", "priceCurrency": "USD", "billingIncrement": "P1M" },
+    { "@type": "Offer", "name": "Enterprise", "price": "25000", "priceCurrency": "USD", "billingIncrement": "P1M" }
+  ]
+}
+</script>
+
+</body>
+</html>
