@@ -82,7 +82,7 @@ Agentic operating system available as a Web App and on Google Play.
 ### x402 Paywall Middleware
 x402 / HTTP-402 paywall middleware. AI agents pay per request in USDC on Base. Drop-in monetization for MCP servers and APIs. Published on npm (`proof402-middleware`).
 
-### MasterSheets™ Tactical OS
+### SMLSheets.AI Tactical OS
 AI-native spreadsheet that replaces Google Sheets. A cognitive command center for life and business management. Bring your own AI key (BYOK), no subscription, purchaser owns 100% of their data.
 
 ### Trading Indicators & Alpha
