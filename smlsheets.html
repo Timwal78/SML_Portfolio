@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QHTHMG61N6"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-QHTHMG61N6');
+    </script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ScriptMasterLabs | SMLSheets.AI</title>
+<meta name="description" content="SMLSheets.AI is the AI-native spreadsheet that replaces Google Sheets. Bring your own key. No subscription. Your data belongs to you — never the platform.">
+<link rel="canonical" href="https://www.scriptmasterlabs.com/smlsheets.html">
+<meta property="og:title" content="SMLSheets.AI — The AI Spreadsheet You Actually Own">
+<meta property="og:description" content="AI-native. Bring your own key. No subscription. You own 100% of your data.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://www.scriptmasterlabs.com/smlsheets.html#app",
+      "name": "SMLSheets.AI",
+      "applicationCategory": "BusinessApplication",
+      "applicationSubCategory": "Spreadsheet",
+      "operatingSystem": "Web",
+      "url": "https://www.scriptmasterlabs.com/smlsheets.html",
+      "publisher": { "@id": "https://www.scriptmasterlabs.com/#org" },
+      "description": "SMLSheets.AI is a direct competitor to Google Sheets and others for $69.99. Bring your own key (BYOK), no subscriptions, and own your data 100%. Nothing belongs to the platform.",
+      "featureList": [
+        "AI in every cell (bring your own key)",
+        "No subscription — one-time purchase",
+        "Purchaser owns 100% of their data",
+        "Vendor never reads or stores your sheets",
+        "Pay AI providers directly at cost, no markup",
+        "Import/export CSV and XLSX, no lock-in"
+      ],
+      "offers": { "@type": "Offer", "price": "69.99", "priceCurrency": "USD", "url": "https://www.scriptmasterlabs.com/smlsheets.html" }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.scriptmasterlabs.com/" },
+        { "@type": "ListItem", "position": 2, "name": "SMLSheets.AI", "item": "https://www.scriptmasterlabs.com/smlsheets.html" }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        { "@type": "Question", "name": "What is SMLSheets.AI?", "acceptedAnswer": { "@type": "Answer", "text": "SMLSheets.AI is an AI-native spreadsheet from Script Master Labs that replaces Google Sheets. You bring your own AI key, there is no subscription, and the purchaser owns 100% of their data." } },
+        { "@type": "Question", "name": "Does SMLSheets.AI require a subscription?", "acceptedAnswer": { "@type": "Answer", "text": "No. SMLSheets.AI is a one-time purchase of $69.99 with no subscription. You pay your chosen AI provider directly at cost with no markup." } },
+        { "@type": "Question", "name": "Who owns the data in SMLSheets.AI?", "acceptedAnswer": { "@type": "Answer", "text": "The purchaser owns 100% of their data. Script Master Labs cannot read, store, or sell your sheets." } },
+        { "@type": "Question", "name": "What is bring-your-own-key (BYOK)?", "acceptedAnswer": { "@type": "Answer", "text": "You connect your own OpenAI, Anthropic, or OpenRouter API key. Your prompts and data go straight to the model you chose; SMLSheets.AI never sits in the middle." } }
+      ]
+    }
+  ]
+}
+</script>
+
+<style>
+  :root {
+    --black: #000000;
+    --black-soft: #0a0a0a;
+    --black-card: #0f0f0f;
+    --green: #39FF14;
+    --mint: #00FF7F;
+    --pink: #FF1493;
+    --gold: #FFD700;
+    --orange: #FF6B00;
+    --white: #FFFFFF;
+    --ghost: #8a8a8a;
+    --border: rgba(57,255,20,0.18);
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Inter', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: var(--sans);
+    overflow-x: hidden;
+    line-height: 1.5;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+  }
+
+  a { color: inherit; text-decoration: none; }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 28px; }
+
+  /* ---------- NAV ---------- */
+  nav {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 28px; max-width: 1180px; margin: 0 auto;
+  }
+  .logo {
+    font-family: var(--mono); font-weight: 800; font-size: 19px;
+    letter-spacing: 0.5px;
+  }
+  .logo .dot { color: var(--green); }
+  .nav-links { display: flex; gap: 32px; font-family: var(--mono); font-size: 13px; color: var(--ghost); }
+  .nav-links a:hover { color: var(--green); }
+  .nav-cta {
+    background: var(--green); color: var(--black); font-family: var(--mono);
+    font-weight: 700; font-size: 13px; padding: 10px 20px; border-radius: 4px;
+  }
+  .nav-mobile { display: none; }
+  @media (max-width: 760px) {
+    .nav-links { display: none; }
+  }
+
+  /* ---------- HERO ---------- */
+  .hero {
+    position: relative;
+    padding: 100px 0 80px;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 600px 400px at 20% 10%, rgba(57,255,20,0.10), transparent 60%),
+      radial-gradient(ellipse 500px 500px at 85% 30%, rgba(255,20,147,0.08), transparent 60%);
+    pointer-events: none;
+  }
+  .hero-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(57,255,20,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(57,255,20,0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(ellipse 900px 600px at 50% 0%, black, transparent 70%);
+    pointer-events: none;
+  }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--mono); font-size: 12px; font-weight: 700;
+    color: var(--green); letter-spacing: 1.5px; text-transform: uppercase;
+    border: 1px solid var(--border); padding: 7px 14px; border-radius: 100px;
+    margin-bottom: 28px; position: relative; z-index: 1;
+  }
+  .eyebrow::before {
+    content: ''; width: 7px; height: 7px; border-radius: 50%;
+    background: var(--green); box-shadow: 0 0 8px var(--green);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  .hero-content {
+    position: relative; z-index: 1;
+    display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 56px; align-items: center;
+  }
+  @media (max-width: 920px) {
+    .hero-content { grid-template-columns: 1fr; }
+  }
+
+  h1 {
+    font-family: var(--mono); font-weight: 800;
+    font-size: clamp(38px, 5.2vw, 64px);
+    line-height: 1.04; letter-spacing: -1px;
+    margin-bottom: 24px;
+  }
+  h1 .accent { color: var(--green); }
+  h1 .strike-wrap { position: relative; display: inline-block; color: var(--ghost); }
+  h1 .strike-wrap::after {
+    content: ''; position: absolute; left: -2%; right: -2%; top: 52%; height: 3px;
+    background: var(--pink); transform: rotate(-2deg);
+  }
+
+  .hero-sub {
+    font-size: 19px; color: #c8c8c8; max-width: 480px; margin-bottom: 36px; line-height: 1.6;
+  }
+  .hero-sub strong { color: var(--white); font-weight: 600; }
+
+  .hero-ctas { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 28px; }
+  .btn-primary {
+    background: var(--green); color: var(--black);
+    font-family: var(--mono); font-weight: 800; font-size: 15px;
+    padding: 16px 30px; border-radius: 6px;
+    box-shadow: 0 0 0 0 rgba(57,255,20,0.5);
+    transition: box-shadow 0.25s, transform 0.2s;
+  }
+  .btn-primary:hover { box-shadow: 0 0 32px rgba(57,255,20,0.45); transform: translateY(-1px); }
+  .btn-secondary {
+    border: 1px solid rgba(255,255,255,0.18); color: var(--white);
+    font-family: var(--mono); font-weight: 700; font-size: 15px;
+    padding: 16px 26px; border-radius: 6px;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .btn-secondary:hover { border-color: var(--green); background: rgba(57,255,20,0.06); }
+
+  .hero-trust { display: flex; gap: 24px; flex-wrap: wrap; font-family: var(--mono); font-size: 12.5px; color: var(--ghost); }
+  .hero-trust span { display: flex; align-items: center; gap: 7px; }
+  .hero-trust .check { color: var(--mint); font-weight: 800; }
+
+  /* ---------- LIVE SHEET DEMO (signature element) ---------- */
+  .sheet-demo {
+    background: var(--black-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 0 60px rgba(57,255,20,0.07), 0 20px 60px rgba(0,0,0,0.6);
+  }
+  .sheet-titlebar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px; background: #141414; border-bottom: 1px solid var(--border);
+  }
+  .sheet-dots { display: flex; gap: 6px; }
+  .sheet-dots span { width: 10px; height: 10px; border-radius: 50%; }
+  .sheet-dots span:nth-child(1) { background: var(--pink); }
+  .sheet-dots span:nth-child(2) { background: var(--gold); }
+  .sheet-dots span:nth-child(3) { background: var(--mint); }
+  .sheet-tabname { font-family: var(--mono); font-size: 12px; color: var(--ghost); }
+  .sheet-ai-badge {
+    font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--green);
+    border: 1px solid var(--green); padding: 3px 9px; border-radius: 100px;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .sheet-ai-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 1.4s ease-in-out infinite; }
+
+  .sheet-grid { font-family: var(--mono); font-size: 13px; }
+  .sheet-row { display: grid; grid-template-columns: 36px repeat(4, 1fr); }
+  .sheet-row.header .cell { background: #161616; color: var(--ghost); font-weight: 700; font-size: 11px; }
+  .cell {
+    padding: 11px 12px; border-right: 1px solid rgba(255,255,255,0.06); border-bottom: 1px solid rgba(255,255,255,0.06);
+    color: #d8d8d8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-height: 38px;
+    display: flex; align-items: center;
+  }
+  .cell.rownum { background: #141414; color: var(--ghost); font-size: 11px; justify-content: center; }
+  .cell.ai-fill { color: var(--green); position: relative; }
+  .cell.ai-fill .cursor-blink {
+    display: inline-block; width: 2px; height: 14px; background: var(--green);
+    margin-left: 2px; animation: blink 0.9s step-end infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  .cell.empty { color: #3a3a3a; }
+
+  .sheet-footer-bar {
+    display: flex; align-items: center; gap: 10px; padding: 12px 16px;
+    background: #0c0c0c; border-top: 1px solid var(--border);
+    font-family: var(--mono); font-size: 11.5px; color: var(--ghost);
+  }
+  .sheet-footer-bar .key-pill {
+    color: var(--gold); border: 1px solid rgba(255,215,0,0.3); padding: 2px 8px; border-radius: 100px;
+  }
+
+  /* ---------- LOGOS / TRUST STRIP ---------- */
+  .trust-strip {
+    border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    padding: 28px 0; background: var(--black-soft);
+  }
+  .trust-strip .wrap {
+    display: flex; align-items: center; justify-content: center; gap: 48px; flex-wrap: wrap;
+    font-family: var(--mono); font-size: 13px; color: var(--ghost); text-align: center;
+  }
+
+  /* ---------- SECTION SHARED ---------- */
+  section { padding: 96px 0; position: relative; }
+  .section-tag {
+    font-family: var(--mono); font-size: 12px; font-weight: 700; letter-spacing: 1.5px;
+    text-transform: uppercase; color: var(--pink); margin-bottom: 14px;
+  }
+  h2 {
+    font-family: var(--mono); font-weight: 800; font-size: clamp(28px, 3.6vw, 42px);
+    letter-spacing: -0.5px; margin-bottom: 18px; max-width: 720px;
+  }
+  .section-sub { font-size: 17px; color: var(--ghost); max-width: 640px; margin-bottom: 56px; line-height: 1.6; }
+
+  /* ---------- TEARDOWN TABLE ---------- */
+  .teardown {
+    border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+    background: var(--black-card);
+  }
+  .teardown-row {
+    display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .teardown-row:last-child { border-bottom: none; }
+  .teardown-row.head { background: #141414; }
+  .teardown-row.head .td { font-family: var(--mono); font-weight: 800; font-size: 13px; color: var(--white); }
+  .teardown-row.us { background: linear-gradient(90deg, rgba(57,255,20,0.06), transparent); }
+  .td { padding: 18px 20px; font-size: 14.5px; display: flex; align-items: center; gap: 8px; }
+  .td.feature { font-weight: 600; color: var(--white); }
+  .td .yes { color: var(--mint); font-weight: 800; }
+  .td .no { color: #666; }
+  .td .partial { color: var(--orange); font-weight: 700; }
+  .teardown-row.us .td.feature { color: var(--green); }
+  @media (max-width: 720px) {
+    .teardown-row { grid-template-columns: 1.2fr repeat(3, 1fr); font-size: 12px; }
+    .td { padding: 12px 8px; font-size: 12px; }
+  }
+
+  /* ---------- BYOK / OWNERSHIP ---------- */
+  .pillars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  @media (max-width: 860px) { .pillars { grid-template-columns: 1fr; } }
+  .pillar {
+    background: var(--black-card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 32px 28px; position: relative; overflow: hidden;
+  }
+  .pillar::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  }
+  .pillar.p1::before { background: var(--green); }
+  .pillar.p2::before { background: var(--gold); }
+  .pillar.p3::before { background: var(--pink); }
+  .pillar-num { font-family: var(--mono); font-size: 13px; color: var(--ghost); margin-bottom: 16px; }
+  .pillar h3 { font-family: var(--mono); font-size: 20px; font-weight: 700; margin-bottom: 12px; }
+  .pillar.p1 h3 { color: var(--green); }
+  .pillar.p2 h3 { color: var(--gold); }
+  .pillar.p3 h3 { color: var(--pink); }
+  .pillar p { color: #b8b8b8; font-size: 14.5px; line-height: 1.65; }
+
+  /* ---------- FAQ ---------- */
+  .faq-item { border-bottom: 1px solid var(--border); padding: 26px 0; }
+  .faq-q { font-family: var(--mono); font-weight: 700; font-size: 17px; margin-bottom: 10px; color: var(--white); }
+  .faq-q .q-mark { color: var(--green); margin-right: 10px; }
+  .faq-a { color: var(--ghost); font-size: 15px; line-height: 1.65; padding-left: 28px; }
+
+  /* ---------- FINAL CTA ---------- */
+  .final-cta {
+    text-align: center; padding: 110px 0;
+    background: radial-gradient(ellipse 700px 400px at 50% 0%, rgba(57,255,20,0.10), transparent 70%);
+    border-top: 1px solid var(--border);
+  }
+  .final-cta h2 { margin: 0 auto 18px; max-width: 600px; }
+  .final-cta .section-sub { margin: 0 auto 40px; }
+  .final-ctas { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+  footer {
+    border-top: 1px solid var(--border); padding: 40px 0; text-align: center;
+    font-family: var(--mono); font-size: 12.5px; color: #555;
+  }
+  footer a:hover { color: var(--green); }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="logo">SML<span class="dot">Sheets</span>.AI</div>
+    <div class="nav-links">
+      <a href="#how-it-compares">Compare</a>
+      <a href="#how-it-works">How it works</a>
+      <a href="#faq">FAQ</a>
+    </div>
+    <a href="#get-started" class="nav-cta">Get SMLSheets.AI</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-grid"></div>
+  <div class="wrap hero-content">
+    <div>
+      <div class="eyebrow">AI-native · BYOK · Zero subscription</div>
+      <h1>Your spreadsheet.<br><span class="strike-wrap">Their AI.</span><br><span class="accent">Never again.</span></h1>
+      <p class="hero-sub">SMLSheets.AI puts AI in every cell — powered by <strong>your own API key</strong>, not ours. One purchase. No monthly fee. Your data never leaves your hands.</p>
+      <div class="hero-ctas">
+        <a href="#get-started" class="btn-primary">Get SMLSheets.AI — $69.99 →</a>
+        <a href="#how-it-works" class="btn-secondary">See how it works</a>
+      </div>
+      <div class="hero-trust">
+        <span><span class="check">✓</span> No subscription</span>
+        <span><span class="check">✓</span> Bring your own key</span>
+        <span><span class="check">✓</span> You own 100% of your data</span>
+      </div>
+    </div>
+
+    <div class="sheet-demo">
+      <div class="sheet-titlebar">
+        <div class="sheet-dots"><span></span><span></span><span></span></div>
+        <div class="sheet-tabname">Q3_Revenue_Forecast.sml</div>
+        <div class="sheet-ai-badge"><span class="dot"></span>AI LIVE</div>
+      </div>
+      <div class="sheet-grid">
+        <div class="sheet-row header">
+          <div class="cell rownum">#</div>
+          <div class="cell">Client</div>
+          <div class="cell">Status</div>
+          <div class="cell">Risk</div>
+          <div class="cell">Next Action</div>
+        </div>
+        <div class="sheet-row">
+          <div class="cell rownum">1</div>
+          <div class="cell">Northgate Co.</div>
+          <div class="cell">Active</div>
+          <div class="cell ai-fill">Low<span class="cursor-blink"></span></div>
+          <div class="cell empty">—</div>
+        </div>
+        <div class="sheet-row">
+          <div class="cell rownum">2</div>
+          <div class="cell">Brightline LLC</div>
+          <div class="cell">Renewal due</div>
+          <div class="cell empty">—</div>
+          <div class="cell empty">—</div>
+        </div>
+        <div class="sheet-row">
+          <div class="cell rownum">3</div>
+          <div class="cell">Vantos Group</div>
+          <div class="cell">Active</div>
+          <div class="cell empty">—</div>
+          <div class="cell empty">—</div>
+        </div>
+        <div class="sheet-row">
+          <div class="cell rownum">4</div>
+          <div class="cell empty">—</div>
+          <div class="cell empty">—</div>
+          <div class="cell empty">—</div>
+          <div class="cell empty">—</div>
+        </div>
+      </div>
+      <div class="sheet-footer-bar">
+        <span class="key-pill">your-api-key-***7f2a</span>
+        <span>→ analyzing column C, writing risk scores in real time</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="trust-strip">
+  <div class="wrap">
+    <span>BUILT BY SCRIPT MASTER LABS</span>
+    <span>SDVOSB · KINSTON, NC</span>
+    <span>WORKS WITH OPENAI · ANTHROPIC · OPENROUTER</span>
+    <span>IMPORT/EXPORT CSV & XLSX</span>
+  </div>
+</div>
+
+<section id="how-it-compares">
+  <div class="wrap">
+    <div class="section-tag">The honest comparison</div>
+    <h2>Google Sheets has AI now. So does everyone. Here's what they don't tell you.</h2>
+    <p class="section-sub">Every "AI spreadsheet" on the market routes your data through their servers and charges you monthly for the privilege. SMLSheets.AI doesn't.</p>
+
+    <div class="teardown">
+      <div class="teardown-row head">
+        <div class="td feature">Feature</div>
+        <div class="td">Google Sheets</div>
+        <div class="td">Other "AI Sheets"</div>
+        <div class="td">SMLSheets.AI</div>
+      </div>
+      <div class="teardown-row">
+        <div class="td feature">AI in every cell</div>
+        <div class="td"><span class="partial">Limited</span></div>
+        <div class="td"><span class="yes">Yes</span></div>
+        <div class="td"><span class="yes">Yes</span></div>
+      </div>
+      <div class="teardown-row">
+        <div class="td feature">Monthly subscription</div>
+        <div class="td"><span class="no">Workspace req'd</span></div>
+        <div class="td"><span class="no">Usually $20–50/mo</span></div>
+        <div class="td"><span class="yes">$0 — one-time</span></div>
+      </div>
+      <div class="teardown-row">
+        <div class="td feature">Your data touches their servers</div>
+        <div class="td"><span class="no">Yes</span></div>
+        <div class="td"><span class="no">Yes</span></div>
+        <div class="td"><span class="yes">No</span></div>
+      </div>
+      <div class="teardown-row">
+        <div class="td feature">You choose the AI model</div>
+        <div class="td"><span class="no">No</span></div>
+        <div class="td"><span class="no">No</span></div>
+        <div class="td"><span class="yes">Yes — BYOK</span></div>
+      </div>
+      <div class="teardown-row us">
+        <div class="td feature">Who owns your data</div>
+        <div class="td">Google</div>
+        <div class="td">The platform</div>
+        <div class="td"><span class="yes">You. 100%.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="how-it-works">
+  <div class="wrap">
+    <div class="section-tag">How it works</div>
+    <h2>Three things make SMLSheets.AI different. None of them are negotiable.</h2>
+    <p class="section-sub">No asterisks, no "free tier that's actually a trial," no fine print about training on your data.</p>
+
+    <div class="pillars">
+      <div class="pillar p1">
+        <div class="pillar-num">01</div>
+        <h3>Bring your own key</h3>
+        <p>Connect your OpenAI, Anthropic, or OpenRouter key. Your prompts and your data go straight to the model you picked — SMLSheets.AI is never in the middle, never logging, never storing.</p>
+      </div>
+      <div class="pillar p2">
+        <div class="pillar-num">02</div>
+        <h3>Pay providers at cost</h3>
+        <p>You pay your AI provider directly, at their published rate. No markup, no bundled "AI credits" gimmick. What it costs OpenAI is what it costs you.</p>
+      </div>
+      <div class="pillar p3">
+        <div class="pillar-num">03</div>
+        <h3>One purchase, yours forever</h3>
+        <p>No subscription, no seat licenses, no "your data after cancellation" question — because there's nothing to cancel. Buy once. Own it.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <div class="section-tag">Questions</div>
+    <h2>Straight answers</h2>
+
+    <div class="faq-item">
+      <div class="faq-q"><span class="q-mark">→</span>What is SMLSheets.AI?</div>
+      <div class="faq-a">An AI-native spreadsheet from Script Master Labs that replaces Google Sheets. You bring your own AI key, there's no subscription, and you own 100% of your data.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q"><span class="q-mark">→</span>Does it require a subscription?</div>
+      <div class="faq-a">No. SMLSheets.AI is a one-time purchase. You pay your chosen AI provider directly at cost — no markup, no recurring fee to us.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q"><span class="q-mark">→</span>Who owns the data?</div>
+      <div class="faq-a">You do — 100%. Script Master Labs cannot read, store, or sell your sheets. Your AI calls go directly from your machine to your chosen provider.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q"><span class="q-mark">→</span>What's "bring your own key" (BYOK)?</div>
+      <div class="faq-a">You connect your own OpenAI, Anthropic, or OpenRouter API key in settings. Every AI request in SMLSheets.AI uses that key directly — we never see your prompts or your data.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q"><span class="q-mark">→</span>Can I import my existing spreadsheets?</div>
+      <div class="faq-a">Yes — CSV and XLSX import and export, both ways, anytime. No lock-in.</div>
+    </div>
+  </div>
+</section>
+
+<section class="final-cta" id="get-started">
+  <div class="wrap">
+    <div class="section-tag" style="text-align:center;">Ready when you are</div>
+    <h2>Stop renting your spreadsheet's intelligence.</h2>
+    <p class="section-sub">One purchase. Your key. Your data. Forever.</p>
+    <div class="final-ctas">
+      <a href="mailto:ScriptMasterLabs@gmail.com?subject=SMLSheets.AI" class="btn-primary">Get SMLSheets.AI — $69.99 one-time →</a>
+      <a href="https://scriptmasterlabs.com" class="btn-secondary">More from Script Master Labs</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    SMLSheets.AI — a Script Master Labs product · SDVOSB · Kinston, NC<br>
+    <a href="mailto:ScriptMasterLabs@gmail.com">ScriptMasterLabs@gmail.com</a> · <a href="https://scriptmasterlabs.com">scriptmasterlabs.com</a>
+  </div>
+</footer>
+
+<script>
+  // Animate the AI-fill demo cell on load to reinforce "AI live" feel
+  document.addEventListener('DOMContentLoaded', () => {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) return;
+  });
+</script>
+
+<div id="sml-ask"></div>
+<style>
+#sml-ask{position:fixed;right:20px;bottom:20px;z-index:9999;font-family:'JetBrains Mono',monospace}
+.sa-fab{background:#39FF14;color:#000;border:none;font-weight:800;padding:14px 18px;border-radius:40px;cursor:pointer;box-shadow:0 0 24px rgba(57,255,20,.5);font-family:inherit}
+.sa-panel{display:none;flex-direction:column;width:340px;max-width:88vw;height:440px;background:#0b0d0e;border:1px solid rgba(243,239,230,.14);border-radius:14px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.sa-panel.open{display:flex}
+.sa-head{padding:13px 15px;border-bottom:1px solid rgba(243,239,230,.12);color:#f3efe6;font-weight:800;font-size:13px;display:flex;justify-content:space-between}
+.sa-head b{color:#39FF14}
+.sa-x{cursor:pointer;color:rgba(243,239,230,.5)}
+.sa-log{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
+.sa-msg{font-size:12.5px;line-height:1.55;padding:9px 12px;border-radius:9px;max-width:88%}
+.sa-u{align-self:flex-end;background:#39FF14;color:#000;font-weight:600}
+.sa-a{align-self:flex-start;background:#101314;color:#f3efe6;border:1px solid rgba(243,239,230,.1)}
+.sa-in{display:flex;border-top:1px solid rgba(243,239,230,.12)}
+.sa-in input{flex:1;background:#000;border:none;color:#f3efe6;padding:13px 14px;font-family:inherit;font-size:13px;outline:none}
+.sa-in button{background:#39FF14;color:#000;border:none;padding:0 18px;font-weight:800;cursor:pointer}
+</style>
+<script>
+const NLWEB_ENDPOINT = "https://sml-nlweb.onrender.com/ask";
+(function(){
+  const root=document.getElementById("sml-ask");
+  root.innerHTML=`<button class="sa-fab">Ask ✦</button>
+  <div class="sa-panel">
+    <div class="sa-head">Ask <b>SML</b><span class="sa-x">✕</span></div>
+    <div class="sa-log"><div class="sa-msg sa-a">Ask about SMLSheets.AI, x402, the indicators, or anything on the site.</div></div>
+    <div class="sa-in"><input placeholder="Type a question…"/><button>→</button></div>
+  </div>`;
+  const fab=root.querySelector(".sa-fab"),panel=root.querySelector(".sa-panel"),log=root.querySelector(".sa-log"),input=root.querySelector("input"),send=root.querySelector(".sa-in button");
+  fab.onclick=()=>panel.classList.add("open");
+  root.querySelector(".sa-x").onclick=()=>panel.classList.remove("open");
+  function add(t,cls){const d=document.createElement("div");d.className="sa-msg "+cls;d.textContent=t;log.appendChild(d);log.scrollTop=log.scrollHeight;}
+  async function ask(){
+    const q=input.value.trim(); if(!q)return; input.value="";
+    add(q,"sa-u"); add("…","sa-a"); const thinking=log.lastChild;
+    try{
+      const r=await fetch(NLWEB_ENDPOINT+"?query="+encodeURIComponent(q));
+      const data=await r.json();
+      const txt=data.summary||data.answer||(data.results&&data.results[0]&&(data.results[0].description||data.results[0].name))||"No answer found.";
+      thinking.textContent=txt;
+    }catch(e){thinking.textContent="Couldn't reach the answer service.";}
+  }
+  send.onclick=ask; input.addEventListener("keydown",e=>{if(e.key==="Enter")ask();});
+})();
+</script>
+
+</body>
+</html>
