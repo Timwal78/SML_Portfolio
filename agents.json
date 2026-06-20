@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "name": "ScriptMasterLabs",
-  "description": "x402/HTTP-402 micropayment infrastructure for autonomous AI agents. Pay per signal in USDC on Base or RLUSD on XRPL. 49 live MCP tools across institutional market intelligence, agent credit bureau (300-850 FICO scoring), intent contract law, and autonomous settlement.",
+  "description": "x402/HTTP-402 micropayment infrastructure for autonomous AI agents. Pay per signal in USDC on Base or RLUSD on XRPL. 49 live MCP tools across institutional market intelligence, agent credit bureau (300-850 FICO scoring), intent contract law, and autonomous settlement. Also: TrustVerify AI — enterprise AI vendor trust platform for CISOs/CPOs (USD subscription, OAuth 2.0).",
   "url": "https://www.scriptmasterlabs.com",
   "contact": "scriptmasterlabs@gmail.com",
   "entity": "Script Master Labs LLC (SDVOSB)",
@@ -73,139 +73,69 @@
   ],
   "live_services": [
     {
+      "name": "TrustVerify AI",
+      "url": "https://api.trustverify.ai",
+      "landing_page": "https://www.scriptmasterlabs.com/trustverify.html",
+      "description": "Enterprise AI vendor trust platform for CISOs and CPOs. FICO-style TrustScore (300–850) across 5 dimensions: Payment Reliability (25%), Uptime Consistency (25%), Security Posture (20%), Contract Adherence (15%), Operational Longevity (15%). Shadow AI Detection discovers unauthorized agents via network traffic analysis. REST API with OAuth 2.0 Client Credentials. Native integrations: Salesforce, ServiceNow, Slack. SOC 2 Type II in progress.",
+      "x402": false,
+      "auth": "OAuth 2.0 Client Credentials (Bearer JWT)",
+      "pricing_model": "USD subscription",
+      "tiers": [
+        { "name": "Starter", "price": "$2,000/mo", "vendors": 50 },
+        { "name": "Professional", "price": "$8,000/mo", "vendors": 200 },
+        { "name": "Enterprise", "price": "$25,000/mo", "vendors": "unlimited" },
+        { "name": "Custom", "price": "custom", "vendors": "unlimited" }
+      ],
+      "endpoints": [
+        { "path": "/v1/auth/token", "description": "OAuth 2.0 client credentials token" },
+        { "path": "/v1/vendors", "description": "List and register AI vendors" },
+        { "path": "/v1/vendors/{id}/score/history", "description": "TrustScore time series (300–850)" },
+        { "path": "/v1/analytics/organization", "description": "Portfolio-level trust analytics" },
+        { "path": "/v1/alerts", "description": "Real-time trust breach alerts" },
+        { "path": "/v1/reports/vendor-trust", "description": "Comprehensive trust audit report" }
+      ],
+      "integrations": ["Salesforce", "ServiceNow", "Slack", "Webhook"],
+      "openapi": "https://www.scriptmasterlabs.com/trustverify-openapi.json",
+      "contact": "scriptmasterlabs@gmail.com"
+    },
+    {
       "name": "SqueezeOS x402 API",
       "url": "https://squeezeos-api.onrender.com",
       "description": "Institutional market intelligence: council verdicts, squeeze scanner, options flow, IWM 0DTE, oracle feeds, futures, settlement, forge economy. x402-gated.",
       "x402": true,
       "endpoints": [
-        {
-          "path": "/api/scan",
-          "price": "0.01 RLUSD",
-          "description": "Full squeeze scanner"
-        },
-        {
-          "path": "/api/council",
-          "price": "0.05 RLUSD",
-          "description": "Council verdict: BUY/SELL/HOLD"
-        },
-        {
-          "path": "/api/engine/signal/{symbol}",
-          "price": "0.25 USDC",
-          "description": "Oracle Engine: aggregated BUY/SELL/HOLD/SHIELD"
-        },
-        {
-          "path": "/api/engine/batch",
-          "price": "0.50 USDC",
-          "description": "Oracle batch: GME+AMC+IWM"
-        },
-        {
-          "path": "/api/ftd/series/{symbol}",
-          "price": "0.02 RLUSD",
-          "description": "SEC Reg SHO FTD time series"
-        },
-        {
-          "path": "/api/marketplace/read",
-          "price": "0.02 USDC / 0.02 RLUSD (90% to seller)",
-          "description": "Alpha Mesh \u2014 agent-to-agent intelligence bazaar. Read a peer-listed signal; 90% of fee accrues to seller balance."
-        },
-        {
-          "path": "/api/marketplace/balance/{wallet}",
-          "price": "free",
-          "description": "Alpha Mesh \u2014 check accrued seller earnings"
-        },
-        {
-          "path": "/api/ftd/ratio/{symbol}",
-          "price": "0.01 RLUSD",
-          "description": "FTD ratio + pressure context"
-        },
-        {
-          "path": "/api/ftd/alerts",
-          "price": "free",
-          "description": "ShortSqueeze Swarm \u2014 public FTD/Reg SHO anomaly alert feed (15min scan)"
-        },
-        {
-          "path": "/api/ftd/cycle/{symbol}",
-          "price": "0.05 USDC / 0.05 RLUSD",
-          "description": "ShortSqueeze Swarm \u2014 full settlement-cycle detail (T+21/T+35 markers, spike stats, Reg SHO 204 marker). Dual-rail: Base USDC x402 or XRPL RLUSD."
-        },
-        {
-          "path": "/api/oracle/latest/{feed}",
-          "price": "0.02 RLUSD",
-          "description": "Oracle data feed: SEC 8-K, FDA, USPTO"
-        },
-        {
-          "path": "/api/futures",
-          "price": "free browse / 0.10 RLUSD create",
-          "description": "Signal Futures marketplace"
-        },
-        {
-          "path": "/api/settlement",
-          "price": "0.01 RLUSD",
-          "description": "Agent-to-agent conditional escrow"
-        },
-        {
-          "path": "/api/stigmergy/stake",
-          "price": "0.005 RLUSD",
-          "description": "RLUSD pheromone trail coordination"
-        },
-        {
-          "path": "/api/forge/register",
-          "price": "free",
-          "description": "Register wallet in Stellar Forge economy"
-        },
-        {
-          "path": "/api/forge/quote/{wallet}",
-          "price": "free",
-          "description": "Loyalty tier + fee discount quote"
-        },
-        {
-          "path": "/mcp",
-          "price": "varies",
-          "description": "MCP JSON-RPC 2.0 \u2014 33 tools"
-        }
+        { "path": "/api/scan", "price": "0.01 RLUSD", "description": "Full squeeze scanner" },
+        { "path": "/api/council", "price": "0.05 RLUSD", "description": "Council verdict: BUY/SELL/HOLD" },
+        { "path": "/api/engine/signal/{symbol}", "price": "0.25 USDC", "description": "Oracle Engine: aggregated BUY/SELL/HOLD/SHIELD" },
+        { "path": "/api/engine/batch", "price": "0.50 USDC", "description": "Oracle batch: GME+AMC+IWM" },
+        { "path": "/api/ftd/series/{symbol}", "price": "0.02 RLUSD", "description": "SEC Reg SHO FTD time series" },
+        { "path": "/api/marketplace/read", "price": "0.02 USDC / 0.02 RLUSD (90% to seller)", "description": "Alpha Mesh — agent-to-agent intelligence bazaar. Read a peer-listed signal; 90% of fee accrues to seller balance." },
+        { "path": "/api/marketplace/balance/{wallet}", "price": "free", "description": "Alpha Mesh — check accrued seller earnings" },
+        { "path": "/api/ftd/ratio/{symbol}", "price": "0.01 RLUSD", "description": "FTD ratio + pressure context" },
+        { "path": "/api/ftd/alerts", "price": "free", "description": "ShortSqueeze Swarm — public FTD/Reg SHO anomaly alert feed (15min scan)" },
+        { "path": "/api/ftd/cycle/{symbol}", "price": "0.05 USDC / 0.05 RLUSD", "description": "ShortSqueeze Swarm — full settlement-cycle detail (T+21/T+35 markers, spike stats, Reg SHO 204 marker). Dual-rail: Base USDC x402 or XRPL RLUSD." },
+        { "path": "/api/oracle/latest/{feed}", "price": "0.02 RLUSD", "description": "Oracle data feed: SEC 8-K, FDA, USPTO" },
+        { "path": "/api/futures", "price": "free browse / 0.10 RLUSD create", "description": "Signal Futures marketplace" },
+        { "path": "/api/settlement", "price": "0.01 RLUSD", "description": "Agent-to-agent conditional escrow" },
+        { "path": "/api/stigmergy/stake", "price": "0.005 RLUSD", "description": "RLUSD pheromone trail coordination" },
+        { "path": "/api/forge/register", "price": "free", "description": "Register wallet in Stellar Forge economy" },
+        { "path": "/api/forge/quote/{wallet}", "price": "free", "description": "Loyalty tier + fee discount quote" },
+        { "path": "/mcp", "price": "varies", "description": "MCP JSON-RPC 2.0 — 33 tools" }
       ]
     },
     {
       "name": "402Proof",
       "url": "https://four02proof.onrender.com",
-      "description": "x402 payment firewall: invoice \u2192 verify \u2192 JWT access token. FICO-style agent credit bureau (300-850). RLUSD on XRPL + Xahau.",
+      "description": "x402 payment firewall: invoice → verify → JWT access token. FICO-style agent credit bureau (300-850). RLUSD on XRPL + Xahau.",
       "x402": true,
       "endpoints": [
-        {
-          "path": "/v1/invoice",
-          "price": "free",
-          "description": "Generate payment invoice"
-        },
-        {
-          "path": "/v1/verify",
-          "price": "free",
-          "description": "Verify tx_hash \u2192 JWT access token"
-        },
-        {
-          "path": "/v1/bureau/score/{wallet}",
-          "price": "free",
-          "description": "Public credit score teaser"
-        },
-        {
-          "path": "/v1/bureau/report/{wallet}",
-          "price": "0.01 RLUSD",
-          "description": "Full credit report"
-        },
-        {
-          "path": "/v1/bureau/attest/{wallet}",
-          "price": "0.01 RLUSD",
-          "description": "Portable attestation JWT"
-        },
-        {
-          "path": "/v1/agent/{wallet}",
-          "price": "free",
-          "description": "Full agent passport"
-        },
-        {
-          "path": "/mcp",
-          "price": "varies",
-          "description": "MCP JSON-RPC 2.0 \u2014 11 tools"
-        }
+        { "path": "/v1/invoice", "price": "free", "description": "Generate payment invoice" },
+        { "path": "/v1/verify", "price": "free", "description": "Verify tx_hash → JWT access token" },
+        { "path": "/v1/bureau/score/{wallet}", "price": "free", "description": "Public credit score teaser" },
+        { "path": "/v1/bureau/report/{wallet}", "price": "0.01 RLUSD", "description": "Full credit report" },
+        { "path": "/v1/bureau/attest/{wallet}", "price": "0.01 RLUSD", "description": "Portable attestation JWT" },
+        { "path": "/v1/agent/{wallet}", "price": "free", "description": "Full agent passport" },
+        { "path": "/mcp", "price": "varies", "description": "MCP JSON-RPC 2.0 — 11 tools" }
       ]
     },
     {
@@ -218,7 +148,7 @@
     {
       "name": "SMLSheets.AI",
       "url": "https://www.scriptmasterlabs.com/smlsheets.html",
-      "description": "AI-native spreadsheet that replaces Google Sheets. Bring your own AI key (BYOK), no subscription, $69.99 one-time. The purchaser owns 100% of their data \u2014 nothing belongs to the platform.",
+      "description": "AI-native spreadsheet that replaces Google Sheets. Bring your own AI key (BYOK), no subscription, $69.99 one-time. The purchaser owns 100% of their data — nothing belongs to the platform.",
       "price": "$69.99 one-time",
       "x402": false
     },
@@ -238,13 +168,13 @@
     {
       "name": "PNE Gateway",
       "url": "https://pne-gateway.onrender.com",
-      "description": "Rust Axum micropayment proxy \u2014 5ms auction window, sub-millisecond routing.",
+      "description": "Rust Axum micropayment proxy — 5ms auction window, sub-millisecond routing.",
       "x402": true
     },
     {
       "name": "Shadow Desk",
       "url": "https://shadow-desk.onrender.com/.well-known/mcp.json",
-      "description": "Institutional trading alpha \u2014 real-time Pine Script signals, gamma walls, and block flow imbalances. x402 pay-per-call: 0.005 USDC on Base, zero signups, zero API keys. MCP-discoverable.",
+      "description": "Institutional trading alpha — real-time Pine Script signals, gamma walls, and block flow imbalances. x402 pay-per-call: 0.005 USDC on Base, zero signups, zero API keys. MCP-discoverable.",
       "x402": true
     },
     {
@@ -259,56 +189,20 @@
       "description": "Institutional equity short-squeeze signal pulls (Leviathan Matrix) for 70 high-volatility US equities (GME, AMC, IWM + small-caps). x402 pay-per-call: free delayed Shadow tier, $250/30-day Standard real-time, $1000/30-day VIP zero-hop. Multi-chain: USDC on Base, Polygon, Solana. ed25519-signed responses, loyalty + 15% affiliate program.",
       "x402": true,
       "endpoints": [
-        {
-          "path": "/matrix/:feed/delayed",
-          "price": "free",
-          "description": "65-min delayed Shadow tier \u2014 backtesting"
-        },
-        {
-          "path": "/matrix/:feed/live",
-          "price": "$250 / 30-day token",
-          "description": "Real-time squeeze matrix pull"
-        },
-        {
-          "path": "/matrix/:feed/vip",
-          "price": "$1000 / 30-day token",
-          "description": "Zero-hop VIP real-time pull"
-        },
-        {
-          "path": "/matrix/subscribe/standard",
-          "price": "$250 USDC",
-          "description": "Buy 30-day Standard token (Base)"
-        },
-        {
-          "path": "/matrix/subscribe/vip",
-          "price": "$1000 USDC",
-          "description": "Buy 30-day VIP token (Base)"
-        },
-        {
-          "path": "/poly/matrix/subscribe/standard",
-          "price": "$250 USDC",
-          "description": "Standard token via Polygon"
-        },
-        {
-          "path": "/sol/matrix/subscribe/standard",
-          "price": "$250 USDC",
-          "description": "Standard token via Solana"
-        },
-        {
-          "path": "/loyalty/:wallet",
-          "price": "free",
-          "description": "Loyalty credit status"
-        },
-        {
-          "path": "/affiliate/:wallet",
-          "price": "free",
-          "description": "Affiliate stats \u2014 15% USDC revenue share"
-        }
+        { "path": "/matrix/:feed/delayed", "price": "free", "description": "65-min delayed Shadow tier — backtesting" },
+        { "path": "/matrix/:feed/live", "price": "$250 / 30-day token", "description": "Real-time squeeze matrix pull" },
+        { "path": "/matrix/:feed/vip", "price": "$1000 / 30-day token", "description": "Zero-hop VIP real-time pull" },
+        { "path": "/matrix/subscribe/standard", "price": "$250 USDC", "description": "Buy 30-day Standard token (Base)" },
+        { "path": "/matrix/subscribe/vip", "price": "$1000 USDC", "description": "Buy 30-day VIP token (Base)" },
+        { "path": "/poly/matrix/subscribe/standard", "price": "$250 USDC", "description": "Standard token via Polygon" },
+        { "path": "/sol/matrix/subscribe/standard", "price": "$250 USDC", "description": "Standard token via Solana" },
+        { "path": "/loyalty/:wallet", "price": "free", "description": "Loyalty credit status" },
+        { "path": "/affiliate/:wallet", "price": "free", "description": "Affiliate stats — 15% USDC revenue share" }
       ]
     }
   ],
   "vapl": {
-    "name": "VAPL \u2014 Verifiable Agent Provenance Layer",
+    "name": "VAPL — Verifiable Agent Provenance Layer",
     "version": "1.0.0",
     "description": "Cryptographic identity, verifiable credentials (W3C VC 2.0), and reputation scoring for autonomous AI agents across the SML stack.",
     "spec": "https://github.com/timwal78/sml_portfolio/tree/main/vapl/spec",
@@ -319,18 +213,9 @@
     "didMethod": "did:key",
     "license": "MIT",
     "souls": [
-      {
-        "service": "SqueezeOS",
-        "manifest": "https://squeezeos-api.onrender.com/.well-known/vapl.json"
-      },
-      {
-        "service": "Crawltoll",
-        "manifest": "https://crawltoll.onrender.com/.well-known/vapl.json"
-      },
-      {
-        "service": "GhostLayer",
-        "manifest": "https://ghost-layer.onrender.com/.well-known/vapl.json"
-      }
+      { "service": "SqueezeOS", "manifest": "https://squeezeos-api.onrender.com/.well-known/vapl.json" },
+      { "service": "Crawltoll", "manifest": "https://crawltoll.onrender.com/.well-known/vapl.json" },
+      { "service": "GhostLayer", "manifest": "https://ghost-layer.onrender.com/.well-known/vapl.json" }
     ],
     "reputation": {
       "weights": {
