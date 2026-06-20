@@ -1,0 +1,115 @@
+{
+  "schema_version": "1.0",
+  "updated": "2026-06-20",
+  "organization": {
+    "name": "ScriptMasterLabs",
+    "legal_name": "Script Master Labs LLC",
+    "entity_type": "SDVOSB",
+    "url": "https://www.scriptmasterlabs.com",
+    "contact": "scriptmasterlabs@gmail.com",
+    "location": "United States",
+    "description": "Builder of x402 micropayment infrastructure, AI agent trust systems, and institutional market intelligence tools."
+  },
+  "featured_product": {
+    "name": "TrustVerify AI",
+    "tagline": "The FICO Score for AI Vendors",
+    "category": "Enterprise AI Governance / Vendor Risk Management",
+    "url": "https://www.scriptmasterlabs.com/trustverify.html",
+    "api_base": "https://api.trustverify.ai/v1",
+    "openapi": "https://www.scriptmasterlabs.com/trustverify-openapi.json",
+    "description": "Enterprise platform for CISOs and CPOs to continuously assess, score, and monitor AI vendor trustworthiness. Prevents vendor lock-in, shadow AI risk, and compliance failure caused by unreliable AI agents.",
+    "trust_score": {
+      "range": "300-850",
+      "model": "FICO-style",
+      "dimensions": [
+        { "name": "Payment Reliability", "weight": "25%" },
+        { "name": "Uptime Consistency", "weight": "25%" },
+        { "name": "Security Posture", "weight": "20%" },
+        { "name": "Contract Adherence", "weight": "15%" },
+        { "name": "Operational Longevity", "weight": "15%" }
+      ]
+    },
+    "key_differentiators": [
+      "Shadow AI Detection — discovers unauthorized agents via network traffic analysis",
+      "FICO-style 300-850 TrustScore across 5 vendor dimensions",
+      "OAuth 2.0 Client Credentials — no crypto wallet required",
+      "Native Salesforce, ServiceNow, and Slack integrations",
+      "Metadata-only data policy — no AI content or prompts stored"
+    ],
+    "pricing": {
+      "model": "USD monthly subscription",
+      "tiers": [
+        { "name": "Starter", "price": "$2,000/mo", "vendors": 50, "users": 3 },
+        { "name": "Professional", "price": "$8,000/mo", "vendors": 200, "users": 15, "api_access": true },
+        { "name": "Enterprise", "price": "$25,000/mo", "vendors": "unlimited", "users": "unlimited", "custom_integrations": true },
+        { "name": "Custom", "price": "contact us", "vendors": "unlimited" }
+      ]
+    },
+    "auth": "OAuth 2.0 Client Credentials (Bearer JWT)",
+    "integrations": ["Salesforce", "ServiceNow", "Slack", "Webhook"],
+    "compliance": {
+      "GDPR": "compliant",
+      "CCPA": "compliant",
+      "HIPAA_BAA": "available",
+      "SOC2_TypeII": "in progress Q4 2026",
+      "ISO27001": "planned Q2 2027"
+    },
+    "target_buyers": ["CISOs", "CPOs", "VPs of Engineering", "Fortune 1000", "Organizations with 10+ AI vendors"],
+    "contact": "scriptmasterlabs@gmail.com"
+  },
+  "products": [
+    {
+      "name": "TrustVerify AI",
+      "url": "https://www.scriptmasterlabs.com/trustverify.html",
+      "category": "Enterprise AI Governance",
+      "pricing_model": "USD subscription",
+      "auth": "OAuth 2.0"
+    },
+    {
+      "name": "Agent Credit Bureau",
+      "url": "https://www.scriptmasterlabs.com/agent-credit-bureau.html",
+      "api": "https://sml-agent-credit-bureau.onrender.com/mcp",
+      "category": "AI Agent Trust / XRPL",
+      "pricing_model": "x402 RLUSD micropayments",
+      "free_tier": true
+    },
+    {
+      "name": "SqueezeOS",
+      "url": "https://squeezeos-api.onrender.com",
+      "mcp": "https://squeezeos-api.onrender.com/mcp",
+      "category": "Institutional Market Intelligence",
+      "tools": 33,
+      "pricing_model": "x402 RLUSD/USDC micropayments",
+      "free_tier": true
+    },
+    {
+      "name": "mcp-x402",
+      "url": "https://mcp-x402.onrender.com",
+      "category": "AI Agent Payments Infrastructure",
+      "tools": 43,
+      "pricing_model": "x402 USDC on Base/Polygon/Solana"
+    },
+    {
+      "name": "402Proof",
+      "url": "https://four02proof.onrender.com",
+      "mcp": "https://four02proof.onrender.com/mcp",
+      "category": "x402 Payment Firewall",
+      "tools": 11,
+      "pricing_model": "x402 RLUSD"
+    },
+    {
+      "name": "CRAWLTOLL",
+      "url": "https://www.scriptmasterlabs.com/crawltoll.html",
+      "npm": "crawltoll",
+      "category": "AI Crawler Monetization",
+      "pricing_model": "x402 USDC per fetch"
+    }
+  ],
+  "discovery": {
+    "llms_txt": "https://www.scriptmasterlabs.com/llms.txt",
+    "agents_json": "https://www.scriptmasterlabs.com/agents.json",
+    "ai_txt": "https://www.scriptmasterlabs.com/.well-known/ai.txt",
+    "sitemap": "https://www.scriptmasterlabs.com/sitemap.xml",
+    "faq": "https://www.scriptmasterlabs.com/ai/faq.json"
+  }
+}
