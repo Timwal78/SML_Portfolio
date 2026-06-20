@@ -1,0 +1,35 @@
+name: Publish xAAP to MCP Registry
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'xaap/server.json'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download mcp-publisher
+        run: |
+          curl -fsSL https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher-linux-amd64 \
+            -o mcp-publisher
+          chmod +x mcp-publisher
+
+      - name: Login via GitHub OIDC
+        run: ./mcp-publisher login github-oidc
+
+      - name: Publish xAAP
+        run: cd xaap && ../mcp-publisher publish
+
+      - name: Verify listing
+        run: |
+          curl -fsSL https://registry.modelcontextprotocol.io/v0/servers/io.github.Timwal78%2Fxaap \
+            | python3 -m json.tool
