@@ -1,0 +1,13 @@
+src/
+tests/
+sdk/
+services/
+.github/
+.env*
+*.test.ts
+vitest.config.ts
+tsconfig.json
+docker-compose.yml
+Dockerfile
+render.yaml
+smithery.yaml
