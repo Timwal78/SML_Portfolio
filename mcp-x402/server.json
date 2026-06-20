@@ -2,7 +2,7 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.Timwal78/mcp-x402",
   "title": "mcp-x402 — The x402 Amazon for AI Agents",
-  "description": "51 pay-per-call MCP tools covering institutional market intelligence, SEC filings, XRPL payments, memecoin launchpad, copy-trading, web scraping, and more. Pay with USDC (Base/Solana) or RLUSD (XRPL/Xahau). No API keys — agents pay autonomously.",
+  "description": "51 pay-per-call MCP tools: market intel, SEC, XRPL payments, copy-trading. USDC/RLUSD. No keys.",
   "version": "2.1.0",
   "repository": {
     "url": "https://github.com/timwal78/SML_Portfolio",
