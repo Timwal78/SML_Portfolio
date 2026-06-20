@@ -10,34 +10,6 @@
   },
   "homepage": "https://scriptmasterlabs.com",
   "license": "MIT",
-  "packages": [
-    {
-      "registryType": "npm",
-      "identifier": "@scriptmasterlabs/mcp-x402",
-      "version": "2.1.0",
-      "runtimeHint": "node",
-      "transport": {
-        "type": "stdio"
-      },
-      "environmentVariables": [
-        {
-          "name": "MCP_TRANSPORT",
-          "description": "Transport mode. Omit for stdio (default). Set to 'sse' for HTTP server mode.",
-          "isRequired": false
-        },
-        {
-          "name": "SML_PAYMENT_RECEIVER",
-          "description": "Optional USDC Base address to receive payments from agent tool calls.",
-          "isRequired": false
-        },
-        {
-          "name": "WALLET_SEED",
-          "description": "BIP-39 mnemonic for the server wallet. Auto-generated if not set.",
-          "isRequired": false
-        }
-      ]
-    }
-  ],
   "remotes": [
     {
       "type": "streamable-http",
