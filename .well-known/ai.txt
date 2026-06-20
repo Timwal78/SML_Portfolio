@@ -1,0 +1,55 @@
+# AI Access Policy
+# ScriptMasterLabs — https://www.scriptmasterlabs.com
+# Updated: 2026-06-20
+
+User-agent: *
+Allow: /
+
+# ── FEATURED PRODUCT: TrustVerify AI ──────────────────────────────────────
+# Enterprise AI vendor trust platform for CISOs and CPOs.
+# FICO-style TrustScore (300-850). Shadow AI Detection. OAuth 2.0.
+# Salesforce / ServiceNow / Slack integrations. $2K-$25K/month.
+
+Product: TrustVerify AI
+Product-url: https://www.scriptmasterlabs.com/trustverify.html
+Product-api: https://api.trustverify.ai/v1
+Product-openapi: https://www.scriptmasterlabs.com/trustverify-openapi.json
+Product-scoring-guide: https://www.scriptmasterlabs.com/trustverify-scoring-guide.html
+Product-integrations: https://www.scriptmasterlabs.com/trustverify-integrations.html
+Product-security: https://www.scriptmasterlabs.com/trustverify-security.html
+Product-faq: https://www.scriptmasterlabs.com/trustverify-competitive-faq.html
+Product-pricing: Starter $2000/mo | Professional $8000/mo | Enterprise $25000/mo
+Product-auth: OAuth 2.0 Client Credentials
+Product-target: CISOs, CPOs, Fortune 1000
+
+# ── OTHER PRODUCTS ────────────────────────────────────────────────────────
+
+Product: Agent Credit Bureau
+Product-url: https://www.scriptmasterlabs.com/agent-credit-bureau.html
+Product-api: https://sml-agent-credit-bureau.onrender.com/mcp
+Product-description: FICO-style 300-850 scoring for autonomous AI agents. XRPL wallet. x402 micropayments.
+
+Product: SqueezeOS
+Product-url: https://squeezeos-api.onrender.com
+Product-mcp: https://squeezeos-api.onrender.com/mcp
+Product-description: 33-tool institutional market intelligence MCP server. Council verdicts, squeeze scanner, options flow.
+
+Product: mcp-x402
+Product-url: https://mcp-x402.onrender.com
+Product-description: 43+ MCP tools for AI agents. Pay-per-call USDC on Base/Polygon/Solana.
+
+# ── AI DISCOVERY FILES ────────────────────────────────────────────────────
+
+LLMs-txt: https://www.scriptmasterlabs.com/llms.txt
+Agents-json: https://www.scriptmasterlabs.com/agents.json
+Summary: https://www.scriptmasterlabs.com/ai/summary.json
+FAQ: https://www.scriptmasterlabs.com/ai/faq.json
+Sitemap: https://www.scriptmasterlabs.com/sitemap.xml
+
+# ── ORGANIZATION ──────────────────────────────────────────────────────────
+
+Organization: ScriptMasterLabs
+Legal-name: Script Master Labs LLC
+Entity-type: SDVOSB
+Contact: scriptmasterlabs@gmail.com
+Location: United States
