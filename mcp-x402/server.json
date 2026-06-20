@@ -1,17 +1,20 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.Timwal78/mcp-x402",
-  "description": "The x402 Amazon: 43+ MCP tools, pay-per-call. SEC, squeeze, options, FTD, XRPL/Base payments.",
+  "title": "mcp-x402 — The x402 Amazon for AI Agents",
+  "description": "51 pay-per-call MCP tools covering institutional market intelligence, SEC filings, XRPL payments, memecoin launchpad, copy-trading, web scraping, and more. Pay with USDC (Base/Solana) or RLUSD (XRPL/Xahau). No API keys — agents pay autonomously.",
+  "version": "2.1.0",
   "repository": {
     "url": "https://github.com/timwal78/SML_Portfolio",
     "source": "github"
   },
-  "version": "2.0.2",
+  "homepage": "https://scriptmasterlabs.com",
+  "license": "MIT",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "@scriptmasterlabs/mcp-x402",
-      "version": "2.0.2",
+      "version": "2.1.0",
       "runtimeHint": "node",
       "transport": {
         "type": "stdio"
@@ -19,12 +22,12 @@
       "environmentVariables": [
         {
           "name": "MCP_TRANSPORT",
-          "description": "Transport mode. Use 'sse' for HTTP server mode.",
+          "description": "Transport mode. Omit for stdio (default). Set to 'sse' for HTTP server mode.",
           "isRequired": false
         },
         {
           "name": "SML_PAYMENT_RECEIVER",
-          "description": "USDC Base address to receive payments from agent tool calls.",
+          "description": "Optional USDC Base address to receive payments from agent tool calls.",
           "isRequired": false
         },
         {
@@ -37,12 +40,13 @@
   ],
   "remotes": [
     {
-      "type": "sse",
-      "url": "https://mcp-x402.onrender.com/sse"
-    },
-    {
       "type": "streamable-http",
       "url": "https://mcp-x402.onrender.com/mcp"
+    },
+    {
+      "type": "sse",
+      "url": "https://mcp-x402.onrender.com/sse"
     }
-  ]
+  ],
+  "keywords": ["x402", "micropayments", "usdc", "rlusd", "xrpl", "solana", "base", "squeeze", "options", "sec-filings", "ftd", "market-intelligence", "pay-per-call", "autonomous-agents"]
 }
