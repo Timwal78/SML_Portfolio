@@ -28,11 +28,31 @@
       "tools": 5,
       "x402": true,
       "mcp_tools": [
-        { "name": "get_agent_score", "cost": "free", "description": "FICO-style 300-850 score for any XRPL wallet" },
-        { "name": "get_agent_report", "cost": "0.05 RLUSD", "description": "Full 5-dimension credit report with grade, risk, credit limit" },
-        { "name": "batch_score", "cost": "0.01 RLUSD/wallet", "description": "Score up to 100 wallets in one call" },
-        { "name": "register_agent", "cost": "free", "description": "Self-register agent metadata to the bureau" },
-        { "name": "lookup_agent", "cost": "free", "description": "Look up agent registry entry by wallet" }
+        {
+          "name": "get_agent_score",
+          "cost": "free",
+          "description": "FICO-style 300-850 score for any XRPL wallet"
+        },
+        {
+          "name": "get_agent_report",
+          "cost": "0.05 RLUSD",
+          "description": "Full 5-dimension credit report with grade, risk, credit limit"
+        },
+        {
+          "name": "batch_score",
+          "cost": "0.01 RLUSD/wallet",
+          "description": "Score up to 100 wallets in one call"
+        },
+        {
+          "name": "register_agent",
+          "cost": "free",
+          "description": "Self-register agent metadata to the bureau"
+        },
+        {
+          "name": "lookup_agent",
+          "cost": "free",
+          "description": "Look up agent registry entry by wallet"
+        }
       ]
     },
     {
@@ -86,12 +106,12 @@
         {
           "path": "/api/marketplace/read",
           "price": "0.02 USDC / 0.02 RLUSD (90% to seller)",
-          "description": "Alpha Mesh — agent-to-agent intelligence bazaar. Read a peer-listed signal; 90% of fee accrues to seller balance."
+          "description": "Alpha Mesh \u2014 agent-to-agent intelligence bazaar. Read a peer-listed signal; 90% of fee accrues to seller balance."
         },
         {
           "path": "/api/marketplace/balance/{wallet}",
           "price": "free",
-          "description": "Alpha Mesh — check accrued seller earnings"
+          "description": "Alpha Mesh \u2014 check accrued seller earnings"
         },
         {
           "path": "/api/ftd/ratio/{symbol}",
@@ -101,12 +121,12 @@
         {
           "path": "/api/ftd/alerts",
           "price": "free",
-          "description": "ShortSqueeze Swarm — public FTD/Reg SHO anomaly alert feed (15min scan)"
+          "description": "ShortSqueeze Swarm \u2014 public FTD/Reg SHO anomaly alert feed (15min scan)"
         },
         {
           "path": "/api/ftd/cycle/{symbol}",
           "price": "0.05 USDC / 0.05 RLUSD",
-          "description": "ShortSqueeze Swarm — full settlement-cycle detail (T+21/T+35 markers, spike stats, Reg SHO 204 marker). Dual-rail: Base USDC x402 or XRPL RLUSD."
+          "description": "ShortSqueeze Swarm \u2014 full settlement-cycle detail (T+21/T+35 markers, spike stats, Reg SHO 204 marker). Dual-rail: Base USDC x402 or XRPL RLUSD."
         },
         {
           "path": "/api/oracle/latest/{feed}",
@@ -196,6 +216,13 @@
       "x402": true
     },
     {
+      "name": "SMLSheets.AI",
+      "url": "https://www.scriptmasterlabs.com/smlsheets.html",
+      "description": "AI-native spreadsheet that replaces Google Sheets. Bring your own AI key (BYOK), no subscription, $69.99 one-time. The purchaser owns 100% of their data \u2014 nothing belongs to the platform.",
+      "price": "$69.99 one-time",
+      "x402": false
+    },
+    {
       "name": "proof402-middleware",
       "url": "https://www.scriptmasterlabs.com/x402-paywall.html",
       "npm": "proof402-middleware",
@@ -281,7 +308,7 @@
     }
   ],
   "vapl": {
-    "name": "VAPL — Verifiable Agent Provenance Layer",
+    "name": "VAPL \u2014 Verifiable Agent Provenance Layer",
     "version": "1.0.0",
     "description": "Cryptographic identity, verifiable credentials (W3C VC 2.0), and reputation scoring for autonomous AI agents across the SML stack.",
     "spec": "https://github.com/timwal78/sml_portfolio/tree/main/vapl/spec",
@@ -306,9 +333,19 @@
       }
     ],
     "reputation": {
-      "weights": { "accuracy": 0.40, "reliability": 0.30, "contribution": 0.20, "tenure": 0.10 },
+      "weights": {
+        "accuracy": 0.4,
+        "reliability": 0.3,
+        "contribution": 0.2,
+        "tenure": 0.1
+      },
       "decayHalfLifeDays": 30,
-      "tiers": { "Elite": 0.90, "Premium": 0.70, "Standard": 0.40, "Basic": 0.0 }
+      "tiers": {
+        "Elite": 0.9,
+        "Premium": 0.7,
+        "Standard": 0.4,
+        "Basic": 0.0
+      }
     }
   },
   "discovery": {
