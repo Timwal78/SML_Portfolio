@@ -1,0 +1,33 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.Timwal78/xaap",
+  "title": "xAAP — Adversarial Audit Protocol",
+  "description": "Decentralized corporate fraud discovery marketplace. 12 MCP tools: forensic findings, SEC EDGAR analysis, auditor reputation, governance scores, loyalty tracking. Pay-per-call USDC on Base via x402.",
+  "version": "1.0.0",
+  "repository": {
+    "url": "https://github.com/timwal78/SML_Portfolio",
+    "source": "github"
+  },
+  "homepage": "https://xaap.scriptmasterlabs.com",
+  "license": "MIT",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://xaap.scriptmasterlabs.com/mcp"
+    }
+  ],
+  "keywords": [
+    "fraud",
+    "sec-edgar",
+    "forensics",
+    "corporate-governance",
+    "short-thesis",
+    "x402",
+    "usdc",
+    "base",
+    "micropayments",
+    "autonomous-agents",
+    "edgar",
+    "auditing"
+  ]
+}
