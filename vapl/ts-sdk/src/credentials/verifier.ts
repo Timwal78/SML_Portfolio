@@ -80,7 +80,7 @@ export function verifyVC(
   const valid = errors.length === 0;
   return {
     valid,
-    credential: valid ? credential : undefined,
+    ...(valid ? { credential } : {}),
     errors,
     warnings,
     issuerDid: credential.issuer,

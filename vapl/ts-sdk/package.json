@@ -1,6 +1,6 @@
 {
   "name": "@scriptmasterlabs/vapl",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Verifiable Agent Provenance Layer — TypeScript SDK",
   "license": "MIT",
   "type": "module",
@@ -16,7 +16,7 @@
   },
   "files": ["dist"],
   "scripts": {
-    "build": "tsup src/index.ts --format esm,cjs --dts",
+    "build": "tsup src/index.ts --format esm,cjs && tsc --emitDeclarationOnly --outDir dist",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
