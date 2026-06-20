@@ -22,31 +22,72 @@
       "range": "300-850",
       "model": "FICO-style",
       "dimensions": [
-        { "name": "Payment Reliability", "weight": "25%" },
-        { "name": "Uptime Consistency", "weight": "25%" },
-        { "name": "Security Posture", "weight": "20%" },
-        { "name": "Contract Adherence", "weight": "15%" },
-        { "name": "Operational Longevity", "weight": "15%" }
+        {
+          "name": "Payment Reliability",
+          "weight": "25%"
+        },
+        {
+          "name": "Uptime Consistency",
+          "weight": "25%"
+        },
+        {
+          "name": "Security Posture",
+          "weight": "20%"
+        },
+        {
+          "name": "Contract Adherence",
+          "weight": "15%"
+        },
+        {
+          "name": "Operational Longevity",
+          "weight": "15%"
+        }
       ]
     },
     "key_differentiators": [
-      "Shadow AI Detection — discovers unauthorized agents via network traffic analysis",
+      "Shadow AI Detection \u2014 discovers unauthorized agents via network traffic analysis",
       "FICO-style 300-850 TrustScore across 5 vendor dimensions",
-      "OAuth 2.0 Client Credentials — no crypto wallet required",
+      "OAuth 2.0 Client Credentials \u2014 no crypto wallet required",
       "Native Salesforce, ServiceNow, and Slack integrations",
-      "Metadata-only data policy — no AI content or prompts stored"
+      "Metadata-only data policy \u2014 no AI content or prompts stored"
     ],
     "pricing": {
       "model": "USD monthly subscription",
       "tiers": [
-        { "name": "Starter", "price": "$2,000/mo", "vendors": 50, "users": 3 },
-        { "name": "Professional", "price": "$8,000/mo", "vendors": 200, "users": 15, "api_access": true },
-        { "name": "Enterprise", "price": "$25,000/mo", "vendors": "unlimited", "users": "unlimited", "custom_integrations": true },
-        { "name": "Custom", "price": "contact us", "vendors": "unlimited" }
+        {
+          "name": "Starter",
+          "price": "$2,000/mo",
+          "vendors": 50,
+          "users": 3
+        },
+        {
+          "name": "Professional",
+          "price": "$8,000/mo",
+          "vendors": 200,
+          "users": 15,
+          "api_access": true
+        },
+        {
+          "name": "Enterprise",
+          "price": "$25,000/mo",
+          "vendors": "unlimited",
+          "users": "unlimited",
+          "custom_integrations": true
+        },
+        {
+          "name": "Custom",
+          "price": "contact us",
+          "vendors": "unlimited"
+        }
       ]
     },
     "auth": "OAuth 2.0 Client Credentials (Bearer JWT)",
-    "integrations": ["Salesforce", "ServiceNow", "Slack", "Webhook"],
+    "integrations": [
+      "Salesforce",
+      "ServiceNow",
+      "Slack",
+      "Webhook"
+    ],
     "compliance": {
       "GDPR": "compliant",
       "CCPA": "compliant",
@@ -54,7 +95,13 @@
       "SOC2_TypeII": "in progress Q4 2026",
       "ISO27001": "planned Q2 2027"
     },
-    "target_buyers": ["CISOs", "CPOs", "VPs of Engineering", "Fortune 1000", "Organizations with 10+ AI vendors"],
+    "target_buyers": [
+      "CISOs",
+      "CPOs",
+      "VPs of Engineering",
+      "Fortune 1000",
+      "Organizations with 10+ AI vendors"
+    ],
     "contact": "scriptmasterlabs@gmail.com"
   },
   "products": [
@@ -111,5 +158,118 @@
     "ai_txt": "https://www.scriptmasterlabs.com/.well-known/ai.txt",
     "sitemap": "https://www.scriptmasterlabs.com/sitemap.xml",
     "faq": "https://www.scriptmasterlabs.com/ai/faq.json"
+  },
+  "ecosystem": {
+    "organization": "ScriptMasterLabs",
+    "organization_url": "https://scriptmasterlabs.com",
+    "description": "ScriptMasterLabs builds x402 micropayment infrastructure, AI agent trust systems, and institutional market intelligence tools. All products interoperate via the x402 protocol for agent-native payments.",
+    "related_products": [
+      {
+        "name": "SqueezeOS",
+        "role": "Institutional AI trading intelligence MCP server",
+        "description": "33 MCP tools \u2014 short-squeeze detection, options flow, IWM 0DTE scoring, council verdicts, peer signal marketplace. Pay-per-signal in RLUSD on XRP Ledger via x402.",
+        "github": "https://github.com/timwal78/squeezeos",
+        "url": "https://squeezeos-api.onrender.com",
+        "tags": [
+          "mcp-server",
+          "trading",
+          "x402",
+          "rlusd"
+        ]
+      },
+      {
+        "name": "mcp-x402 Signal API",
+        "role": "Unified pay-per-call MCP gateway",
+        "description": "43+ MCP tools covering trading signals, web scraping, SEC data, XRPL whale copy-trading, memecoin launchpad, and agent infrastructure. Multi-chain x402: Base USDC, XRPL RLUSD, Solana USDC.",
+        "github": "https://github.com/timwal78/sml-x402-signal-api",
+        "tags": [
+          "mcp-server",
+          "x402",
+          "multi-chain",
+          "trading"
+        ]
+      },
+      {
+        "name": "Ghost Layer",
+        "role": "Dual-chain XRPL+Base toll gateway",
+        "description": "Private routing engine with XRPL+Base micropayment toll, Xahau hooks intelligence, and URIToken minting. Go service, zero logging.",
+        "github": "https://github.com/timwal78/ghost-layer",
+        "url": "https://ghost-layer.onrender.com",
+        "tags": [
+          "gateway",
+          "xrpl",
+          "base",
+          "privacy"
+        ]
+      },
+      {
+        "name": "Aetheris-MCP",
+        "role": "x402 web scraping MCP server",
+        "description": "SSE MCP server with JSDOM-sanitized web scraping behind an on-chain x402 USDC micropayment interceptor. Content returned as clean ad-free Markdown.",
+        "github": "https://github.com/timwal78/aetheris-mcp-render",
+        "tags": [
+          "mcp-server",
+          "scraping",
+          "x402",
+          "usdc"
+        ]
+      },
+      {
+        "name": "Aetheris Client SDK",
+        "role": "TypeScript x402 payment SDK for Aetheris-MCP",
+        "description": "Official npm SDK that auto-intercepts HTTP 402 challenges and settles USDC payments on Base \u2014 no manual payment handling needed.",
+        "github": "https://github.com/timwal78/aetheris-client-sdk",
+        "tags": [
+          "sdk",
+          "typescript",
+          "x402",
+          "usdc"
+        ]
+      },
+      {
+        "name": "Printing Press Library",
+        "role": "Published catalog of generated Go CLIs and MCP servers",
+        "description": "Registry of type-safe Go CLIs and MCP servers produced by CLI Printing Press. Install any CLI via npx @mvanhorn/printing-press.",
+        "github": "https://github.com/timwal78/printing-press-library",
+        "tags": [
+          "cli",
+          "mcp-server",
+          "go",
+          "catalog"
+        ]
+      },
+      {
+        "name": "ZeroQuery Protocol",
+        "role": "Privacy-preserving intent ranking with ZK proofs",
+        "description": "SDK + Anchor program for ranking user intents without leaking raw queries. Groth16 ZK proofs (Poseidon hash) + pay-as-you-go SOL SaaS tiers.",
+        "github": "https://github.com/timwal78/zeroquery-protocol",
+        "tags": [
+          "zk-proofs",
+          "solana",
+          "privacy",
+          "sdk"
+        ]
+      },
+      {
+        "name": "AGO Orchestrator",
+        "role": "Agent orchestration infrastructure",
+        "description": "Orchestration layer for ScriptMasterLabs autonomous agent workflows.",
+        "github": "https://github.com/timwal78/ago-orchestrator",
+        "tags": [
+          "orchestration",
+          "agents"
+        ]
+      },
+      {
+        "name": "CrawlToll",
+        "role": "x402-gated web crawling service",
+        "description": "Metered web crawling with x402 micropayment gating. Agents pay per crawl in USDC or RLUSD.",
+        "github": "https://github.com/timwal78/crawltoll",
+        "tags": [
+          "crawling",
+          "x402"
+        ]
+      }
+    ]
   }
 }
