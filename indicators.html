@@ -1,22 +1,358 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QHTHMG61N6"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-QHTHMG61N6');
-    </script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ScriptMasterLabs | Indicators</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ScriptMasterLabs™ Pine Script v6 Indicators — Invite-Only Trading Tools</title>
+<meta name="description" content="50+ proprietary Pine Script v6 indicators for TradingView. Invite-only. Specializing in meme stock mechanics: FTD cycles, gamma exposure, dark pool analysis, short squeeze detection. QUEAD™ v2.0: 65.38% win rate, 4.079 profit factor on AMC 4H.">
+<meta name="keywords" content="Pine Script v6 indicators, TradingView indicators, FTD cycle indicator, gamma exposure indicator, short squeeze indicator, AMC GME indicators, meme stock tools, ScriptMasterLabs indicators">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="author" content="Script Master Labs LLC">
+<link rel="canonical" href="https://www.scriptmasterlabs.com/indicators.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.scriptmasterlabs.com/indicators.html">
+<meta property="og:title" content="ScriptMasterLabs™ Pine Script v6 Indicators — Invite-Only">
+<meta property="og:description" content="50+ proprietary Pine Script v6 indicators. QUEAD™ v2.0: 65.38% win rate, 4.079 profit factor. FTD cycles, gamma exposure, dark pool analysis. Invite-only access.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ScriptMasterLabs™ Pine Script v6 Indicators">
+<meta name="twitter:description" content="50+ proprietary indicators. QUEAD™ v2.0: 65.38% WR / 4.079 PF. Invite-only.">
 
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QHTHMG61N6"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-QHTHMG61N6');</script>
+
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<!-- JSON-LD Schema -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://www.scriptmasterlabs.com/#org",
+      "name": "Script Master Labs LLC",
+      "url": "https://www.scriptmasterlabs.com",
+      "description": "Service-Disabled Veteran-Owned Small Business. Proprietary Pine Script v6 indicators and x402 AI agent commerce infrastructure."
+    },
+    {
+      "@type": "Product",
+      "@id": "https://www.scriptmasterlabs.com/indicators.html#indicators",
+      "name": "ScriptMasterLabs™ Pine Script v6 Indicator Suite",
+      "description": "50+ proprietary Pine Script v6 indicators for TradingView. Invite-only access. Specializing in US equity meme stock mechanics: T+35 FTD cycles, gamma exposure, dark pool analysis, short squeeze detection, basket correlation.",
+      "brand": { "@type": "Brand", "name": "ScriptMasterLabs™" },
+      "manufacturer": { "@id": "https://www.scriptmasterlabs.com/#org" },
+      "offers": {
+        "@type": "Offer",
+        "availability": "https://schema.org/InStoreOnly",
+        "description": "Invite-only. Apply via email. Pricing disclosed on application.",
+        "seller": { "@id": "https://www.scriptmasterlabs.com/#org" }
+      }
+    },
+    {
+      "@type": "Product",
+      "@id": "https://www.scriptmasterlabs.com/indicators.html#quead",
+      "name": "QUEAD™ v2.0 — Quad-Engine Adaptive Divergence",
+      "description": "Proprietary Pine Script v6 indicator. Verified backtest results on AMC 4H timeframe: 65.38% win rate, 4.079 profit factor. Quad-engine adaptive divergence detection.",
+      "brand": { "@type": "Brand", "name": "ScriptMasterLabs™" },
+      "offers": { "@type": "Offer", "availability": "https://schema.org/InStoreOnly", "description": "Invite-only access." }
+    },
+    {
+      "@type": "ItemList",
+      "name": "ScriptMasterLabs™ Indicator Suite",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "QUEAD™ v2.0", "description": "65.38% win rate, 4.079 profit factor (AMC 4H backtest)" },
+        { "@type": "ListItem", "position": 2, "name": "SML Trajectory Engine™ v1.1", "description": "Polynomial regression, Hurst exponent, A/B/C/F grading, 4 trader modes" },
+        { "@type": "ListItem", "position": 3, "name": "SML SqueezeOS™", "description": "Primary short squeeze pressure engine" },
+        { "@type": "ListItem", "position": 4, "name": "SML Forced Move Engine™ v3.0", "description": "T+35 FTD cycle detection and forced delivery timing" },
+        { "@type": "ListItem", "position": 5, "name": "SML Chain Pressure Engine™", "description": "Dark pool and block trade pressure scoring" },
+        { "@type": "ListItem", "position": 6, "name": "SML Volume Intelligence Engine™", "description": "Volume signature classification" },
+        { "@type": "ListItem", "position": 7, "name": "SML Macro Causality Engine™", "description": "Macro event to price causality mapping" },
+        { "@type": "ListItem", "position": 8, "name": "SML Chaos Theory Engine™", "description": "Fractal market regime detection" }
+      ]
+    }
+  ]
+}
+</script>
+
+<style>
+:root{
+  --bg:#000000;--panel:#0A0E0A;--panel2:#10140F;--line:#1C241C;
+  --green:#39FF14;--green2:#00FF7F;--pink:#FF1493;--gold:#FFD700;--orange:#FF6B00;
+  --white:#F5F7F5;--mute:#8A958C;--mute2:#5A6560;
+  --mono:'JetBrains Mono','SF Mono',ui-monospace,Menlo,monospace;
+  --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--white);font-family:var(--sans);line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+header{padding:64px 0 36px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:var(--mono);font-size:11px;color:var(--green);letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px}
+h1{font-size:clamp(2rem,5vw,3.5rem);font-weight:800;line-height:1.1;margin-bottom:20px}
+.accent{color:var(--green)}
+.pink{color:var(--pink)}
+.gold{color:var(--gold)}
+.sub{font-size:1.05rem;color:var(--mute);max-width:680px;margin-bottom:24px}
+.chip{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:5px 12px;margin:4px 4px 4px 0}
+.chip .dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+.chip.gold-chip .dot{background:var(--gold)}
+.chip.pink-chip .dot{background:var(--pink)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+section{padding:56px 0;border-bottom:1px solid var(--line)}
+h2{font-size:1.5rem;font-weight:700;margin-bottom:8px}
+h3{font-size:1rem;font-weight:700;font-family:var(--mono);color:var(--green);margin-bottom:4px}
+.section-sub{color:var(--mute);font-size:.95rem;margin-bottom:32px}
+
+/* Pricing table */
+table{width:100%;border-collapse:collapse;margin-top:24px;font-size:.9rem}
+th{text-align:left;font-family:var(--mono);font-size:.75rem;color:var(--mute);text-transform:uppercase;letter-spacing:.08em;padding:10px 16px;border-bottom:1px solid var(--line)}
+td{padding:14px 16px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:none}
+td:first-child{font-family:var(--mono);font-size:.85rem;color:var(--green);font-weight:700}
+td.perf{color:var(--gold);font-family:var(--mono);font-size:.85rem;font-weight:700}
+tr:hover td{background:var(--panel)}
+
+/* Indicator cards */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-top:24px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:24px;transition:border-color .2s}
+.card:hover{border-color:var(--green)}
+.card-tag{font-family:var(--mono);font-size:10px;color:var(--mute);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+.card h3{color:var(--green2);margin-bottom:8px}
+.card p{font-size:.875rem;color:var(--mute);line-height:1.6}
+.badge{display:inline-block;font-family:var(--mono);font-size:10px;background:rgba(57,255,20,.1);color:var(--green);border:1px solid rgba(57,255,20,.3);border-radius:4px;padding:2px 8px;margin-top:10px}
+.badge.gold-badge{background:rgba(255,215,0,.1);color:var(--gold);border-color:rgba(255,215,0,.3)}
+
+/* Stat blocks */
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;margin-top:24px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:20px}
+.stat-num{font-family:var(--mono);font-size:1.8rem;font-weight:800;color:var(--green);display:block}
+.stat-num.gold-num{color:var(--gold)}
+.stat-label{font-size:.8rem;color:var(--mute);margin-top:4px}
+
+/* CTA */
+.cta-block{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:40px;text-align:center;margin-top:48px}
+.cta-block h2{margin-bottom:12px}
+.cta-block p{color:var(--mute);margin-bottom:24px}
+.btn{display:inline-block;background:var(--green);color:#000;font-weight:800;font-family:var(--mono);padding:14px 28px;border-radius:8px;font-size:.9rem;transition:opacity .2s}
+.btn:hover{opacity:.85}
+.btn.secondary{background:transparent;color:var(--white);border:1px solid var(--line);margin-left:12px}
+
+nav{padding:20px 0;border-bottom:1px solid var(--line)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-family:var(--mono);font-size:.85rem;color:var(--green);font-weight:700}
+.nav-links{display:flex;gap:24px;font-size:.85rem;color:var(--mute)}
+.nav-links a:hover{color:var(--white)}
+footer{padding:40px 0;color:var(--mute2);font-size:.8rem;font-family:var(--mono)}
+.footer-inner{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+</style>
 </head>
-<body style="background: #050507; color: #f1f1f1; font-family: sans-serif; text-align: center; padding-top: 20%;">
-    <h1>ScriptMasterLabs | Indicators</h1>
-    <p>Content coming soon.</p>
+<body>
+
+<div class="wrap">
+  <nav>
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">ScriptMasterLabs™</a>
+      <div class="nav-links">
+        <a href="/stack.html">Stack</a>
+        <a href="/indicators.html">Indicators</a>
+        <a href="/smlsheets.html">SMLSheets</a>
+        <a href="/books.html">Books</a>
+      </div>
+    </div>
+  </nav>
+
+  <header>
+    <div class="eyebrow">Script Master Labs · SDVOSB · Invite-Only · TradingView</div>
+    <h1><span class="accent">ScriptMasterLabs™</span><br>Pine Script v6 Indicators</h1>
+    <p class="sub">50+ proprietary indicators built for US equity meme stock mechanics. FTD cycles, gamma exposure, dark pool analysis, and short squeeze detection — on 4H and daily timeframes to avoid PDT restrictions.</p>
+    <div>
+      <span class="chip"><span class="dot"></span>50+ indicators live</span>
+      <span class="chip gold-chip"><span class="dot"></span>Invite-only access</span>
+      <span class="chip pink-chip"><span class="dot"></span>Pine Script v6 · TradingView</span>
+      <span class="chip"><span class="dot"></span>AMC · GME · US Equities</span>
+    </div>
+  </header>
+
+  <!-- VERIFIED BACKTEST RESULTS -->
+  <section>
+    <h2>Verified <span class="accent">Backtest Results</span></h2>
+    <p class="section-sub">Real production data only. No simulated, demo, or hypothetical results.</p>
+    <div class="stats">
+      <div class="stat">
+        <span class="stat-num gold-num">65.38%</span>
+        <div class="stat-label">QUEAD™ v2.0 Win Rate — AMC 4H</div>
+      </div>
+      <div class="stat">
+        <span class="stat-num gold-num">4.079</span>
+        <div class="stat-label">QUEAD™ v2.0 Profit Factor — AMC 4H</div>
+      </div>
+      <div class="stat">
+        <span class="stat-num">50+</span>
+        <div class="stat-label">Proprietary indicators in suite</div>
+      </div>
+      <div class="stat">
+        <span class="stat-num">4H / Daily</span>
+        <div class="stat-label">Primary timeframes (avoids PDT)</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INDICATOR TABLE -->
+  <section>
+    <h2>Full Indicator <span class="accent">Suite</span></h2>
+    <p class="section-sub">All indicators are TradingView invite-only scripts. Access is granted per application.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Indicator</th>
+          <th>Description</th>
+          <th>Performance / Notes</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>QUEAD™ v2.0</td>
+          <td>Quad-engine adaptive divergence. Three-file system: Overlay, Pane, Backtest.</td>
+          <td class="perf">65.38% WR · 4.079 PF (AMC 4H)</td>
+          <td><span class="badge gold-badge">Live</span></td>
+        </tr>
+        <tr>
+          <td>SML Trajectory Engine™ v1.1</td>
+          <td>Polynomial regression + Hurst exponent. A/B/C/F grading output. 4 trader modes.</td>
+          <td class="perf">Regime-adaptive</td>
+          <td><span class="badge">Live</span></td>
+        </tr>
+        <tr>
+          <td>SML SqueezeOS™</td>
+          <td>Primary short squeeze pressure engine. Short interest + options flow synthesis.</td>
+          <td class="perf">Real-time signal</td>
+          <td><span class="badge">Live</span></td>
+        </tr>
+        <tr>
+          <td>SML Forced Move Engine™ v3.0</td>
+          <td>T+35 FTD cycle detection and forced delivery timing for Reg SHO violations.</td>
+          <td class="perf">FTD cycle precision</td>
+          <td><span class="badge">Live</span></td>
+        </tr>
+        <tr>
+          <td>SML Chain Pressure Engine™</td>
+          <td>Dark pool and block trade pressure scoring. Identifies institutional positioning.</td>
+          <td class="perf">Institutional-grade</td>
+          <td><span class="badge">Live</span></td>
+        </tr>
+        <tr>
+          <td>SML Volume Intelligence Engine™</td>
+          <td>Volume signature classification. Identifies accumulation, distribution, and anomalies.</td>
+          <td class="perf">Signature detection</td>
+          <td><span class="badge">Live</span></td>
+        </tr>
+        <tr>
+          <td>SML Macro Causality Engine™</td>
+          <td>Macro event to price causality mapping. Connects Fed decisions and macro data to price.</td>
+          <td class="perf">Macro-correlated</td>
+          <td><span class="badge">Live</span></td>
+        </tr>
+        <tr>
+          <td>SML Chaos Theory Engine™</td>
+          <td>Fractal market regime detection. Identifies market structure transitions.</td>
+          <td class="perf">Regime detection</td>
+          <td><span class="badge">Live</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- SPECIALIZATION -->
+  <section>
+    <h2>Built for <span class="pink">Meme Stock</span> Mechanics</h2>
+    <p class="section-sub">These indicators are engineered specifically for the mechanics of US equity short squeeze candidates — not generic technical analysis.</p>
+    <div class="grid">
+      <div class="card">
+        <div class="card-tag">FTD Cycles</div>
+        <h3>T+35 Delivery Tracking</h3>
+        <p>Tracks Failure-to-Deliver cycles under Reg SHO. Identifies T+35 forced buy-in windows that create predictable price pressure on high-FTD tickers like AMC and GME.</p>
+        <span class="badge">SML Forced Move Engine™</span>
+      </div>
+      <div class="card">
+        <div class="card-tag">Gamma Exposure</div>
+        <h3>Options Flow Synthesis</h3>
+        <p>Synthesizes options market gamma exposure levels with price. Identifies gamma walls, dealer hedging thresholds, and options-driven price amplification zones.</p>
+        <span class="badge">SML SqueezeOS™</span>
+      </div>
+      <div class="card">
+        <div class="card-tag">Dark Pool</div>
+        <h3>Block Trade Pressure</h3>
+        <p>Scores dark pool and block trade activity relative to lit market volume. Detects institutional accumulation and distribution that doesn't appear in standard volume data.</p>
+        <span class="badge">SML Chain Pressure Engine™</span>
+      </div>
+      <div class="card">
+        <div class="card-tag">Basket Correlation</div>
+        <h3>Cross-Ticker Mechanics</h3>
+        <p>Maps correlation between AMC, GME, and related tickers in the same short-seller basket. Detects coordinated pressure and simultaneous squeeze conditions.</p>
+        <span class="badge">SML Macro Causality Engine™</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ACCESS -->
+  <section>
+    <h2>Access <span class="accent">Requirements</span></h2>
+    <p class="section-sub">ScriptMasterLabs™ indicators are invite-only. All indicators are protected TradingView scripts.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Requirement</th>
+          <th>Details</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Platform</td>
+          <td>Active TradingView account (any tier)</td>
+        </tr>
+        <tr>
+          <td>Access model</td>
+          <td>Invite-only. TradingView username required to grant access.</td>
+        </tr>
+        <tr>
+          <td>Pricing</td>
+          <td>Disclosed on application. Varies by indicator and access tier.</td>
+        </tr>
+        <tr>
+          <td>Contact</td>
+          <td><a href="mailto:ScriptMasterLabs@gmail.com" style="color:var(--green)">ScriptMasterLabs@gmail.com</a></td>
+        </tr>
+        <tr>
+          <td>MCP access</td>
+          <td>Backtest data available via <a href="https://mcp-x402.onrender.com/mcp" style="color:var(--green)">mcp-x402</a> tools: backtest_run, backtest_validate</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <div class="cta-block">
+    <h2>Apply for <span class="accent">Invite Access</span></h2>
+    <p>Send your TradingView username and which indicators you're interested in. Pricing is disclosed on application.</p>
+    <a href="mailto:ScriptMasterLabs@gmail.com" class="btn">Apply for Access</a>
+    <a href="/stack.html" class="btn secondary">View Full Stack</a>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <span>© 2026 Script Master Labs LLC · SDVOSB · Kinston NC</span>
+      <span>ScriptMasterLabs@gmail.com</span>
+      <span><a href="/privacy.html" style="color:inherit">Privacy</a> · <a href="/terms.html" style="color:inherit">Terms</a></span>
+    </div>
+  </footer>
+</div>
+
 <div id="sml-ask"></div>
 <style>
 #sml-ask{position:fixed;right:20px;bottom:20px;z-index:9999;font-family:'JetBrains Mono',monospace}
@@ -35,13 +371,13 @@
 .sa-in button{background:#00ff88;color:#000;border:none;padding:0 18px;font-weight:800;cursor:pointer}
 </style>
 <script>
-const NLWEB_ENDPOINT = "https://sml-nlweb.onrender.com/ask";
+const NLWEB_ENDPOINT="https://sml-nlweb.onrender.com/ask";
 (function(){
   const root=document.getElementById("sml-ask");
   root.innerHTML=`<button class="sa-fab">Ask ✦</button>
   <div class="sa-panel">
     <div class="sa-head">Ask <b>SML</b><span class="sa-x">✕</span></div>
-    <div class="sa-log"><div class="sa-msg sa-a">Ask about x402, MasterSheets, the indicators, or anything on the site.</div></div>
+    <div class="sa-log"><div class="sa-msg sa-a">Ask about x402, XRPL, Pine Script indicators, SMLSheets.AI, or anything SML.</div></div>
     <div class="sa-in"><input placeholder="Type a question…"/><button>→</button></div>
   </div>`;
   const fab=root.querySelector(".sa-fab"),panel=root.querySelector(".sa-panel"),log=root.querySelector(".sa-log"),input=root.querySelector("input"),send=root.querySelector(".sa-in button");
@@ -49,8 +385,8 @@ const NLWEB_ENDPOINT = "https://sml-nlweb.onrender.com/ask";
   root.querySelector(".sa-x").onclick=()=>panel.classList.remove("open");
   function add(t,cls){const d=document.createElement("div");d.className="sa-msg "+cls;d.textContent=t;log.appendChild(d);log.scrollTop=log.scrollHeight;}
   async function ask(){
-    const q=input.value.trim(); if(!q)return; input.value="";
-    add(q,"sa-u"); add("…","sa-a"); const thinking=log.lastChild;
+    const q=input.value.trim();if(!q)return;input.value="";
+    add(q,"sa-u");add("…","sa-a");const thinking=log.lastChild;
     try{
       const r=await fetch(NLWEB_ENDPOINT+"?query="+encodeURIComponent(q));
       const data=await r.json();
@@ -58,9 +394,10 @@ const NLWEB_ENDPOINT = "https://sml-nlweb.onrender.com/ask";
       thinking.textContent=txt;
     }catch(e){thinking.textContent="Couldn't reach the answer service.";}
   }
-  send.onclick=ask; input.addEventListener("keydown",e=>{if(e.key==="Enter")ask();});
+  send.onclick=ask;input.addEventListener("keydown",e=>{if(e.key==="Enter")ask();});
 })();
 </script>
+
 
 </body>
 </html>
