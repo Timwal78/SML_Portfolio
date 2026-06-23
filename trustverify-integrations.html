@@ -96,6 +96,18 @@
   }
 }
 </script>
+<style>
+.pricing-section{padding:40px 0;border-top:1px solid #1C241C}
+.pricing-section h2{font-size:1.5rem;font-weight:700;margin-bottom:8px;color:#F5F7F5}
+.pricing-section .ps{color:#8A958C;font-size:.95rem;margin-bottom:24px}
+.pricing-table{width:100%;border-collapse:collapse;font-size:.9rem}
+.pricing-table th{text-align:left;font-family:'JetBrains Mono',monospace;font-size:.75rem;color:#8A958C;text-transform:uppercase;letter-spacing:.08em;padding:10px 16px;border-bottom:1px solid #1C241C}
+.pricing-table td{padding:14px 16px;border-bottom:1px solid #1C241C;vertical-align:top;color:#F5F7F5}
+.pricing-table tr:last-child td{border-bottom:none}
+.pricing-table td:first-child{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:#39FF14;font-weight:700}
+.pricing-table td.price{font-family:'JetBrains Mono',monospace;color:#FFD700;font-weight:700}
+.pricing-table tr:hover td{background:#0A0E0A}
+</style>
 </head>
 <body>
 
@@ -464,5 +476,19 @@ function copyCode(btn){
   });
 }
 </script>
+<div class="pricing-section"><div style="max-width:1080px;margin:0 auto;padding:0 24px">
+<h2>TrustVerify AI — Integrations Pricing</h2>
+<p class="ps">Native integrations included in Professional and Enterprise tiers. Currently in private early access.</p>
+<table class="pricing-table">
+<thead><tr><th>Integration</th><th>Tier Required</th><th>Details</th></tr></thead>
+<tbody>
+<tr><td>Salesforce</td><td class="price">Professional+</td><td>TrustVerify_Score__c custom field, automated sync</td></tr>
+<tr><td>ServiceNow</td><td class="price">Professional+</td><td>Scripted REST API, automated incident on score drop</td></tr>
+<tr><td>Slack</td><td class="price">Professional+</td><td>Block Kit alerts, /trustscore slash command</td></tr>
+<tr><td>Custom API</td><td class="price">Enterprise</td><td>Full REST API access, custom webhook endpoints</td></tr>
+</tbody>
+</table>
+<p style="color:#5A6560;font-family:'JetBrains Mono',monospace;font-size:.8rem;margin-top:16px">Contact: ScriptMasterLabs@gmail.com · Live scoring today via Agent Credit Bureau MCP</p>
+</div></div>
 </body>
 </html>
