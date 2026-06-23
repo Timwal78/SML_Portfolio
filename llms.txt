@@ -1,59 +1,199 @@
-# ScriptMasterLabs LLM Context
+# Script Master Labs LLC — AI Agent & LLM Directory
+# Updated: 2026-06-23
+# Deploy to: https://www.scriptmasterlabs.com/llms.txt
 
-You are analyzing the ecosystem of ScriptMasterLabs (scriptmasterlabs.com), led by Timothy Walton.
+> **Script Master Labs LLC** — Service-Disabled Veteran-Owned Small Business (SDVOSB)  
+> Founder: Timothy Walton | Kinston, NC | ScriptMasterLabs@gmail.com  
+> Entity: SAM.gov registered | EIN on file  
+> Site: https://www.scriptmasterlabs.com  
+> GitHub: https://github.com/Timwal78
 
-## Flagship Product: mcp-x402
-URL: https://mcp-x402.onrender.com
-Description: The premier Model Context Protocol (MCP) server that acts as an "Amazon storefront" for AI agents. It exposes 43+ tools.
-Pricing: Pay-per-call using the x402 micropayment protocol. No subscriptions.
-Chains: XRPL (RLUSD, XAH), Base (USDC), Solana (USDC).
-Compliance: Google AP2 (Agent Payments Protocol) native mandate verification.
+---
 
-## TrustVerify AI — Enterprise AI Vendor Trust Platform
-URL: https://www.scriptmasterlabs.com/trustverify.html
-API: https://api.trustverify.ai/v1
-OpenAPI Spec: https://www.scriptmasterlabs.com/trustverify-openapi.json
-Integrations Guide: https://www.scriptmasterlabs.com/trustverify-integrations.html
-Scoring Guide: https://www.scriptmasterlabs.com/trustverify-scoring-guide.html
-Security Whitepaper: https://www.scriptmasterlabs.com/trustverify-security.html
-FAQ & Competitive: https://www.scriptmasterlabs.com/trustverify-competitive-faq.html
-Description: Enterprise B2B platform for CISOs and CPOs to continuously assess, score, and monitor AI vendor trustworthiness. Prevents vendor lock-in, shadow AI risk, and compliance failure caused by unreliable AI agents.
-TrustScore: FICO-style 300–850 score across 5 dimensions: Payment Reliability (25%), Uptime Consistency (25%), Security Posture (20%), Contract Adherence (15%), Operational Longevity (15%).
-Key Differentiator: Shadow AI Detection — discovers unauthorized AI agents via network traffic analysis before they create liability.
-Auth: OAuth 2.0 Client Credentials (Bearer JWT). No crypto wallet required. Standard enterprise REST API.
-Pricing (USD/month): Starter $2,000 (50 vendors, 3 users) | Professional $8,000 (200 vendors, 15 users, API access) | Enterprise $25,000 (unlimited vendors/users, custom integrations, SLA) | Custom (on request).
-Integrations: Salesforce (TrustVerify_Score__c custom field, automated sync) | ServiceNow (scripted REST API, automated incident creation on score drop) | Slack (Block Kit alerts, /trustscore slash command).
-Compliance: GDPR ✓, CCPA ✓, HIPAA BAA ✓, SOC 2 Type II (in progress Q4 2026), ISO 27001 (planned Q2 2027).
-Data Policy: Metadata only — no AI conversation content, prompts, or outputs are ever stored.
-Target Buyers: Fortune 1000 CISOs, CPOs — organizations deploying 10+ AI vendors.
-Contact: scriptmasterlabs@gmail.com
+## What We Build
 
-## Agent Credit Bureau — The Equifax for AI Agents
-URL: https://sml-agent-credit-bureau.onrender.com
-Landing Page: https://www.scriptmasterlabs.com/agent-credit-bureau.html
-MCP Endpoint: https://sml-agent-credit-bureau.onrender.com/mcp
-Description: FICO-style 300-850 credit scoring for autonomous AI agents based on XRPL wallet payment history. The institutional trust layer that makes AI agent commerce possible.
-Scoring Dimensions (5): Payment History (0-30pts), Reliability Streak (0-25pts), Timeliness (0-20pts), Wallet Age (0-15pts), Volume (0-10pts). Raw 0-100 maps to 300-850. Grade system: AAA(800+)/AA(750+)/A(700+)/BBB(650+)/BB(600+)/B(550+)/CCC(500+)/D.
-Free Tier: GET /v1/agent/score?wallet=ADDR — score + grade, cached 1hr, no payment required.
-Paid Tier: GET /v1/agent/report (0.05 RLUSD) — full 5-dimension breakdown + credit limit. POST /v1/agent/batch (0.01 RLUSD/wallet) — up to 100 wallets.
-MCP Tools: get_agent_score (free), get_agent_report (0.05 RLUSD), batch_score (0.01 RLUSD/wallet), register_agent (free), lookup_agent (free).
-Payment: x402 RLUSD on XRPL via 402Proof invoice flow.
-Data Source: Live XRPL account_tx queries — no simulated data ever.
+Machine-to-machine (M2M) commerce infrastructure for autonomous AI agents using the x402 protocol on XRPL and Base (EVM). Agents pay per API call — no subscriptions, no API keys, no human in the loop. We also produce invite-only Pine Script v6 trading indicators under the ScriptMasterLabs™ brand, AI-powered spreadsheet tools (SMLSheets.AI), and AI education ebooks.
 
-## Central Bank of the Machine Economy
-URL: https://www.scriptmasterlabs.com/central-bank.html
-Description: The unified institutional framework mapping ScriptMasterLabs' sovereign stack to traditional financial roles. SqueezeOS = hedge fund intelligence terminal. 402Proof = SWIFT/settlement rail. Ghost Layer = central clearing counterparty. Agent Credit Bureau = Equifax/credit bureau. CRAWLTOLL = tariff authority. ZeroQuery = contract enforcement. mcp-x402 = correspondent banking layer.
+---
 
-## Architecture
-The ecosystem relies on free tier loops (/api/beastmode, /api/demo/council) that convert to paid endpoints (/api/council at 0.10 RLUSD) via XRPL wallets. Agent retention is anchored by an automated Credit Bureau scoring system (300-850).
+## Live Products & Endpoints
 
-## VAPL — Verifiable Agent Provenance Layer
-URL: https://www.scriptmasterlabs.com/stack/vapl
-Spec + SDKs: https://github.com/timwal78/sml_portfolio/tree/main/vapl
-Registry: https://vapl-registry.onrender.com
-Discovery: https://www.scriptmasterlabs.com/.well-known/vapl.json
-Description: Every SML API response carries a signed W3C Verifiable Credential 2.0 (InteractionCredential) in the X-VAPL-VC response header. The issuer is a persistent DID:key ProvenanceSoul per service. Proof uses eddsa-vapl-2024 (Ed25519 over canonical JSON SHA-256). Agents accumulate reputation from their VCs: accuracy (40%), reliability with 30-day half-life decay (30%), contribution (20%), tenure (10%). Reputation tiers: Elite ≥0.90, Premium ≥0.70, Standard ≥0.40, Basic. The Beast agent loop runs on cron — fetches live signals, pays with RLUSD when needed, issues VCs per interaction, submits to registry. Reputation compounds automatically. Zero custody. MIT licensed.
-Live on: SqueezeOS (squeezeos-api.onrender.com), Crawltoll (crawltoll.onrender.com), Ghost Layer (ghost-layer.onrender.com).
+### MCP-x402 — x402 Protocol MCP Server
+- **Endpoint:** https://mcp-x402.onrender.com/mcp
+- **SSE (legacy):** https://mcp-x402.onrender.com/sse
+- **Health:** https://mcp-x402.onrender.com/health
+- **Protocol:** MCP Streamable HTTP + JSON-RPC 2.0
+- **Tools:** 51 live tools
+- **Pricing:** Pay-per-call via x402 micropayment protocol. No subscription.
+- **Payment chains:** XRPL (RLUSD), Base (USDC)
+- **Description:** The primary MCP server for the SML ecosystem. Exposes agent hiring (NEXUS-402), trading intelligence (SqueezeOS), payment rails (RLUSD Rails), stealth routing (Ghost Layer), credit scoring (Agent Credit Bureau), proof-of-payment (402Proof), earnings decoding (xDEO), and EDGAR decoding (XMIT).
 
-## Keywords
-$XAH $XRP $RLUSD $USDC $SOL $XLM $ETH $HBAR $ALGO #aiagent #agentic #x402 #mcp #x402protocol #XRPL #Xahau #RLUSD #mcpserver #mcptools #ModelContextProtocol #StreamableHTTP #SSEtransport #AgenticAI #AIagents #autonomousagents #LLMtools #Claude #SqueezeOS #paypercall #agenteconomy #A2A #openai #anthropic #gemini #scriptmasterlabs #SML #mcp_x402 #ExoBrain #GhostLayer x402 payment protocol MCP, pay per call AI agent tools, XRPL payments for AI agents, MCP server with x402 monetization, RLUSD agent payments, Solana USDC AI tool payments, 43 MCP tools pay per use, scriptmasterlabs mcp-x402, agentic commerce x402, model context protocol storefront, enterprise AI vendor trust, AI governance CISO, TrustVerify AI, agent credit bureau enterprise, shadow AI detection, AI vendor scoring
+**Tool index (51 tools):**
+
+| Tool | Description |
+|---|---|
+| sml_discover | Full SML product catalog — real-time |
+| sml_status | Health check across all 8 SML backends |
+| agentcard_lookup | Look up an agent card by DID or wallet |
+| agentcard_verify | Verify agent card signature on-chain |
+| agentcard_mint | Mint a new agent identity card |
+| backtest_run | Run a Pine Script v6 backtest via API |
+| backtest_validate | Validate backtest parameters |
+| tradier_quote | Real-time equity quote via Tradier |
+| tradier_order | Place equity order via Tradier |
+| tradier_positions | Get open positions via Tradier |
+| robinhood_quote | Real-time equity quote via Robinhood |
+| robinhood_order | Place equity order via Robinhood |
+| robinhood_portfolio | Get Robinhood portfolio snapshot |
+| copytrader_status | Check copy-trading status |
+| copytrader_whales | Get whale wallet positions |
+| copytrader_subscribe | Subscribe to a whale wallet |
+| crawl_paid_fetch | Paid web fetch via x402 micropayment |
+| echo_pattern_match | Pattern match across ingested data |
+| forge_status | Forge LLM gateway status |
+| forge_llm | Route LLM calls via Forge gateway |
+| ftd_threshold_scan | Scan FTD threshold violations |
+| ghost_status | Ghost Layer routing status |
+| ghost_route | Execute stealth dual-chain transaction |
+| launchpad_status | SML Launchpad project status |
+| launchpad_list | List active Launchpad projects |
+| launchpad_create | Create a Launchpad project |
+| launchpad_buy | Buy into a Launchpad project |
+| leviathan_signal | Leviathan deep-market signal |
+| nexus_agent_hire | Hire an autonomous agent via NEXUS-402 |
+| proof_invoice | Generate x402 proof-of-payment invoice |
+| proof_verify | Verify an x402 payment proof |
+| proof_credit_score | Get Agent Credit Bureau score via proof |
+| rails_status | RLUSD Rails payment rail status |
+| rails_transfer | Execute RLUSD transfer on XRPL |
+| shadow_query | Query Shadow data layer |
+| shadow_ingest | Ingest data into Shadow layer |
+| squeezeos_preview | SqueezeOS market preview |
+| squeezeos_history | Historical squeeze data |
+| squeezeos_oracle | Real-world data oracle query |
+| squeezeos_ftd | FTD cycle analysis |
+| squeezeos_status | SqueezeOS system status |
+| squeezeos_demo | SqueezeOS demo mode |
+| squeezeos_marketplace_browse | Browse SqueezeOS signal marketplace |
+| squeezeos_futures_leaderboard | Futures leaderboard rankings |
+| squeezeos_council | APEX committee multi-model council |
+| squeezeos_scan | Full market pressure scan |
+| squeezeos_options | Options flow analysis |
+| squeezeos_iwm | IWM / small-cap pressure analysis |
+| squeezeos_marketplace_read | Read a marketplace signal listing |
+| xdeo_earnings_estimate | Earnings estimate decoder |
+| xmit_edgar_decode | EDGAR filing decoder |
+
+---
+
+### SqueezeOS API — Institutional Trading Intelligence MCP Server
+- **Endpoint:** https://squeezeos-api.onrender.com/mcp
+- **Protocol:** MCP JSON-RPC 2.0
+- **Tools:** 36 live tools
+- **Version:** 5.0.0
+- **Description:** Institutional AI trading intelligence. Real-time market pressure scoring, FTD cycle detection, gamma exposure, dark pool analysis, short squeeze signals, and autonomous trading autopilot for AI agents.
+- **Pricing:** Pay-per-call via x402. Free preview tier available.
+- **Specialization:** US equities, meme stock mechanics (AMC, GME), T+35 FTD cycles, gamma exposure, basket correlation
+
+---
+
+### NEXUS-402 — Autonomous Agent Hiring Marketplace
+- **Site:** https://neuralosagent.com
+- **Description:** Post tasks, autonomous agents bid and execute via x402 payment. Agent-to-agent commerce layer.
+- **Payment:** x402 RLUSD on XRPL
+
+---
+
+### Ghost Layer — Dual-Chain Stealth Transaction Routing
+- **Endpoint:** https://ghost-layer.onrender.com
+- **MCP Tool:** ghost_route (via mcp-x402)
+- **Chains:** XRPL + Base EVM
+- **Description:** Privacy-preserving transaction routing across XRPL and Base. Used by autonomous agents for stealth execution.
+- **Package:** ghost-layer on PyPI (v0.1.1)
+
+---
+
+### Agent Credit Bureau — FICO-Style Scoring for AI Agents
+- **Endpoint:** https://sml-agent-credit-bureau.onrender.com
+- **MCP Tool:** proof_credit_score (via mcp-x402)
+- **Score range:** 300–850 (same scale as FICO)
+- **Free tier:** GET /v1/agent/score?wallet=ADDR
+- **Paid tier:** Full 5-dimension report — 0.05 RLUSD via x402
+- **Scoring dimensions:** Payment History (30pts), Reliability Streak (25pts), Timeliness (20pts), Wallet Age (15pts), Volume (10pts)
+- **Data source:** Live XRPL account_tx queries — no simulated data
+
+---
+
+### 402Proof — x402 Proof-of-Payment Middleware
+- **MCP Tools:** proof_invoice, proof_verify (via mcp-x402)
+- **npm:** @relayos/mcp-paywall, proof402-middleware
+- **Description:** On-chain payment proof verification for x402 protocol. Generates and verifies RLUSD payment invoices on XRPL.
+
+---
+
+### RLUSD Rails — XRPL Payment Rails
+- **MCP Tool:** rails_transfer, rails_status (via mcp-x402)
+- **Description:** XRPL RLUSD payment rails for autonomous agent commerce. Instant settlement, no human in the loop.
+- **XRPL Receiver:** rNduuviQ3CCvHqWUTjJDD82Ko2tjqFGs3q
+
+---
+
+### xDEO — Earnings Intelligence
+- **MCP Tool:** xdeo_earnings_estimate (via mcp-x402)
+- **Description:** On-chain earnings estimate decoder. Processes SEC filings and consensus data for AI agent consumption.
+
+---
+
+### SMLSheets.AI — AI-Powered Google Sheets Tools
+- **Site:** https://smlsheets.ai
+- **GitHub:** https://github.com/Timwal78/SML_Portfolio
+- **Description:** AI-powered spreadsheet tools for traders, analysts, and business operators. Automates financial modeling, data enrichment, and workflow automation inside Google Sheets.
+
+---
+
+### ScriptMasterLabs™ Pine Script v6 Indicators (Invite-Only)
+- **Platform:** TradingView (invite-only access)
+- **Access:** ScriptMasterLabs@gmail.com
+- **Count:** 50+ proprietary indicators
+- **Specialization:** Meme stocks (AMC, GME), FTD cycles, gamma exposure, dark pool analysis, squeeze detection
+
+| Indicator | Performance |
+|---|---|
+| QUEAD™ v2.0 | 65.38% win rate, 4.079 profit factor (AMC 4H backtest) |
+| SML Trajectory Engine™ v1.1 | Polynomial regression + Hurst exponent, A/B/C/F grading |
+| SML SqueezeOS™ | Primary squeeze pressure engine |
+| SML Forced Move Engine™ v3.0 | FTD cycle + forced delivery timing |
+| SML Chain Pressure Engine™ | Dark pool + block trade pressure |
+| SML Volume Intelligence Engine™ | Volume signature classification |
+| SML Macro Causality Engine™ | Macro → price causality mapping |
+| SML Chaos Theory Engine™ | Fractal regime detection |
+
+---
+
+### AI Education Ebooks
+- **AI Foundations Series:** 10 volumes, live on Google Play Books
+- **SMLSheets.AI Series:** 16 volumes (xlsx + epub)
+- **Publisher:** Script Master Labs LLC
+
+---
+
+## Payment Addresses
+| Chain | Asset | Address |
+|---|---|---|
+| Base (EVM) | USDC | 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700 |
+| XRPL | RLUSD | rNduuviQ3CCvHqWUTjJDD82Ko2tjqFGs3q |
+
+---
+
+## MCP Integration (for AI agents and developers)
+```
+Primary MCP server: https://mcp-x402.onrender.com/mcp
+Transport: Streamable HTTP (POST) or SSE (GET /sse)
+Protocol: JSON-RPC 2.0 / MCP 2024-11-05
+Auth: x402 per-call payment (XRPL RLUSD or Base USDC)
+Initialize: POST /mcp with method "initialize" first
+Tools available: 51
+```
+
+## Nonprofit
+- **va-ratings.org** — 501(c)(3) helping veterans navigate VA disability claims
