@@ -1,58 +1,37 @@
-# ScriptMasterLabs — agentic web optimized
-# Founder: Timothy Walton | SDVO | Kinston NC
+# Script Master Labs LLC — robots.txt
+# All AI crawlers explicitly allowed on all public pages
 
 User-agent: *
 Allow: /
 
 User-agent: GPTBot
 Allow: /
-User-agent: OAI-SearchBot
-Allow: /
-User-agent: ChatGPT-User
-Allow: /
+
 User-agent: ClaudeBot
 Allow: /
-User-agent: anthropic-ai
-Allow: /
-User-agent: PerplexityBot
-Allow: /
-User-agent: Perplexity-User
-Allow: /
+
 User-agent: Google-Extended
 Allow: /
-User-agent: Applebot-Extended
+
+User-agent: PerplexityBot
 Allow: /
-User-agent: CCBot
+
+User-agent: anthropic-ai
 Allow: /
-User-agent: Bytespider
-Allow: /
+
 User-agent: Amazonbot
 Allow: /
+
 User-agent: cohere-ai
 Allow: /
+
 User-agent: YouBot
 Allow: /
-User-agent: meta-externalagent
-Allow: /
-User-agent: facebookexternalhit
-Allow: /
-User-agent: Facebot
+
+User-agent: Applebot-Extended
 Allow: /
 
-Disallow: /src/
-Disallow: /node_modules/
+User-agent: Bytespider
+Allow: /
 
 Sitemap: https://www.scriptmasterlabs.com/sitemap.xml
-
-# === AGENTIC DISCOVERY ===
-# Agent catalog (JSON): https://www.scriptmasterlabs.com/agents.json
-# LLM context (short): https://www.scriptmasterlabs.com/llms.txt
-# LLM context (full): https://www.scriptmasterlabs.com/llms-full.txt
-# x402 payments: https://www.scriptmasterlabs.com/x402-paywall.html
-# MCP Servers:
-#   Agent Credit Bureau — https://sml-agent-credit-bureau.onrender.com/mcp (5 tools, FICO 300-850)
-#   SqueezeOS          — https://squeezeos-api.onrender.com/mcp (33 tools)
-#   402Proof           — https://four02proof.onrender.com/mcp (11 tools)
-# Agent Credit Bureau landing: https://www.scriptmasterlabs.com/agent-credit-bureau.html
-# Central Bank of Machine Economy: https://www.scriptmasterlabs.com/central-bank.html
-# npm: https://www.npmjs.com/package/proof402-middleware
