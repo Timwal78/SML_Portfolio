@@ -1,20 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Core -->
   <url><loc>https://www.scriptmasterlabs.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
-  <url><loc>https://www.scriptmasterlabs.com/llms.txt</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://www.scriptmasterlabs.com/mcp-x402</loc><changefreq>weekly</changefreq><priority>0.95</priority></url>
-  <url><loc>https://www.scriptmasterlabs.com/squeezeos</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://www.scriptmasterlabs.com/nexus-402</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://www.scriptmasterlabs.com/ghost-layer</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.scriptmasterlabs.com/rlusd-rails</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.scriptmasterlabs.com/agent-credit-bureau.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.scriptmasterlabs.com/402proof</loc><changefreq>monthly</changefreq><priority>0.75</priority></url>
-  <url><loc>https://www.scriptmasterlabs.com/xdeo</loc><changefreq>monthly</changefreq><priority>0.75</priority></url>
-  <url><loc>https://www.scriptmasterlabs.com/indicators</loc><changefreq>monthly</changefreq><priority>0.85</priority></url>
-  <url><loc>https://www.scriptmasterlabs.com/trustverify.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.scriptmasterlabs.com/central-bank.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.scriptmasterlabs.com/stack/vapl</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.scriptmasterlabs.com/ebooks</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.scriptmasterlabs.com/stack.html</loc><changefreq>weekly</changefreq><priority>0.95</priority></url>
+  <url><loc>https://www.scriptmasterlabs.com/indicators.html</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.scriptmasterlabs.com/smlsheets.html</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.scriptmasterlabs.com/books.html</loc><changefreq>monthly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://www.scriptmasterlabs.com/agent-credit-bureau.html</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.scriptmasterlabs.com/trustverify.html</loc><changefreq>monthly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://www.scriptmasterlabs.com/central-bank.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.scriptmasterlabs.com/crawltoll.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.scriptmasterlabs.com/x402-paywall.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.scriptmasterlabs.com/pipeline.html</loc><changefreq>monthly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://www.scriptmasterlabs.com/affiliate.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.scriptmasterlabs.com/about.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <!-- TrustVerify -->
+  <url><loc>https://www.scriptmasterlabs.com/trustverify-competitive-faq.html</loc><changefreq>monthly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://www.scriptmasterlabs.com/trustverify-integrations.html</loc><changefreq>monthly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://www.scriptmasterlabs.com/trustverify-scoring-guide.html</loc><changefreq>monthly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://www.scriptmasterlabs.com/trustverify-security.html</loc><changefreq>monthly</changefreq><priority>0.75</priority></url>
+  <!-- AI / GEO files -->
+  <url><loc>https://www.scriptmasterlabs.com/llms.txt</loc><changefreq>weekly</changefreq><priority>0.95</priority></url>
+  <url><loc>https://www.scriptmasterlabs.com/robots.txt</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <!-- External properties -->
   <url><loc>https://smlsheets.ai/</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
   <url><loc>https://neuralosagent.com/</loc><changefreq>weekly</changefreq><priority>0.85</priority></url>
   <url><loc>https://va-ratings.org/</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
