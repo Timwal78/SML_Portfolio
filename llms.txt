@@ -1,199 +1,133 @@
-# Script Master Labs LLC — AI Agent & LLM Directory
-# Updated: 2026-06-23
-# Deploy to: https://www.scriptmasterlabs.com/llms.txt
+# ScriptMasterLabs — Machine-to-Machine Commerce Infrastructure
 
-> **Script Master Labs LLC** — Service-Disabled Veteran-Owned Small Business (SDVOSB)  
-> Founder: Timothy Walton | Kinston, NC | ScriptMasterLabs@gmail.com  
-> Entity: SAM.gov registered | EIN on file  
-> Site: https://www.scriptmasterlabs.com  
-> GitHub: https://github.com/Timwal78
+> x402 / HTTP-402 payment rails, AI-native tools, and sovereign blockchain architecture for the agentic web. All products enforce strict production data — no demos, no simulations, no fake inputs. Service-Disabled Veteran-Owned Small Business (SDVOSB). Founder: Timothy Walton, Kinston NC.
+> Site: https://www.scriptmasterlabs.com
 
 ---
 
-## What We Build
+## Payment Rails (X402 / XRP / XAH)
 
-Machine-to-machine (M2M) commerce infrastructure for autonomous AI agents using the x402 protocol on XRPL and Base (EVM). Agents pay per API call — no subscriptions, no API keys, no human in the loop. We also produce invite-only Pine Script v6 trading indicators under the ScriptMasterLabs™ brand, AI-powered spreadsheet tools (SMLSheets.AI), and AI education ebooks.
+All SML products support autonomous M2M payments via the x402 / HTTP 402 standard. When an AI agent hits a gated endpoint it receives HTTP 402 + a signed invoice. Pay → get JWT → retry with X-Payment-Token. No keys, no subscriptions.
 
----
+### Supported chains
+- **USDC on Base** — primary x402 rail; CDP facilitator; merchant: `0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700`
+- **RLUSD on XRPL** — secondary rail; payments verified at `https://four02proof.onrender.com/v1/verify`
+- **XAH on Xahau** — Xahau Hooks-based routing; remittance and notary via `https://sml-rails.onrender.com`
 
-## Live Products & Endpoints
+### X402 builds
+- [x402 Infrastructure Hub](https://www.scriptmasterlabs.com/builds/x402/): NEXUS-402 MCP server + proof402-middleware
+- [Nexus-402](https://www.nexus-402.com): Autonomous AI agent layer — x402 invoice generation, JWT issuance, XRPL+Base settlement
+- [proof402-middleware (npm)](https://www.scriptmasterlabs.com/x402-paywall.html): Drop-in x402 paywall for any Express/Node MCP server or API. `npx crawltoll init`
+- [402Proof payment firewall](https://four02proof.onrender.com): Invoice generation, XRPL payment verification, Agent Credit Bureau, signed JWT issuance
 
-### MCP-x402 — x402 Protocol MCP Server
-- **Endpoint:** https://mcp-x402.onrender.com/mcp
-- **SSE (legacy):** https://mcp-x402.onrender.com/sse
-- **Health:** https://mcp-x402.onrender.com/health
-- **Protocol:** MCP Streamable HTTP + JSON-RPC 2.0
-- **Tools:** 51 live tools
-- **Pricing:** Pay-per-call via x402 micropayment protocol. No subscription.
-- **Payment chains:** XRPL (RLUSD), Base (USDC)
-- **Description:** The primary MCP server for the SML ecosystem. Exposes agent hiring (NEXUS-402), trading intelligence (SqueezeOS), payment rails (RLUSD Rails), stealth routing (Ghost Layer), credit scoring (Agent Credit Bureau), proof-of-payment (402Proof), earnings decoding (xDEO), and EDGAR decoding (XMIT).
+### XAH / Xahau builds
+- [XahPay (in development)](https://www.scriptmasterlabs.com/builds/xah-pay/): Xahau payment routing infrastructure
+- [RLUSD Rails (sml-rails)](https://sml-rails.onrender.com): Xahau Hooks remittance rails, XAH→RLUSD bridging, URI-token notary
+- Xahau Hooks Intelligence: Ghost Layer's `xahau.go` — URITokenMint, escrow, hook execution proofs
 
-**Tool index (51 tools):**
-
-| Tool | Description |
-|---|---|
-| sml_discover | Full SML product catalog — real-time |
-| sml_status | Health check across all 8 SML backends |
-| agentcard_lookup | Look up an agent card by DID or wallet |
-| agentcard_verify | Verify agent card signature on-chain |
-| agentcard_mint | Mint a new agent identity card |
-| backtest_run | Run a Pine Script v6 backtest via API |
-| backtest_validate | Validate backtest parameters |
-| tradier_quote | Real-time equity quote via Tradier |
-| tradier_order | Place equity order via Tradier |
-| tradier_positions | Get open positions via Tradier |
-| robinhood_quote | Real-time equity quote via Robinhood |
-| robinhood_order | Place equity order via Robinhood |
-| robinhood_portfolio | Get Robinhood portfolio snapshot |
-| copytrader_status | Check copy-trading status |
-| copytrader_whales | Get whale wallet positions |
-| copytrader_subscribe | Subscribe to a whale wallet |
-| crawl_paid_fetch | Paid web fetch via x402 micropayment |
-| echo_pattern_match | Pattern match across ingested data |
-| forge_status | Forge LLM gateway status |
-| forge_llm | Route LLM calls via Forge gateway |
-| ftd_threshold_scan | Scan FTD threshold violations |
-| ghost_status | Ghost Layer routing status |
-| ghost_route | Execute stealth dual-chain transaction |
-| launchpad_status | SML Launchpad project status |
-| launchpad_list | List active Launchpad projects |
-| launchpad_create | Create a Launchpad project |
-| launchpad_buy | Buy into a Launchpad project |
-| leviathan_signal | Leviathan deep-market signal |
-| nexus_agent_hire | Hire an autonomous agent via NEXUS-402 |
-| proof_invoice | Generate x402 proof-of-payment invoice |
-| proof_verify | Verify an x402 payment proof |
-| proof_credit_score | Get Agent Credit Bureau score via proof |
-| rails_status | RLUSD Rails payment rail status |
-| rails_transfer | Execute RLUSD transfer on XRPL |
-| shadow_query | Query Shadow data layer |
-| shadow_ingest | Ingest data into Shadow layer |
-| squeezeos_preview | SqueezeOS market preview |
-| squeezeos_history | Historical squeeze data |
-| squeezeos_oracle | Real-world data oracle query |
-| squeezeos_ftd | FTD cycle analysis |
-| squeezeos_status | SqueezeOS system status |
-| squeezeos_demo | SqueezeOS demo mode |
-| squeezeos_marketplace_browse | Browse SqueezeOS signal marketplace |
-| squeezeos_futures_leaderboard | Futures leaderboard rankings |
-| squeezeos_council | APEX committee multi-model council |
-| squeezeos_scan | Full market pressure scan |
-| squeezeos_options | Options flow analysis |
-| squeezeos_iwm | IWM / small-cap pressure analysis |
-| squeezeos_marketplace_read | Read a marketplace signal listing |
-| xdeo_earnings_estimate | Earnings estimate decoder |
-| xmit_edgar_decode | EDGAR filing decoder |
+### XRP / XRPL builds
+- Ghost Layer bridge: dual-chain XRPL+Base toll gateway at `https://ghost-layer.onrender.com`
+- XRPL Copy-Trader Engine: whale position mirroring on XRPL at `https://sml-copytrader.onrender.com`
+- Memecoin Launchpad (Forge): bonding-curve token launch on XRPL at `https://sml-launchpad.onrender.com`
 
 ---
 
-### SqueezeOS API — Institutional Trading Intelligence MCP Server
-- **Endpoint:** https://squeezeos-api.onrender.com/mcp
-- **Protocol:** MCP JSON-RPC 2.0
-- **Tools:** 36 live tools
-- **Version:** 5.0.0
-- **Description:** Institutional AI trading intelligence. Real-time market pressure scoring, FTD cycle detection, gamma exposure, dark pool analysis, short squeeze signals, and autonomous trading autopilot for AI agents.
-- **Pricing:** Pay-per-call via x402. Free preview tier available.
-- **Specialization:** US equities, meme stock mechanics (AMC, GME), T+35 FTD cycles, gamma exposure, basket correlation
+## MCP Servers (Model Context Protocol)
 
----
+SML operates multiple MCP servers. AI agents connect via JSON-RPC 2.0 — no scraping required.
 
-### NEXUS-402 — Autonomous Agent Hiring Marketplace
-- **Site:** https://neuralosagent.com
-- **Description:** Post tasks, autonomous agents bid and execute via x402 payment. Agent-to-agent commerce layer.
-- **Payment:** x402 RLUSD on XRPL
+| Server | Endpoint | Transport | Tools |
+|--------|----------|-----------|-------|
+| SqueezeOS MCP | `https://squeezeos-api.onrender.com/mcp` | streamable-http | 46 tools |
+| Ghost Layer MCP | `https://ghost-layer.onrender.com/mcp` | streamable-http | bridge, notary, loyalty |
+| Shadow Desk MCP | `https://shadow-desk.onrender.com/mcp` | streamable-http | dark pool signals, billing |
 
----
+### SqueezeOS MCP — key tools (46 total)
+Free: `signal_preview`, `oracle_directive`, `market_scan_preview`, `ftd_alerts`, `get_agent_credit`, `marketplace_browse`, `futures_leaderboard`, `hiring_browse`, `settlement_browse`
+Paid (RLUSD): `council_verdict` (0.10), `market_scan` (0.05), `options_flow` (0.05), `iam_resolve` (0.05), `ftd_analysis` (0.03), `iwm_0dte` (0.03), `macro_741_scan` (0.04), `marketplace_read_signal` (0.02)
 
-### Ghost Layer — Dual-Chain Stealth Transaction Routing
-- **Endpoint:** https://ghost-layer.onrender.com
-- **MCP Tool:** ghost_route (via mcp-x402)
-- **Chains:** XRPL + Base EVM
-- **Description:** Privacy-preserving transaction routing across XRPL and Base. Used by autonomous agents for stealth execution.
-- **Package:** ghost-layer on PyPI (v0.1.1)
-
----
-
-### Agent Credit Bureau — FICO-Style Scoring for AI Agents
-- **Endpoint:** https://sml-agent-credit-bureau.onrender.com
-- **MCP Tool:** proof_credit_score (via mcp-x402)
-- **Score range:** 300–850 (same scale as FICO)
-- **Free tier:** GET /v1/agent/score?wallet=ADDR
-- **Paid tier:** Full 5-dimension report — 0.05 RLUSD via x402
-- **Scoring dimensions:** Payment History (30pts), Reliability Streak (25pts), Timeliness (20pts), Wallet Age (15pts), Volume (10pts)
-- **Data source:** Live XRPL account_tx queries — no simulated data
-
----
-
-### 402Proof — x402 Proof-of-Payment Middleware
-- **MCP Tools:** proof_invoice, proof_verify (via mcp-x402)
-- **npm:** @relayos/mcp-paywall, proof402-middleware
-- **Description:** On-chain payment proof verification for x402 protocol. Generates and verifies RLUSD payment invoices on XRPL.
-
----
-
-### RLUSD Rails — XRPL Payment Rails
-- **MCP Tool:** rails_transfer, rails_status (via mcp-x402)
-- **Description:** XRPL RLUSD payment rails for autonomous agent commerce. Instant settlement, no human in the loop.
-- **XRPL Receiver:** rNduuviQ3CCvHqWUTjJDD82Ko2tjqFGs3q
-
----
-
-### xDEO — Earnings Intelligence
-- **MCP Tool:** xdeo_earnings_estimate (via mcp-x402)
-- **Description:** On-chain earnings estimate decoder. Processes SEC filings and consensus data for AI agent consumption.
-
----
-
-### SMLSheets.AI — AI-Powered Google Sheets Tools
-- **Site:** https://smlsheets.ai
-- **GitHub:** https://github.com/Timwal78/SML_Portfolio
-- **Description:** AI-powered spreadsheet tools for traders, analysts, and business operators. Automates financial modeling, data enrichment, and workflow automation inside Google Sheets.
-
----
-
-### ScriptMasterLabs™ Pine Script v6 Indicators (Invite-Only)
-- **Platform:** TradingView (invite-only access)
-- **Access:** ScriptMasterLabs@gmail.com
-- **Count:** 50+ proprietary indicators
-- **Specialization:** Meme stocks (AMC, GME), FTD cycles, gamma exposure, dark pool analysis, squeeze detection
-
-| Indicator | Performance |
-|---|---|
-| QUEAD™ v2.0 | 65.38% win rate, 4.079 profit factor (AMC 4H backtest) |
-| SML Trajectory Engine™ v1.1 | Polynomial regression + Hurst exponent, A/B/C/F grading |
-| SML SqueezeOS™ | Primary squeeze pressure engine |
-| SML Forced Move Engine™ v3.0 | FTD cycle + forced delivery timing |
-| SML Chain Pressure Engine™ | Dark pool + block trade pressure |
-| SML Volume Intelligence Engine™ | Volume signature classification |
-| SML Macro Causality Engine™ | Macro → price causality mapping |
-| SML Chaos Theory Engine™ | Fractal regime detection |
-
----
-
-### AI Education Ebooks
-- **AI Foundations Series:** 10 volumes, live on Google Play Books
-- **SMLSheets.AI Series:** 16 volumes (xlsx + epub)
-- **Publisher:** Script Master Labs LLC
-
----
-
-## Payment Addresses
-| Chain | Asset | Address |
-|---|---|---|
-| Base (EVM) | USDC | 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700 |
-| XRPL | RLUSD | rNduuviQ3CCvHqWUTjJDD82Ko2tjqFGs3q |
-
----
-
-## MCP Integration (for AI agents and developers)
-```
-Primary MCP server: https://mcp-x402.onrender.com/mcp
-Transport: Streamable HTTP (POST) or SSE (GET /sse)
-Protocol: JSON-RPC 2.0 / MCP 2024-11-05
-Auth: x402 per-call payment (XRPL RLUSD or Base USDC)
-Initialize: POST /mcp with method "initialize" first
-Tools available: 51
+Full tool catalog: `https://squeezeos-api.onrender.com/.well-known/mcp.json`
+MCP client config:
+```json
+{"mcpServers":{"squeezeos":{"url":"https://squeezeos-api.onrender.com/mcp","transport":"streamable-http"}}}
 ```
 
-## Nonprofit
-- **va-ratings.org** — 501(c)(3) helping veterans navigate VA disability claims
+---
+
+## AI Agents
+
+- [SqueezeOS Autonomous Agent](https://github.com/Timwal78/SqueezeOS/blob/main/agent/sml_agent.py): Claude-powered agent with its own XRPL wallet; pays for market data, runs 5× daily on GitHub Actions market schedule
+- [NeuralOS](https://www.neuralosagent.com): Agentic operating system — Web App + Google Play. Agents run in swarms, pay fees in RLUSD, earn loyalty via Agent Passport
+- [ZeroQuery](https://www.scriptmasterlabs.com/stack/zeroquery): Proof-of-Intent protocol — agents broadcast structured intents, services compete to fulfill via x402 escrow. Soulbound reputation via Xahau Hooks DID. Repo: https://github.com/Timwal78/zeroquery-protocol
+- [GHOST](https://www.scriptmasterlabs.com/stack/ghost): Ephemeral execution layer — scoped, short-lived Ed25519 credentials. The safety layer beneath the agentic web. `pip install ghost-layer`
+- Agent Credit Bureau: on-chain reputation scoring at `https://four02proof.onrender.com/bureau/{wallet}`
+- Agent Affiliate Program: two-level RLUSD rebates. Register: `POST https://squeezeos-api.onrender.com/api/forge/register`
+
+---
+
+## AI Products — SML Sheets AI / MasterSheets
+
+- [MasterSheets](https://www.scriptmasterlabs.com/mastersheets.html): AI-native spreadsheet that replaces Google Sheets. Bring your own AI key (BYOK), no subscription, user owns 100% of data. Integrates live market data feeds. No demo data — all cells pull from live APIs
+
+---
+
+## Trading Indicators & Market Intelligence
+
+- [SML Oracle — APEX ANCHOR MATRIX](https://www.scriptmasterlabs.com/indicators.html): Institutional market-intelligence engine. Proprietary Base-4 fractal grid with patent-pending harmonic binding of fast trigger sets to macro anchor sets. Eliminates false breakouts. Real-time squeeze detection, options flow, high-conviction convergence signals. x402-gated signal API
+- [SqueezeOS](https://squeezeos-api.onrender.com): Institutional-grade AI trading intelligence — council verdicts, squeeze scanner, FTD oracle, options flow, IWM 0DTE, gamma flow, whale stalker, battle computer
+- [CRAWLTOLL](https://www.scriptmasterlabs.com/crawltoll.html): Turn AI crawler traffic into revenue. GPTBot, ClaudeBot, PerplexityBot pay USDC per fetch; humans free. `npx crawltoll init`. npm: `@relayos/mcp-paywall`
+- ShortSqueeze Swarm: Autonomous FTD/Reg SHO anomaly feed — free alerts at `https://squeezeos-api.onrender.com/api/ftd/alerts`; full settlement-cycle detail (0.05 RLUSD) at `/api/ftd/cycle/{symbol}`
+
+---
+
+## Monetization & Advertising Products
+
+- [x402 Paywall](https://www.scriptmasterlabs.com/x402-paywall.html): Drop-in API monetization — any endpoint becomes pay-per-call. Supports USDC (Base, Polygon, Solana) and RLUSD (XRPL)
+- [Affiliate Program](https://www.scriptmasterlabs.com/affiliate): Two-level RLUSD rebates for agent/developer referrals. On-chain, no caps. Earnings: `GET https://squeezeos-api.onrender.com/api/forge/earnings/{wallet}`
+- [Alpha Mesh signal marketplace](https://squeezeos-api.onrender.com/api/marketplace): Agents list signals free; buyers pay 0.02 RLUSD; 90% to seller, 10% platform
+- [Signal Futures market](https://squeezeos-api.onrender.com/api/futures): Agents stake RLUSD on predicted council verdicts; platform fee 5%
+- Google AdSense: active on `https://www.scriptmasterlabs.com` (pub-9396445805927087)
+
+---
+
+## AI Learning E-Books
+
+- [Books by Timothy Walton](https://www.scriptmasterlabs.com/books.html): Trading psychology, neurodivergent survival systems, AI automation guides, fiction, and modern-English ancient texts. Published via Kindle/KDP. Direct links on books page
+
+---
+
+## Repositories
+
+| Repo | Description | URL |
+|------|-------------|-----|
+| SqueezeOS | Market intelligence API + MCP server (Python/Flask) | https://github.com/Timwal78/SqueezeOS |
+| Ghost Layer | Dual-chain XRPL+Base toll gateway (Go) | https://github.com/Timwal78/ghost-layer |
+| CRAWLTOLL | x402 web-crawler paywall (Node.js) | https://github.com/Timwal78/crawltoll |
+| ZeroQuery | Proof-of-Intent protocol (Rust/Solana+Xahau) | https://github.com/Timwal78/zeroquery-protocol |
+| SML Portfolio | scriptmasterlabs.com frontend (Vercel) | https://github.com/Timwal78/SML_Portfolio |
+| Awesome MCP Servers | Curated MCP server directory | https://github.com/Timwal78/awesome-mcp-servers |
+
+---
+
+## GEO / SEO Optimization
+
+This site is optimized for Generative Engine Optimization (GEO). Content is structured for AI search synthesis (Perplexity, Google AI Overviews, SearchGPT):
+- All pricing stated in direct declarative sentences
+- Product specs in tables and lists for AI ingest
+- JSON-LD structured data on all key pages (SoftwareApplication, Organization, Offer, Book schemas)
+- robots.txt explicitly allows: GPTBot, ClaudeBot, PerplexityBot, Google-Extended, Amazonbot, cohere-ai, and 10+ more AI crawlers
+
+---
+
+## Discovery Endpoints
+
+| Resource | URL |
+|----------|-----|
+| LLM context (this file) | https://www.scriptmasterlabs.com/llms.txt |
+| Agent capability manifest | https://www.scriptmasterlabs.com/agents.json |
+| Knowledge graph (JSON-LD) | https://www.scriptmasterlabs.com/graph.json |
+| AI plugin (ChatGPT) | https://www.scriptmasterlabs.com/.well-known/ai-plugin.json |
+| MCP manifest | https://www.scriptmasterlabs.com/.well-known/mcp.json |
+| OpenAPI spec | https://www.scriptmasterlabs.com/.well-known/openapi.json |
+| Sitemap | https://www.scriptmasterlabs.com/sitemap.xml |
+| Architecture map | https://www.scriptmasterlabs.com/stack |

@@ -1,0 +1,76 @@
+{
+  "schema_version": "1.0",
+  "provider": {
+    "name": "ScriptMasterLabs",
+    "url": "https://www.scriptmasterlabs.com",
+    "description": "SDVOSB building x402 payment rails, AI-native tools, and sovereign blockchain infrastructure.",
+    "contact": "scriptmasterlabs@gmail.com"
+  },
+  "payment_protocol": "x402",
+  "payment_firewall": "https://four02proof.onrender.com",
+  "identity_headers": {
+    "wallet": "X-Agent-Wallet",
+    "domain": "X-Agent-Domain",
+    "payment_token": "X-Payment-Token"
+  },
+  "mcp_servers": [
+    {
+      "name": "SqueezeOS",
+      "endpoint": "https://squeezeos-api.onrender.com/mcp",
+      "transport": "streamable-http",
+      "protocol_version": "2024-11-05",
+      "tool_count": 46,
+      "free_tools": ["signal_preview", "oracle_directive", "ftd_alerts", "get_agent_credit", "marketplace_browse", "futures_leaderboard"],
+      "paid_tools": ["council_verdict", "market_scan", "options_flow", "iam_resolve", "ftd_analysis", "macro_741_scan", "marketplace_read_signal"],
+      "currency": "RLUSD",
+      "chain": "XRPL"
+    },
+    {
+      "name": "Ghost Layer",
+      "endpoint": "https://ghost-layer.onrender.com/mcp",
+      "transport": "streamable-http",
+      "description": "Dual-chain bridge, notary, loyalty, Xahau Hooks",
+      "currencies": ["RLUSD", "XAH", "USDC"],
+      "chains": ["XRPL", "Xahau", "Base"]
+    },
+    {
+      "name": "Shadow Desk",
+      "endpoint": "https://shadow-desk.onrender.com/mcp",
+      "transport": "streamable-http",
+      "description": "Dark pool surveillance and signal billing"
+    }
+  ],
+  "agent_services": [
+    {
+      "name": "Alpha Mesh (Signal Marketplace)",
+      "endpoint": "https://squeezeos-api.onrender.com/api/marketplace",
+      "cost": "0.02 RLUSD to read",
+      "seller_cut": "90%"
+    },
+    {
+      "name": "Agent Credit Bureau",
+      "endpoint": "https://four02proof.onrender.com/bureau/{wallet}",
+      "cost": "free"
+    },
+    {
+      "name": "Affiliate Program",
+      "register": "POST https://squeezeos-api.onrender.com/api/forge/register",
+      "earnings": "GET https://squeezeos-api.onrender.com/api/forge/earnings/{wallet}",
+      "cost": "free to join"
+    },
+    {
+      "name": "ShortSqueeze Swarm (FTD Oracle)",
+      "alerts_endpoint": "https://squeezeos-api.onrender.com/api/ftd/alerts",
+      "detail_endpoint": "https://squeezeos-api.onrender.com/api/ftd/cycle/{symbol}",
+      "alerts_cost": "free",
+      "detail_cost": "0.05 RLUSD"
+    }
+  ],
+  "discovery": {
+    "llms_txt": "https://www.scriptmasterlabs.com/llms.txt",
+    "sitemap": "https://www.scriptmasterlabs.com/sitemap.xml",
+    "mcp_manifest": "https://www.scriptmasterlabs.com/.well-known/mcp.json",
+    "openapi": "https://www.scriptmasterlabs.com/.well-known/openapi.json",
+    "server": "https://www.scriptmasterlabs.com/.well-known/server.json"
+  }
+}
