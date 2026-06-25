@@ -1,0 +1,34 @@
+{
+  "schema_version": "2024-11-05",
+  "name": "ScriptMasterLabs",
+  "description": "x402 payment rails, AI-native tools, and MCP servers for the agentic web. USDC on Base · RLUSD on XRPL · XAH on Xahau.",
+  "servers": [
+    {
+      "name": "SqueezeOS MCP",
+      "url": "https://squeezeos-api.onrender.com/mcp",
+      "transport": "streamable-http",
+      "description": "46-tool market intelligence MCP server — squeeze scanner, council verdicts, options flow, FTD oracle, IAM resolver, macro matrix. Free + paid (0.02–0.10 RLUSD).",
+      "payment_protocol": "x402",
+      "payment_assets": ["RLUSD/XRPL", "USDC/Base"]
+    },
+    {
+      "name": "Ghost Layer MCP",
+      "url": "https://ghost-layer.onrender.com/mcp",
+      "transport": "streamable-http",
+      "description": "Dual-chain XRPL+Base toll gateway — bridge, notary, loyalty scoring, Xahau Hooks execution.",
+      "payment_protocol": "x402",
+      "payment_assets": ["RLUSD/XRPL", "USDC/Base", "XAH/Xahau"]
+    },
+    {
+      "name": "Shadow Desk MCP",
+      "url": "https://shadow-desk.onrender.com/mcp",
+      "transport": "streamable-http",
+      "description": "Dark pool surveillance and signal billing.",
+      "payment_protocol": "x402"
+    }
+  ],
+  "payment_firewall": "https://four02proof.onrender.com",
+  "agent_catalog": "https://www.scriptmasterlabs.com/agents.json",
+  "llms_txt": "https://www.scriptmasterlabs.com/llms.txt",
+  "sitemap": "https://www.scriptmasterlabs.com/sitemap.xml"
+}
