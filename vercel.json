@@ -13,7 +13,7 @@
     },
     {
       "source": "/slack",
-      "destination": "https://slack.com/oauth/v2/authorize?client_id=11228367485462.11460484600548&scope=app_mentions:read,channels:read,chat:write,chat:write.public,commands,im:history,im:read,im:write,incoming-webhook&user_scope=",
+      "destination": "/slack.html",
       "permanent": false
     },
     {
