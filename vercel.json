@@ -12,6 +12,11 @@
       "permanent": true
     },
     {
+      "source": "/slack",
+      "destination": "/slack.html",
+      "permanent": false
+    },
+    {
       "source": "/privacy",
       "destination": "/privacy.html",
       "permanent": false
