@@ -12,6 +12,16 @@
       "permanent": true
     },
     {
+      "source": "/privacy",
+      "destination": "/privacy.html",
+      "permanent": false
+    },
+    {
+      "source": "/terms",
+      "destination": "/terms.html",
+      "permanent": false
+    },
+    {
       "source": "/trustverify",
       "destination": "/trustverify.html",
       "permanent": false
