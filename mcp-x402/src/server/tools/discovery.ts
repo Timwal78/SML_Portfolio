@@ -119,6 +119,7 @@ const CATALOG = {
       backend: 'https://squeezeos-api.onrender.com',
       tools: [
         { name: 'apm_negotiate', type: 'FREE|PAID', price_usdc: '0.02', description: 'FREE preview returns match count + best category. PAID contract ($0.02) returns the full ranked plan with prices, live-status, brokerage terms, and a price-locked signed quote.' },
+        { name: 'apm_execute', type: 'PAID', price_usdc: 'locked price + 5% brokerage', description: 'Execute a tool recommended by apm_negotiate under its signed price-locked quote. Charges the locked price + 5% brokerage, runs the tool, returns the result. Brokers the live SqueezeOS family today.' },
       ],
     },
     {
@@ -143,7 +144,7 @@ const CATALOG = {
     },
   ],
   stats: {
-    total_tools: 44,
+    total_tools: 45,
     free_tools: 22,
     paid_tools: 22,
     products: 12,
