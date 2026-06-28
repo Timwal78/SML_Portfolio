@@ -34,6 +34,17 @@ const DAILY_SPEND_CAP = parseFloat(
   process.env['DAILY_SPEND_CAP_USD'] ?? '50.0',
 );
 
+// SML's published Base USDC receiving address (public — see agents.json, llms.txt,
+// x402-paywall.html). Used as the default so the gateway COLLECTS even when
+// SML_PAYMENT_RECEIVER isn't set in the environment. Override via env to redirect.
+// The private key (WALLET_SEED) is never stored here.
+const SML_DEFAULT_RECEIVER = '0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700';
+
+/** Resolve the address that collects USDC for paid tool calls. */
+export function getPaymentReceiver(): string {
+  return process.env['SML_PAYMENT_RECEIVER'] ?? SML_DEFAULT_RECEIVER;
+}
+
 const dailySpend = new Map<string, { amount: number; date: string }>();
 
 function getTodayKey(): string {
@@ -121,12 +132,12 @@ export async function executeX402Payment(
   }
 
   // Route payment to cheapest/fastest chain (N13)
-  // If SML_PAYMENT_RECEIVER is not configured, log the intended payment and continue
-  const receiver = process.env['SML_PAYMENT_RECEIVER'] ?? '';
+  // Receiver defaults to SML's published address; only empty if explicitly set to ''.
+  const receiver = getPaymentReceiver();
   let txResult: { txHash: string; chain: string; latencyMs: number };
 
   if (!receiver) {
-    audit.warn('payment_receiver_unset', { tool: config.toolName, amount: config.price, note: 'SML_PAYMENT_RECEIVER not configured — logging only' });
+    audit.warn('payment_receiver_unset', { tool: config.toolName, amount: config.price, note: 'SML_PAYMENT_RECEIVER explicitly empty — logging only' });
     txResult = { txHash: `pending-${Date.now()}`, chain: 'none', latencyMs: 0 };
   } else {
     try {
