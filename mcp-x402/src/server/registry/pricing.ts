@@ -1,9 +1,14 @@
 const PRICE_CACHE_TTL = parseInt(process.env['PRICE_CACHE_TTL_MS'] ?? '60000', 10);
 
+// Keys MUST match the toolName each tool passes to getPrice()/executeX402Payment().
+// Paid-tool prices MUST equal what sml_discover advertises (advertised == charged).
+// A drift-guard test (tests/unit/pricing-drift.test.ts) enforces both.
 const BASE_PRICES: Record<string, string> = {
   // Discovery (free)
   sml_discover: '0.00',
   sml_status: '0.00',
+  // APM — Agent Preference Manifest (free preview, paid contract)
+  apm_negotiate: '0.02',
   // SqueezeOS signals
   leviathan_signal: '0.05',
   squeezeos_council: '0.10',
@@ -21,18 +26,15 @@ const BASE_PRICES: Record<string, string> = {
   crawl_paid_fetch: '0.005',
   // Agent marketplace
   nexus_agent_hire: '0.00',
-  nexus_agent_list: '0.00',
-  nexus_agent_status: '0.00',
   // Ghost Layer (cross-chain)
-  ghost_transfer: '0.02',
+  ghost_route: '0.01',
   ghost_status: '0.00',
-  ghost_routes: '0.00',
   // RLUSD Rails
-  rails_send: '0.01',
+  rails_transfer: '0.01',
   rails_status: '0.00',
   // Launchpad
-  launchpad_create_token: '0.10',
-  launchpad_buy_token: '0.02',
+  launchpad_create: '0.10',
+  launchpad_buy: '0.01',
   launchpad_list: '0.00',
   launchpad_status: '0.00',
   // Copy-Trader
@@ -42,30 +44,26 @@ const BASE_PRICES: Record<string, string> = {
   backtest_run: '0.05',
   backtest_validate: '0.05',
   backtest_status: '0.00',
-  // Brokers (Tradier)
-  brokers_quote: '0.00',
-  brokers_options_chain: '0.01',
-  brokers_place_order: '0.05',
-  brokers_account: '0.01',
+  // Brokers (Tradier + Robinhood order execution)
+  tradier_order: '0.01',
+  robinhood_order: '0.01',
   // Shadow Desk
-  shadow_query: '0.05',
-  shadow_ingest: '0.02',
+  shadow_query: '0.02',
+  shadow_ingest: '0.01',
   shadow_status: '0.00',
   // Forge (LLM gateway)
-  forge_complete: '0.02',
+  forge_llm: '0.02',
   forge_status: '0.00',
-  // Proof402
-  proof402_get_invoice: '0.00',
-  proof402_verify: '0.00',
-  proof402_credit_score: '0.00',
+  // Proof402 (free)
+  proof_invoice: '0.00',
+  proof_verify: '0.00',
+  proof_credit_score: '0.00',
   // Echo (pattern matching)
-  echo_analogs: '0.05',
+  echo_pattern_match: '0.05',
   // Agent card / identity
+  agentcard_mint: '0.01',
   agentcard_verify: '0.00',
-  agentcard_register: '0.01',
   agentcard_lookup: '0.00',
-  // APM — Agent Preference Manifest negotiation (free preview, paid contract)
-  apm_negotiate: '0.02',
 };
 
 interface CachedPrice {

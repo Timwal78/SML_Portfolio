@@ -17,7 +17,7 @@
     "test:unit": "vitest run tests/unit",
     "test:integration": "vitest run tests/integration",
     "test:coverage": "vitest run --coverage",
-    "lint": "eslint src --ext .ts",
+    "lint": "eslint src tests",
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "npm run build && npm run typecheck"
   },
