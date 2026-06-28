@@ -1,5 +1,6 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { registerAgentCard } from './agentcard.js';
+import { registerApm } from './apm.js';
 import { registerBacktest } from './backtest.js';
 import { registerBrokers } from './brokers.js';
 import { registerCopyTrader } from './copytrader.js';
@@ -21,6 +22,7 @@ import { registerXmit } from './xmit.js';
 
 export async function registerTools(server: McpServer): Promise<void> {
   registerDiscovery(server);
+  registerApm(server);
   registerAgentCard(server);
   registerBacktest(server);
   registerBrokers(server);

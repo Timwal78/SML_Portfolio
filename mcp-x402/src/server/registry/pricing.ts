@@ -64,6 +64,8 @@ const BASE_PRICES: Record<string, string> = {
   agentcard_verify: '0.00',
   agentcard_register: '0.01',
   agentcard_lookup: '0.00',
+  // APM — Agent Preference Manifest negotiation (free preview, paid contract)
+  apm_negotiate: '0.02',
 };
 
 interface CachedPrice {
@@ -117,9 +119,10 @@ export class PriceRegistry {
       return fallback;
     }
 
-    // Unknown tool — default to free rather than reject
-    this.cache.set(toolName, { price: '0.00', fetchedAt: now });
-    return '0.00';
+    // Unknown tool — reject rather than silently treat as free.
+    // Returning '0.00' here would let any unknown/mistyped tool name be served
+    // for free (revenue + safety leak). Callers that charge must get null and stop.
+    return null;
   }
 
   seedDefaults(): void {

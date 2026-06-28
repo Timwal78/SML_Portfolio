@@ -1,5 +1,6 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { AuditLogger } from '../security/audit.js';
+import { BACKENDS, checkBackends } from '../registry/backends.js';
 
 const CATALOG = {
   version: '2.0.0',
@@ -113,6 +114,14 @@ const CATALOG = {
       ],
     },
     {
+      product: 'APM (Agent Preference Manifest)',
+      description: 'Ask, don’t guess. Declare what you NEED (capability, budget, chain, freshness) and get the exact LIVE tool(s) that match — saving the tokens and failed payments of trial-and-error across the catalog.',
+      backend: 'https://squeezeos-api.onrender.com',
+      tools: [
+        { name: 'apm_negotiate', type: 'FREE|PAID', price_usdc: '0.02', description: 'FREE preview returns match count + best category. PAID contract ($0.02) returns the full ranked plan with prices, live-status, brokerage terms, and a price-locked signed quote.' },
+      ],
+    },
+    {
       product: 'echo-forge',
       description: 'Historical equity pattern similarity engine — ML cosine similarity on Polygon.io data',
       backend: 'coming_soon',
@@ -134,24 +143,13 @@ const CATALOG = {
     },
   ],
   stats: {
-    total_tools: 43,
+    total_tools: 44,
     free_tools: 22,
-    paid_tools: 21,
-    products: 11,
+    paid_tools: 22,
+    products: 12,
     chains_supported: 3,
   },
 };
-
-const BACKENDS = [
-  { name: 'SqueezeOS',     url: 'https://squeezeos-api.onrender.com/api/status' },
-  { name: 'Ghost Layer',   url: 'https://ghost-layer.onrender.com/api/status' },
-  { name: '402Proof',      url: 'https://four02proof.onrender.com/health' },
-  { name: 'RLUSD Rails',   url: 'https://sml-rails.onrender.com/health' },
-  { name: 'Copy-Trader',   url: 'https://sml-copytrader.onrender.com/health' },
-  { name: 'Launchpad',     url: 'https://sml-launchpad.onrender.com/health' },
-  { name: 'Shadow Desk',   url: 'https://shadow-desk.onrender.com/health' },
-  { name: 'Forge Gateway', url: 'https://forge-gateway-a822.onrender.com/health' },
-];
 
 export function registerDiscovery(server: McpServer): void {
   server.tool(
@@ -170,19 +168,11 @@ export function registerDiscovery(server: McpServer): void {
     {},
     async () => {
       AuditLogger.getInstance().info('sml_status', {});
-      const results = await Promise.allSettled(
-        BACKENDS.map(async (b) => {
-          const start = Date.now();
-          try {
-            const res = await fetch(b.url, { signal: AbortSignal.timeout(5000) });
-            return { name: b.name, status: res.ok ? 'online' : 'degraded', http: res.status, latency_ms: Date.now() - start };
-          } catch (err) {
-            return { name: b.name, status: 'offline', error: String(err), latency_ms: Date.now() - start };
-          }
-        }),
-      );
-      const statuses = results.map((r) =>
-        r.status === 'fulfilled' ? r.value : { name: 'unknown', status: 'error' },
+      const health = await checkBackends(5000);
+      const statuses = health.map((h) =>
+        h.status === 'offline'
+          ? { name: h.name, status: h.status, error: h.error, latency_ms: h.latency_ms }
+          : { name: h.name, status: h.status, http: h.http, latency_ms: h.latency_ms },
       );
       const online = statuses.filter((s) => s.status === 'online').length;
       return {
