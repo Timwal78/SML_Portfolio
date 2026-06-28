@@ -6,6 +6,7 @@ import { Sandbox } from '../security/sandbox.js';
 import { AuditLogger } from '../security/audit.js';
 import { PriceRegistry } from '../registry/pricing.js';
 import { SqueezeOSAPI } from '../../lib/sml-api/squeezeos.js';
+import { PaymentRequiredError, PaymentUnverifiedError } from '../payments/agent-payment.js';
 
 // ── Schemas ──────────────────────────────────────────────────────────────────
 
@@ -17,18 +18,25 @@ const OptionalSymbolSchema = z.object({
   symbol: z.string().min(1).max(10).toUpperCase().optional(),
 });
 
+const PaymentProofSchema = z.object({ tx_hash: z.string().min(6) });
+const toProof = (p?: { tx_hash: string }): { txHash: string } | undefined =>
+  p ? { txHash: p.tx_hash } : undefined;
+
 const PaidSchema = z.object({
   wallet_address: z.string().optional(),
+  payment_proof: PaymentProofSchema.optional(),
 });
 
 const CouncilSchema = z.object({
   symbol: z.string().min(1).max(10).toUpperCase(),
   wallet_address: z.string().optional(),
+  payment_proof: PaymentProofSchema.optional(),
 });
 
 const MarketplaceReadSchema = z.object({
   listing_id: z.string().min(1),
   wallet_address: z.string().optional(),
+  payment_proof: PaymentProofSchema.optional(),
 });
 
 // ── Helper ────────────────────────────────────────────────────────────────────
@@ -36,6 +44,7 @@ const MarketplaceReadSchema = z.object({
 async function paidCall(
   toolName: string,
   walletAddress: string | undefined,
+  paymentProof: { txHash: string } | undefined,
   fn: (walletAddress: string) => Promise<unknown>,
 ): Promise<{ content: Array<{ type: 'text'; text: string }>; isError?: true }> {
   const audit = AuditLogger.getInstance();
@@ -52,8 +61,15 @@ async function paidCall(
 
   let payment;
   try {
-    payment = await executeX402Payment({ price, currency: 'USDC', toolName, walletAddress });
+    payment = await executeX402Payment({ price, currency: 'USDC', toolName, walletAddress, paymentProof });
   } catch (err) {
+    if (err instanceof PaymentRequiredError) {
+      // 402 challenge — tell the agent how to pay, then re-call with payment_proof.
+      return { content: [{ type: 'text', text: JSON.stringify({ ...err.gate, tool: toolName, price_usd: price }) }], isError: true };
+    }
+    if (err instanceof PaymentUnverifiedError) {
+      return { content: [{ type: 'text', text: JSON.stringify({ error: 'payment_unverified', tool: toolName, ...err.gate }) }], isError: true };
+    }
     audit.warn(`${toolName}_payment_fail`, { error: String(err) });
     return { content: [{ type: 'text', text: JSON.stringify({ error: 'payment_failed', message: String(err) }) }], isError: true };
   }
@@ -244,10 +260,11 @@ export function registerSqueezeOS(server: McpServer): void {
     {
       symbol: z.string().describe('Ticker symbol to analyze (e.g. TSLA, GME, IWM).'),
       wallet_address: z.string().describe('Agent wallet address for x402 payment.'),
+      payment_proof: z.object({ tx_hash: z.string() }).optional().describe('On-chain payment tx hash. Required only when agent-pays enforcement is on; first call without it returns a 402 challenge.'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(CouncilSchema, rawArgs);
-      return paidCall('squeezeos_council', args.wallet_address, (wlt) =>
+      return paidCall('squeezeos_council', args.wallet_address, toProof(args.payment_proof), (wlt) =>
         SqueezeOSAPI.council(args.symbol, wlt),
       );
     },
@@ -258,10 +275,11 @@ export function registerSqueezeOS(server: McpServer): void {
     'squeezeos_scan',
     {
       wallet_address: z.string().describe('Agent wallet address for x402 payment.'),
+      payment_proof: z.object({ tx_hash: z.string() }).optional().describe('On-chain payment tx hash. Required only when agent-pays enforcement is on; first call without it returns a 402 challenge.'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(PaidSchema, rawArgs);
-      return paidCall('squeezeos_scan', args.wallet_address, (wlt) =>
+      return paidCall('squeezeos_scan', args.wallet_address, toProof(args.payment_proof), (wlt) =>
         SqueezeOSAPI.scan(wlt),
       );
     },
@@ -272,10 +290,11 @@ export function registerSqueezeOS(server: McpServer): void {
     'squeezeos_options',
     {
       wallet_address: z.string().describe('Agent wallet address for x402 payment.'),
+      payment_proof: z.object({ tx_hash: z.string() }).optional().describe('On-chain payment tx hash. Required only when agent-pays enforcement is on; first call without it returns a 402 challenge.'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(PaidSchema, rawArgs);
-      return paidCall('squeezeos_options', args.wallet_address, (wlt) =>
+      return paidCall('squeezeos_options', args.wallet_address, toProof(args.payment_proof), (wlt) =>
         SqueezeOSAPI.options(wlt),
       );
     },
@@ -286,10 +305,11 @@ export function registerSqueezeOS(server: McpServer): void {
     'squeezeos_iwm',
     {
       wallet_address: z.string().describe('Agent wallet address for x402 payment.'),
+      payment_proof: z.object({ tx_hash: z.string() }).optional().describe('On-chain payment tx hash. Required only when agent-pays enforcement is on; first call without it returns a 402 challenge.'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(PaidSchema, rawArgs);
-      return paidCall('squeezeos_iwm', args.wallet_address, (wlt) =>
+      return paidCall('squeezeos_iwm', args.wallet_address, toProof(args.payment_proof), (wlt) =>
         SqueezeOSAPI.iwm(wlt),
       );
     },
@@ -301,10 +321,11 @@ export function registerSqueezeOS(server: McpServer): void {
     {
       listing_id: z.string().describe('Listing ID from squeezeos_marketplace_browse.'),
       wallet_address: z.string().describe('Agent wallet address for x402 payment.'),
+      payment_proof: z.object({ tx_hash: z.string() }).optional().describe('On-chain payment tx hash. Required only when agent-pays enforcement is on; first call without it returns a 402 challenge.'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(MarketplaceReadSchema, rawArgs);
-      return paidCall('squeezeos_marketplace_read', args.wallet_address, (wlt) =>
+      return paidCall('squeezeos_marketplace_read', args.wallet_address, toProof(args.payment_proof), (wlt) =>
         SqueezeOSAPI.marketplaceRead(args.listing_id, wlt),
       );
     },

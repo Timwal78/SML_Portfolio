@@ -6,12 +6,16 @@ import { ChainRouter } from './router.js';
 import { ReceiptStore } from './receipt.js';
 import { CreditBureau } from '../../lib/credit/bureau.js';
 import { PriceRegistry } from '../registry/pricing.js';
+import { isAgentPaymentEnforced, enforceAgentPayment, PaymentRequiredError, PaymentUnverifiedError } from './agent-payment.js';
 
 export const PaymentConfigSchema = z.object({
   price: z.string().regex(/^\d+(\.\d+)?$/),
   currency: z.enum(['USDC', 'RLUSD']),
   toolName: z.string(),
   walletAddress: z.string().optional(),
+  // Agent's on-chain payment proof. When agent-pays enforcement is on, the tool is
+  // only served once this verifies via 402Proof.
+  paymentProof: z.object({ txHash: z.string() }).optional(),
 });
 
 export type PaymentConfig = z.infer<typeof PaymentConfigSchema>;
@@ -68,6 +72,35 @@ export async function executeX402Payment(
   config: PaymentConfig,
 ): Promise<PaymentResult> {
   const audit = AuditLogger.getInstance();
+
+  // Agent-pays enforcement (flag-gated, OFF by default). When on, the AGENT must
+  // pay and we verify via 402Proof — no gateway self-transfer. Fails CLOSED.
+  if (isAgentPaymentEnforced()) {
+    const gate = await enforceAgentPayment({
+      toolName: config.toolName,
+      price: config.price,
+      paymentProof: config.paymentProof,
+    });
+    if (gate.status === 'unconfigured') {
+      audit.error('agent_payment_unconfigured', { tool: config.toolName });
+      throw new Error(`Agent payment enforcement is on but no 402Proof endpoint is configured for ${config.toolName}. Set PROOF402_ENDPOINT_${config.toolName.toUpperCase()}.`);
+    }
+    if (gate.status === 'payment_required') throw new PaymentRequiredError(gate);
+    if (gate.status === 'payment_invalid') throw new PaymentUnverifiedError(gate);
+    // gate.status === 'paid' — agent payment verified on-chain. Record receipt, no self-transfer.
+    const w = await WalletManager.getInstance().getOrCreateWallet();
+    const receipt = await ReceiptStore.getInstance().create({
+      txHash: gate.txHash, chain: 'verified', amount: config.price,
+      currency: config.currency, tool: config.toolName, wallet: config.walletAddress ?? w.address,
+    });
+    audit.info('agent_payment_verified', { tool: config.toolName, txHash: gate.txHash, receiptId: receipt.id });
+    return {
+      receiptId: receipt.id, txHash: gate.txHash, chain: 'verified',
+      amountPaid: config.price, currency: config.currency, timestamp: Date.now(),
+      walletAddress: config.walletAddress ?? w.address,
+    };
+  }
+
   const wallet = await WalletManager.getInstance().getOrCreateWallet();
   const walletAddress = wallet.address;
 
