@@ -18,6 +18,9 @@ services:
         sync: false
       - key: WALLET_SEED
         sync: false
+      # Base USDC address that COLLECTS payments from agent tool calls (public).
+      - key: SML_PAYMENT_RECEIVER
+        value: "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700"
       - key: BASE_RPC_URL
         sync: false
       - key: XRPL_RPC_URL
