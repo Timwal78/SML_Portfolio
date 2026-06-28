@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, afterEach } from 'vitest';
 import { CAPABILITIES } from '../../src/server/apm/capabilities.js';
 import { matchManifest, scoreCapability, tokenize, evaluateFit } from '../../src/server/apm/matcher.js';
 import { createQuote, verifyQuote } from '../../src/server/apm/quote.js';
