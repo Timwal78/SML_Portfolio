@@ -186,3 +186,77 @@ export async function executeX402Payment(
     walletAddress,
   };
 }
+
+/**
+ * Brokered payment for APM-executed tools (apm_execute). The amount is the
+ * price-locked quote value + brokerage; its integrity is guaranteed by the
+ * SML-signed quote verified upstream — NOT by the price registry. Mirrors the
+ * settlement steps of executeX402Payment (cap, credit, AP2, route, receipt).
+ * Never call without a verified, unexpired quote.
+ */
+export async function executeBrokeredPayment(params: {
+  amount: string;
+  toolName: string;
+}): Promise<PaymentResult> {
+  const { amount, toolName } = params;
+  const currency = 'USDC' as const;
+  const audit = AuditLogger.getInstance();
+  const wallet = await WalletManager.getInstance().getOrCreateWallet();
+  const walletAddress = wallet.address;
+
+  // Daily spend cap (N9)
+  const amountNum = parseFloat(amount);
+  const currentSpend = getDailySpend(walletAddress);
+  if (currentSpend + amountNum > DAILY_SPEND_CAP) {
+    audit.warn('spend_cap_exceeded', { wallet: walletAddress, current: currentSpend, requested: amountNum, cap: DAILY_SPEND_CAP });
+    throw new Error(`Daily spend cap of $${DAILY_SPEND_CAP} exceeded. Current: $${currentSpend.toFixed(4)}`);
+  }
+
+  // Credit Bureau check (N8)
+  const score = await CreditBureau.getInstance().getScore(walletAddress);
+  const autoApprove = amountNum <= AUTO_APPROVE_THRESHOLD && score >= 300;
+  audit.info('brokered_payment_attempt', { tool: toolName, amount, wallet: walletAddress, bureauScore: score, autoApprove });
+  if (!autoApprove && score < 300) {
+    throw new Error(`Credit Bureau score ${score} below minimum 300. Payment requires manual approval.`);
+  }
+
+  // AP2 mandate verification (N6)
+  const ap2 = AP2Client.getInstance();
+  const mandateValid = await ap2.verifyMandate(walletAddress, { maxAmount: amount, currency, toolName });
+  if (!mandateValid) {
+    audit.warn('ap2_mandate_rejected', { wallet: walletAddress, tool: toolName });
+    throw new Error('AP2 mandate verification failed. Agent not authorized for this payment.');
+  }
+
+  // Route payment (N13)
+  const receiver = getPaymentReceiver();
+  let txResult: { txHash: string; chain: string; latencyMs: number };
+  if (!receiver) {
+    audit.warn('payment_receiver_unset', { tool: toolName, amount, note: 'SML_PAYMENT_RECEIVER explicitly empty — logging only' });
+    txResult = { txHash: `pending-${Date.now()}`, chain: 'none', latencyMs: 0 };
+  } else {
+    try {
+      const router = ChainRouter.getInstance();
+      txResult = await router.route({ amount, currency, from: walletAddress, to: receiver, timeoutMs: 500 });
+    } catch (err) {
+      audit.warn('payment_tx_failed', { tool: toolName, amount, error: String(err), note: 'Server wallet may be unfunded — tool served anyway' });
+      txResult = { txHash: `failed-${Date.now()}`, chain: 'none', latencyMs: 0 };
+    }
+  }
+
+  addDailySpend(walletAddress, amountNum);
+
+  // 402Proof receipt (N7)
+  const receipt = await ReceiptStore.getInstance().create({ txHash: txResult.txHash, chain: txResult.chain, amount, currency, tool: toolName, wallet: walletAddress });
+  audit.info('brokered_payment_success', { receiptId: receipt.id, txHash: txResult.txHash, chain: txResult.chain, tool: toolName, wallet: walletAddress });
+
+  return {
+    receiptId: receipt.id,
+    txHash: txResult.txHash,
+    chain: txResult.chain,
+    amountPaid: amount,
+    currency,
+    timestamp: Date.now(),
+    walletAddress,
+  };
+}

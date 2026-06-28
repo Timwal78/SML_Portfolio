@@ -90,3 +90,36 @@ export function verifyQuote(canonical: string, signature: string): boolean {
   if (a.length !== b.length) return false;
   return timingSafeEqual(a, b);
 }
+
+export interface ParsedQuote {
+  tool: string;
+  price_usd: string;
+  currency: string;
+  payment_chains: string[];
+  brokerage_commission_pct: number;
+  agent_id: string | null;
+  issued_at: string;
+  expires_at: string;
+}
+
+export interface QuoteCheck {
+  valid: boolean;
+  expired: boolean;
+  reason?: string;
+  quote?: ParsedQuote;
+}
+
+/** Verify a quote's signature AND parse it, reporting expiry. Used by apm_execute. */
+export function verifyAndParseQuote(canonical: string, signature: string): QuoteCheck {
+  if (!verifyQuote(canonical, signature)) {
+    return { valid: false, expired: false, reason: 'signature_invalid_or_unsigned' };
+  }
+  let parsed: ParsedQuote;
+  try {
+    parsed = JSON.parse(canonical) as ParsedQuote;
+  } catch {
+    return { valid: false, expired: false, reason: 'canonical_unparseable' };
+  }
+  const expired = Date.now() > new Date(parsed.expires_at).getTime();
+  return { valid: true, expired, quote: parsed };
+}
