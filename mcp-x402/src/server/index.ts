@@ -3,14 +3,15 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
-import express from 'express';
+import express, { type Request, type Response } from 'express';
 import { randomUUID } from 'crypto';
 import cors from 'cors';
 import { registerTools } from './tools/index.js';
 import { AuditLogger } from './security/audit.js';
 import { RateLimiter } from './security/rate-limit.js';
 import { healthHandler } from './health.js';
-import { verifyBaseUsdcPayment, alreadyRedeemed, markRedeemed } from './payments/verify-inbound.js';
+import { verifyBaseUsdcPayment, alreadyRedeemed, markRedeemed, releaseRedeem } from './payments/verify-inbound.js';
+import { facilitatorChain, decodePaymentHeader, type PaymentRequirements } from './payments/facilitators.js';
 
 const VERSION = '1.0.0';
 
@@ -76,6 +77,56 @@ async function runSSE(): Promise<void> {
   // detect and index this server. Authoritative per-tool pricing lives in the
   // sml_discover MCP tool; these emit a spec-correct x402 V2 PaymentRequirements.
   const X402_PAY_TO = process.env['SML_PAYMENT_RECEIVER'] ?? '0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700';
+  const USDC_BASE_ASSET = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
+
+  // ── Dual-rail x402 payment gate (institution-grade) ─────────────────────────
+  // Rail A (standard x402 "exact" / EIP-3009): client sends `X-PAYMENT`; verified
+  //   and settled through a hybrid facilitator chain (x402.org / CDP / partner /
+  //   self) — interoperable with every standard x402 client and explorer.
+  // Rail B (sovereign): client pays on-chain and sends `X-PAYMENT-TX`; verified
+  //   directly on Base via viem, no facilitator, no custody.
+  // Both advertised in one 402 `accepts` array; agent picks whichever it can fulfil.
+  type PayResult = { ok: true; payer: { rail: string; from: string; tx: string } } | { ok: false };
+  const buildAccepts = (resource: string, priceUnits: bigint, description: string, inputSchema: unknown, outputSchema: unknown): unknown[] => {
+    const units = priceUnits.toString();
+    const common = { scheme: 'exact', network: 'base', maxAmountRequired: units, resource, description, mimeType: 'application/json', outputSchema, inputSchema, payTo: X402_PAY_TO, maxTimeoutSeconds: 300, asset: USDC_BASE_ASSET };
+    return [
+      { ...common, extra: { name: 'USD Coin', version: '2' } },
+      { ...common, extra: { name: 'USDC', version: '2', settlement: 'onchain-tx', paymentHeader: 'X-PAYMENT-TX' } },
+    ];
+  };
+  const send402 = (res: Response, challenge: Record<string, unknown>, header402: string, extra?: Record<string, unknown>): void => {
+    res.status(402).set('PAYMENT-REQUIRED', header402).set('Access-Control-Expose-Headers', 'PAYMENT-REQUIRED').set('Access-Control-Allow-Origin', '*').json(extra ? { ...challenge, ...extra } : challenge);
+  };
+  const requirePayment = async (req: Request, res: Response, opts: { resource: string; priceUnits: bigint; description: string; inputSchema: unknown; outputSchema: unknown }): Promise<PayResult> => {
+    const accepts = buildAccepts(opts.resource, opts.priceUnits, opts.description, opts.inputSchema, opts.outputSchema);
+    const challenge: Record<string, unknown> = { x402Version: 1, error: 'X-PAYMENT header is required', accepts };
+    const header402 = Buffer.from(JSON.stringify(challenge)).toString('base64');
+
+    const xPayment = typeof req.headers['x-payment'] === 'string' ? req.headers['x-payment'] : '';
+    const txHash = typeof req.headers['x-payment-tx'] === 'string' ? req.headers['x-payment-tx'] : '';
+
+    // Rail A — standard EIP-3009 via hybrid facilitator chain
+    if (xPayment) {
+      const payload = decodePaymentHeader(xPayment);
+      if (!payload) { send402(res, challenge, header402, { error: 'invalid_payment_payload' }); return { ok: false }; }
+      const result = await facilitatorChain().process(payload, accepts[0] as PaymentRequirements);
+      if (!result.success) { send402(res, challenge, header402, { error: 'payment_unsettled', detail: result.errorReason ?? '' }); return { ok: false }; }
+      return { ok: true, payer: { rail: `standard:${result.facilitator ?? ''}`, from: result.payer ?? payload.payload.authorization.from, tx: result.transaction ?? '' } };
+    }
+
+    // Rail B — sovereign on-chain tx-hash
+    if (txHash) {
+      if (alreadyRedeemed(txHash)) { send402(res, challenge, header402, { error: 'payment_already_redeemed', detail: 'This transaction hash was already used. Send a new payment.' }); return { ok: false }; }
+      const v = await verifyBaseUsdcPayment({ txHash, payTo: X402_PAY_TO, minAmountUnits: opts.priceUnits });
+      if (!v.ok) { send402(res, challenge, header402, { error: 'payment_unverified', detail: v.error ?? '' }); return { ok: false }; }
+      markRedeemed(txHash);
+      return { ok: true, payer: { rail: 'sovereign', from: v.from ?? '', tx: txHash } };
+    }
+
+    send402(res, challenge, header402);
+    return { ok: false };
+  };
   app.get('/x402/discover', (req, res) => {
     const resource = `https://${req.headers.host ?? 'mcp-x402.onrender.com'}${req.originalUrl}`;
     const challenge = { x402Version: 2, error: 'payment_required', accepts: [{ scheme: 'exact', network: 'eip155:8453', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', maxAmountRequired: '20000', resource, description: 'SML pay-per-call data tools — federal grants/contracts, market intel, SEC, FTD. Per-tool pricing via the sml_discover MCP tool.', mimeType: 'application/json', payTo: X402_PAY_TO, maxTimeoutSeconds: 120, inputSchema: { type: 'object', properties: { tool: { type: 'string', description: 'Tool name to price/call. See GET /x402/tool/{name}.' } } }, extra: { name: 'USDC', version: '2' } }] };
@@ -98,33 +149,24 @@ async function runSSE(): Promise<void> {
     const rows = Math.min(Math.max(parseInt(String(req.query['rows'] ?? '10'), 10) || 10, 1), 50);
     const inputSchema = { type: 'object', properties: { keyword: { type: 'string', description: 'Search keywords or CFDA/assistance-listing number.' }, rows: { type: 'integer', minimum: 1, maximum: 50, default: 10 } }, required: ['keyword'] };
     const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { keyword: { type: 'string', required: true, description: 'Search keywords or CFDA number.' }, rows: { type: 'integer', required: false } } }, output: null };
-    const challenge = { x402Version: 1, error: 'X-PAYMENT header is required', accepts: [{ scheme: 'exact', network: 'base', maxAmountRequired: '20000', resource, description: 'Live U.S. federal grant search (Grants.gov Search2). Pay 0.02 USDC to payTo on Base, then retry with header X-PAYMENT-TX: <txHash>.', mimeType: 'application/json', outputSchema, inputSchema, payTo: X402_PAY_TO, maxTimeoutSeconds: 300, asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', extra: { name: 'USDC', version: '2', settlement: 'onchain-tx', paymentHeader: 'X-PAYMENT-TX' } }] };
-    const header402 = Buffer.from(JSON.stringify(challenge)).toString('base64');
 
-    const txHash = (req.headers['x-payment-tx'] as string | undefined) ?? '';
-    if (!txHash) {
-      return res.status(402).set('PAYMENT-REQUIRED', header402).set('Access-Control-Expose-Headers', 'PAYMENT-REQUIRED').set('Access-Control-Allow-Origin', '*').json(challenge);
-    }
-    if (alreadyRedeemed(txHash)) {
-      return res.status(402).set('Access-Control-Allow-Origin', '*').json({ ...challenge, error: 'payment_already_redeemed', detail: 'This transaction hash was already used. Send a new payment.' });
-    }
-    const v = await verifyBaseUsdcPayment({ txHash, payTo: X402_PAY_TO, minAmountUnits: GRANTS_PRICE_UNITS });
-    if (!v.ok) {
-      return res.status(402).set('PAYMENT-REQUIRED', header402).set('Access-Control-Expose-Headers', 'PAYMENT-REQUIRED').set('Access-Control-Allow-Origin', '*').json({ ...challenge, error: 'payment_unverified', detail: v.error });
-    }
+    const pay = await requirePayment(req, res, { resource, priceUnits: GRANTS_PRICE_UNITS, description: 'Live U.S. federal grant search (Grants.gov Search2). Pay 0.02 USDC on Base via X-PAYMENT (standard) or X-PAYMENT-TX (sovereign).', inputSchema, outputSchema });
+    if (!pay.ok) return;
     if (!keyword) {
-      return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_keyword', detail: 'Payment verified. Add ?keyword= and retry with the same X-PAYMENT-TX.' });
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_keyword', detail: 'Payment verified. Add ?keyword= and retry with the same payment.' });
     }
     try {
       const r = await fetch('https://api.grants.gov/v1/api/search2', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ keyword, oppStatuses: 'posted', rows }) });
       if (!r.ok) {
+        if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
         return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'grants_api_error', status: r.status });
       }
       const j = await r.json() as { data?: { hitCount?: number; oppHits?: unknown[] } };
       const results = j.data?.oppHits ?? [];
-      markRedeemed(txHash);
-      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'grants.gov/search2', total: j.data?.hitCount ?? results.length, results, _paid: { tx: txHash, from: v.from ?? '', amount_units: String(v.amountUnits ?? ''), asset: 'USDC', network: 'base' } });
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'grants.gov/search2', total: j.data?.hitCount ?? results.length, results, _paid: pay.payer });
     } catch (err) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
       return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'grants_fetch_failed', message: String(err) });
     }
   });
@@ -148,28 +190,19 @@ async function runSSE(): Promise<void> {
     const rows = Math.min(Math.max(parseInt(String(req.query['rows'] ?? '10'), 10) || 10, 1), 25);
     const inputSchema = { type: 'object', properties: { naics: { type: 'string', description: '6-digit NAICS code (required).' }, state: { type: 'string', description: '2-letter state code (optional).' }, set_aside: { type: 'string', enum: Object.keys(SET_ASIDE_CODE), default: 'SDVOSB' }, rows: { type: 'integer', minimum: 1, maximum: 25, default: 10 } }, required: ['naics'] };
     const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { naics: { type: 'string', required: true }, state: { type: 'string', required: false }, set_aside: { type: 'string', required: false }, rows: { type: 'integer', required: false } } }, output: null };
-    const challenge = { x402Version: 1, error: 'X-PAYMENT header is required', accepts: [{ scheme: 'exact', network: 'base', maxAmountRequired: '80000', resource, description: 'Find self-certified SDVOSB/WOSB/SDB/minority firms by NAICS + state (SAM.gov). Pay 0.08 USDC on Base, then retry with header X-PAYMENT-TX: <txHash>.', mimeType: 'application/json', outputSchema, inputSchema, payTo: X402_PAY_TO, maxTimeoutSeconds: 300, asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', extra: { name: 'USDC', version: '2', settlement: 'onchain-tx', paymentHeader: 'X-PAYMENT-TX' } }] };
-    const header402 = Buffer.from(JSON.stringify(challenge)).toString('base64');
 
-    const txHash = (req.headers['x-payment-tx'] as string | undefined) ?? '';
-    if (!txHash) {
-      return res.status(402).set('PAYMENT-REQUIRED', header402).set('Access-Control-Expose-Headers', 'PAYMENT-REQUIRED').set('Access-Control-Allow-Origin', '*').json(challenge);
-    }
-    if (alreadyRedeemed(txHash)) {
-      return res.status(402).set('Access-Control-Allow-Origin', '*').json({ ...challenge, error: 'payment_already_redeemed', detail: 'This transaction hash was already used. Send a new payment.' });
-    }
-    const v = await verifyBaseUsdcPayment({ txHash, payTo: X402_PAY_TO, minAmountUnits: FIRMS_PRICE_UNITS });
-    if (!v.ok) {
-      return res.status(402).set('PAYMENT-REQUIRED', header402).set('Access-Control-Expose-Headers', 'PAYMENT-REQUIRED').set('Access-Control-Allow-Origin', '*').json({ ...challenge, error: 'payment_unverified', detail: v.error });
-    }
+    const pay = await requirePayment(req, res, { resource, priceUnits: FIRMS_PRICE_UNITS, description: 'Find self-certified SDVOSB/WOSB/SDB/minority firms by NAICS + state (SAM.gov). Pay 0.08 USDC on Base via X-PAYMENT (standard) or X-PAYMENT-TX (sovereign).', inputSchema, outputSchema });
+    if (!pay.ok) return;
     if (!/^\d{6}$/.test(naics)) {
-      return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_or_invalid_naics', detail: 'Payment verified. Add ?naics=<6-digit> and retry with the same X-PAYMENT-TX.' });
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_or_invalid_naics', detail: 'Payment verified. Add ?naics=<6-digit> and retry with the same payment.' });
     }
     try {
       const p = new URLSearchParams({ api_key: samKey, primaryNaics: naics, businessTypeCode: SET_ASIDE_CODE[setAside] ?? 'QF', registrationStatus: 'A', includeSections: 'entityRegistration,coreData', page: '0', size: String(rows) });
       if (state) p.set('physicalAddressProvinceOrStateCode', state);
       const r = await fetch(`https://api.sam.gov/entity-information/v3/entities?${p.toString()}`, { headers: { Accept: 'application/json' } });
       if (!r.ok) {
+        if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
         return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'sam_api_error', status: r.status });
       }
       const j = await r.json() as SamResponse;
@@ -180,9 +213,9 @@ async function runSSE(): Promise<void> {
         const types = (cd.businessTypes?.businessTypeList ?? []).map((t) => t.businessTypeCode ?? '').filter(Boolean);
         return { name: er.legalBusinessName ?? '', uei: er.ueiSAM ?? '', cage: er.cageCode ?? '', status: er.registrationStatus ?? '', registration_expires: er.registrationExpirationDate ?? '', city: addr.city ?? '', state: addr.stateOrProvinceCode ?? '', business_type_codes: types };
       });
-      markRedeemed(txHash);
-      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'sam.gov/entity-information/v3', query: { naics, state: state || 'any', set_aside: setAside, code: SET_ASIDE_CODE[setAside] }, total: j.totalRecords ?? firms.length, count: firms.length, firms, _disclaimer: 'Socioeconomic flags here are SELF-CERTIFIED in SAM.gov. SBA-certified 8(a)/HUBZone status is not in SAM — verify at search.certifications.sba.gov.', _paid: { tx: txHash, from: v.from ?? '', amount_units: String(v.amountUnits ?? ''), asset: 'USDC', network: 'base' } });
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'sam.gov/entity-information/v3', query: { naics, state: state || 'any', set_aside: setAside, code: SET_ASIDE_CODE[setAside] }, total: j.totalRecords ?? firms.length, count: firms.length, firms, _disclaimer: 'Socioeconomic flags here are SELF-CERTIFIED in SAM.gov. SBA-certified 8(a)/HUBZone status is not in SAM — verify at search.certifications.sba.gov.', _paid: pay.payer });
     } catch (err) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
       return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'sam_fetch_failed', message: String(err) });
     }
   });
@@ -196,22 +229,12 @@ async function runSSE(): Promise<void> {
     const years = Math.min(Math.max(parseInt(String(req.query['years'] ?? '3'), 10) || 3, 1), 10);
     const inputSchema = { type: 'object', properties: { naics: { type: 'string', description: '6-digit NAICS code (required).' }, years: { type: 'integer', minimum: 1, maximum: 10, default: 3 } }, required: ['naics'] };
     const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { naics: { type: 'string', required: true }, years: { type: 'integer', required: false } } }, output: null };
-    const challenge = { x402Version: 1, error: 'X-PAYMENT header is required', accepts: [{ scheme: 'exact', network: 'base', maxAmountRequired: '300000', resource, description: 'Federal contract market intelligence by NAICS (USAspending): top incumbents + buying agencies + total obligated. Pay 0.30 USDC on Base, then retry with header X-PAYMENT-TX: <txHash>.', mimeType: 'application/json', outputSchema, inputSchema, payTo: X402_PAY_TO, maxTimeoutSeconds: 300, asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', extra: { name: 'USDC', version: '2', settlement: 'onchain-tx', paymentHeader: 'X-PAYMENT-TX' } }] };
-    const header402 = Buffer.from(JSON.stringify(challenge)).toString('base64');
 
-    const txHash = (req.headers['x-payment-tx'] as string | undefined) ?? '';
-    if (!txHash) {
-      return res.status(402).set('PAYMENT-REQUIRED', header402).set('Access-Control-Expose-Headers', 'PAYMENT-REQUIRED').set('Access-Control-Allow-Origin', '*').json(challenge);
-    }
-    if (alreadyRedeemed(txHash)) {
-      return res.status(402).set('Access-Control-Allow-Origin', '*').json({ ...challenge, error: 'payment_already_redeemed', detail: 'This transaction hash was already used. Send a new payment.' });
-    }
-    const v = await verifyBaseUsdcPayment({ txHash, payTo: X402_PAY_TO, minAmountUnits: MARKET_PRICE_UNITS });
-    if (!v.ok) {
-      return res.status(402).set('PAYMENT-REQUIRED', header402).set('Access-Control-Expose-Headers', 'PAYMENT-REQUIRED').set('Access-Control-Allow-Origin', '*').json({ ...challenge, error: 'payment_unverified', detail: v.error });
-    }
+    const pay = await requirePayment(req, res, { resource, priceUnits: MARKET_PRICE_UNITS, description: 'Federal contract market intelligence by NAICS (USAspending): top incumbents + buying agencies + total obligated. Pay 0.30 USDC on Base via X-PAYMENT (standard) or X-PAYMENT-TX (sovereign).', inputSchema, outputSchema });
+    if (!pay.ok) return;
     if (!/^\d{6}$/.test(naics)) {
-      return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_or_invalid_naics', detail: 'Payment verified. Add ?naics=<6-digit> and retry with the same X-PAYMENT-TX.' });
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_or_invalid_naics', detail: 'Payment verified. Add ?naics=<6-digit> and retry with the same payment.' });
     }
     const end = new Date().toISOString().slice(0, 10);
     const start = new Date(Date.now() - years * 365 * 86400000).toISOString().slice(0, 10);
@@ -224,9 +247,9 @@ async function runSSE(): Promise<void> {
     };
     try {
       const [incumbents, agencies] = await Promise.all([usaCat('recipient', 8), usaCat('awarding_agency', 8)]);
-      markRedeemed(txHash);
-      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'usaspending.gov/api/v2', naics, window: { start_date: start, end_date: end, years }, award_types: 'prime contracts (A,B,C,D)', top_incumbents: incumbents, top_buying_agencies: agencies, _note: 'Obligated $ for prime contract awards in the window. Use for capture targeting and competitor analysis.', _paid: { tx: txHash, from: v.from ?? '', amount_units: String(v.amountUnits ?? ''), asset: 'USDC', network: 'base' } });
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'usaspending.gov/api/v2', naics, window: { start_date: start, end_date: end, years }, award_types: 'prime contracts (A,B,C,D)', top_incumbents: incumbents, top_buying_agencies: agencies, _note: 'Obligated $ for prime contract awards in the window. Use for capture targeting and competitor analysis.', _paid: pay.payer });
     } catch (err) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
       return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'usaspending_error', message: String(err) });
     }
   });
@@ -237,7 +260,7 @@ async function runSSE(): Promise<void> {
     openapi: '3.1.0',
     info: { title: 'Script Master Labs — x402 Data API', version: VERSION, description: 'Pay-per-call U.S. federal data, settled in USDC on Base via x402.', contact: { name: 'Script Master Labs', email: 'ScriptMasterLabs@gmail.com', url: 'https://scriptmasterlabs.com' } },
     servers: [{ url: 'https://mcp-x402.onrender.com' }],
-    'x-service-info': { categories: ['government-data', 'grants', 'federal-contracts', 'market-intelligence'], docs: { homepage: 'https://scriptmasterlabs.com', llms: 'https://mcp-x402.onrender.com/llms.txt', apiReference: 'https://github.com/Timwal78/SML_Portfolio/tree/main/mcp-x402' } },
+    'x-service-info': { categories: ['government-data', 'grants', 'federal-contracts', 'market-intelligence'], payment: { protocol: 'x402', rails: [{ id: 'standard', scheme: 'exact', network: 'base', settlement: 'facilitator', note: 'EIP-3009 via X-PAYMENT — settled through a hybrid facilitator chain.' }, { id: 'sovereign', scheme: 'exact', network: 'base', settlement: 'onchain-tx', note: 'Pay USDC then send X-PAYMENT-TX — verified directly on-chain, no facilitator.' }], facilitators: '/x402/facilitators' }, docs: { homepage: 'https://scriptmasterlabs.com', llms: 'https://mcp-x402.onrender.com/llms.txt', apiReference: 'https://github.com/Timwal78/SML_Portfolio/tree/main/mcp-x402' } },
     paths: { '/x402/grants': { get: {
       operationId: 'searchGrants',
       summary: 'Search live U.S. federal grant opportunities (Grants.gov Search2).',
@@ -275,6 +298,16 @@ async function runSSE(): Promise<void> {
   app.get('/.well-known/x402', (_req, res) => { res.set('Access-Control-Allow-Origin', '*').json(OPENAPI_DOC); });
   app.get('/openapi.json', (_req, res) => { res.set('Access-Control-Allow-Origin', '*').json(OPENAPI_DOC); });
   app.get('/favicon.ico', (_req, res) => { res.redirect(302, 'https://scriptmasterlabs.com/favicon.ico'); });
+  app.get('/x402/facilitators', (_req, res) => {
+    res.set('Access-Control-Allow-Origin', '*').json({
+      rails: [
+        { id: 'standard', header: 'X-PAYMENT', scheme: 'exact', network: 'base', asset: USDC_BASE_ASSET, settlement: 'facilitator-chain', chain: facilitatorChain().names },
+        { id: 'sovereign', header: 'X-PAYMENT-TX', scheme: 'exact', network: 'base', asset: USDC_BASE_ASSET, settlement: 'onchain-verify' },
+      ],
+      payTo: X402_PAY_TO,
+      note: 'Standard rail is settled through the listed facilitator chain (hybrid: tried in order, first success wins). Funds always settle to payTo regardless of facilitator. Sovereign rail needs no facilitator.',
+    });
+  });
 
   // Root handler — service discovery for agents hitting / directly
   app.get('/', (_req, res) => {
