@@ -10,6 +10,7 @@ import { registerTools } from './tools/index.js';
 import { AuditLogger } from './security/audit.js';
 import { RateLimiter } from './security/rate-limit.js';
 import { healthHandler } from './health.js';
+import { verifyBaseUsdcPayment, alreadyRedeemed, markRedeemed } from './payments/verify-inbound.js';
 
 const VERSION = '1.0.0';
 
@@ -77,14 +78,77 @@ async function runSSE(): Promise<void> {
   const X402_PAY_TO = process.env['SML_PAYMENT_RECEIVER'] ?? '0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700';
   app.get('/x402/discover', (req, res) => {
     const resource = `https://${req.headers.host ?? 'mcp-x402.onrender.com'}${req.originalUrl}`;
-    const challenge = { x402Version: 2, error: 'payment_required', accepts: [{ scheme: 'exact', network: 'eip155:8453', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', maxAmountRequired: '20000', resource, description: 'SML pay-per-call data tools — federal grants/contracts, market intel, SEC, FTD. Per-tool pricing via the sml_discover MCP tool.', mimeType: 'application/json', payTo: X402_PAY_TO, maxTimeoutSeconds: 120, extra: { name: 'USDC', version: '2' } }] };
+    const challenge = { x402Version: 2, error: 'payment_required', accepts: [{ scheme: 'exact', network: 'eip155:8453', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', maxAmountRequired: '20000', resource, description: 'SML pay-per-call data tools — federal grants/contracts, market intel, SEC, FTD. Per-tool pricing via the sml_discover MCP tool.', mimeType: 'application/json', payTo: X402_PAY_TO, maxTimeoutSeconds: 120, inputSchema: { type: 'object', properties: { tool: { type: 'string', description: 'Tool name to price/call. See GET /x402/tool/{name}.' } } }, extra: { name: 'USDC', version: '2' } }] };
     res.status(402).set('PAYMENT-REQUIRED', Buffer.from(JSON.stringify(challenge)).toString('base64')).set('Access-Control-Expose-Headers', 'PAYMENT-REQUIRED').set('Access-Control-Allow-Origin', '*').json(challenge);
   });
   app.get('/x402/tool/:name', (req, res) => {
     const resource = `https://${req.headers.host ?? 'mcp-x402.onrender.com'}${req.originalUrl}`;
-    const challenge = { x402Version: 2, error: 'payment_required', accepts: [{ scheme: 'exact', network: 'eip155:8453', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', maxAmountRequired: '20000', resource, description: `Paid SML tool ${req.params.name} — pay-per-call via x402, USDC on Base.`, mimeType: 'application/json', payTo: X402_PAY_TO, maxTimeoutSeconds: 120, extra: { name: 'USDC', version: '2' } }] };
+    const challenge = { x402Version: 2, error: 'payment_required', accepts: [{ scheme: 'exact', network: 'eip155:8453', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', maxAmountRequired: '20000', resource, description: `Paid SML tool ${req.params.name} — pay-per-call via x402, USDC on Base.`, mimeType: 'application/json', payTo: X402_PAY_TO, maxTimeoutSeconds: 120, inputSchema: { type: 'object', properties: { args: { type: 'object', description: 'Tool-specific arguments.' } } }, extra: { name: 'USDC', version: '2' } }] };
     res.status(402).set('PAYMENT-REQUIRED', Buffer.from(JSON.stringify(challenge)).toString('base64')).set('Access-Control-Expose-Headers', 'PAYMENT-REQUIRED').set('Access-Control-Allow-Origin', '*').json(challenge);
   });
+
+  // ── REAL fulfilling x402 endpoint: live federal grant search ──────────────
+  // Unpaid → 402 challenge. Paid (USDC on Base, verified on-chain) → real data.
+  const GRANTS_PRICE_UNITS = 20000n; // 0.02 USDC (6 decimals)
+  app.get('/x402/grants', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/grants`;
+    const keyword = typeof req.query['keyword'] === 'string' ? req.query['keyword']
+      : (typeof req.query['q'] === 'string' ? req.query['q'] : '');
+    const rows = Math.min(Math.max(parseInt(String(req.query['rows'] ?? '10'), 10) || 10, 1), 50);
+    const inputSchema = { type: 'object', properties: { keyword: { type: 'string', description: 'Search keywords or CFDA/assistance-listing number.' }, rows: { type: 'integer', minimum: 1, maximum: 50, default: 10 } }, required: ['keyword'] };
+    const challenge = { x402Version: 2, error: 'payment_required', accepts: [{ scheme: 'exact', network: 'eip155:8453', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', maxAmountRequired: '20000', resource, description: 'Live U.S. federal grant search (Grants.gov Search2). Pay 0.02 USDC to payTo on Base, then retry with header X-PAYMENT-TX: <txHash>.', mimeType: 'application/json', payTo: X402_PAY_TO, maxTimeoutSeconds: 300, inputSchema, extra: { name: 'USDC', version: '2', settlement: 'onchain-tx', paymentHeader: 'X-PAYMENT-TX' } }] };
+    const header402 = Buffer.from(JSON.stringify(challenge)).toString('base64');
+
+    const txHash = (req.headers['x-payment-tx'] as string | undefined) ?? '';
+    if (!txHash) {
+      return res.status(402).set('PAYMENT-REQUIRED', header402).set('Access-Control-Expose-Headers', 'PAYMENT-REQUIRED').set('Access-Control-Allow-Origin', '*').json(challenge);
+    }
+    if (alreadyRedeemed(txHash)) {
+      return res.status(402).set('Access-Control-Allow-Origin', '*').json({ ...challenge, error: 'payment_already_redeemed', detail: 'This transaction hash was already used. Send a new payment.' });
+    }
+    const v = await verifyBaseUsdcPayment({ txHash, payTo: X402_PAY_TO, minAmountUnits: GRANTS_PRICE_UNITS });
+    if (!v.ok) {
+      return res.status(402).set('PAYMENT-REQUIRED', header402).set('Access-Control-Expose-Headers', 'PAYMENT-REQUIRED').set('Access-Control-Allow-Origin', '*').json({ ...challenge, error: 'payment_unverified', detail: v.error });
+    }
+    if (!keyword) {
+      return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_keyword', detail: 'Payment verified. Add ?keyword= and retry with the same X-PAYMENT-TX.' });
+    }
+    try {
+      const r = await fetch('https://api.grants.gov/v1/api/search2', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ keyword, oppStatuses: 'posted', rows }) });
+      if (!r.ok) {
+        return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'grants_api_error', status: r.status });
+      }
+      const j = await r.json() as { data?: { hitCount?: number; oppHits?: unknown[] } };
+      const results = j.data?.oppHits ?? [];
+      markRedeemed(txHash);
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'grants.gov/search2', total: j.data?.hitCount ?? results.length, results, _paid: { tx: txHash, from: v.from ?? '', amount_units: String(v.amountUnits ?? ''), asset: 'USDC', network: 'base' } });
+    } catch (err) {
+      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'grants_fetch_failed', message: String(err) });
+    }
+  });
+
+  // ── x402 discovery document (OpenAPI 3.1 + x-service-info / x-payment-info) ─
+  // x402scan's canonical signal; served at /.well-known/x402 and /openapi.json.
+  const OPENAPI_DOC = {
+    openapi: '3.1.0',
+    info: { title: 'Script Master Labs — x402 Data API', version: VERSION, description: 'Pay-per-call U.S. federal data, settled in USDC on Base via x402.' },
+    servers: [{ url: 'https://mcp-x402.onrender.com' }],
+    'x-service-info': { categories: ['government-data', 'grants', 'federal-contracts', 'market-intelligence'], docs: { homepage: 'https://scriptmasterlabs.com', llms: 'https://mcp-x402.onrender.com/llms.txt', apiReference: 'https://github.com/Timwal78/SML_Portfolio/tree/main/mcp-x402' } },
+    paths: { '/x402/grants': { get: {
+      operationId: 'searchGrants',
+      summary: 'Search live U.S. federal grant opportunities (Grants.gov Search2).',
+      description: 'Returns real, current grant opportunities. Pay 0.02 USDC on Base, then call with X-PAYMENT-TX set to the transaction hash.',
+      parameters: [
+        { name: 'keyword', in: 'query', required: true, schema: { type: 'string' }, description: 'Search keywords or CFDA/assistance-listing number.' },
+        { name: 'rows', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 50, default: 10 } },
+      ],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'eip155:8453', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.02', amountUnits: '20000', payTo: X402_PAY_TO, settlement: 'onchain-tx', paymentHeader: 'X-PAYMENT-TX' },
+      responses: { '200': { description: 'Live grant results' }, '402': { description: 'Payment required — pay USDC then retry with X-PAYMENT-TX.' } },
+    } } },
+  };
+  app.get('/.well-known/x402', (_req, res) => { res.set('Access-Control-Allow-Origin', '*').json(OPENAPI_DOC); });
+  app.get('/openapi.json', (_req, res) => { res.set('Access-Control-Allow-Origin', '*').json(OPENAPI_DOC); });
 
   // Root handler — service discovery for agents hitting / directly
   app.get('/', (_req, res) => {
