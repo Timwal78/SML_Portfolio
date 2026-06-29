@@ -29,6 +29,10 @@ export function alreadyRedeemed(txHash: string): boolean {
 export function markRedeemed(txHash: string): void {
   redeemed.add(txHash.toLowerCase());
 }
+// Release a hold if WE failed to deliver data, so the payer can retry the same tx.
+export function releaseRedeem(txHash: string): void {
+  redeemed.delete(txHash.toLowerCase());
+}
 
 function topicToAddress(topic: string): string {
   // 0x + 64 hex chars → take the trailing 40 (20-byte address)
