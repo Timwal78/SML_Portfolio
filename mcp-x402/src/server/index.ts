@@ -129,6 +129,64 @@ async function runSSE(): Promise<void> {
     }
   });
 
+  // ── REAL fulfilling x402 endpoint: SDVOSB / set-aside firm finder (SAM.gov) ─
+  const FIRMS_PRICE_UNITS = 80000n; // 0.08 USDC
+  const SET_ASIDE_CODE: Record<string, string> = { SDVOSB: 'QF', WOSB: '8W', SDB: '27', MINORITY: '23' };
+  interface SamEntity { entityRegistration?: { legalBusinessName?: string; ueiSAM?: string; cageCode?: string; registrationStatus?: string; registrationExpirationDate?: string }; coreData?: { physicalAddress?: { city?: string; stateOrProvinceCode?: string }; businessTypes?: { businessTypeList?: Array<{ businessTypeCode?: string; businessTypeDesc?: string }> } }; }
+  interface SamResponse { totalRecords?: number; entityData?: SamEntity[] }
+  app.get('/x402/firms', async (req, res) => {
+    const samKey = process.env['SAM_API_KEY'];
+    if (!samKey) {
+      return res.status(503).set('Access-Control-Allow-Origin', '*').json({ error: 'service_unconfigured', detail: 'Operator must set SAM_API_KEY (free at sam.gov). No payment taken.' });
+    }
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/firms`;
+    const naics = typeof req.query['naics'] === 'string' ? req.query['naics'] : '';
+    const state = typeof req.query['state'] === 'string' ? req.query['state'].toUpperCase().slice(0, 2) : '';
+    const setAsideRaw = typeof req.query['set_aside'] === 'string' ? req.query['set_aside'].toUpperCase() : 'SDVOSB';
+    const setAside = setAsideRaw in SET_ASIDE_CODE ? setAsideRaw : 'SDVOSB';
+    const rows = Math.min(Math.max(parseInt(String(req.query['rows'] ?? '10'), 10) || 10, 1), 25);
+    const inputSchema = { type: 'object', properties: { naics: { type: 'string', description: '6-digit NAICS code (required).' }, state: { type: 'string', description: '2-letter state code (optional).' }, set_aside: { type: 'string', enum: Object.keys(SET_ASIDE_CODE), default: 'SDVOSB' }, rows: { type: 'integer', minimum: 1, maximum: 25, default: 10 } }, required: ['naics'] };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { naics: { type: 'string', required: true }, state: { type: 'string', required: false }, set_aside: { type: 'string', required: false }, rows: { type: 'integer', required: false } } }, output: null };
+    const challenge = { x402Version: 1, error: 'X-PAYMENT header is required', accepts: [{ scheme: 'exact', network: 'base', maxAmountRequired: '80000', resource, description: 'Find self-certified SDVOSB/WOSB/SDB/minority firms by NAICS + state (SAM.gov). Pay 0.08 USDC on Base, then retry with header X-PAYMENT-TX: <txHash>.', mimeType: 'application/json', outputSchema, inputSchema, payTo: X402_PAY_TO, maxTimeoutSeconds: 300, asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', extra: { name: 'USDC', version: '2', settlement: 'onchain-tx', paymentHeader: 'X-PAYMENT-TX' } }] };
+    const header402 = Buffer.from(JSON.stringify(challenge)).toString('base64');
+
+    const txHash = (req.headers['x-payment-tx'] as string | undefined) ?? '';
+    if (!txHash) {
+      return res.status(402).set('PAYMENT-REQUIRED', header402).set('Access-Control-Expose-Headers', 'PAYMENT-REQUIRED').set('Access-Control-Allow-Origin', '*').json(challenge);
+    }
+    if (alreadyRedeemed(txHash)) {
+      return res.status(402).set('Access-Control-Allow-Origin', '*').json({ ...challenge, error: 'payment_already_redeemed', detail: 'This transaction hash was already used. Send a new payment.' });
+    }
+    const v = await verifyBaseUsdcPayment({ txHash, payTo: X402_PAY_TO, minAmountUnits: FIRMS_PRICE_UNITS });
+    if (!v.ok) {
+      return res.status(402).set('PAYMENT-REQUIRED', header402).set('Access-Control-Expose-Headers', 'PAYMENT-REQUIRED').set('Access-Control-Allow-Origin', '*').json({ ...challenge, error: 'payment_unverified', detail: v.error });
+    }
+    if (!/^\d{6}$/.test(naics)) {
+      return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_or_invalid_naics', detail: 'Payment verified. Add ?naics=<6-digit> and retry with the same X-PAYMENT-TX.' });
+    }
+    try {
+      const p = new URLSearchParams({ api_key: samKey, primaryNaics: naics, businessTypeCode: SET_ASIDE_CODE[setAside] ?? 'QF', registrationStatus: 'A', includeSections: 'entityRegistration,coreData', page: '0', size: String(rows) });
+      if (state) p.set('physicalAddressProvinceOrStateCode', state);
+      const r = await fetch(`https://api.sam.gov/entity-information/v3/entities?${p.toString()}`, { headers: { Accept: 'application/json' } });
+      if (!r.ok) {
+        return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'sam_api_error', status: r.status });
+      }
+      const j = await r.json() as SamResponse;
+      const firms = (j.entityData ?? []).map((e) => {
+        const er = e.entityRegistration ?? {};
+        const cd = e.coreData ?? {};
+        const addr = cd.physicalAddress ?? {};
+        const types = (cd.businessTypes?.businessTypeList ?? []).map((t) => t.businessTypeCode ?? '').filter(Boolean);
+        return { name: er.legalBusinessName ?? '', uei: er.ueiSAM ?? '', cage: er.cageCode ?? '', status: er.registrationStatus ?? '', registration_expires: er.registrationExpirationDate ?? '', city: addr.city ?? '', state: addr.stateOrProvinceCode ?? '', business_type_codes: types };
+      });
+      markRedeemed(txHash);
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'sam.gov/entity-information/v3', query: { naics, state: state || 'any', set_aside: setAside, code: SET_ASIDE_CODE[setAside] }, total: j.totalRecords ?? firms.length, count: firms.length, firms, _disclaimer: 'Socioeconomic flags here are SELF-CERTIFIED in SAM.gov. SBA-certified 8(a)/HUBZone status is not in SAM — verify at search.certifications.sba.gov.', _paid: { tx: txHash, from: v.from ?? '', amount_units: String(v.amountUnits ?? ''), asset: 'USDC', network: 'base' } });
+    } catch (err) {
+      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'sam_fetch_failed', message: String(err) });
+    }
+  });
+
   // ── x402 discovery document (OpenAPI 3.1 + x-service-info / x-payment-info) ─
   // x402scan's canonical signal; served at /.well-known/x402 and /openapi.json.
   const OPENAPI_DOC = {
@@ -146,6 +204,18 @@ async function runSSE(): Promise<void> {
       ],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.02', amountUnits: '20000', payTo: X402_PAY_TO, settlement: 'onchain-tx', paymentHeader: 'X-PAYMENT-TX' },
       responses: { '200': { description: 'Live grant results' }, '402': { description: 'Payment required — pay USDC then retry with X-PAYMENT-TX.' } },
+    } }, '/x402/firms': { get: {
+      operationId: 'findFirms',
+      summary: 'Find self-certified SDVOSB/WOSB/SDB/minority firms by NAICS + state (SAM.gov).',
+      description: 'Returns registered firms with a self-certified socioeconomic flag, filtered by NAICS and optional state. Pay 0.08 USDC on Base, then call with X-PAYMENT-TX. Note: SBA-certified 8(a)/HUBZone status is not in SAM.',
+      parameters: [
+        { name: 'naics', in: 'query', required: true, schema: { type: 'string' }, description: '6-digit NAICS code.' },
+        { name: 'state', in: 'query', required: false, schema: { type: 'string' }, description: '2-letter state code.' },
+        { name: 'set_aside', in: 'query', required: false, schema: { type: 'string', enum: ['SDVOSB', 'WOSB', 'SDB', 'MINORITY'], default: 'SDVOSB' } },
+        { name: 'rows', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 25, default: 10 } },
+      ],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.08', amountUnits: '80000', payTo: X402_PAY_TO, settlement: 'onchain-tx', paymentHeader: 'X-PAYMENT-TX' },
+      responses: { '200': { description: 'Matching firms' }, '402': { description: 'Payment required — pay USDC then retry with X-PAYMENT-TX.' } },
     } } },
   };
   app.get('/.well-known/x402', (_req, res) => { res.set('Access-Control-Allow-Origin', '*').json(OPENAPI_DOC); });
