@@ -34,6 +34,9 @@ const PAID_TOOLS = [
   'forge_llm',
   'echo_pattern_match',
   'agentcard_mint',
+  'search_grants',
+  'search_contracts',
+  'lookup_entity',
 ] as const;
 
 describe('pricing drift guard', () => {
