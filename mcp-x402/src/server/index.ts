@@ -70,6 +70,22 @@ async function runSSE(): Promise<void> {
     res.sendFile('.well-known/agentcard.json', { root: process.cwd() });
   });
 
+  // ── x402 discovery resources ──────────────────────────────────────────────
+  // Public crawlable HTTP 402 challenges so x402scan / 402 Index / Bazaar can
+  // detect and index this server. Authoritative per-tool pricing lives in the
+  // sml_discover MCP tool; these emit a spec-correct x402 V2 PaymentRequirements.
+  const X402_PAY_TO = process.env['SML_PAYMENT_RECEIVER'] ?? '0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700';
+  app.get('/x402/discover', (req, res) => {
+    const resource = `https://${req.headers.host ?? 'mcp-x402.onrender.com'}${req.originalUrl}`;
+    const challenge = { x402Version: 2, error: 'payment_required', accepts: [{ scheme: 'exact', network: 'eip155:8453', asset: 'USDC', maxAmountRequired: '20000', resource, description: 'SML pay-per-call data tools — federal grants/contracts, market intel, SEC, FTD. Per-tool pricing via the sml_discover MCP tool.', mimeType: 'application/json', payTo: X402_PAY_TO, maxTimeoutSeconds: 120 }] };
+    res.status(402).set('PAYMENT-REQUIRED', Buffer.from(JSON.stringify(challenge)).toString('base64')).set('Access-Control-Expose-Headers', 'PAYMENT-REQUIRED').set('Access-Control-Allow-Origin', '*').json(challenge);
+  });
+  app.get('/x402/tool/:name', (req, res) => {
+    const resource = `https://${req.headers.host ?? 'mcp-x402.onrender.com'}${req.originalUrl}`;
+    const challenge = { x402Version: 2, error: 'payment_required', accepts: [{ scheme: 'exact', network: 'eip155:8453', asset: 'USDC', maxAmountRequired: '20000', resource, description: `Paid SML tool ${req.params.name} — pay-per-call via x402, USDC on Base.`, mimeType: 'application/json', payTo: X402_PAY_TO, maxTimeoutSeconds: 120 }] };
+    res.status(402).set('PAYMENT-REQUIRED', Buffer.from(JSON.stringify(challenge)).toString('base64')).set('Access-Control-Expose-Headers', 'PAYMENT-REQUIRED').set('Access-Control-Allow-Origin', '*').json(challenge);
+  });
+
   // Root handler — service discovery for agents hitting / directly
   app.get('/', (_req, res) => {
     res.json({
