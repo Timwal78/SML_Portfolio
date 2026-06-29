@@ -17,6 +17,16 @@ const CATALOG = {
   },
   products: [
     {
+      product: 'Federal Data',
+      description: 'Live federal grant and contract intelligence — Grants.gov + SAM.gov, set-aside aware (SDVOSB, 8(a), WOSB, HUBZone)',
+      backend: 'https://api.grants.gov + https://api.sam.gov',
+      tools: [
+        { name: 'search_grants',    type: 'PAID', price_usdc: '0.02', description: 'Search federal grant opportunities via Grants.gov Search2 — keyword, agency, CFDA, status' },
+        { name: 'search_contracts', type: 'PAID', price_usdc: '0.03', description: 'Search SAM.gov contract opportunities — NAICS, set-aside, agency, title' },
+        { name: 'lookup_entity',    type: 'PAID', price_usdc: '0.02', description: 'SAM entity lookup by UEI — registration status, NAICS, set-aside eligibility' },
+      ],
+    },
+    {
       product: 'SqueezeOS',
       description: 'Institutional-grade equity intelligence — squeeze scanner, options flow, multi-engine AI council verdicts',
       backend: 'https://squeezeos-api.onrender.com',
