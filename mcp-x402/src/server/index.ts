@@ -9,6 +9,7 @@ import cors from 'cors';
 import { registerTools } from './tools/index.js';
 import { AuditLogger } from './security/audit.js';
 import { RateLimiter } from './security/rate-limit.js';
+import { rapidApiGuard } from './security/rapidapi.js';
 import { healthHandler } from './health.js';
 import { verifyBaseUsdcPayment, alreadyRedeemed, markRedeemed, releaseRedeem } from './payments/verify-inbound.js';
 import { facilitatorChain, decodePaymentHeader, type PaymentRequirements } from './payments/facilitators.js';
@@ -51,6 +52,7 @@ async function runSSE(): Promise<void> {
 
   app.use(cors({ origin: process.env['CORS_ORIGIN'] ?? '*' }));
   app.use(express.json({ limit: '1mb' }));
+  app.use(rapidApiGuard);
 
   // Health endpoint — hit every 30s by Docker healthcheck + keepalive cron
   app.get('/health', healthHandler);
