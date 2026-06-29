@@ -77,12 +77,12 @@ async function runSSE(): Promise<void> {
   const X402_PAY_TO = process.env['SML_PAYMENT_RECEIVER'] ?? '0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700';
   app.get('/x402/discover', (req, res) => {
     const resource = `https://${req.headers.host ?? 'mcp-x402.onrender.com'}${req.originalUrl}`;
-    const challenge = { x402Version: 2, error: 'payment_required', accepts: [{ scheme: 'exact', network: 'eip155:8453', asset: 'USDC', maxAmountRequired: '20000', resource, description: 'SML pay-per-call data tools — federal grants/contracts, market intel, SEC, FTD. Per-tool pricing via the sml_discover MCP tool.', mimeType: 'application/json', payTo: X402_PAY_TO, maxTimeoutSeconds: 120 }] };
+    const challenge = { x402Version: 2, error: 'payment_required', accepts: [{ scheme: 'exact', network: 'eip155:8453', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', maxAmountRequired: '20000', resource, description: 'SML pay-per-call data tools — federal grants/contracts, market intel, SEC, FTD. Per-tool pricing via the sml_discover MCP tool.', mimeType: 'application/json', payTo: X402_PAY_TO, maxTimeoutSeconds: 120, extra: { name: 'USDC', version: '2' } }] };
     res.status(402).set('PAYMENT-REQUIRED', Buffer.from(JSON.stringify(challenge)).toString('base64')).set('Access-Control-Expose-Headers', 'PAYMENT-REQUIRED').set('Access-Control-Allow-Origin', '*').json(challenge);
   });
   app.get('/x402/tool/:name', (req, res) => {
     const resource = `https://${req.headers.host ?? 'mcp-x402.onrender.com'}${req.originalUrl}`;
-    const challenge = { x402Version: 2, error: 'payment_required', accepts: [{ scheme: 'exact', network: 'eip155:8453', asset: 'USDC', maxAmountRequired: '20000', resource, description: `Paid SML tool ${req.params.name} — pay-per-call via x402, USDC on Base.`, mimeType: 'application/json', payTo: X402_PAY_TO, maxTimeoutSeconds: 120 }] };
+    const challenge = { x402Version: 2, error: 'payment_required', accepts: [{ scheme: 'exact', network: 'eip155:8453', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', maxAmountRequired: '20000', resource, description: `Paid SML tool ${req.params.name} — pay-per-call via x402, USDC on Base.`, mimeType: 'application/json', payTo: X402_PAY_TO, maxTimeoutSeconds: 120, extra: { name: 'USDC', version: '2' } }] };
     res.status(402).set('PAYMENT-REQUIRED', Buffer.from(JSON.stringify(challenge)).toString('base64')).set('Access-Control-Expose-Headers', 'PAYMENT-REQUIRED').set('Access-Control-Allow-Origin', '*').json(challenge);
   });
 
