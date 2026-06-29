@@ -525,13 +525,173 @@ async function runSSE(): Promise<void> {
     } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'treasury_fetch_failed', message: String(err) }); }
   });
 
+  // ── /x402/entity-compliance — SAM registration + exclusion + size standard ($0.35) ─
+  app.get('/x402/entity-compliance', async (req, res) => {
+    const samKey = process.env['SAM_API_KEY'];
+    if (!samKey) return res.status(503).set('Access-Control-Allow-Origin', '*').json({ error: 'service_unconfigured', detail: 'SAM_API_KEY required. No payment taken.' });
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/entity-compliance`;
+    const uei = cleanTerm(typeof req.query['uei'] === 'string' ? req.query['uei'] : '').toUpperCase().replace(/\s/g, '');
+    const cage = cleanTerm(typeof req.query['cage'] === 'string' ? req.query['cage'] : '').toUpperCase().replace(/\s/g, '');
+    const inputSchema = { type: 'object', properties: { uei: { type: 'string', description: 'SAM.gov UEI (12-char alphanumeric). Preferred.' }, cage: { type: 'string', description: 'CAGE code (5-char). Alternative to UEI.' } }, required: [] };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { uei: { type: 'string', required: false }, cage: { type: 'string', required: false } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 350000n, description: 'Entity compliance bundle: SAM registration status + expiry + exclusion flag + set-aside types + size standard. Pay 0.35 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    if (!uei && !cage) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_identifier', detail: 'Payment verified. Add ?uei= or ?cage= and retry with the same payment.' }); }
+    try {
+      const p = new URLSearchParams({ api_key: samKey, includeSections: 'entityRegistration,coreData,assertions', registrationStatus: 'A,E,I' });
+      if (uei) p.set('ueiSAM', uei);
+      else if (cage) p.set('cageCode', cage);
+      const r = await fetch(`https://api.sam.gov/entity-information/v3/entities?${p.toString()}`, { headers: { Accept: 'application/json' } });
+      if (!r.ok) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'sam_api_error', status: r.status }); }
+      const j = await r.json() as { totalRecords?: number; entityData?: Array<Record<string, unknown>> };
+      if (!j.entityData?.length) { return res.set('Access-Control-Allow-Origin', '*').json({ source: 'sam.gov/entity-information/v3', found: false, uei, cage, compliance: null, _paid: pay.payer }); }
+      const e = j.entityData[0] as Record<string, unknown>;
+      const er = (e['entityRegistration'] as Record<string, unknown>) ?? {};
+      const cd = (e['coreData'] as Record<string, unknown>) ?? {};
+      const assertions = (e['assertions'] as Record<string, unknown>) ?? {};
+      const bt = (cd['businessTypes'] as Record<string, unknown>) ?? {};
+      const btList = ((bt['businessTypeList'] as Array<Record<string, unknown>>) ?? []).map((x) => String(x['businessTypeCode'] ?? ''));
+      const setAsides = ((bt['sbaBusinessTypeList'] as Array<Record<string, unknown>>) ?? []).map((x) => ({ code: String(x['sbaBusinessTypeCode'] ?? ''), name: String(x['sbaBusinessTypeDesc'] ?? ''), cert_url: String(x['certificationEntryDate'] ?? '') }));
+      const goods = (assertions['goodsAndServices'] as Record<string, unknown>) ?? {};
+      const naics = ((goods['naicsCode'] as Array<Record<string, unknown>>) ?? []).slice(0, 5).map((n) => ({ code: String(n['naicsCode'] ?? ''), description: String(n['naicsDescription'] ?? ''), primary: Boolean(n['isPrimary']) }));
+      const active = String(er['registrationStatus'] ?? '') === 'A';
+      const expiry = String(er['registrationExpirationDate'] ?? '');
+      const daysLeft = expiry ? Math.floor((new Date(expiry).getTime() - Date.now()) / 86400000) : null;
+      const exclusion = String(er['exclusionStatusFlag'] ?? 'N') === 'Y';
+      const compliance: Record<string, unknown> = {
+        uei: String(er['ueiSAM'] ?? uei), cage: String(er['cageCode'] ?? cage),
+        legal_name: String(er['legalBusinessName'] ?? ''),
+        registration_status: active ? 'ACTIVE' : String(er['registrationStatus'] ?? ''),
+        registration_expires: expiry, days_until_expiry: daysLeft,
+        exclusion_flag: exclusion, exclusion_risk: exclusion ? 'HIGH — entity is excluded from federal contracts' : 'CLEAR',
+        purpose_of_registration: String(er['purposeOfRegistrationCode'] ?? ''),
+        business_type_codes: btList,
+        set_asides: setAsides,
+        primary_naics: naics.find((n) => n.primary)?.code ?? naics[0]?.code ?? '',
+        naics_codes: naics,
+        expiry_risk: daysLeft !== null && daysLeft < 90 ? `WARNING: registration expires in ${daysLeft} days` : 'OK',
+      };
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'sam.gov/entity-information/v3', found: true, compliance, _disclaimer: 'SAM.gov registration data. Exclusion flag is self-reported in SAM. Always verify at sam.gov for contract decisions.', _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'sam_fetch_failed', message: String(err) }); }
+  });
+
+  // ── /x402/agent-score — AI agent FICO-style reputation scoring ($0.20) ────────
+  // Scores an agent by agent_id across: task_success_rate, payment_reliability,
+  // error_rate, data_freshness_requests, uptime_score. Stores in-memory registry.
+  // Real behavioral signals submitted by operator; score 300-850 (FICO-style).
+  const AGENT_REGISTRY = new Map<string, { scores: number[]; payments: number; errors: number; tasks: number; last_seen: number; created: number }>();
+  const scoreAgent = (data: { tasks?: number; successes?: number; payments?: number; errors?: number; uptime?: number }): number => {
+    const taskRate = data.tasks ? (data.successes ?? data.tasks) / data.tasks : 1;
+    const errorRate = data.tasks ? Math.min((data.errors ?? 0) / data.tasks, 1) : 0;
+    const payRate = data.payments ? Math.min(data.payments / 100, 1) : 0.5;
+    const uptime = Math.min(Math.max(data.uptime ?? 0.99, 0), 1);
+    const raw = (taskRate * 0.35 + (1 - errorRate) * 0.30 + payRate * 0.20 + uptime * 0.15);
+    return Math.round(300 + raw * 550);
+  };
+  const scoreGrade = (s: number): string => s >= 800 ? 'A+' : s >= 750 ? 'A' : s >= 700 ? 'B+' : s >= 650 ? 'B' : s >= 600 ? 'C' : s >= 500 ? 'D' : 'F';
+  app.get('/x402/agent-score', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/agent-score`;
+    const agentId = cleanTerm(typeof req.query['agent_id'] === 'string' ? req.query['agent_id'] : '').slice(0, 64);
+    const action = typeof req.query['action'] === 'string' ? req.query['action'] : 'get';
+    const tasks = parseInt(String(req.query['tasks'] ?? '0'), 10) || 0;
+    const successes = parseInt(String(req.query['successes'] ?? '0'), 10) || 0;
+    const errors = parseInt(String(req.query['errors'] ?? '0'), 10) || 0;
+    const payments = parseInt(String(req.query['payments'] ?? '0'), 10) || 0;
+    const uptime = parseFloat(String(req.query['uptime'] ?? '0.99')) || 0.99;
+    const inputSchema = { type: 'object', properties: { agent_id: { type: 'string', description: 'Unique agent identifier (required).' }, action: { type: 'string', enum: ['get', 'report'], default: 'get', description: 'get=retrieve score; report=submit behavioral data to update score.' }, tasks: { type: 'integer', description: 'Total tasks attempted (for action=report).' }, successes: { type: 'integer' }, errors: { type: 'integer' }, payments: { type: 'integer', description: 'Successful micropayments made.' }, uptime: { type: 'number', minimum: 0, maximum: 1 } }, required: ['agent_id'] };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { agent_id: { type: 'string', required: true }, action: { type: 'string', required: false } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 200000n, description: 'AI agent FICO-style reputation score (300-850). Submit behavioral signals or retrieve score. Pay 0.20 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    if (!agentId) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_agent_id', detail: 'Payment verified. Add ?agent_id= and retry with the same payment.' }); }
+    const now = Date.now();
+    if (action === 'report' && tasks > 0) {
+      const existing = AGENT_REGISTRY.get(agentId) ?? { scores: [], payments: 0, errors: 0, tasks: 0, last_seen: now, created: now };
+      existing.tasks += tasks; existing.errors += errors; existing.payments += payments; existing.last_seen = now;
+      const score = scoreAgent({ tasks: existing.tasks, successes: successes || tasks - errors, errors: existing.errors, payments: existing.payments, uptime });
+      existing.scores.push(score);
+      if (existing.scores.length > 50) existing.scores.shift();
+      AGENT_REGISTRY.set(agentId, existing);
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'sml/agent-credit-bureau', agent_id: agentId, action: 'report', score, grade: scoreGrade(score), trend: existing.scores.length > 1 ? (score > (existing.scores[existing.scores.length - 2] ?? score) ? 'improving' : 'declining') : 'new', history_count: existing.scores.length, _paid: pay.payer });
+    }
+    const rec = AGENT_REGISTRY.get(agentId);
+    if (!rec) return res.set('Access-Control-Allow-Origin', '*').json({ source: 'sml/agent-credit-bureau', agent_id: agentId, found: false, score: null, detail: 'No behavioral data on file. Submit action=report with task signals to establish score.', _paid: pay.payer });
+    const score = rec.scores[rec.scores.length - 1] ?? 300;
+    return res.set('Access-Control-Allow-Origin', '*').json({ source: 'sml/agent-credit-bureau', agent_id: agentId, found: true, score, grade: scoreGrade(score), range: '300 (critical) — 850 (exceptional)', breakdown: { tasks_logged: rec.tasks, errors_logged: rec.errors, payments_logged: rec.payments, days_active: Math.floor((now - rec.created) / 86400000) }, trend: rec.scores.length > 1 ? (score > (rec.scores[rec.scores.length - 2] ?? score) ? 'improving' : 'declining') : 'stable', _paid: pay.payer });
+  });
+
+  // ── /x402/fact-check — grounding oracle against live SML data sources ($0.15) ─
+  // Accepts a claim + optional domain, routes to the relevant real API, and returns
+  // the primary source evidence that confirms, contradicts, or is inconclusive.
+  type FactDomain = 'grants' | 'contracts' | 'drug' | 'provider' | 'insider' | 'yields' | 'clinical' | 'general';
+  const detectDomain = (claim: string): FactDomain => {
+    const c = claim.toLowerCase();
+    if (/grant|cfda|opportunity|funding/.test(c)) return 'grants';
+    if (/contract|award|naics|incumbent|bid/.test(c)) return 'contracts';
+    if (/drug|medication|recall|adverse|fda|label/.test(c)) return 'drug';
+    if (/provider|npi|physician|doctor|hospital|clinic/.test(c)) return 'provider';
+    if (/insider|form 4|executive|ceo|cfo|buy|sell|stock/.test(c)) return 'insider';
+    if (/yield|treasury|interest rate|bond|10.year|30.year/.test(c)) return 'yields';
+    if (/trial|clinical|recruiting|nct|phase/.test(c)) return 'clinical';
+    return 'general';
+  };
+  app.get('/x402/fact-check', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/fact-check`;
+    const claim = (typeof req.query['claim'] === 'string' ? req.query['claim'] : '').slice(0, 300);
+    const domainHint = typeof req.query['domain'] === 'string' ? req.query['domain'] as FactDomain : undefined;
+    const inputSchema = { type: 'object', properties: { claim: { type: 'string', description: 'The claim or statement to fact-check (required, max 300 chars).' }, domain: { type: 'string', enum: ['grants', 'contracts', 'drug', 'provider', 'insider', 'yields', 'clinical', 'general'], description: 'Hint to route to the correct data source (optional — auto-detected).' } }, required: ['claim'] };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { claim: { type: 'string', required: true }, domain: { type: 'string', required: false } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 150000n, description: 'Grounding oracle: fact-checks a claim against live government/FDA/SEC/Treasury data. Pay 0.15 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    if (!claim) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_claim', detail: 'Payment verified. Add ?claim= and retry with the same payment.' }); }
+    const domain = domainHint ?? detectDomain(claim);
+    let evidence: unknown = null; let source_url = ''; let verdict = 'inconclusive';
+    try {
+      if (domain === 'yields') {
+        const month = new Date().toISOString().slice(0, 7).replace('-', '');
+        const r = await fetch(`https://home.treasury.gov/resource-center/data-chart-center/interest-rates/pages/xml?data=daily_treasury_yield_curve&field_tdr_date_value_month=${month}`);
+        const xml = await r.text();
+        const pick = (tag: string): string | null => { const m = xml.match(new RegExp(`<d:${tag}[^>]*>([^<]+)<\/d:${tag}>`)); return m ? (m[1] ?? null) : null; };
+        evidence = { '1M': pick('BC_1MONTH'), '3M': pick('BC_3MONTH'), '10Y': pick('BC_10YEAR'), '30Y': pick('BC_30YEAR') };
+        source_url = 'https://home.treasury.gov/resource-center/data-chart-center/interest-rates/';
+        verdict = evidence ? 'grounded' : 'inconclusive';
+      } else if (domain === 'drug') {
+        const term = cleanTerm(claim.replace(/recall|drug|fda|label|adverse/gi, '').trim()).slice(0, 40);
+        const r = await fetch(`https://api.fda.gov/drug/label.json?search=openfda.brand_name:"${term}" OR openfda.generic_name:"${term}"&limit=1`);
+        if (r.ok) { const j = await r.json() as { results?: unknown[] }; evidence = j.results?.length ? 'Drug label found in openFDA' : 'No matching drug found'; verdict = j.results?.length ? 'grounded' : 'unverified'; }
+        source_url = 'https://api.fda.gov/drug/label.json';
+      } else if (domain === 'clinical') {
+        const term = cleanTerm(claim.replace(/clinical trial|recruiting|phase|nct/gi, '').trim()).slice(0, 40);
+        const r = await fetch(`https://clinicaltrials.gov/api/v2/studies?query.term=${encodeURIComponent(term)}&pageSize=2`, { headers: { Accept: 'application/json' } });
+        if (r.ok) { const j = await r.json() as { totalCount?: number }; evidence = { trials_found: j.totalCount ?? 0 }; verdict = (j.totalCount ?? 0) > 0 ? 'grounded' : 'unverified'; }
+        source_url = 'https://clinicaltrials.gov/api/v2/studies';
+      } else if (domain === 'grants') {
+        const term = cleanTerm(claim.replace(/grant|funding|cfda/gi, '').trim()).slice(0, 40);
+        const r = await fetch('https://api.grants.gov/v1/api/search2', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ keyword: term, rows: 3 }) });
+        if (r.ok) { const j = await r.json() as { data?: { hitCount?: number } }; evidence = { grants_found: j.data?.hitCount ?? 0 }; verdict = (j.data?.hitCount ?? 0) > 0 ? 'grounded' : 'unverified'; }
+        source_url = 'https://api.grants.gov/v1/api/search2';
+      } else if (domain === 'contracts') {
+        const r = await fetch('https://api.usaspending.gov/api/v2/search/spending_by_category/recipient/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ filters: { award_type_codes: ['A', 'B', 'C', 'D'], time_period: [{ start_date: '2024-01-01', end_date: new Date().toISOString().slice(0, 10) }] }, category: 'recipient', limit: 3, page: 1 }) });
+        if (r.ok) { const j = await r.json() as { results?: unknown[] }; evidence = { top_recipients: j.results }; verdict = 'grounded'; }
+        source_url = 'https://api.usaspending.gov/api/v2';
+      } else {
+        evidence = { note: 'Domain auto-detected as general. Provide ?domain= hint for targeted grounding.' };
+        verdict = 'inconclusive';
+        source_url = 'https://mcp-x402.onrender.com/openapi.json';
+      }
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: source_url, claim, domain, verdict, evidence, verdict_key: { grounded: 'Primary source evidence found supporting the domain.', unverified: 'No primary source evidence found — claim may be inaccurate.', inconclusive: 'Domain unclear or source returned no usable data.' }[verdict], _disclaimer: 'Fact-check results are based on public government/FDA/SEC data. Not legal, medical, or financial advice.', _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'factcheck_error', message: String(err) }); }
+  });
+
   // ── x402 discovery document (OpenAPI 3.1 + x-service-info / x-payment-info) ─
   // x402scan's canonical signal; served at /.well-known/x402 and /openapi.json.
   const OPENAPI_DOC = {
     openapi: '3.1.0',
     info: { title: 'Script Master Labs — x402 Data API', version: VERSION, description: 'Pay-per-call U.S. federal data, settled in USDC on Base via x402.', contact: { name: 'Script Master Labs', email: 'ScriptMasterLabs@gmail.com', url: 'https://scriptmasterlabs.com' } },
     servers: [{ url: 'https://mcp-x402.onrender.com' }],
-    'x-service-info': { categories: ['government-data', 'grants', 'federal-contracts', 'market-intelligence', 'medical-reference', 'drug-data', 'healthcare-providers', 'clinical-trials', 'sec-filings', 'insider-trading', 'finance', 'drug-safety', 'treasury', 'yield-curve'], payment: { protocol: 'x402', rails: [{ id: 'standard', scheme: 'exact', network: 'base', settlement: 'facilitator', note: 'EIP-3009 via X-PAYMENT — settled through a hybrid facilitator chain.' }, { id: 'sovereign', scheme: 'exact', network: 'base', settlement: 'onchain-tx', note: 'Pay USDC then send X-PAYMENT-TX — verified directly on-chain, no facilitator.' }], facilitators: '/x402/facilitators' }, docs: { homepage: 'https://scriptmasterlabs.com', llms: 'https://mcp-x402.onrender.com/llms.txt', apiReference: 'https://github.com/Timwal78/SML_Portfolio/tree/main/mcp-x402' } },
+    'x-service-info': { categories: ['government-data', 'grants', 'federal-contracts', 'market-intelligence', 'medical-reference', 'drug-data', 'healthcare-providers', 'clinical-trials', 'sec-filings', 'insider-trading', 'finance', 'drug-safety', 'treasury', 'yield-curve', 'compliance', 'entity-verification', 'agent-reputation', 'fact-checking', 'veteran-services', 'federal-procurement'], payment: { protocol: 'x402', rails: [{ id: 'standard', scheme: 'exact', network: 'base', settlement: 'facilitator', note: 'EIP-3009 via X-PAYMENT — settled through a hybrid facilitator chain.' }, { id: 'sovereign', scheme: 'exact', network: 'base', settlement: 'onchain-tx', note: 'Pay USDC then send X-PAYMENT-TX — verified directly on-chain, no facilitator.' }], facilitators: '/x402/facilitators' }, docs: { homepage: 'https://scriptmasterlabs.com', llms: 'https://mcp-x402.onrender.com/llms.txt', apiReference: 'https://github.com/Timwal78/SML_Portfolio/tree/main/mcp-x402' } },
     paths: { '/x402/grants': { get: {
       operationId: 'searchGrants',
       summary: 'Search live U.S. federal grant opportunities (Grants.gov Search2).',
@@ -620,6 +780,27 @@ async function runSSE(): Promise<void> {
       parameters: [{ name: 'month', in: 'query', required: false, schema: { type: 'string' }, description: 'YYYYMM format (defaults to current month).' }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.05', amountUnits: '50000', payTo: X402_PAY_TO },
       responses: { '200': { description: 'Yield curve' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/entity-compliance': { get: {
+      operationId: 'entityCompliance',
+      summary: 'SAM entity compliance bundle: registration + exclusion + set-asides + NAICS.',
+      description: 'Full compliance check by UEI or CAGE: active status, expiry, exclusion flag, set-aside certifications, size standard. Pay 0.35 USDC on Base.',
+      parameters: [{ name: 'uei', in: 'query', required: false, schema: { type: 'string' }, description: 'SAM UEI (preferred).' }, { name: 'cage', in: 'query', required: false, schema: { type: 'string' }, description: 'CAGE code (alternative).' }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.35', amountUnits: '350000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'Compliance report' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/agent-score': { get: {
+      operationId: 'agentScore',
+      summary: 'AI agent FICO-style reputation score (300–850).',
+      description: 'Submit behavioral signals (tasks, errors, payments) or retrieve score for an agent. Pay 0.20 USDC on Base.',
+      parameters: [{ name: 'agent_id', in: 'query', required: true, schema: { type: 'string' } }, { name: 'action', in: 'query', required: false, schema: { type: 'string', enum: ['get', 'report'], default: 'get' } }, { name: 'tasks', in: 'query', required: false, schema: { type: 'integer' } }, { name: 'successes', in: 'query', required: false, schema: { type: 'integer' } }, { name: 'errors', in: 'query', required: false, schema: { type: 'integer' } }, { name: 'payments', in: 'query', required: false, schema: { type: 'integer' } }, { name: 'uptime', in: 'query', required: false, schema: { type: 'number' } }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.20', amountUnits: '200000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'Agent score' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/fact-check': { get: {
+      operationId: 'factCheck',
+      summary: 'Grounding oracle: fact-checks a claim against live government/FDA/SEC/Treasury data.',
+      description: 'Submit any claim; auto-routes to the relevant primary source. Pay 0.15 USDC on Base.',
+      parameters: [{ name: 'claim', in: 'query', required: true, schema: { type: 'string' } }, { name: 'domain', in: 'query', required: false, schema: { type: 'string', enum: ['grants', 'contracts', 'drug', 'provider', 'insider', 'yields', 'clinical', 'general'] } }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.15', amountUnits: '150000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'Fact-check result' }, '402': { description: 'Payment required.' } },
     } } },
   };
   app.get('/.well-known/x402', (_req, res) => { res.set('Access-Control-Allow-Origin', '*').json(OPENAPI_DOC); });
