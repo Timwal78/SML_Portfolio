@@ -64,6 +64,10 @@ const BASE_PRICES: Record<string, string> = {
   agentcard_mint: '0.01',
   agentcard_verify: '0.00',
   agentcard_lookup: '0.00',
+  // Federal data (Grants.gov + SAM.gov)
+  search_grants: '0.02',
+  search_contracts: '0.03',
+  lookup_entity: '0.02',
 };
 
 interface CachedPrice {
