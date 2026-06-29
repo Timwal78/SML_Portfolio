@@ -1,9 +1,9 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.Timwal78/mcp-x402",
-  "title": "mcp-x402 — The x402 Amazon for AI Agents",
-  "description": "51 pay-per-call MCP tools: market intel, SEC, XRPL payments, copy-trading. USDC/RLUSD. No keys.",
-  "version": "2.1.0",
+  "title": "mcp-x402 \u2014 The x402 Amazon for AI Agents",
+  "description": "56 pay-per-call MCP tools incl. live federal grants & contracts (Grants.gov + SAM.gov, set-aside aware), market intel, SEC, FTD, XRPL/Base payments. USDC/RLUSD. No keys.",
+  "version": "2.2.0",
   "repository": {
     "url": "https://github.com/timwal78/SML_Portfolio",
     "source": "github"
@@ -20,5 +20,25 @@
       "url": "https://mcp-x402.onrender.com/sse"
     }
   ],
-  "keywords": ["x402", "micropayments", "usdc", "rlusd", "xrpl", "solana", "base", "squeeze", "options", "sec-filings", "ftd", "market-intelligence", "pay-per-call", "autonomous-agents"]
+  "keywords": [
+    "x402",
+    "micropayments",
+    "usdc",
+    "rlusd",
+    "xrpl",
+    "solana",
+    "base",
+    "squeeze",
+    "options",
+    "sec-filings",
+    "ftd",
+    "market-intelligence",
+    "pay-per-call",
+    "autonomous-agents",
+    "federal",
+    "grants",
+    "sam-gov",
+    "govcon",
+    "sdvosb"
+  ]
 }
