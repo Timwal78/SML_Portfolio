@@ -254,13 +254,105 @@ async function runSSE(): Promise<void> {
     }
   });
 
+  // ── Medical reference endpoints (keyless: openFDA + NPPES) ──────────────────
+  const cleanTerm = (s: string): string => s.replace(/[^a-zA-Z0-9 .\-]/g, '').trim().slice(0, 60);
+  const fdaKey = process.env['OPENFDA_API_KEY'];
+
+  // 1) FDA drug label lookup — $0.05
+  app.get('/x402/drug-label', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/drug-label`;
+    const drug = cleanTerm(typeof req.query['drug'] === 'string' ? req.query['drug'] : '');
+    const inputSchema = { type: 'object', properties: { drug: { type: 'string', description: 'Brand or generic drug name (required).' } }, required: ['drug'] };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { drug: { type: 'string', required: true } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 50000n, description: 'FDA drug label lookup (openFDA): indications, dosage, warnings, interactions. Pay 0.05 USDC on Base via X-PAYMENT (standard) or X-PAYMENT-TX (sovereign).', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    if (!drug) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_drug', detail: 'Payment verified. Add ?drug= and retry with the same payment.' }); }
+    try {
+      const p = new URLSearchParams({ search: `openfda.brand_name:"${drug}" OR openfda.generic_name:"${drug}"`, limit: '1' });
+      if (fdaKey) p.set('api_key', fdaKey);
+      const r = await fetch(`https://api.fda.gov/drug/label.json?${p.toString()}`);
+      if (r.status === 404) return res.set('Access-Control-Allow-Origin', '*').json({ source: 'openfda/drug/label', drug, found: false, label: null, _disclaimer: 'FDA label reference data. Not medical advice.', _paid: pay.payer });
+      if (!r.ok) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'openfda_error', status: r.status }); }
+      const j = await r.json() as { results?: Array<Record<string, unknown>> };
+      const x = (j.results ?? [])[0] ?? {};
+      const pick = (k: string): string | undefined => { const v = x[k]; return Array.isArray(v) ? (v as unknown[]).map(String).join(' ').slice(0, 1200) : undefined; };
+      const openfda = (x['openfda'] ?? {}) as Record<string, unknown>;
+      const brandArr = openfda['brand_name'];
+      const brand = Array.isArray(brandArr) && brandArr.length > 0 ? String(brandArr[0]) : drug;
+      const label = { brand, indications: pick('indications_and_usage'), dosage: pick('dosage_and_administration'), warnings: pick('boxed_warning') ?? pick('warnings'), interactions: pick('drug_interactions'), adverse_reactions: pick('adverse_reactions') };
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'openfda/drug/label', drug, found: true, label, _disclaimer: 'FDA label reference data. Not medical advice.', _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'openfda_fetch_failed', message: String(err) }); }
+  });
+
+  // 2) FDA drug recall / enforcement search — $0.08
+  app.get('/x402/drug-recall', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/drug-recall`;
+    const drug = cleanTerm(typeof req.query['drug'] === 'string' ? req.query['drug'] : '');
+    const limit = Math.min(Math.max(parseInt(String(req.query['limit'] ?? '5'), 10) || 5, 1), 20);
+    const inputSchema = { type: 'object', properties: { drug: { type: 'string', description: 'Drug name (required).' }, limit: { type: 'integer', minimum: 1, maximum: 20, default: 5 } }, required: ['drug'] };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { drug: { type: 'string', required: true }, limit: { type: 'integer', required: false } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 80000n, description: 'FDA drug recall/enforcement search (openFDA): reason, classification, status, recalling firm. Pay 0.08 USDC on Base via X-PAYMENT (standard) or X-PAYMENT-TX (sovereign).', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    if (!drug) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_drug', detail: 'Payment verified. Add ?drug= and retry with the same payment.' }); }
+    try {
+      const p = new URLSearchParams({ search: `openfda.brand_name:"${drug}" OR openfda.generic_name:"${drug}" OR product_description:"${drug}"`, limit: String(limit), sort: 'recall_initiation_date:desc' });
+      if (fdaKey) p.set('api_key', fdaKey);
+      const r = await fetch(`https://api.fda.gov/drug/enforcement.json?${p.toString()}`);
+      if (r.status === 404) return res.set('Access-Control-Allow-Origin', '*').json({ source: 'openfda/drug/enforcement', drug, count: 0, recalls: [], _disclaimer: 'FDA enforcement reference data. Not medical advice.', _paid: pay.payer });
+      if (!r.ok) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'openfda_error', status: r.status }); }
+      const j = await r.json() as { results?: Array<Record<string, unknown>> };
+      const g = (o: Record<string, unknown>, k: string, n = 200): string => { const v = o[k]; return typeof v === 'string' ? v.slice(0, n) : ''; };
+      const recalls = (j.results ?? []).map((o) => ({ reason: g(o, 'reason_for_recall', 240), classification: g(o, 'classification', 20), status: g(o, 'status', 20), initiated: g(o, 'recall_initiation_date', 10), firm: g(o, 'recalling_firm', 80), product: g(o, 'product_description', 160), distribution: g(o, 'distribution_pattern', 120), type: g(o, 'voluntary_mandated', 40) }));
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'openfda/drug/enforcement', drug, count: recalls.length, recalls, _disclaimer: 'FDA enforcement reference data. Not medical advice.', _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'openfda_fetch_failed', message: String(err) }); }
+  });
+
+  // 3) NPPES provider (NPI) lookup — $0.05
+  interface NpiResult { number?: number | string; enumeration_type?: string; basic?: { first_name?: string; last_name?: string; organization_name?: string; credential?: string }; taxonomies?: Array<{ desc?: string; primary?: boolean; state?: string }>; addresses?: Array<{ address_1?: string; city?: string; state?: string; postal_code?: string; telephone_number?: string; address_purpose?: string }> }
+  app.get('/x402/npi', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/npi`;
+    const first = cleanTerm(typeof req.query['first_name'] === 'string' ? req.query['first_name'] : '');
+    const last = cleanTerm(typeof req.query['last_name'] === 'string' ? req.query['last_name'] : '');
+    const org = cleanTerm(typeof req.query['organization_name'] === 'string' ? req.query['organization_name'] : '');
+    const state = (typeof req.query['state'] === 'string' ? req.query['state'].toUpperCase().slice(0, 2) : '');
+    const specialty = cleanTerm(typeof req.query['specialty'] === 'string' ? req.query['specialty'] : '');
+    const limit = Math.min(Math.max(parseInt(String(req.query['limit'] ?? '10'), 10) || 10, 1), 20);
+    const inputSchema = { type: 'object', properties: { last_name: { type: 'string' }, first_name: { type: 'string' }, organization_name: { type: 'string' }, state: { type: 'string', description: '2-letter state code.' }, specialty: { type: 'string', description: 'Taxonomy description, e.g. Cardiology.' }, limit: { type: 'integer', minimum: 1, maximum: 20, default: 10 } }, required: [] };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { last_name: { type: 'string', required: false }, organization_name: { type: 'string', required: false }, specialty: { type: 'string', required: false }, state: { type: 'string', required: false } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 50000n, description: 'NPPES provider (NPI) lookup: NPI number, name, specialty, location, phone. Provide last_name, organization_name, or specialty. Pay 0.05 USDC on Base via X-PAYMENT (standard) or X-PAYMENT-TX (sovereign).', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    if (!last && !org && !specialty) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_query', detail: 'Payment verified. Provide last_name, organization_name, or specialty and retry with the same payment.' }); }
+    try {
+      const p = new URLSearchParams({ version: '2.1', limit: String(limit) });
+      if (first) p.set('first_name', first);
+      if (last) p.set('last_name', last);
+      if (org) p.set('organization_name', org);
+      if (state) p.set('state', state);
+      if (specialty) p.set('taxonomy_description', specialty);
+      const r = await fetch(`https://npiregistry.cms.hhs.gov/api/?${p.toString()}`);
+      if (!r.ok) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'nppes_error', status: r.status }); }
+      const j = await r.json() as { result_count?: number; results?: NpiResult[] };
+      const providers = (j.results ?? []).map((o) => {
+        const b = o.basic ?? {};
+        const tax = (o.taxonomies ?? []).find((t) => t.primary) ?? (o.taxonomies ?? [])[0] ?? {};
+        const loc = (o.addresses ?? []).find((a) => a.address_purpose === 'LOCATION') ?? (o.addresses ?? [])[0] ?? {};
+        const name = o.enumeration_type === 'NPI-2' ? (b.organization_name ?? '') : `${b.first_name ?? ''} ${b.last_name ?? ''}`.trim();
+        return { npi: String(o.number ?? ''), type: o.enumeration_type === 'NPI-2' ? 'organization' : 'individual', name, credential: b.credential ?? '', specialty: tax.desc ?? '', city: loc.city ?? '', state: loc.state ?? '', phone: loc.telephone_number ?? '' };
+      });
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'nppes/npi-registry', count: j.result_count ?? providers.length, providers, _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'nppes_fetch_failed', message: String(err) }); }
+  });
+
   // ── x402 discovery document (OpenAPI 3.1 + x-service-info / x-payment-info) ─
   // x402scan's canonical signal; served at /.well-known/x402 and /openapi.json.
   const OPENAPI_DOC = {
     openapi: '3.1.0',
     info: { title: 'Script Master Labs — x402 Data API', version: VERSION, description: 'Pay-per-call U.S. federal data, settled in USDC on Base via x402.', contact: { name: 'Script Master Labs', email: 'ScriptMasterLabs@gmail.com', url: 'https://scriptmasterlabs.com' } },
     servers: [{ url: 'https://mcp-x402.onrender.com' }],
-    'x-service-info': { categories: ['government-data', 'grants', 'federal-contracts', 'market-intelligence'], payment: { protocol: 'x402', rails: [{ id: 'standard', scheme: 'exact', network: 'base', settlement: 'facilitator', note: 'EIP-3009 via X-PAYMENT — settled through a hybrid facilitator chain.' }, { id: 'sovereign', scheme: 'exact', network: 'base', settlement: 'onchain-tx', note: 'Pay USDC then send X-PAYMENT-TX — verified directly on-chain, no facilitator.' }], facilitators: '/x402/facilitators' }, docs: { homepage: 'https://scriptmasterlabs.com', llms: 'https://mcp-x402.onrender.com/llms.txt', apiReference: 'https://github.com/Timwal78/SML_Portfolio/tree/main/mcp-x402' } },
+    'x-service-info': { categories: ['government-data', 'grants', 'federal-contracts', 'market-intelligence', 'medical-reference', 'drug-data', 'healthcare-providers'], payment: { protocol: 'x402', rails: [{ id: 'standard', scheme: 'exact', network: 'base', settlement: 'facilitator', note: 'EIP-3009 via X-PAYMENT — settled through a hybrid facilitator chain.' }, { id: 'sovereign', scheme: 'exact', network: 'base', settlement: 'onchain-tx', note: 'Pay USDC then send X-PAYMENT-TX — verified directly on-chain, no facilitator.' }], facilitators: '/x402/facilitators' }, docs: { homepage: 'https://scriptmasterlabs.com', llms: 'https://mcp-x402.onrender.com/llms.txt', apiReference: 'https://github.com/Timwal78/SML_Portfolio/tree/main/mcp-x402' } },
     paths: { '/x402/grants': { get: {
       operationId: 'searchGrants',
       summary: 'Search live U.S. federal grant opportunities (Grants.gov Search2).',
@@ -293,6 +385,27 @@ async function runSSE(): Promise<void> {
       ],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.30', amountUnits: '300000', payTo: X402_PAY_TO, settlement: 'onchain-tx', paymentHeader: 'X-PAYMENT-TX' },
       responses: { '200': { description: 'Market intelligence' }, '402': { description: 'Payment required — pay USDC then retry with X-PAYMENT-TX.' } },
+    } }, '/x402/drug-label': { get: {
+      operationId: 'drugLabel',
+      summary: 'FDA drug label lookup (openFDA).',
+      description: 'Indications, dosage, warnings, interactions for a drug. Pay 0.05 USDC on Base.',
+      parameters: [{ name: 'drug', in: 'query', required: true, schema: { type: 'string' }, description: 'Brand or generic drug name.' }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.05', amountUnits: '50000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'Drug label' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/drug-recall': { get: {
+      operationId: 'drugRecall',
+      summary: 'FDA drug recall/enforcement search (openFDA).',
+      description: 'Recall reason, classification, status, recalling firm. Pay 0.08 USDC on Base.',
+      parameters: [{ name: 'drug', in: 'query', required: true, schema: { type: 'string' } }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 20, default: 5 } }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.08', amountUnits: '80000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'Recalls' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/npi': { get: {
+      operationId: 'npiLookup',
+      summary: 'NPPES provider (NPI) lookup.',
+      description: 'NPI, name, specialty, location, phone. Provide last_name, organization_name, or specialty. Pay 0.05 USDC on Base.',
+      parameters: [{ name: 'last_name', in: 'query', required: false, schema: { type: 'string' } }, { name: 'organization_name', in: 'query', required: false, schema: { type: 'string' } }, { name: 'specialty', in: 'query', required: false, schema: { type: 'string' } }, { name: 'state', in: 'query', required: false, schema: { type: 'string' } }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.05', amountUnits: '50000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'Providers' }, '402': { description: 'Payment required.' } },
     } } },
   };
   app.get('/.well-known/x402', (_req, res) => { res.set('Access-Control-Allow-Origin', '*').json(OPENAPI_DOC); });
