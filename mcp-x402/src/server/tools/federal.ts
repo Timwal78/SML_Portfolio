@@ -122,15 +122,15 @@ export function registerFederal(server: McpServer): void {
 
       const params = new URLSearchParams({
         api_key: apiKey,
-        postedFrom: samDate(args.days_back),
+        postedFrom: samDate(args.days_back ?? 90),
         postedTo: samDate(0),
-        limit: String(args.limit),
+        limit: String(args.limit ?? 15),
         offset: '0',
       });
       if (args.title) params.set('title', args.title);
       if (args.naics) params.set('ncode', args.naics);
       if (args.agency) params.set('deptname', args.agency);
-      if (args.set_aside) params.set('typeOfSetAside', SET_ASIDE_CODES[args.set_aside]);
+      if (args.set_aside) { const code = SET_ASIDE_CODES[args.set_aside]; if (code) params.set('typeOfSetAside', code); }
 
       try {
         const resp = await fetch(`${SAM_OPP_URL}?${params.toString()}`, { headers: { Accept: 'application/json' } });
