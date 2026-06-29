@@ -187,6 +187,50 @@ async function runSSE(): Promise<void> {
     }
   });
 
+  // ── REAL fulfilling x402 endpoint: federal market intelligence (USAspending) ─
+  const MARKET_PRICE_UNITS = 300000n; // 0.30 USDC
+  app.get('/x402/market', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/market`;
+    const naics = typeof req.query['naics'] === 'string' ? req.query['naics'] : '';
+    const years = Math.min(Math.max(parseInt(String(req.query['years'] ?? '3'), 10) || 3, 1), 10);
+    const inputSchema = { type: 'object', properties: { naics: { type: 'string', description: '6-digit NAICS code (required).' }, years: { type: 'integer', minimum: 1, maximum: 10, default: 3 } }, required: ['naics'] };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { naics: { type: 'string', required: true }, years: { type: 'integer', required: false } } }, output: null };
+    const challenge = { x402Version: 1, error: 'X-PAYMENT header is required', accepts: [{ scheme: 'exact', network: 'base', maxAmountRequired: '300000', resource, description: 'Federal contract market intelligence by NAICS (USAspending): top incumbents + buying agencies + total obligated. Pay 0.30 USDC on Base, then retry with header X-PAYMENT-TX: <txHash>.', mimeType: 'application/json', outputSchema, inputSchema, payTo: X402_PAY_TO, maxTimeoutSeconds: 300, asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', extra: { name: 'USDC', version: '2', settlement: 'onchain-tx', paymentHeader: 'X-PAYMENT-TX' } }] };
+    const header402 = Buffer.from(JSON.stringify(challenge)).toString('base64');
+
+    const txHash = (req.headers['x-payment-tx'] as string | undefined) ?? '';
+    if (!txHash) {
+      return res.status(402).set('PAYMENT-REQUIRED', header402).set('Access-Control-Expose-Headers', 'PAYMENT-REQUIRED').set('Access-Control-Allow-Origin', '*').json(challenge);
+    }
+    if (alreadyRedeemed(txHash)) {
+      return res.status(402).set('Access-Control-Allow-Origin', '*').json({ ...challenge, error: 'payment_already_redeemed', detail: 'This transaction hash was already used. Send a new payment.' });
+    }
+    const v = await verifyBaseUsdcPayment({ txHash, payTo: X402_PAY_TO, minAmountUnits: MARKET_PRICE_UNITS });
+    if (!v.ok) {
+      return res.status(402).set('PAYMENT-REQUIRED', header402).set('Access-Control-Expose-Headers', 'PAYMENT-REQUIRED').set('Access-Control-Allow-Origin', '*').json({ ...challenge, error: 'payment_unverified', detail: v.error });
+    }
+    if (!/^\d{6}$/.test(naics)) {
+      return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_or_invalid_naics', detail: 'Payment verified. Add ?naics=<6-digit> and retry with the same X-PAYMENT-TX.' });
+    }
+    const end = new Date().toISOString().slice(0, 10);
+    const start = new Date(Date.now() - years * 365 * 86400000).toISOString().slice(0, 10);
+    const usaCat = async (category: string, limit: number): Promise<Array<{ name: string; total_obligated_usd: number }>> => {
+      const body = { filters: { award_type_codes: ['A', 'B', 'C', 'D'], naics_codes: [naics], time_period: [{ start_date: start, end_date: end }] }, category, limit, page: 1 };
+      const r = await fetch(`https://api.usaspending.gov/api/v2/search/spending_by_category/${category}/`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      if (!r.ok) throw new Error(`${category} HTTP ${r.status}`);
+      const j = await r.json() as { results?: Array<{ name?: string; amount?: number }> };
+      return (j.results ?? []).map((x) => ({ name: x.name ?? '', total_obligated_usd: Math.round(x.amount ?? 0) }));
+    };
+    try {
+      const [incumbents, agencies] = await Promise.all([usaCat('recipient', 8), usaCat('awarding_agency', 8)]);
+      markRedeemed(txHash);
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'usaspending.gov/api/v2', naics, window: { start_date: start, end_date: end, years }, award_types: 'prime contracts (A,B,C,D)', top_incumbents: incumbents, top_buying_agencies: agencies, _note: 'Obligated $ for prime contract awards in the window. Use for capture targeting and competitor analysis.', _paid: { tx: txHash, from: v.from ?? '', amount_units: String(v.amountUnits ?? ''), asset: 'USDC', network: 'base' } });
+    } catch (err) {
+      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'usaspending_error', message: String(err) });
+    }
+  });
+
   // ── x402 discovery document (OpenAPI 3.1 + x-service-info / x-payment-info) ─
   // x402scan's canonical signal; served at /.well-known/x402 and /openapi.json.
   const OPENAPI_DOC = {
@@ -216,6 +260,16 @@ async function runSSE(): Promise<void> {
       ],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.08', amountUnits: '80000', payTo: X402_PAY_TO, settlement: 'onchain-tx', paymentHeader: 'X-PAYMENT-TX' },
       responses: { '200': { description: 'Matching firms' }, '402': { description: 'Payment required — pay USDC then retry with X-PAYMENT-TX.' } },
+    } }, '/x402/market': { get: {
+      operationId: 'marketIntel',
+      summary: 'Federal contract market intelligence by NAICS (USAspending).',
+      description: 'Top incumbents (recipients) and top buying agencies by obligated dollars for a NAICS over a lookback window. Pay 0.30 USDC on Base, then call with X-PAYMENT-TX.',
+      parameters: [
+        { name: 'naics', in: 'query', required: true, schema: { type: 'string' }, description: '6-digit NAICS code.' },
+        { name: 'years', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 10, default: 3 } },
+      ],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.30', amountUnits: '300000', payTo: X402_PAY_TO, settlement: 'onchain-tx', paymentHeader: 'X-PAYMENT-TX' },
+      responses: { '200': { description: 'Market intelligence' }, '402': { description: 'Payment required — pay USDC then retry with X-PAYMENT-TX.' } },
     } } },
   };
   app.get('/.well-known/x402', (_req, res) => { res.set('Access-Control-Allow-Origin', '*').json(OPENAPI_DOC); });
