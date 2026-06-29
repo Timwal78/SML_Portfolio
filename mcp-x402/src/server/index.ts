@@ -440,13 +440,98 @@ async function runSSE(): Promise<void> {
     } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'edgar_fetch_failed', message: String(err) }); }
   });
 
+  // ── /x402/drug-adverse-events — openFDA FAERS, keyless, $0.08 ───────────────
+  app.get('/x402/drug-adverse-events', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/drug-adverse-events`;
+    const drug = cleanTerm(typeof req.query['drug'] === 'string' ? req.query['drug'] : '');
+    const limit = Math.min(Math.max(parseInt(String(req.query['limit'] ?? '10'), 10) || 10, 1), 25);
+    const inputSchema = { type: 'object', properties: { drug: { type: 'string', description: 'Drug name (required).' }, limit: { type: 'integer', minimum: 1, maximum: 25, default: 10 } }, required: ['drug'] };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { drug: { type: 'string', required: true }, limit: { type: 'integer', required: false } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 80000n, description: 'FDA adverse event reports (openFDA FAERS): reactions, seriousness, outcomes for a drug. Pay 0.08 USDC on Base via X-PAYMENT (standard) or X-PAYMENT-TX (sovereign).', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    if (!drug) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_drug', detail: 'Payment verified. Add ?drug= and retry with the same payment.' }); }
+    try {
+      const p = new URLSearchParams({ search: `patient.drug.medicinalproduct:"${drug}"`, limit: String(limit), sort: 'receivedate:desc' });
+      if (fdaKey) p.set('api_key', fdaKey);
+      const r = await fetch(`https://api.fda.gov/drug/event.json?${p.toString()}`);
+      if (r.status === 404) return res.set('Access-Control-Allow-Origin', '*').json({ source: 'openfda/drug/event', drug, count: 0, events: [], _disclaimer: 'FDA FAERS reference data. Not medical advice.', _paid: pay.payer });
+      if (!r.ok) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'openfda_error', status: r.status }); }
+      const j = await r.json() as { meta?: { results?: { total?: number } }; results?: Array<Record<string, unknown>> };
+      const events = (j.results ?? []).map((e) => {
+        const pt = e['patient'] as Record<string, unknown> | undefined ?? {};
+        const reactions = ((pt['reaction'] ?? []) as Array<Record<string, unknown>>).map((rx) => String(rx['reactionmeddrapt'] ?? '')).filter(Boolean).slice(0, 8);
+        const drugs = ((pt['drug'] ?? []) as Array<Record<string, unknown>>).map((d2) => String(d2['medicinalproduct'] ?? '')).filter(Boolean).slice(0, 5);
+        const src = (e['primarysource'] as Record<string, unknown> | undefined) ?? {};
+        return { report_id: String(e['safetyreportid'] ?? ''), received: String(e['receivedate'] ?? ''), serious: e['serious'] === '1' || e['serious'] === 1, reactions, concomitant_drugs: drugs, reporter_country: String(src['reportercountry'] ?? ''), outcome: String(((pt['patientdeath'] as Record<string, unknown>)?.['patientdeathdate']) ? 'death' : (e['seriousnesshospitalization'] === '1' ? 'hospitalization' : (e['seriousnesslifethreatening'] === '1' ? 'life_threatening' : 'other'))) };
+      });
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'openfda/drug/event', drug, total: j.meta?.results?.total ?? events.length, count: events.length, events, _disclaimer: 'FDA FAERS reference data. Not medical advice.', _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'openfda_fetch_failed', message: String(err) }); }
+  });
+
+  // ── /x402/sec-8k — SEC EDGAR 8-K material events by ticker, $0.25 ────────────
+  app.get('/x402/sec-8k', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/sec-8k`;
+    const ticker = cleanTerm(typeof req.query['ticker'] === 'string' ? req.query['ticker'] : '').toUpperCase();
+    const limit = Math.min(Math.max(parseInt(String(req.query['limit'] ?? '5'), 10) || 5, 1), 20);
+    const inputSchema = { type: 'object', properties: { ticker: { type: 'string', description: 'Stock ticker (required). e.g. TSLA, AMC, GME.' }, limit: { type: 'integer', minimum: 1, maximum: 20, default: 5 } }, required: ['ticker'] };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { ticker: { type: 'string', required: true }, limit: { type: 'integer', required: false } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 250000n, description: 'SEC EDGAR 8-K material event filings by ticker (earnings surprises, CEO changes, M&A). Pay 0.25 USDC on Base via X-PAYMENT (standard) or X-PAYMENT-TX (sovereign).', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    if (!ticker || !/^[A-Z]{1,5}$/.test(ticker)) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_or_invalid_ticker', detail: 'Payment verified. Add ?ticker=TSLA and retry with the same payment.' }); }
+    try {
+      const cik = await resolveTickerToCik(ticker);
+      if (!cik) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(404).set('Access-Control-Allow-Origin', '*').json({ error: 'ticker_not_found', ticker }); }
+      const r = await fetch(`https://data.sec.gov/submissions/CIK${cik}.json`, { headers: { 'User-Agent': 'ScriptMasterLabs ScriptMasterLabs@gmail.com' } });
+      if (!r.ok) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'edgar_error', status: r.status }); }
+      const sub = await r.json() as { name?: string; filings?: { recent?: { form?: string[]; filingDate?: string[]; primaryDocument?: string[]; accessionNumber?: string[]; items?: string[] } } };
+      const rec = sub.filings?.recent ?? {};
+      const forms = rec.form ?? []; const dates = rec.filingDate ?? []; const docs = rec.primaryDocument ?? []; const acc = rec.accessionNumber ?? []; const items = rec.items ?? [];
+      const cikShort = cik.replace(/^0+/, '');
+      const filings = forms.map((f, i) => ({ form: f, date: dates[i] ?? '', doc: docs[i] ?? '', acc: acc[i] ?? '', items: String(items[i] ?? '') }))
+        .filter((x) => x.form === '8-K')
+        .slice(0, limit)
+        .map((x) => {
+          const accFmt = x.acc.replace(/-/g, '');
+          return { date: x.date, form: x.form, items: x.items, filing_url: `https://www.sec.gov/Archives/edgar/data/${cikShort}/${accFmt}/${x.doc}`, accession: x.acc };
+        });
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'sec.gov/EDGAR', ticker, company: sub.name ?? '', cik: cikShort, form_type: '8-K', count: filings.length, filings, note: 'Items field indicates the material event type (e.g. 2.02=earnings, 5.02=executive change, 1.01=agreement). filing_url links to the full 8-K document.', _disclaimer: 'SEC EDGAR public filing data. Not investment advice.', _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'edgar_fetch_failed', message: String(err) }); }
+  });
+
+  // ── /x402/treasury-yields — Daily Treasury yield curve, keyless, $0.05 ───────
+  app.get('/x402/treasury-yields', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/treasury-yields`;
+    const month = typeof req.query['month'] === 'string' && /^\d{6}$/.test(req.query['month']) ? req.query['month'] : new Date().toISOString().slice(0, 7).replace('-', '');
+    const inputSchema = { type: 'object', properties: { month: { type: 'string', description: 'YYYYMM format (optional, defaults to current month). e.g. 202606.' } }, required: [] };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { month: { type: 'string', required: false } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 50000n, description: 'Daily US Treasury yield curve rates (1M–30Y). Pay 0.05 USDC on Base via X-PAYMENT (standard) or X-PAYMENT-TX (sovereign).', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    try {
+      const url = `https://home.treasury.gov/resource-center/data-chart-center/interest-rates/pages/xml?data=daily_treasury_yield_curve&field_tdr_date_value_month=${month}`;
+      const r = await fetch(url, { headers: { Accept: 'application/xml' } });
+      if (!r.ok) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'treasury_error', status: r.status }); }
+      const xml = await r.text();
+      const pick = (tag: string): string | null => { const m = xml.match(new RegExp(`<d:${tag}[^>]*>([^<]+)</d:${tag}>`)); return m ? (m[1] ?? null) : null; };
+      const pickAll = (tag: string): string[] => { const re = new RegExp(`<d:${tag}[^>]*>([^<]+)<\/d:${tag}>`, 'g'); const out: string[] = []; let m; while ((m = re.exec(xml)) !== null) { if (m[1]) out.push(m[1]); } return out; };
+      const dates = pickAll('NEW_DATE'); const m1 = pickAll('BC_1MONTH'); const m3 = pickAll('BC_3MONTH'); const m6 = pickAll('BC_6MONTH'); const y1 = pickAll('BC_1YEAR'); const y2 = pickAll('BC_2YEAR'); const y3 = pickAll('BC_3YEAR'); const y5 = pickAll('BC_5YEAR'); const y7 = pickAll('BC_7YEAR'); const y10 = pickAll('BC_10YEAR'); const y20 = pickAll('BC_20YEAR'); const y30 = pickAll('BC_30YEAR');
+      const datesFallback = pickAll('Id').map((id) => { const dm = id.match(/(\d{4}-\d{2}-\d{2})/); return dm ? (dm[1] ?? '') : ''; }).filter(Boolean);
+      const useDates = dates.length > 0 ? dates : datesFallback;
+      const curve = m1.map((_v, i) => ({ date: useDates[i] ?? `${month.slice(0,4)}-${month.slice(4,6)}`, '1M': m1[i] ?? null, '3M': m3[i] ?? null, '6M': m6[i] ?? null, '1Y': y1[i] ?? null, '2Y': y2[i] ?? null, '3Y': y3[i] ?? null, '5Y': y5[i] ?? null, '7Y': y7[i] ?? null, '10Y': y10[i] ?? null, '20Y': y20[i] ?? null, '30Y': y30[i] ?? null })).slice(0, 5).reverse();
+      const latest = curve[curve.length - 1] ?? {};
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'home.treasury.gov/yield-curve', month, latest, recent_days: curve, units: 'percent', _disclaimer: 'US Treasury published yield curve rates. Not investment advice.', _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'treasury_fetch_failed', message: String(err) }); }
+  });
+
   // ── x402 discovery document (OpenAPI 3.1 + x-service-info / x-payment-info) ─
   // x402scan's canonical signal; served at /.well-known/x402 and /openapi.json.
   const OPENAPI_DOC = {
     openapi: '3.1.0',
     info: { title: 'Script Master Labs — x402 Data API', version: VERSION, description: 'Pay-per-call U.S. federal data, settled in USDC on Base via x402.', contact: { name: 'Script Master Labs', email: 'ScriptMasterLabs@gmail.com', url: 'https://scriptmasterlabs.com' } },
     servers: [{ url: 'https://mcp-x402.onrender.com' }],
-    'x-service-info': { categories: ['government-data', 'grants', 'federal-contracts', 'market-intelligence', 'medical-reference', 'drug-data', 'healthcare-providers', 'clinical-trials', 'sec-filings', 'insider-trading', 'finance'], payment: { protocol: 'x402', rails: [{ id: 'standard', scheme: 'exact', network: 'base', settlement: 'facilitator', note: 'EIP-3009 via X-PAYMENT — settled through a hybrid facilitator chain.' }, { id: 'sovereign', scheme: 'exact', network: 'base', settlement: 'onchain-tx', note: 'Pay USDC then send X-PAYMENT-TX — verified directly on-chain, no facilitator.' }], facilitators: '/x402/facilitators' }, docs: { homepage: 'https://scriptmasterlabs.com', llms: 'https://mcp-x402.onrender.com/llms.txt', apiReference: 'https://github.com/Timwal78/SML_Portfolio/tree/main/mcp-x402' } },
+    'x-service-info': { categories: ['government-data', 'grants', 'federal-contracts', 'market-intelligence', 'medical-reference', 'drug-data', 'healthcare-providers', 'clinical-trials', 'sec-filings', 'insider-trading', 'finance', 'drug-safety', 'treasury', 'yield-curve'], payment: { protocol: 'x402', rails: [{ id: 'standard', scheme: 'exact', network: 'base', settlement: 'facilitator', note: 'EIP-3009 via X-PAYMENT — settled through a hybrid facilitator chain.' }, { id: 'sovereign', scheme: 'exact', network: 'base', settlement: 'onchain-tx', note: 'Pay USDC then send X-PAYMENT-TX — verified directly on-chain, no facilitator.' }], facilitators: '/x402/facilitators' }, docs: { homepage: 'https://scriptmasterlabs.com', llms: 'https://mcp-x402.onrender.com/llms.txt', apiReference: 'https://github.com/Timwal78/SML_Portfolio/tree/main/mcp-x402' } },
     paths: { '/x402/grants': { get: {
       operationId: 'searchGrants',
       summary: 'Search live U.S. federal grant opportunities (Grants.gov Search2).',
@@ -514,6 +599,27 @@ async function runSSE(): Promise<void> {
       parameters: [{ name: 'ticker', in: 'query', required: true, schema: { type: 'string' }, description: 'Stock ticker (e.g. TSLA, AMC, GME).' }, { name: 'days', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 90, default: 30 } }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 25, default: 10 } }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.20', amountUnits: '200000', payTo: X402_PAY_TO },
       responses: { '200': { description: 'Insider trades' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/drug-adverse-events': { get: {
+      operationId: 'drugAdverseEvents',
+      summary: 'FDA adverse event reports (openFDA FAERS).',
+      description: 'Reactions, seriousness, outcomes for a drug from FDA safety reports. Pay 0.08 USDC on Base.',
+      parameters: [{ name: 'drug', in: 'query', required: true, schema: { type: 'string' } }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 25, default: 10 } }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.08', amountUnits: '80000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'Adverse events' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/sec-8k': { get: {
+      operationId: 'sec8k',
+      summary: 'SEC EDGAR 8-K material event filings by ticker.',
+      description: 'Earnings, CEO changes, M&A, and other material events. Pay 0.25 USDC on Base.',
+      parameters: [{ name: 'ticker', in: 'query', required: true, schema: { type: 'string' } }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 20, default: 5 } }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.25', amountUnits: '250000', payTo: X402_PAY_TO },
+      responses: { '200': { description: '8-K filings' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/treasury-yields': { get: {
+      operationId: 'treasuryYields',
+      summary: 'Daily US Treasury yield curve rates (1M–30Y).',
+      description: 'Official daily yield curve from Treasury.gov. Pay 0.05 USDC on Base.',
+      parameters: [{ name: 'month', in: 'query', required: false, schema: { type: 'string' }, description: 'YYYYMM format (defaults to current month).' }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.05', amountUnits: '50000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'Yield curve' }, '402': { description: 'Payment required.' } },
     } } },
   };
   app.get('/.well-known/x402', (_req, res) => { res.set('Access-Control-Allow-Origin', '*').json(OPENAPI_DOC); });
