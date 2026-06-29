@@ -97,7 +97,8 @@ async function runSSE(): Promise<void> {
       : (typeof req.query['q'] === 'string' ? req.query['q'] : '');
     const rows = Math.min(Math.max(parseInt(String(req.query['rows'] ?? '10'), 10) || 10, 1), 50);
     const inputSchema = { type: 'object', properties: { keyword: { type: 'string', description: 'Search keywords or CFDA/assistance-listing number.' }, rows: { type: 'integer', minimum: 1, maximum: 50, default: 10 } }, required: ['keyword'] };
-    const challenge = { x402Version: 2, error: 'payment_required', accepts: [{ scheme: 'exact', network: 'eip155:8453', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', maxAmountRequired: '20000', resource, description: 'Live U.S. federal grant search (Grants.gov Search2). Pay 0.02 USDC to payTo on Base, then retry with header X-PAYMENT-TX: <txHash>.', mimeType: 'application/json', payTo: X402_PAY_TO, maxTimeoutSeconds: 300, inputSchema, extra: { name: 'USDC', version: '2', settlement: 'onchain-tx', paymentHeader: 'X-PAYMENT-TX' } }] };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { keyword: { type: 'string', required: true, description: 'Search keywords or CFDA number.' }, rows: { type: 'integer', required: false } } }, output: null };
+    const challenge = { x402Version: 1, error: 'X-PAYMENT header is required', accepts: [{ scheme: 'exact', network: 'base', maxAmountRequired: '20000', resource, description: 'Live U.S. federal grant search (Grants.gov Search2). Pay 0.02 USDC to payTo on Base, then retry with header X-PAYMENT-TX: <txHash>.', mimeType: 'application/json', outputSchema, inputSchema, payTo: X402_PAY_TO, maxTimeoutSeconds: 300, asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', extra: { name: 'USDC', version: '2', settlement: 'onchain-tx', paymentHeader: 'X-PAYMENT-TX' } }] };
     const header402 = Buffer.from(JSON.stringify(challenge)).toString('base64');
 
     const txHash = (req.headers['x-payment-tx'] as string | undefined) ?? '';
@@ -132,7 +133,7 @@ async function runSSE(): Promise<void> {
   // x402scan's canonical signal; served at /.well-known/x402 and /openapi.json.
   const OPENAPI_DOC = {
     openapi: '3.1.0',
-    info: { title: 'Script Master Labs — x402 Data API', version: VERSION, description: 'Pay-per-call U.S. federal data, settled in USDC on Base via x402.' },
+    info: { title: 'Script Master Labs — x402 Data API', version: VERSION, description: 'Pay-per-call U.S. federal data, settled in USDC on Base via x402.', contact: { name: 'Script Master Labs', email: 'ScriptMasterLabs@gmail.com', url: 'https://scriptmasterlabs.com' } },
     servers: [{ url: 'https://mcp-x402.onrender.com' }],
     'x-service-info': { categories: ['government-data', 'grants', 'federal-contracts', 'market-intelligence'], docs: { homepage: 'https://scriptmasterlabs.com', llms: 'https://mcp-x402.onrender.com/llms.txt', apiReference: 'https://github.com/Timwal78/SML_Portfolio/tree/main/mcp-x402' } },
     paths: { '/x402/grants': { get: {
@@ -143,12 +144,13 @@ async function runSSE(): Promise<void> {
         { name: 'keyword', in: 'query', required: true, schema: { type: 'string' }, description: 'Search keywords or CFDA/assistance-listing number.' },
         { name: 'rows', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 50, default: 10 } },
       ],
-      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'eip155:8453', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.02', amountUnits: '20000', payTo: X402_PAY_TO, settlement: 'onchain-tx', paymentHeader: 'X-PAYMENT-TX' },
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.02', amountUnits: '20000', payTo: X402_PAY_TO, settlement: 'onchain-tx', paymentHeader: 'X-PAYMENT-TX' },
       responses: { '200': { description: 'Live grant results' }, '402': { description: 'Payment required — pay USDC then retry with X-PAYMENT-TX.' } },
     } } },
   };
   app.get('/.well-known/x402', (_req, res) => { res.set('Access-Control-Allow-Origin', '*').json(OPENAPI_DOC); });
   app.get('/openapi.json', (_req, res) => { res.set('Access-Control-Allow-Origin', '*').json(OPENAPI_DOC); });
+  app.get('/favicon.ico', (_req, res) => { res.redirect(302, 'https://scriptmasterlabs.com/favicon.ico'); });
 
   // Root handler — service discovery for agents hitting / directly
   app.get('/', (_req, res) => {
