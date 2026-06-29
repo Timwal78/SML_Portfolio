@@ -346,13 +346,107 @@ async function runSSE(): Promise<void> {
     } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'nppes_fetch_failed', message: String(err) }); }
   });
 
+  // ── /x402/clinical-trials — ClinicalTrials.gov APIv2, keyless, $0.08 ─────────
+  interface CtStudy { protocolSection?: { identificationModule?: { nctId?: string; briefTitle?: string; officialTitle?: string }; statusModule?: { overallStatus?: string; startDateStruct?: { date?: string }; primaryCompletionDateStruct?: { date?: string } }; conditionsModule?: { conditions?: string[] }; designModule?: { phases?: string[]; enrollmentInfo?: { count?: number } }; descriptionModule?: { briefSummary?: string }; sponsorCollaboratorsModule?: { leadSponsor?: { name?: string } } } }
+  app.get('/x402/clinical-trials', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/clinical-trials`;
+    const term = cleanTerm(typeof req.query['term'] === 'string' ? req.query['term'] : '');
+    const condition = cleanTerm(typeof req.query['condition'] === 'string' ? req.query['condition'] : '');
+    const status = typeof req.query['status'] === 'string' ? req.query['status'].toUpperCase() : '';
+    const validStatus: Record<string, string> = { RECRUITING: 'RECRUITING', ACTIVE: 'ACTIVE_NOT_RECRUITING', COMPLETED: 'COMPLETED', ALL: '' };
+    const ctStatus = validStatus[status] ?? 'RECRUITING';
+    const rows = Math.min(Math.max(parseInt(String(req.query['rows'] ?? '10'), 10) || 10, 1), 25);
+    const inputSchema = { type: 'object', properties: { term: { type: 'string', description: 'Drug, sponsor, or keyword (required if no condition).' }, condition: { type: 'string', description: 'Disease or condition (e.g. diabetes).' }, status: { type: 'string', enum: ['RECRUITING', 'ACTIVE', 'COMPLETED', 'ALL'], default: 'RECRUITING' }, rows: { type: 'integer', minimum: 1, maximum: 25, default: 10 } }, required: [] };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { term: { type: 'string', required: false }, condition: { type: 'string', required: false }, status: { type: 'string', required: false } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 80000n, description: 'Clinical trial search (ClinicalTrials.gov APIv2): NCT ID, title, status, phase, enrollment, sponsor, conditions. Pay 0.08 USDC on Base via X-PAYMENT (standard) or X-PAYMENT-TX (sovereign).', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    if (!term && !condition) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_query', detail: 'Payment verified. Add ?term= or ?condition= and retry with the same payment.' }); }
+    try {
+      const p = new URLSearchParams({ pageSize: String(rows) });
+      const q = [term, condition].filter(Boolean).join(' ');
+      if (q) p.set('query.term', q);
+      if (ctStatus) p.set('filter.overallStatus', ctStatus);
+      const r = await fetch(`https://clinicaltrials.gov/api/v2/studies?${p.toString()}`, { headers: { Accept: 'application/json' } });
+      if (!r.ok) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'clinicaltrials_error', status: r.status }); }
+      const j = await r.json() as { totalCount?: number; studies?: CtStudy[] };
+      const trials = (j.studies ?? []).map((st) => {
+        const ps = st.protocolSection ?? {};
+        const im = ps.identificationModule ?? {}; const sm = ps.statusModule ?? {}; const cm = ps.conditionsModule ?? {}; const dm = ps.designModule ?? {}; const desc = ps.descriptionModule ?? {}; const sp = ps.sponsorCollaboratorsModule ?? {};
+        return { nct_id: im.nctId ?? '', title: im.briefTitle ?? '', status: sm.overallStatus ?? '', phase: (dm.phases ?? []).join(', '), enrollment: dm.enrollmentInfo?.count ?? null, conditions: cm.conditions ?? [], sponsor: sp.leadSponsor?.name ?? '', start_date: sm.startDateStruct?.date ?? '', completion_date: sm.primaryCompletionDateStruct?.date ?? '', summary: (desc.briefSummary ?? '').slice(0, 400), url: im.nctId ? `https://clinicaltrials.gov/study/${im.nctId}` : '' };
+      });
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'clinicaltrials.gov/api/v2', query: { term, condition, status: ctStatus || 'ALL' }, total: j.totalCount ?? trials.length, count: trials.length, trials, _disclaimer: 'Clinical trial reference data. Not medical advice.', _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'clinicaltrials_fetch_failed', message: String(err) }); }
+  });
+
+  // ── /x402/insider-trades — SEC EDGAR Form 4, keyless, $0.20 ────────────────
+  interface EdgarHit { _id?: string; _source?: { display_names?: string[]; period_ending?: string; ciks?: string[]; file_num?: string[] } }
+  const CIK_CACHE: Record<string, string> = {};
+  async function resolveTickerToCik(ticker: string): Promise<string | null> {
+    const t = ticker.toUpperCase();
+    if (CIK_CACHE[t]) return CIK_CACHE[t] ?? null;
+    try {
+      const r = await fetch('https://www.sec.gov/files/company_tickers.json', { headers: { 'User-Agent': 'ScriptMasterLabs ScriptMasterLabs@gmail.com' } });
+      if (!r.ok) return null;
+      const d = await r.json() as Record<string, { cik_str: number; ticker: string }>;
+      for (const v of Object.values(d)) {
+        const cikStr = String(v.cik_str).padStart(10, '0');
+        CIK_CACHE[v.ticker.toUpperCase()] = cikStr;
+      }
+      return CIK_CACHE[t] ?? null;
+    } catch { return null; }
+  }
+  app.get('/x402/insider-trades', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/insider-trades`;
+    const ticker = cleanTerm(typeof req.query['ticker'] === 'string' ? req.query['ticker'] : '').toUpperCase();
+    const days = Math.min(Math.max(parseInt(String(req.query['days'] ?? '30'), 10) || 30, 1), 90);
+    const limit = Math.min(Math.max(parseInt(String(req.query['limit'] ?? '10'), 10) || 10, 1), 25);
+    const inputSchema = { type: 'object', properties: { ticker: { type: 'string', description: 'Stock ticker symbol (required). e.g. TSLA, AMC, GME.' }, days: { type: 'integer', minimum: 1, maximum: 90, default: 30, description: 'Lookback window in days.' }, limit: { type: 'integer', minimum: 1, maximum: 25, default: 10 } }, required: ['ticker'] };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { ticker: { type: 'string', required: true }, days: { type: 'integer', required: false }, limit: { type: 'integer', required: false } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 200000n, description: 'SEC EDGAR insider trades (Form 4): executive buys/sells by ticker. Pay 0.20 USDC on Base via X-PAYMENT (standard) or X-PAYMENT-TX (sovereign).', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    if (!ticker || !/^[A-Z]{1,5}$/.test(ticker)) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_or_invalid_ticker', detail: 'Payment verified. Add ?ticker=TSLA (1-5 uppercase letters) and retry with the same payment.' }); }
+    try {
+      const cik = await resolveTickerToCik(ticker);
+      if (!cik) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(404).set('Access-Control-Allow-Origin', '*').json({ error: 'ticker_not_found', ticker, detail: 'No CIK found for this ticker in SEC company registry.' }); }
+      const end = new Date().toISOString().slice(0, 10);
+      const start = new Date(Date.now() - days * 86400000).toISOString().slice(0, 10);
+      const p = new URLSearchParams({ forms: '4', dateRange: 'custom', startdt: start, enddt: end });
+      const searchUrl = `https://efts.sec.gov/LATEST/search-index?${p.toString()}&hits.hits.total=true`;
+      const r = await fetch(searchUrl, { headers: { 'User-Agent': 'ScriptMasterLabs ScriptMasterLabs@gmail.com' } });
+      if (!r.ok) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'edgar_search_error', status: r.status }); }
+      const j = await r.json() as { hits?: { total?: { value?: number }; hits?: EdgarHit[] } };
+      const allHits = j.hits?.hits ?? [];
+      const cikShort = cik.replace(/^0+/, '');
+      const filtered = allHits.filter((h) => (h._source?.ciks ?? []).some((c) => c.replace(/^0+/, '') === cikShort));
+      // fetch the issuer's own submissions for richer data
+      const subR = await fetch(`https://data.sec.gov/submissions/CIK${cik}.json`, { headers: { 'User-Agent': 'ScriptMasterLabs ScriptMasterLabs@gmail.com' } });
+      let trades: unknown[] = [];
+      if (subR.ok) {
+        const sub = await subR.json() as { name?: string; filings?: { recent?: { form?: string[]; filingDate?: string[]; primaryDocument?: string[]; accessionNumber?: string[] } } };
+        const rec = sub.filings?.recent ?? {};
+        const forms = rec.form ?? []; const dates = rec.filingDate ?? []; const docs = rec.primaryDocument ?? []; const acc = rec.accessionNumber ?? [];
+        const cutoff = start;
+        trades = forms.map((f, i) => ({ form: f, date: dates[i] ?? '', doc: docs[i] ?? '', acc: acc[i] ?? '' }))
+          .filter((x) => x.form === '4' && x.date >= cutoff)
+          .slice(0, limit)
+          .map((x) => {
+            const accFmt = (x.acc as string).replace(/-/g, '');
+            return { period: x.date, accession: x.acc, filing_url: `https://www.sec.gov/Archives/edgar/data/${cikShort}/${accFmt}/${x.doc as string}`, index_url: `https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=${cikShort}&type=4&dateb=&owner=include&count=10` };
+          });
+      }
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'sec.gov/EDGAR', ticker, cik: cikShort, window: { start_date: start, end_date: end, days }, form_type: '4', total_in_window: trades.length, trades, note: 'Each trade object includes a filing_url to the actual Form 4 XML/HTML for full insider buy/sell details (shares, price, transaction code).', _disclaimer: 'SEC EDGAR public filing data. Not investment advice.', _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'edgar_fetch_failed', message: String(err) }); }
+  });
+
   // ── x402 discovery document (OpenAPI 3.1 + x-service-info / x-payment-info) ─
   // x402scan's canonical signal; served at /.well-known/x402 and /openapi.json.
   const OPENAPI_DOC = {
     openapi: '3.1.0',
     info: { title: 'Script Master Labs — x402 Data API', version: VERSION, description: 'Pay-per-call U.S. federal data, settled in USDC on Base via x402.', contact: { name: 'Script Master Labs', email: 'ScriptMasterLabs@gmail.com', url: 'https://scriptmasterlabs.com' } },
     servers: [{ url: 'https://mcp-x402.onrender.com' }],
-    'x-service-info': { categories: ['government-data', 'grants', 'federal-contracts', 'market-intelligence', 'medical-reference', 'drug-data', 'healthcare-providers'], payment: { protocol: 'x402', rails: [{ id: 'standard', scheme: 'exact', network: 'base', settlement: 'facilitator', note: 'EIP-3009 via X-PAYMENT — settled through a hybrid facilitator chain.' }, { id: 'sovereign', scheme: 'exact', network: 'base', settlement: 'onchain-tx', note: 'Pay USDC then send X-PAYMENT-TX — verified directly on-chain, no facilitator.' }], facilitators: '/x402/facilitators' }, docs: { homepage: 'https://scriptmasterlabs.com', llms: 'https://mcp-x402.onrender.com/llms.txt', apiReference: 'https://github.com/Timwal78/SML_Portfolio/tree/main/mcp-x402' } },
+    'x-service-info': { categories: ['government-data', 'grants', 'federal-contracts', 'market-intelligence', 'medical-reference', 'drug-data', 'healthcare-providers', 'clinical-trials', 'sec-filings', 'insider-trading', 'finance'], payment: { protocol: 'x402', rails: [{ id: 'standard', scheme: 'exact', network: 'base', settlement: 'facilitator', note: 'EIP-3009 via X-PAYMENT — settled through a hybrid facilitator chain.' }, { id: 'sovereign', scheme: 'exact', network: 'base', settlement: 'onchain-tx', note: 'Pay USDC then send X-PAYMENT-TX — verified directly on-chain, no facilitator.' }], facilitators: '/x402/facilitators' }, docs: { homepage: 'https://scriptmasterlabs.com', llms: 'https://mcp-x402.onrender.com/llms.txt', apiReference: 'https://github.com/Timwal78/SML_Portfolio/tree/main/mcp-x402' } },
     paths: { '/x402/grants': { get: {
       operationId: 'searchGrants',
       summary: 'Search live U.S. federal grant opportunities (Grants.gov Search2).',
@@ -406,6 +500,20 @@ async function runSSE(): Promise<void> {
       parameters: [{ name: 'last_name', in: 'query', required: false, schema: { type: 'string' } }, { name: 'organization_name', in: 'query', required: false, schema: { type: 'string' } }, { name: 'specialty', in: 'query', required: false, schema: { type: 'string' } }, { name: 'state', in: 'query', required: false, schema: { type: 'string' } }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.05', amountUnits: '50000', payTo: X402_PAY_TO },
       responses: { '200': { description: 'Providers' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/clinical-trials': { get: {
+      operationId: 'clinicalTrials',
+      summary: 'Clinical trial search (ClinicalTrials.gov APIv2).',
+      description: 'NCT ID, title, status, phase, enrollment, sponsor, conditions. Pay 0.08 USDC on Base.',
+      parameters: [{ name: 'term', in: 'query', required: false, schema: { type: 'string' }, description: 'Drug, sponsor, or keyword.' }, { name: 'condition', in: 'query', required: false, schema: { type: 'string' } }, { name: 'status', in: 'query', required: false, schema: { type: 'string', enum: ['RECRUITING', 'ACTIVE', 'COMPLETED', 'ALL'], default: 'RECRUITING' } }, { name: 'rows', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 25, default: 10 } }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.08', amountUnits: '80000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'Clinical trials' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/insider-trades': { get: {
+      operationId: 'insiderTrades',
+      summary: 'SEC EDGAR Form 4 insider trades by ticker.',
+      description: 'Executive buy/sell filings from SEC EDGAR. Returns filing URLs with full Form 4 detail. Pay 0.20 USDC on Base.',
+      parameters: [{ name: 'ticker', in: 'query', required: true, schema: { type: 'string' }, description: 'Stock ticker (e.g. TSLA, AMC, GME).' }, { name: 'days', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 90, default: 30 } }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 25, default: 10 } }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.20', amountUnits: '200000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'Insider trades' }, '402': { description: 'Payment required.' } },
     } } },
   };
   app.get('/.well-known/x402', (_req, res) => { res.set('Access-Control-Allow-Origin', '*').json(OPENAPI_DOC); });
