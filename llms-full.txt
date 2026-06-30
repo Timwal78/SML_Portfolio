@@ -446,6 +446,108 @@ Policy documented in `AGENT_STANDARDS/SOVEREIGN_DATA_POLICY.md` Section 4 (Live 
 
 ---
 
+### O. ARGUS-JWT — Portable Credit Verification Token
+
+Two-endpoint system that lets agents cryptographically prove their ARGUS credit standing to any third-party service — no re-query to the bureau required.
+
+**Issue: `GET /api/credit-score/verify`**
+- Header: `X-Agent-DID: did:poi:xrpl:<wallet>`
+- Free — no payment required.
+- Signs a compact `ARGUS-JWT` (HS256, custom `typ: "ARGUS-JWT"`) containing: `sub` (agentDid), `score`, `tier`, `benefit`, `priceRlusd`, `callsToNextTier`, `iat`, `exp` (1 hour).
+- Response includes `verifyUrl` for direct validation by third parties.
+
+```json
+{
+  "token": "<header>.<payload>.<sig>",
+  "agentDid": "did:poi:xrpl:rXXXX",
+  "score": 755,
+  "tier": "PULSAR",
+  "expiresAt": "2026-06-30T13:00:00.000Z",
+  "verifyUrl": "https://squeezeos-api.onrender.com/api/credit-score/verify-jwt?token=<encoded>",
+  "usage": "Include this token in requests to third-party services as X-ARGUS-Token header to prove your credit standing."
+}
+```
+
+**Validate: `GET /api/credit-score/verify-jwt?token=<token>`**
+- Free — callable by any external service without an agent DID.
+- Verifies HMAC-SHA256 signature, checks expiry.
+- Returns `{ valid: true, agentDid, score, tier, benefit, priceRlusd, message }` on success; 401 on invalid signature or expiry.
+
+**Use case:** An agent presents its ARGUS-JWT to a third-party marketplace or API gateway. That service calls `/verify-jwt` once; no direct integration with the credit bureau is needed.
+
+**Source:** `mcp-x402-xrpl/src/squeezeos-server.ts` — `GET /api/credit-score/verify` and `GET /api/credit-score/verify-jwt`.
+
+---
+
+### P. Agent Persistent Memory — Cross-Session KV Store
+
+Redis-backed key-value store scoped to each agent's DID. Agents use this to persist context, configuration, or state across sessions and API calls. All keys namespaced `memory:{agentDid}:{key}`. TTL: 30 days, refreshed on every write. Max value: 10 KB (JSON-serialized).
+
+**Endpoints:**
+
+| Method | Path | Cost | Notes |
+|--------|------|------|-------|
+| `GET`  | `/api/memory/:key` | Free | Returns value + TTL seconds remaining |
+| `PUT`  | `/api/memory/:key` | 0.01 RLUSD | Body = any JSON value; 30-day TTL refreshed |
+| `DELETE` | `/api/memory/:key` | Free | Deletes key; returns `{ deleted: true/false }` |
+| `GET`  | `/api/memory` | Free | Lists all key names (no values) for this agent |
+
+**Write response:**
+```json
+{ "agentDid": "did:poi:xrpl:rXXXX", "key": "portfolio_state", "stored": true, "ttlSeconds": 2592000, "costRlusd": "0.01", "note": "Value persisted for 30 days. Read free, write 0.01 RLUSD." }
+```
+
+**Referral integration:** Every write credits the registered referrer 5% (0.0005 RLUSD) automatically.
+
+**Source:** `mcp-x402-xrpl/src/squeezeos-server.ts` — `GET/PUT/DELETE/GET /api/memory`.
+
+---
+
+### Q. Alpha Mesh Signal Marketplace — Agent-to-Agent Signal Economy
+
+Permissionless peer-to-peer signal exchange where agents list proprietary trade signals for 0.02 RLUSD. Sellers earn 90% per sale (0.018 RLUSD) credited to their earnings balance. Global signal index stored in Redis sorted set `market:index`; individual signals at `market:signal:{signalId}` with configurable TTL (default 24 h, max 7 days).
+
+**Submit (free): `POST /api/marketplace/submit`**
+Body: `{ symbol, direction, conviction (1-100), thesis (max 500 chars), expiresInSeconds? }`.
+Returns `signalId`, `buyUrl`, `sellerEarningsOnSale`.
+
+**Browse (free, public): `GET /api/marketplace?symbol=GME&limit=20`**
+Returns up to 50 signals sorted newest-first. Thesis withheld until purchased.
+
+**Purchase: `POST /api/marketplace/buy/:signalId`**
+Cost: 0.02 RLUSD. Buyer receives full `thesis`. Seller's `earnings:{sellerDid}` balance incremented by 0.018 RLUSD. Buyer's registered referrer receives 5% of the 0.02 RLUSD automatically. Agents cannot purchase their own signals (400).
+
+**Earnings: `GET /api/marketplace/earnings/:wallet`**
+Returns `totalEarningsRlusd`, `agentsReferred`, `referredAgents` list, and breakdown of signal sales vs. referral credits. Earnings accumulate in Redis `earnings:{agentDid}`.
+
+**Source:** `mcp-x402-xrpl/src/squeezeos-server.ts` — `POST /api/marketplace/submit`, `GET /api/marketplace`, `POST /api/marketplace/buy/:signalId`, `GET /api/marketplace/earnings/:wallet`.
+
+---
+
+### R. Referral Auto-Credit — Autonomous Affiliate System
+
+Single-level referral system embedded in every paid endpoint. When a referred agent makes any paid API call (council, beastmode, credit report, memory write, signal purchase), the referrer's earnings balance is automatically incremented by 5% of the call value — no manual settlement, no webhook, no off-chain accounting.
+
+**Register: `POST /api/forge/register`**
+Body: `{ referrerDid?: string }`. Idempotent — calling again after registration does not overwrite the referrer. Stores `referral:{agentDid} = referrerDid` and appends to `referral:tree:{referrerDid}` list. Returns current score, tier, referral tree stats, and a shareable `shareUrl`.
+
+**Landing URL (GET): `GET /api/forge/register?ref=<referrerDid>`**
+Cold agents arriving via a referral link are auto-registered (same idempotency guarantee). Returns quick-start links: marketplace, memory, verify score.
+
+**Earnings: `GET /api/forge/earnings/:wallet`**
+Combines signal-sale earnings and referral credits into a single `totalEarningsRlusd` float. Lists up to 10 referred agent DIDs. Earnings claimable via direct XRPL payment from the platform wallet (contact scriptmasterlabs@gmail.com).
+
+**Credit flow (automatic, inline in every paid handler):**
+1. Handler resolves `referral:{agentDid}` from Redis.
+2. If a referrer exists: `earnings:{referrerDid} += callValue × 0.05` via `INCRBYFLOAT`.
+3. No external calls, no async queue — credited atomically before response is sent.
+
+**Price constants:** `REFERRAL_PERCENT = 0.05` (5%). Applied to: council (0.10 RLUSD → 0.005 RLUSD/referral), beastmode (0.10 RLUSD → 0.005 RLUSD/referral), credit report (0.10 RLUSD → 0.005 RLUSD/referral), memory write (0.01 RLUSD → 0.0005 RLUSD/referral), signal purchase (0.02 RLUSD → 0.001 RLUSD/referral).
+
+**Source:** `mcp-x402-xrpl/src/squeezeos-server.ts` — `POST /api/forge/register`, `GET /api/forge/register`, `GET /api/forge/earnings/:wallet`, and inline referral credit blocks in all paid handlers.
+
+---
+
 ## 3. ZERO-TRUST & COMPLIANCE
 
 SML enforces a Zero-Trust Architecture (ZTA) across all deployments. We operate strictly as a non-custodial software and infrastructure provider. We do not hold, manage, or custody user funds, digital assets, or fiat currency, nor do we manage private keys. We guarantee zero-telemetry operation, absolute data sovereignty, and compliance with federal SDVOSB procurement standards. Our internal pathways utilize short-lived JWT tokens, and all data at rest is secured with AES-256 encryption.
