@@ -14,6 +14,12 @@ import { healthHandler } from './health.js';
 import { verifyBaseUsdcPayment, alreadyRedeemed, markRedeemed, releaseRedeem } from './payments/verify-inbound.js';
 import { facilitatorChain, decodePaymentHeader, type PaymentRequirements } from './payments/facilitators.js';
 
+// Embedded favicon (jet black / neon green SML mark) — served directly, no redirect
+const FAVICON_ICO = Buffer.from(
+  'AAABAAEAEBAAAAAAIACiAQAAFgAAAIlQTkcNChoKAAAADUlIRFIAAAAQAAAAEAgGAAAAH/P/YQAAAWlJREFUeJytk71KQ0EQhb/Z3XuTgDH4h5DGQgt9AAttRa1sfAxtfQffQkkjNraC9oK9YCtWQSNEMCS5MXvHYnMTozeSwlPN7Oye+TsrgAKIzawpIKB+aE79LBdObGCbPyxQPSriPYjkX9YUjMDrRZdGLUEMuCx/9aTEwlZMCtgJ2RSIMNgloVFLQgVZMG0pqVderhI+7j7BAOkPAg09N296Q9+NomCt0Lzu0ah1pxvAGMGAsbBiKKwYxIH2814JybMfeWJR9bBxW2FxN6aXaGDKS+jBGaF+3uXpuIXYbxV0HvvoToxEICZ/DapgRZjZdENfEBQFMVBat0EkPwrI2pk/iFk9LdO87/Gw/Q7ybY2aQvvR8xfaqz5oxIzOXKbFaNkwtxehIiDjJWRiK29FpF7HtOvEhOBarUx1v8gnygQhkg6S28roxnCIb5cJ8azgCfPIgyo4J9TPOqEy+Y/PlBliJq7/F7K2Ab4A7DWCSg0K90IAAAAASUVORK5CYII=',
+  'base64'
+);
+
 const VERSION = '1.0.0';
 
 async function createServer(): Promise<McpServer> {
@@ -807,7 +813,9 @@ async function runSSE(): Promise<void> {
   };
   app.get('/.well-known/x402', (_req, res) => { res.set('Access-Control-Allow-Origin', '*').json(OPENAPI_DOC); });
   app.get('/openapi.json', (_req, res) => { res.set('Access-Control-Allow-Origin', '*').json(OPENAPI_DOC); });
-  app.get('/favicon.ico', (_req, res) => { res.redirect(302, 'https://scriptmasterlabs.com/favicon.ico'); });
+  app.get('/favicon.ico', (_req, res) => {
+    res.set('Content-Type', 'image/x-icon').set('Cache-Control', 'public, max-age=86400').send(FAVICON_ICO);
+  });
   app.get('/x402/facilitators', (_req, res) => {
     res.set('Access-Control-Allow-Origin', '*').json({
       rails: [
