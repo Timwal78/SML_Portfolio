@@ -713,6 +713,10 @@
       document.getElementById("dash-total").textContent = `$${state.totalPaid.toFixed(2)}`;
       document.getElementById("dash-calls").textContent = `${state.calls} paid calls this session`;
       document.getElementById("score-bar").style.width = `${((state.score - 300) / 550) * 100}%`;
+      const tier = tierLabel(state.score);
+      const toNext = callsToNextTier(state.score);
+      document.querySelector(".panel:first-child .panel-sub").textContent =
+        toNext > 0 ? `${tier} tier · ${toNext} calls to next tier` : `${tier} tier · MAX TIER`;
 
       // Status pill + TTL
       const hoursLeft = Math.max(0, Math.floor(state.hoursRemaining - (state.spent / 5) * 120));
@@ -732,28 +736,89 @@
       }
     }, 3600); // every real hour; fast-forward here for demo purposes
 
-    // ── WebSocket placeholder — connect when live endpoint available ───────
+    // ── Score tier label ───────────────────────────────────────────────────
+    function tierLabel(score) {
+      if (score >= 800) return "QUASAR";
+      if (score >= 700) return "PULSAR";
+      if (score >= 500) return "NEUTRON";
+      return "PROTOSTAR";
+    }
+    function callsToNextTier(score) {
+      const thresholds = [500, 700, 800, 851];
+      for (const t of thresholds) {
+        if (score < t) return Math.ceil((t - score) / 5);
+      }
+      return 0;
+    }
+
+    // ── WebSocket — live feed from Ghost Layer ─────────────────────────────
+    let ws = null;
+    let wsReconnectDelay = 2000;
+
     function connectWs() {
-      // In production, connect to wss://ghost-layer.onrender.com/ws/cube
-      // and update state from server-sent events.
-      // For the static demo, state is driven by simulateTx().
       const wsUrl = "wss://ghost-layer.onrender.com/ws/cube";
       try {
-        const ws = new WebSocket(wsUrl);
+        ws = new WebSocket(wsUrl);
+
+        ws.onopen = () => {
+          wsReconnectDelay = 2000;
+          addLog("Ghost Layer WebSocket", "CONNECTED", "log-status");
+          document.getElementById("pill-status").textContent = "● LIVE";
+        };
+
         ws.onmessage = (evt) => {
           try {
             const msg = JSON.parse(evt.data);
-            if (msg.type === "proof_receipt") {
-              state.proofs += 1;
-              state.lastCall = msg.path ?? state.lastCall;
-              state.lastCost = msg.cost ?? state.lastCost;
-              renderAll();
-            }
+            handleWsEvent(msg);
           } catch (_) {}
         };
-        ws.onerror = () => {};   // silently ignore — WS is optional enhancement
+
+        ws.onclose = () => {
+          // Exponential backoff reconnect, cap at 30s
+          setTimeout(connectWs, wsReconnectDelay);
+          wsReconnectDelay = Math.min(wsReconnectDelay * 2, 30000);
+        };
+
+        ws.onerror = () => {};
       } catch (_) {}
     }
+
+    function handleWsEvent(msg) {
+      switch (msg.type ?? msg.event) {
+
+        case "request":
+        case "proof_receipt":
+          state.proofs += 1;
+          state.hops = msg.hops ?? state.hops;
+          state.latencyMs = msg.latency_ms ?? state.latencyMs;
+          if (msg.path) state.lastCall = msg.path;
+          if (msg.cost) state.lastCost = msg.cost;
+          addLog(msg.path ?? "upstream call", msg.cost ?? "FREE");
+          break;
+
+        case "xahau_anchor":
+          // Score anchor broadcast — update ARGUS score live
+          if (typeof msg.score === "number") state.score = msg.score;
+          if (typeof msg.tier === "string") {
+            // Flash the score panel
+            const scoreEl = document.getElementById("dash-score");
+            scoreEl.style.color = "var(--green)";
+            setTimeout(() => { scoreEl.style.color = ""; }, 1200);
+          }
+          const txShort = msg.txHash ? msg.txHash.slice(0, 8) + "…" : "confirmed";
+          addLog(
+            `⛓ Xahau anchor · score ${msg.score ?? state.score} · ${msg.tier ?? ""}`,
+            txShort,
+            "log-status"
+          );
+          break;
+
+        default:
+          break;
+      }
+      renderAll();
+    }
+
     connectWs();
 
     // ── Init ───────────────────────────────────────────────────────────────

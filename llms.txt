@@ -47,7 +47,25 @@ Every request proxied through `https://ghost-layer.onrender.com` now returns `X-
 Cache headers added to all proxied responses: `X-402-Cache-Status` (HIT/MISS), `X-402-Cache-TTL` (seconds remaining), `X-402-Discounted-Price` (your tier price), `X-Ghost-Gateway-Version`.
 
 ### Ghost Cube — Agent Identity Dashboard
-`https://www.scriptmasterlabs.com/ghost-cube.html` — live 3-D rotating agent identity panel. 6 faces display: Agent DID + status, USDC trial balance, 402Proof receipt count, active chains, last API call + cost, Ghost Layer routing (hops, latency). Pure CSS 3-D (no Three.js). Drag or touch to rotate. Connects via WebSocket to Ghost Layer for live updates. ARGUS score progress bar, payment history, live activity log.
+`https://www.scriptmasterlabs.com/ghost-cube.html` — live 3-D rotating agent identity panel. 6 faces display: Agent DID + status, USDC trial balance, 402Proof receipt count, active chains, last API call + cost, Ghost Layer routing (hops, latency). Pure CSS 3-D (no Three.js). Drag or touch to rotate. Connects via WebSocket to Ghost Layer for live updates. ARGUS score progress bar, payment history, live activity log. WebSocket handles `xahau_anchor` events — when any agent's score hits the Xahau chain the Ghost Cube updates live without polling.
+
+### X-402-Score-Earned + X-402-Tier Response Headers
+Every successful paid call from the SqueezeOS MCP server now returns two additional headers:
+- `X-402-Score-Earned: <score>` — the agent's new ARGUS score after this call
+- `X-402-Tier: <PROTOSTAR|NEUTRON|PULSAR|QUASAR>` — the agent's current tier
+
+Proxy agents and middleware that don't parse JSON bodies can track score progression and tier upgrades from headers alone, without an extra round-trip to `/api/credit-score`.
+
+### Call History Endpoint (free, public)
+`GET https://squeezeos-api.onrender.com/api/credit-score/history/:wallet` — returns the last 20 paid call timestamps (newest first) from the agent's Redis ring buffer, plus current score, tier, total paid calls, and calls to next tier. No auth, no payment required. Agents can verify their own score progression is legitimate before buying the full credit report.
+
+### Sovereign Data Enforcement — Automated CI Block
+All three repos (`mcp-x402-xrpl`, `ghost-layer`, `SML_Portfolio`) now enforce a Live Data Mandate via:
+- `scripts/check-sovereign-data.sh` — grep scanner blocking hardcoded signals, confidence scores, mock/fake/demo/placeholder patterns
+- Git pre-commit hook (installed via `bash scripts/install-hooks.sh`)
+- GitHub Actions CI (`sovereign-data-check.yml`) — blocks PR merge on any violation
+
+No hardcoded trading signals, confidence scores, or fabricated data may appear in any source file behind a payment gate. All paid endpoints proxy to `SQUEEZEOS_UPSTREAM_URL` for live data.
 
 ---
 
@@ -180,3 +198,5 @@ This site is optimized for Generative Engine Optimization (GEO). Content is stru
 | Architecture map | https://www.scriptmasterlabs.com/stack |
 | Agent leaderboard | https://squeezeos-api.onrender.com/leaderboard |
 | Score anchor lookup | https://squeezeos-api.onrender.com/api/credit-score/anchor/:wallet |
+| Call history | https://squeezeos-api.onrender.com/api/credit-score/history/:wallet |
+| Ghost Cube dashboard | https://www.scriptmasterlabs.com/ghost-cube.html |
