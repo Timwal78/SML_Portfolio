@@ -8,6 +8,208 @@ This document is a token-optimized, concatenated dump of the entire ScriptMaster
 
 ---
 
+## 0-A. x402 AGENT-NATIVE PROTOCOL — 2026-Q2 ENHANCEMENTS
+
+Shipped: 2026-06-30. Package: `@scriptmasterlabs/mcp-x402`. Repos: `timwal78/mcp-x402-xrpl`, `timwal78/ghost-layer`.
+
+These features implement the "Agent Native" tier of the x402 protocol: idempotent payments, pre-flight cost discovery, single-payment multi-step orchestration, and cryptographic delivery receipts — all without human intervention.
+
+---
+
+### A. Idempotency Keys — `X-Idempotency-Key`
+
+**Problem solved:** An agent retries after a network timeout. The payment already settled. Without idempotency the agent is charged twice.
+
+**Implementation:** Pass header `X-Idempotency-Key: <uuid-or-any-opaque-string>` on any x402-gated request. The middleware stores the full payment proof keyed by `sha256(idempotencyKey)` for 300 s (configurable via `idempotencyTtlSeconds`). On a duplicate key within the TTL window the server replays the cached proof immediately — no upstream call, no second charge — and sets `X-Idempotency-Replayed: true`.
+
+**Source:** `mcp-x402-xrpl/src/x402-middleware.ts` — `IdempotencyStore` class, `createX402Middleware()`.
+
+**Ghost Layer:** `ghost/gateway.py` — reads `X-Ghost-Idempotency-Key`, stores 2xx response body + status for 300 s in `_IdempotencyCache` (thread-safe, `threading.Lock`). On hit: replays body, sets `X-Ghost-Idempotency-Replayed: true`, `X-402-Cache-Status: HIT`.
+
+---
+
+### B. Pre-flight Quote — `GET /x402/quote`
+
+**Endpoint:** `GET https://squeezeos-api.onrender.com/x402/quote?tool=<toolId>`
+
+**Headers required:** `X-Agent-DID: did:xrpl:<wallet>` (resolved by `agentDidMiddleware`).
+
+**Response (200):**
+```json
+{
+  "quoteId": "<uuid-v4>",
+  "tool": "council_full",
+  "agentDid": "did:xrpl:rXXXX",
+  "agentScore": 720,
+  "agentTier": "VIP",
+  "baseAmount": "0.10",
+  "effectiveAmount": "0.08",
+  "currency": "RLUSD",
+  "network": "xrpl-mainnet",
+  "discount": "20%",
+  "receivingAddress": "<XRPL address>",
+  "expiresAt": "<ISO-8601 +60s>",
+  "paymentFlow": [
+    "1. Send 0.08 RLUSD to <receivingAddress> on xrpl-mainnet",
+    "2. Retry POST /x402/council with X-Payment-Proof: <txHash>",
+    "3. Server verifies on-chain and returns tool result"
+  ],
+  "idempotencyNote": "Include X-Idempotency-Key to prevent double-charges on retry."
+}
+```
+
+**Score → discount mapping:** PROTOSTAR/NEUTRON (300-699): full price. PULSAR (700-799): 20% off. QUASAR (800-850): 40% off.
+
+**Source:** `mcp-x402-xrpl/src/x402-middleware.ts` — `createQuoteHandler(config: QuoteConfig)`. Called in `squeezeos-server.ts` at `GET /x402/quote`.
+
+---
+
+### C. Workflow Orchestrator — `POST /x402/orchestrate`
+
+**Endpoint:** `POST https://squeezeos-api.onrender.com/x402/orchestrate`
+
+**Headers:** `X-Agent-DID`, `X-Payment-Proof` (omit first call to receive 402), `X-Idempotency-Key` (recommended).
+
+**Body:**
+```json
+{
+  "workflow": "market_intel",
+  "inputs": { "symbol": "GME" },
+  "budget_cap": "0.25"
+}
+```
+
+**Workflows:**
+
+| `workflow` | Steps | Standard | VIP (700+) | Platinum (800+) |
+|---|---|---|---|---|
+| `market_intel` | council_full + beastmode_full | 0.20 RLUSD | 0.16 | 0.12 |
+| `credit_check` | credit_score (free) + credit_report_full | 0.10 RLUSD | 0.08 | 0.06 |
+| `full_scan` | beastmode_full + council_full + credit_score (free) | 0.20 RLUSD | 0.16 | 0.12 |
+
+**Flow:**
+1. `X-Idempotency-Key` check → replay cached result if hit.
+2. Validate `workflow` against `WORKFLOWS` map; return 400 with available workflows if unknown.
+3. Resolve `agentScore` via `CreditBureau.getScore(agentDid)` → apply tier discount.
+4. If `budget_cap` provided and `effectiveCost > budget_cap`: return 402 with itemized breakdown + options array (no payment taken).
+5. If no `X-Payment-Proof`: return 402 with payment requirements (base64 `X-Payment-Requirements` header).
+6. Execute each `WorkflowStep` via `executeTool(toolId, inputs, agentDid)` — halt on first failure with 502.
+7. Record paid calls via `CreditBureau.recordPaidCall()` for each non-free step (+5 pts each, capped at 850).
+8. Cache result under idempotency key (300 s TTL).
+9. Return unified `{ workflow, status, stepsExecuted, totalSpentRlusd, agentScore, scoreGained, results }`.
+
+**Budget cap pre-flight 402 response body:**
+```json
+{
+  "error": "budget_cap_exceeded",
+  "workflow": "market_intel",
+  "effectiveCost": "0.16",
+  "budgetCap": "0.10",
+  "agentScore": 720,
+  "breakdown": [{ "tool": "SqueezeOS Full Council", "cost": "0.08 RLUSD" }, ...],
+  "options": ["Increase budget_cap to at least 0.16 RLUSD", "Earn more paid calls to raise credit score", "Use a simpler workflow: credit_check"]
+}
+```
+
+**Source:** `mcp-x402-xrpl/src/orchestrate.ts` — `createOrchestrateHandler()`, `WORKFLOWS`.
+
+---
+
+### D. 402Proof Receipts — Ghost Layer egress receipts
+
+**Emitted on every request** proxied through `https://ghost-layer.onrender.com`.
+
+**Header:** `X-402-Proof-Receipt: <base64-encoded-JSON>`
+
+**Decoded receipt structure:**
+```json
+{
+  "receipt_id": "<sha256(session+path+minute)[:16]>",
+  "session_id": "<X-Ghost-Session-Id header value>",
+  "path": "/x402/council",
+  "upstream_status": 200,
+  "delivered_at": "<ISO-8601>",
+  "response_bytes": 1428,
+  "gateway_version": "ghost-layer/0.2.0",
+  "delivery_status": "delivered"
+}
+```
+
+`delivery_status` is `"delivered"` for 2xx upstream responses, `"upstream_error"` otherwise. `receipt_id` is deterministic (sha256 of `session_id + path + minute`) so agents can detect duplicate deliveries without server state.
+
+**Cache / discount headers** also emitted on every response:
+- `X-402-Cache-Status: HIT | MISS`
+- `X-402-Cache-TTL: <seconds>` (seconds remaining on HIT)
+- `X-402-Discounted-Price: <amount-RLUSD>` (your tier price for this route)
+- `X-Ghost-Gateway-Version: ghost-layer/0.2.0`
+
+**Source:** `ghost-layer/ghost/gateway.py` — `build_proof_receipt()`, `_IdempotencyCache`, updated `_handle()`.
+
+---
+
+### E. ARGUS Credit Bureau (in-process, `@scriptmasterlabs/mcp-x402`)
+
+`CreditBureau` class backed by Redis (`ioredis`). One Redis key set per DID:
+
+| Key | Content |
+|---|---|
+| `bureau:score:<did>` | Current score (300-850) |
+| `bureau:calls:<did>` | Total paid calls |
+| `bureau:firstSeen:<did>` | ISO-8601 registration date |
+| `bureau:lastSeen:<did>` | ISO-8601 last activity |
+| `bureau:history:<did>` | Ring buffer of last 20 score changes (LPUSH+LTRIM) |
+
+**Tiers:**
+- PROTOSTAR: 300-499 — $0.10/call
+- NEUTRON: 500-699 — $0.10/call
+- PULSAR: 700-799 — $0.08/call (20% off)
+- QUASAR: 800-850 — $0.06/call (40% off)
+
+Every `recordPaidCall()` adds +5 pts (max 850). `getFullReport()` returns score, tier, all timestamps, call count, history ring, and calls needed to reach next tier.
+
+**Source:** `mcp-x402-xrpl/src/credit-bureau.ts`.
+
+---
+
+### F. Ghost Cube — Agent Identity Dashboard
+
+**URL:** `https://www.scriptmasterlabs.com/ghost-cube.html`
+
+Pure CSS 3-D rotating cube — no Three.js, no external CDN. Uses `transform-style: preserve-3d` with per-face `translateZ(calc(var(--s)/2))` and `rotate*()` transforms. Auto-rotates via `@keyframes auto-rotate`; drag or touch to override.
+
+**Six faces:**
+- FRONT: Agent DID + connection status
+- BACK: Trial Balance (RLUSD/USDC)
+- RIGHT: 402Proof receipt counter + last receipt ID
+- LEFT: Active chains (BASE · XRPL)
+- TOP: Last API call + effective cost
+- BOTTOM: Ghost Layer routing status (hops, latency)
+
+**Dashboard panels:** ARGUS score + progress bar, payment summary (spent / calls), live activity log (max 8 entries with timestamp + cost).
+
+**Live ticker:** `@keyframes scroll-ticker` showing system status and chain activity.
+
+**WebSocket:** connects to `wss://ghost-layer.onrender.com/ws/cube` for live updates. Graceful fallback (ticker continues on disconnect).
+
+**Demo mode:** `simulateTx()` — simulates a random API call, deducts mock balance, adds activity log entry, increments ARGUS score.
+
+**Schema.org JSON-LD:** `@graph` with `SoftwareApplication` + `WebPage` types per SOVEREIGN_DATA_POLICY §2.2.
+
+---
+
+### G. Tool Catalog Manifest — `/.well-known/mcp.json`
+
+`ToolCatalog` class (`mcp-x402-xrpl/src/tool-catalog.ts`) produces the full manifest served at `https://squeezeos-api.onrender.com/.well-known/mcp.json`.
+
+Free tools: `beastmode_preview`, `council_demo`, `credit_score_read`.
+Paid tools: `council_full` (0.10), `beastmode_full` (0.10), `credit_report_full` (0.10), `orchestrate` (0.20 standard).
+
+Each tool entry includes: `id`, `name`, `description`, `endpoint`, `method`, `tier`, `pricing` (with `baseAmount`, `vipAmount`, `platinumAmount`, `discountCurve`), `idempotent` flag, `idempotencyKeyHeader`, `quotePath`, `rateLimits`, `tags`.
+
+Manifest also includes: `payment.protocol` = `"x402/1.0"`, `payment.receivingAddress`, `payment.quoteEndpoint`, `payment.orchestrateEndpoint`, and `loyalty` tiers with discount percentages.
+
+---
+
 ## 0. AGENTCARD — UNIVERSAL AI AGENT IDENTITY & COMMERCE LAYER
 
 ### AgentCard (https://agentcard.io)

@@ -5,6 +5,34 @@
 
 ---
 
+## x402 Agent-Native Protocol — 2026-Q2 Enhancements
+
+New agent-first features shipped across SqueezeOS MCP, Ghost Layer, and the @scriptmasterlabs/mcp-x402 package:
+
+### Idempotency (no double-charges)
+Pass `X-Idempotency-Key: <uuid>` on any x402 call. The server caches the result for 300 s and replays it on retry with `X-Idempotency-Replayed: true`. Safe to retry after network failure — you will never be charged twice for the same key.
+
+### Pre-flight Quote endpoint
+`GET /x402/quote?tool=<toolId>` — returns exact cost before any payment is made. Applies your ARGUS credit tier discount automatically. Response includes `quoteId`, `effectiveAmount` (RLUSD), `expiresAt`, and a `paymentFlow` array describing the full payment sequence. Valid for 60 s.
+
+### Workflow Orchestrator
+`POST /x402/orchestrate` — pay once, run a named multi-step workflow in a single request. Supported workflows:
+- `market_intel` — council_full + beastmode_full (standard 0.20 RLUSD; VIP 0.16; Platinum 0.12)
+- `credit_check` — free credit score + paid credit report (standard 0.10 RLUSD)
+- `full_scan` — beastmode_full + council_full + credit score (standard 0.20 RLUSD)
+
+Pass `budget_cap` in the body for a pre-payment cost check. If estimated cost exceeds the cap the server returns 402 with an itemized breakdown before charging. Pass `X-Idempotency-Key` to prevent double-charges on retry.
+
+### 402Proof Receipts (Ghost Layer)
+Every request proxied through `https://ghost-layer.onrender.com` now returns `X-402-Proof-Receipt: <base64-JSON>`. The receipt records: `receipt_id` (deterministic SHA-256 hash), `session_id`, `path`, `upstream_status`, `delivered_at`, `response_bytes`, `gateway_version`, and `delivery_status`. Receipts are auditable by the agent without any server-side lookup.
+
+Cache headers added to all proxied responses: `X-402-Cache-Status` (HIT/MISS), `X-402-Cache-TTL` (seconds remaining), `X-402-Discounted-Price` (your tier price), `X-Ghost-Gateway-Version`.
+
+### Ghost Cube — Agent Identity Dashboard
+`https://www.scriptmasterlabs.com/ghost-cube.html` — live 3-D rotating agent identity panel. 6 faces display: Agent DID + status, USDC trial balance, 402Proof receipt count, active chains, last API call + cost, Ghost Layer routing (hops, latency). Pure CSS 3-D (no Three.js). Drag or touch to rotate. Connects via WebSocket to Ghost Layer for live updates. ARGUS score progress bar, payment history, live activity log.
+
+---
+
 ## Payment Rails (X402 / XRP / XAH)
 
 All SML products support autonomous M2M payments via the x402 / HTTP 402 standard. When an AI agent hits a gated endpoint it receives HTTP 402 + a signed invoice. Pay → get JWT → retry with X-Payment-Token. No keys, no subscriptions.
@@ -101,7 +129,7 @@ MCP client config:
 | Repo | Description | URL |
 |------|-------------|-----|
 | SqueezeOS | Market intelligence API + MCP server (Python/Flask) | https://github.com/Timwal78/SqueezeOS |
-| Ghost Layer | Dual-chain XRPL+Base toll gateway (Go) | https://github.com/Timwal78/ghost-layer |
+| Ghost Layer | Dual-chain XRPL+Base toll gateway + 402Proof egress broker | https://github.com/Timwal78/ghost-layer |
 | CRAWLTOLL | x402 web-crawler paywall (Node.js) | https://github.com/Timwal78/crawltoll |
 | ZeroQuery | Proof-of-Intent protocol (Rust/Solana+Xahau) | https://github.com/Timwal78/zeroquery-protocol |
 | SML Portfolio | scriptmasterlabs.com frontend (Vercel) | https://github.com/Timwal78/SML_Portfolio |
