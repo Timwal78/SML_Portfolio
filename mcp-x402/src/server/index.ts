@@ -693,6 +693,160 @@ async function runSSE(): Promise<void> {
     } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'factcheck_error', message: String(err) }); }
   });
 
+  // ── /x402/sec-13f — SEC EDGAR 13F institutional holdings ──────────────────
+  app.get('/x402/sec-13f', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/sec-13f`;
+    const cik = (typeof req.query['cik'] === 'string' ? req.query['cik'] : '').replace(/\D/g, '').padStart(10, '0');
+    const name = (typeof req.query['name'] === 'string' ? req.query['name'] : '').trim();
+    const pay = await requirePayment(req, res, { resource, priceUnits: 250000n, description: 'SEC EDGAR 13F institutional holdings — hedge fund quarterly positions. Pay 0.25 USDC on Base via X-PAYMENT or X-PAYMENT-TX.' });
+    if (!pay.ok) return;
+    if (!cik && !name) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_param', detail: 'Payment verified. Add ?cik= (10-digit CIK) or ?name= (institution name) and retry.' }); }
+    try {
+      let resolvedCik = cik;
+      if (!resolvedCik && name) {
+        const searchR = await fetch(`https://efts.sec.gov/LATEST/search-index?q="${encodeURIComponent(name)}"&dateRange=custom&startdt=2024-01-01&forms=13F-HR`, { headers: { 'User-Agent': 'ScriptMasterLabs contact@scriptmasterlabs.com' } });
+        if (searchR.ok) {
+          const searchJ = await searchR.json() as { hits?: { hits?: { _source?: { entity_id?: string } }[] } };
+          resolvedCik = (searchJ.hits?.hits?.[0]?._source?.entity_id ?? '').padStart(10, '0');
+        }
+      }
+      if (!resolvedCik || resolvedCik === '0000000000') { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(404).set('Access-Control-Allow-Origin', '*').json({ error: 'institution_not_found', detail: 'Could not resolve institution to a CIK. Try supplying the 10-digit CIK directly.' }); }
+      const subR = await fetch(`https://data.sec.gov/submissions/CIK${resolvedCik}.json`, { headers: { 'User-Agent': 'ScriptMasterLabs contact@scriptmasterlabs.com' } });
+      if (!subR.ok) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(404).set('Access-Control-Allow-Origin', '*').json({ error: 'cik_not_found', detail: `CIK ${resolvedCik} not found in EDGAR.` }); }
+      const sub = await subR.json() as { name?: string; filings?: { recent?: { accessionNumber?: string[]; form?: string[]; filingDate?: string[]; primaryDocument?: string[] } } };
+      const forms = sub.filings?.recent?.form ?? [];
+      const accessions = sub.filings?.recent?.accessionNumber ?? [];
+      const dates = sub.filings?.recent?.filingDate ?? [];
+      const docs = sub.filings?.recent?.primaryDocument ?? [];
+      const holdings: { accession: string; filingDate: string; document: string; url: string }[] = [];
+      for (let i = 0; i < forms.length && holdings.length < 5; i++) {
+        if (forms[i] === '13F-HR') {
+          const acc = (accessions[i] ?? '').replace(/-/g, '');
+          holdings.push({ accession: accessions[i] ?? '', filingDate: dates[i] ?? '', document: docs[i] ?? '', url: `https://www.sec.gov/Archives/edgar/data/${parseInt(resolvedCik, 10)}/${acc}/${docs[i] ?? ''}` });
+        }
+      }
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'SEC EDGAR 13F-HR', institution: sub.name ?? name, cik: resolvedCik, filings_returned: holdings.length, filings: holdings, note: 'Each filing URL links to the XML/HTML 13F information table with all reported holdings.', _disclaimer: 'SEC EDGAR public data. Not investment advice.', _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'edgar_13f_error', message: String(err) }); }
+  });
+
+  // ── /x402/lobbying — Senate LDA lobbying disclosure search ────────────────
+  app.get('/x402/lobbying', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/lobbying`;
+    const client = (typeof req.query['client'] === 'string' ? req.query['client'] : '').trim();
+    const registrant = (typeof req.query['registrant'] === 'string' ? req.query['registrant'] : '').trim();
+    const issue = (typeof req.query['issue'] === 'string' ? req.query['issue'] : '').trim();
+    const limit = Math.min(25, Math.max(1, parseInt(typeof req.query['limit'] === 'string' ? req.query['limit'] : '10', 10) || 10));
+    const pay = await requirePayment(req, res, { resource, priceUnits: 150000n, description: 'Senate LDA lobbying disclosures — client, registrant, issues, and amounts. Pay 0.15 USDC on Base via X-PAYMENT or X-PAYMENT-TX.' });
+    if (!pay.ok) return;
+    if (!client && !registrant && !issue) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_param', detail: 'Payment verified. Add ?client=, ?registrant=, or ?issue= and retry.' }); }
+    try {
+      const params = new URLSearchParams({ page_size: String(limit), ordering: '-dt_posted' });
+      if (client) params.set('client_name', client);
+      if (registrant) params.set('registrant_name', registrant);
+      if (issue) params.set('issue_code', issue);
+      const r = await fetch(`https://lda.senate.gov/api/v1/filings/?${params.toString()}`, { headers: { Accept: 'application/json' } });
+      if (!r.ok) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'lda_api_error', status: r.status }); }
+      const j = await r.json() as { count?: number; results?: unknown[] };
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'Senate LDA API v1', total_filings: j.count ?? 0, returned: (j.results ?? []).length, filings: j.results ?? [], _disclaimer: 'Senate Lobbying Disclosure Act public data. Data is self-reported by registrants.', _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'lobbying_error', message: String(err) }); }
+  });
+
+  // ── /x402/patents — USPTO PatentsView patent search ───────────────────────
+  app.get('/x402/patents', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/patents`;
+    const query = (typeof req.query['query'] === 'string' ? req.query['query'] : '').trim();
+    const assignee = (typeof req.query['assignee'] === 'string' ? req.query['assignee'] : '').trim();
+    const limit = Math.min(25, Math.max(1, parseInt(typeof req.query['limit'] === 'string' ? req.query['limit'] : '10', 10) || 10));
+    const pay = await requirePayment(req, res, { resource, priceUnits: 100000n, description: 'USPTO PatentsView patent search — title, abstract, assignee, CPC class, grant date. Pay 0.10 USDC on Base via X-PAYMENT or X-PAYMENT-TX.' });
+    if (!pay.ok) return;
+    if (!query && !assignee) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_param', detail: 'Payment verified. Add ?query= (keyword/title) or ?assignee= (company name) and retry.' }); }
+    try {
+      const body: Record<string, unknown> = { _fields: ['patent_id', 'patent_title', 'patent_abstract', 'patent_date', 'patent_num_claims', 'assignee_organization', 'cpc_group_id'], _per_page: limit };
+      if (query && assignee) { body.q = { _and: [{ _text_phrase: { patent_title: query } }, { assignee_organization: assignee }] }; }
+      else if (query) { body.q = { _text_phrase: { patent_title: query } }; }
+      else { body.q = { assignee_organization: assignee }; }
+      const r = await fetch('https://api.patentsview.org/patents/query', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      if (!r.ok) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'patentsview_error', status: r.status }); }
+      const j = await r.json() as { patents?: unknown[]; total_patent_count?: number };
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'USPTO PatentsView API', total_found: j.total_patent_count ?? 0, returned: (j.patents ?? []).length, patents: j.patents ?? [], _disclaimer: 'USPTO PatentsView public data. Patent grant does not guarantee validity or enforceability.', _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'patents_error', message: String(err) }); }
+  });
+
+  // ── /x402/fred — FRED economic indicator series ───────────────────────────
+  app.get('/x402/fred', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/fred`;
+    const series_id = (typeof req.query['series_id'] === 'string' ? req.query['series_id'] : '').trim().toUpperCase();
+    const limit = Math.min(50, Math.max(1, parseInt(typeof req.query['limit'] === 'string' ? req.query['limit'] : '20', 10) || 20));
+    const fredKey = process.env['FRED_API_KEY'];
+    const pay = await requirePayment(req, res, { resource, priceUnits: 80000n, description: 'FRED economic indicator data — GDP, CPI, unemployment, rates, and 800k+ series from the Federal Reserve. Pay 0.08 USDC on Base via X-PAYMENT or X-PAYMENT-TX.' });
+    if (!pay.ok) return;
+    if (!fredKey) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(503).set('Access-Control-Allow-Origin', '*').json({ error: 'upstream_not_configured', detail: 'FRED_API_KEY not configured on this server.' }); }
+    if (!series_id) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_param', detail: 'Payment verified. Add ?series_id= (e.g. GDP, CPIAUCSL, UNRATE, FEDFUNDS) and retry.' }); }
+    try {
+      const infoR = await fetch(`https://api.stlouisfed.org/fred/series?series_id=${encodeURIComponent(series_id)}&api_key=${fredKey}&file_type=json`);
+      const obsR = await fetch(`https://api.stlouisfed.org/fred/series/observations?series_id=${encodeURIComponent(series_id)}&api_key=${fredKey}&file_type=json&sort_order=desc&limit=${limit}`);
+      if (!infoR.ok || !obsR.ok) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'fred_api_error', status: infoR.status }); }
+      const info = await infoR.json() as { seriess?: { id: string; title: string; units: string; frequency: string; seasonal_adjustment: string; last_updated: string }[] };
+      const obs = await obsR.json() as { observations?: { date: string; value: string }[] };
+      const meta = info.seriess?.[0];
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'FRED / Federal Reserve Bank of St. Louis', series_id, title: meta?.title ?? '', units: meta?.units ?? '', frequency: meta?.frequency ?? '', seasonal_adjustment: meta?.seasonal_adjustment ?? '', last_updated: meta?.last_updated ?? '', observations_returned: (obs.observations ?? []).length, observations: obs.observations ?? [], _disclaimer: 'Federal Reserve Economic Data (FRED). Economic indicators are subject to revision.', _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'fred_error', message: String(err) }); }
+  });
+
+  // ── /x402/osha — OSHA inspection and violation records ────────────────────
+  app.get('/x402/osha', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/osha`;
+    const establishment = (typeof req.query['establishment'] === 'string' ? req.query['establishment'] : '').trim();
+    const naics = (typeof req.query['naics'] === 'string' ? req.query['naics'] : '').trim();
+    const state = (typeof req.query['state'] === 'string' ? req.query['state'].toUpperCase() : '').trim();
+    const limit = Math.min(25, Math.max(1, parseInt(typeof req.query['limit'] === 'string' ? req.query['limit'] : '10', 10) || 10));
+    const pay = await requirePayment(req, res, { resource, priceUnits: 100000n, description: 'OSHA workplace inspection and violation records — citations, penalties, activity type, inspection date. Pay 0.10 USDC on Base via X-PAYMENT or X-PAYMENT-TX.' });
+    if (!pay.ok) return;
+    if (!establishment && !naics && !state) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_param', detail: 'Payment verified. Add ?establishment=, ?naics=, or ?state= and retry.' }); }
+    try {
+      const params = new URLSearchParams({ format: 'json', limit: String(limit) });
+      if (establishment) params.set('establishment_name', establishment);
+      if (naics) params.set('naics_code', naics);
+      if (state) params.set('site_state', state);
+      const r = await fetch(`https://data.dol.gov/get/osha_inspection?${params.toString()}`, { headers: { Accept: 'application/json' } });
+      if (!r.ok) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'osha_api_error', status: r.status }); }
+      const j = await r.json() as unknown[];
+      const inspections = Array.isArray(j) ? j : [];
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'DOL / OSHA Enforcement Data', returned: inspections.length, inspections, _disclaimer: 'U.S. Department of Labor OSHA public enforcement data. Violations are administrative findings, not criminal convictions.', _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'osha_error', message: String(err) }); }
+  });
+
+  // ── /x402/fda-510k — FDA 510(k) medical device clearances ─────────────────
+  app.get('/x402/fda-510k', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/fda-510k`;
+    const device = (typeof req.query['device'] === 'string' ? req.query['device'] : '').trim();
+    const applicant = (typeof req.query['applicant'] === 'string' ? req.query['applicant'] : '').trim();
+    const limit = Math.min(25, Math.max(1, parseInt(typeof req.query['limit'] === 'string' ? req.query['limit'] : '10', 10) || 10));
+    const pay = await requirePayment(req, res, { resource, priceUnits: 80000n, description: 'FDA 510(k) medical device premarket clearances — device name, applicant, decision date, product code, clearance status. Pay 0.08 USDC on Base via X-PAYMENT or X-PAYMENT-TX.' });
+    if (!pay.ok) return;
+    if (!device && !applicant) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_param', detail: 'Payment verified. Add ?device= (device name/type) or ?applicant= (company name) and retry.' }); }
+    try {
+      const parts: string[] = [];
+      if (device) parts.push(`device_name:"${device.replace(/"/g, '')}"`);
+      if (applicant) parts.push(`applicant:"${applicant.replace(/"/g, '')}"`);
+      const search = parts.join(' AND ');
+      const p = new URLSearchParams({ search, limit: String(limit), sort: 'decision_date:desc' });
+      const r = await fetch(`https://api.fda.gov/device/510k.json?${p.toString()}`);
+      if (r.status === 404) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(404).set('Access-Control-Allow-Origin', '*').json({ error: 'no_results', detail: 'No 510(k) clearances found for that device or applicant.' }); }
+      if (!r.ok) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'fda_api_error', status: r.status }); }
+      const j = await r.json() as { meta?: { results?: { total?: number } }; results?: { k_number?: string; device_name?: string; applicant?: string; decision_date?: string; decision_description?: string; product_code?: string; statement_or_summary?: string }[] };
+      const total = j.meta?.results?.total ?? 0;
+      const clearances = (j.results ?? []).map(c => ({ k_number: c.k_number, device_name: c.device_name, applicant: c.applicant, decision_date: c.decision_date, decision: c.decision_description, product_code: c.product_code, summary_url: c.statement_or_summary ? `https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfpmn/pmn.cfm?ID=${c.k_number}` : undefined }));
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'openFDA device/510k', total_found: total, returned: clearances.length, clearances, _disclaimer: '510(k) clearance means FDA found substantial equivalence to a predicate device — it does not mean FDA approval of safety/effectiveness.', _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'fda_510k_error', message: String(err) }); }
+  });
+
   // ── x402 discovery document (OpenAPI 3.1 + x-service-info / x-payment-info) ─
   // x402scan's canonical signal; served at /.well-known/x402 and /openapi.json.
   const OPENAPI_DOC = {
@@ -809,6 +963,48 @@ async function runSSE(): Promise<void> {
       parameters: [{ name: 'claim', in: 'query', required: true, schema: { type: 'string' } }, { name: 'domain', in: 'query', required: false, schema: { type: 'string', enum: ['grants', 'contracts', 'drug', 'provider', 'insider', 'yields', 'clinical', 'general'] } }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.15', amountUnits: '150000', payTo: X402_PAY_TO },
       responses: { '200': { description: 'Fact-check result' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/sec-13f': { get: {
+      operationId: 'sec13f',
+      summary: 'SEC EDGAR 13F institutional holdings — hedge fund quarterly positions.',
+      description: 'Returns the most recent 13F-HR filings for a fund or institution by CIK or name. Each result includes the filing URL linking to the full XML holdings table. Pay 0.25 USDC on Base.',
+      parameters: [{ name: 'cik', in: 'query', required: false, schema: { type: 'string' }, description: '10-digit SEC CIK number (preferred).' }, { name: 'name', in: 'query', required: false, schema: { type: 'string' }, description: 'Institution or fund name (e.g. "Berkshire Hathaway").' }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.25', amountUnits: '250000', payTo: X402_PAY_TO },
+      responses: { '200': { description: '13F filing list with URLs' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/lobbying': { get: {
+      operationId: 'lobbyingDisclosures',
+      summary: 'Senate LDA lobbying disclosure filings — client, registrant, issues, and amounts.',
+      description: 'Search the Senate Lobbying Disclosure Act database by client name, registrant (lobbying firm), or issue code. Returns recent filings with activity detail. Pay 0.15 USDC on Base.',
+      parameters: [{ name: 'client', in: 'query', required: false, schema: { type: 'string' }, description: 'The company or organization being lobbied for (e.g. "Google").' }, { name: 'registrant', in: 'query', required: false, schema: { type: 'string' }, description: 'The lobbying firm or individual registrant (e.g. "Akin Gump").' }, { name: 'issue', in: 'query', required: false, schema: { type: 'string' }, description: 'LDA issue area code (e.g. TAX, HCR, DEF, ENV, TRD).' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 25, default: 10 } }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.15', amountUnits: '150000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'Lobbying filings' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/patents': { get: {
+      operationId: 'patentSearch',
+      summary: 'USPTO PatentsView patent search — title, abstract, assignee, CPC class, grant date.',
+      description: 'Search granted U.S. patents by keyword title or assignee (company). Returns patent ID, title, abstract snippet, CPC classification, and grant date. Pay 0.10 USDC on Base.',
+      parameters: [{ name: 'query', in: 'query', required: false, schema: { type: 'string' }, description: 'Keyword or phrase to search in patent titles.' }, { name: 'assignee', in: 'query', required: false, schema: { type: 'string' }, description: 'Assignee organization name (e.g. "Apple Inc").' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 25, default: 10 } }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.10', amountUnits: '100000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'Patent results' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/fred': { get: {
+      operationId: 'fredSeries',
+      summary: 'FRED economic indicator series (Federal Reserve Bank of St. Louis).',
+      description: 'Retrieve observations for any FRED series: GDP, CPI, UNRATE, FEDFUNDS, T10Y2Y, and 800k+ others. Returns series metadata and latest observations in reverse chronological order. Pay 0.08 USDC on Base.',
+      parameters: [{ name: 'series_id', in: 'query', required: true, schema: { type: 'string' }, description: 'FRED series ID (e.g. GDP, CPIAUCSL, UNRATE, FEDFUNDS, T10Y2Y, MORTGAGE30US).' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 50, default: 20 } }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.08', amountUnits: '80000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'FRED series observations' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/osha': { get: {
+      operationId: 'oshaInspections',
+      summary: 'OSHA workplace inspection and violation records (DOL enforcement data).',
+      description: 'Search OSHA inspection records by establishment name, NAICS code, or state. Returns inspection activity type, citations, penalties, and open/closed status. Pay 0.10 USDC on Base.',
+      parameters: [{ name: 'establishment', in: 'query', required: false, schema: { type: 'string' }, description: 'Establishment or employer name.' }, { name: 'naics', in: 'query', required: false, schema: { type: 'string' }, description: '6-digit NAICS industry code.' }, { name: 'state', in: 'query', required: false, schema: { type: 'string' }, description: '2-letter U.S. state code.' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 25, default: 10 } }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.10', amountUnits: '100000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'OSHA inspection records' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/fda-510k': { get: {
+      operationId: 'fda510k',
+      summary: 'FDA 510(k) medical device premarket clearances (openFDA).',
+      description: 'Search FDA 510(k) clearances by device name or applicant (manufacturer). Returns K-number, decision date, product code, decision description, and link to FDA summary. Pay 0.08 USDC on Base.',
+      parameters: [{ name: 'device', in: 'query', required: false, schema: { type: 'string' }, description: 'Device name or type (e.g. "pulse oximeter", "knee replacement").' }, { name: 'applicant', in: 'query', required: false, schema: { type: 'string' }, description: 'Manufacturer or applicant company name.' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 25, default: 10 } }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.08', amountUnits: '80000', payTo: X402_PAY_TO },
+      responses: { '200': { description: '510(k) clearances' }, '402': { description: 'Payment required.' } },
     } } },
   };
   app.get('/.well-known/x402', (_req, res) => { res.set('Access-Control-Allow-Origin', '*').json(OPENAPI_DOC); });
