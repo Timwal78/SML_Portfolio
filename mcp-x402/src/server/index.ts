@@ -823,6 +823,18 @@ async function runSSE(): Promise<void> {
       responses: { '200': { description: 'Fact-check result' }, '402': { description: 'Payment required.' } },
     } } },
   };
+  // x402scan/Bazaar discovery validation (per their docs/DISCOVERY.md) requires
+  // every paid operation's x-payment-info to carry a `protocols` array and a
+  // nested `price` object. Our existing flat fields (method/amount/etc.) stay
+  // for richer clients; these two are added so the doc validates as x402.
+  for (const pathItem of Object.values(OPENAPI_DOC.paths) as Array<Record<string, { 'x-payment-info'?: Record<string, unknown> }>>) {
+    const op = pathItem['get'];
+    const pi = op?.['x-payment-info'];
+    if (pi && typeof pi === 'object') {
+      pi['protocols'] = ['x402'];
+      pi['price'] = { mode: 'fixed', currency: 'USD', amount: pi['amount'] };
+    }
+  }
   app.get('/.well-known/x402', (_req, res) => { res.set('Access-Control-Allow-Origin', '*').json(OPENAPI_DOC); });
   app.get('/openapi.json', (_req, res) => { res.set('Access-Control-Allow-Origin', '*').json(OPENAPI_DOC); });
   app.get('/favicon.ico', (_req, res) => {
