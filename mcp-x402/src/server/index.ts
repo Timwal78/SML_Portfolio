@@ -98,13 +98,35 @@ async function runSSE(): Promise<void> {
   //   directly on Base via viem, no facilitator, no custody.
   // Both advertised in one 402 `accepts` array; agent picks whichever it can fulfil.
   type PayResult = { ok: true; payer: { rail: string; from: string; tx: string } } | { ok: false };
-  // x402 v2 spec: lean accepts array — no non-spec fields, CAIP-2 network, single standard entry.
-  // The sovereign rail (X-PAYMENT-TX) is documented in description; its extra fields are non-spec.
-  const buildAccepts = (resource: string, priceUnits: bigint, description: string): unknown[] => {
+  // x402 v2 payment challenge, validated against the agentcash/x402scan discovery
+  // schema (validatePaymentRequiredDetailed). Three things that crawler requires
+  // and that the deployed body was missing:
+  //   1. Each accept carries `amount` (v2 field). We keep `maxAmountRequired` too
+  //      because our own facilitator chain settles off that field — extra accept
+  //      fields are ignored by the validator (its accept schema is non-strict).
+  //   2. Top-level `resource` is an OBJECT { url, description, mimeType }, not a string.
+  //   3. Input/output JSON schemas live under `extensions.bazaar.schema.properties`,
+  //      not inline on the accept. Missing input schema is an ERROR to the crawler.
+  // network is CAIP-2 (`eip155:8453`) as the v2 validator mandates; the facilitator
+  // ignores network, so settlement is unaffected.
+  const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v);
+  const buildAccepts = (resource: string, priceUnits: bigint, description: string, maxTimeoutSeconds = 300): unknown[] => {
     const units = priceUnits.toString();
-    const common = { scheme: 'exact', network: 'eip155:8453', maxAmountRequired: units, resource, description, mimeType: 'application/json', payTo: X402_PAY_TO, maxTimeoutSeconds: 300, asset: USDC_BASE_ASSET };
-    return [{ ...common, extra: { name: 'USD Coin', version: '2' } }];
+    return [{
+      scheme: 'exact', network: 'eip155:8453',
+      amount: units, maxAmountRequired: units,
+      asset: USDC_BASE_ASSET, payTo: X402_PAY_TO, maxTimeoutSeconds,
+      resource, description, mimeType: 'application/json',
+      extra: { name: 'USD Coin', version: '2' },
+    }];
   };
+  // extensions.bazaar.schema — the v2 location the crawler reads input/output from.
+  const buildBazaarExtensions = (inputSchema: unknown, outputSchema: unknown): Record<string, unknown> => ({
+    bazaar: { schema: { properties: {
+      input: { properties: { queryParams: isRecord(inputSchema) ? inputSchema : { type: 'object' } } },
+      output: { properties: { example: isRecord(outputSchema) ? outputSchema : { type: 'object' } } },
+    } } },
+  });
   const send402 = (res: Response, challenge: Record<string, unknown>, header402: string, extra?: Record<string, unknown>): void => {
     const body = extra ? { ...challenge, ...extra } : challenge;
     res.status(402)
@@ -116,7 +138,13 @@ async function runSSE(): Promise<void> {
   };
   const requirePayment = async (req: Request, res: Response, opts: { resource: string; priceUnits: bigint; description: string; inputSchema: unknown; outputSchema: unknown }): Promise<PayResult> => {
     const accepts = buildAccepts(opts.resource, opts.priceUnits, opts.description);
-    const challenge: Record<string, unknown> = { x402Version: 2, error: 'payment_required', accepts };
+    const challenge: Record<string, unknown> = {
+      x402Version: 2,
+      error: 'payment_required',
+      resource: { url: opts.resource, description: opts.description, mimeType: 'application/json' },
+      accepts,
+      extensions: buildBazaarExtensions(opts.inputSchema, opts.outputSchema),
+    };
     const header402 = Buffer.from(JSON.stringify(challenge)).toString('base64');
 
     const xPayment = typeof req.headers['x-payment'] === 'string' ? req.headers['x-payment'] : '';
@@ -150,7 +178,12 @@ async function runSSE(): Promise<void> {
   };
   const inlineDiscover402 = (resource: string, description: string): Record<string, unknown> => ({
     x402Version: 2, error: 'payment_required',
-    accepts: [{ scheme: 'exact', network: 'eip155:8453', asset: USDC_BASE_ASSET, maxAmountRequired: '20000', resource, description, mimeType: 'application/json', payTo: X402_PAY_TO, maxTimeoutSeconds: 120, extra: { name: 'USD Coin', version: '2' } }],
+    resource: { url: resource, description, mimeType: 'application/json' },
+    accepts: buildAccepts(resource, 20000n, description, 120),
+    extensions: buildBazaarExtensions(
+      { type: 'object', properties: { tool: { type: 'string', description: 'Tool name to price/call. See GET /x402/tool/{name}.' } } },
+      { type: 'object', description: 'Per-tool x402 payment challenge.' },
+    ),
   });
   app.get('/x402/discover', (req, res) => {
     const resource = `https://${req.headers.host ?? 'mcp-x402.onrender.com'}${req.originalUrl}`;
