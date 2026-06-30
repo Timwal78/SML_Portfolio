@@ -197,7 +197,7 @@ export class HttpFacilitator implements Facilitator {
 
   async verify(payload: PaymentPayload, requirements: PaymentRequirements): Promise<VerifyResult> {
     try {
-      const r = await fetch(`${this.baseUrl}/verify`, { method: 'POST', headers: this.headers(), body: JSON.stringify({ x402Version: 1, paymentPayload: payload, paymentRequirements: requirements }) });
+      const r = await fetch(`${this.baseUrl}/verify`, { method: 'POST', headers: this.headers(), body: JSON.stringify({ x402Version: 2, paymentPayload: payload, paymentRequirements: requirements }) });
       if (!r.ok) return { isValid: false, invalidReason: `facilitator_http_${r.status}` };
       const j = await r.json() as { isValid?: boolean; invalidReason?: string; payer?: string };
       return { isValid: j.isValid === true, ...(j.invalidReason ? { invalidReason: j.invalidReason } : {}), ...(j.payer ? { payer: j.payer } : {}) };
@@ -208,7 +208,7 @@ export class HttpFacilitator implements Facilitator {
 
   async settle(payload: PaymentPayload, requirements: PaymentRequirements): Promise<SettleResult> {
     try {
-      const r = await fetch(`${this.baseUrl}/settle`, { method: 'POST', headers: this.headers(), body: JSON.stringify({ x402Version: 1, paymentPayload: payload, paymentRequirements: requirements }) });
+      const r = await fetch(`${this.baseUrl}/settle`, { method: 'POST', headers: this.headers(), body: JSON.stringify({ x402Version: 2, paymentPayload: payload, paymentRequirements: requirements }) });
       if (!r.ok) return { success: false, errorReason: `facilitator_http_${r.status}` };
       const j = await r.json() as { success?: boolean; errorReason?: string; transaction?: string; payer?: string };
       return { success: j.success === true, ...(j.errorReason ? { errorReason: j.errorReason } : {}), ...(j.transaction ? { transaction: j.transaction } : {}), ...(j.payer ? { payer: j.payer } : {}) };
