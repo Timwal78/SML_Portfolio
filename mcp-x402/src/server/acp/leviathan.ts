@@ -17,6 +17,7 @@
  *   SML_API_KEY             — SqueezeOS OPERATOR_API_KEY for X-API-Key auth
  */
 
+import { createPrivateKey } from 'crypto';
 import {
   AcpAgent,
   PrivyAlchemyEvmProviderAdapter,
@@ -24,6 +25,20 @@ import {
 } from '@virtuals-protocol/acp-node-v2';
 import type { JobSession, JobRoomEntry, AgentMessage } from '@virtuals-protocol/acp-node-v2';
 import { base } from '@account-kit/infra';
+
+// Virtuals "Add Signer" UI gives a PKCS#8 base64 private key.
+// PrivyAlchemyEvmProviderAdapter expects the raw 32-byte scalar as 0x hex.
+// This function normalises both formats so either works in ACP_SIGNER_PRIVATE_KEY.
+function parseSignerKey(key: string): `0x${string}` {
+  if (key.startsWith('0x')) return key as `0x${string}`;
+  try {
+    const der = Buffer.from(key, 'base64');
+    const pk = createPrivateKey({ key: der, format: 'der', type: 'pkcs8' });
+    const jwk = pk.export({ format: 'jwk' }) as { d?: string };
+    if (jwk.d) return `0x${Buffer.from(jwk.d, 'base64url').toString('hex')}` as `0x${string}`;
+  } catch { /* fall through */ }
+  return key as `0x${string}`;
+}
 
 // ─── CONFIG ──────────────────────────────────────────────────────────────────
 
@@ -384,7 +399,7 @@ export async function startLeviathan(): Promise<void> {
     provider: await PrivyAlchemyEvmProviderAdapter.create({
       walletAddress: WALLET_ADDRESS,
       walletId: WALLET_ID,
-      signerPrivateKey: SIGNER_PRIVATE_KEY as `0x${string}`,
+      signerPrivateKey: parseSignerKey(SIGNER_PRIVATE_KEY),
       chains: [base],
     }),
   });
