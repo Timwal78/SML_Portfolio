@@ -16,6 +16,10 @@ services:
         value: 3402
       - key: SML_API_BASE
         sync: false
+      - key: SQUEEZEOS_API_BASE
+        value: "https://squeezeos-api.onrender.com"
+      - key: SML_API_KEY
+        sync: false
       - key: WALLET_SEED
         sync: false
       # Base USDC address that COLLECTS payments from agent tool calls (public).

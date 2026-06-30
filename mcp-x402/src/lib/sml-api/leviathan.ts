@@ -1,25 +1,37 @@
+export type LeviathanSignalType = 'squeeze' | 'momentum' | 'all';
+
 export interface LeviathanSignalParams {
-  ticker?: string;
-  signalType: 'squeeze' | 'momentum' | 'dark_pool' | 'all';
-  minConfidence: number;
+  ticker: string;
+  signalType: LeviathanSignalType;
 }
 
 export interface LeviathanSignal {
-  ticker: string;
-  signal_type: string;
-  confidence: number;
-  directive: string;
-  regime: string;
-  timestamp: string;
+  symbol: string;
+  signal: string;
+  squeeze_alert?: boolean;
   source: string;
+  timestamp: string;
+  [key: string]: unknown;
 }
+
+const SIGNAL_PATH: Record<LeviathanSignalType, string> = {
+  squeeze:  '/api/signals/741',
+  momentum: '/api/signals/365',
+  all:      '/api/signals/full',
+};
 
 export class LeviathanClient {
   private static instance: LeviathanClient;
   private readonly baseUrl: string;
+  private readonly apiKey: string;
 
   private constructor() {
-    this.baseUrl = process.env['SML_API_BASE'] ?? 'https://api.scriptmasterlabs.com';
+    this.baseUrl = (
+      process.env['SQUEEZEOS_API_BASE'] ??
+      process.env['SML_API_BASE'] ??
+      'https://squeezeos-api.onrender.com'
+    ).replace(/\/$/, '');
+    this.apiKey = process.env['SML_API_KEY'] ?? '';
   }
 
   static getInstance(): LeviathanClient {
@@ -29,21 +41,23 @@ export class LeviathanClient {
     return LeviathanClient.instance;
   }
 
-  async getSignal(params: LeviathanSignalParams): Promise<LeviathanSignal[]> {
-    const qs = new URLSearchParams({
-      signal_type: params.signalType,
-      min_confidence: String(params.minConfidence),
-    });
-    if (params.ticker) qs.set('ticker', params.ticker);
+  async getSignal(params: LeviathanSignalParams): Promise<LeviathanSignal> {
+    const path = SIGNAL_PATH[params.signalType];
+    const url = `${this.baseUrl}${path}/${encodeURIComponent(params.ticker.toUpperCase())}`;
 
-    const res = await fetch(`${this.baseUrl}/leviathan/v1/signal?${qs.toString()}`, {
+    const headers: Record<string, string> = { 'Accept': 'application/json' };
+    if (this.apiKey) headers['X-SML-API-Key'] = this.apiKey;
+
+    const res = await fetch(url, {
+      headers,
       signal: AbortSignal.timeout(10_000),
     });
 
     if (!res.ok) {
-      throw new Error(`Leviathan API error: HTTP ${res.status}`);
+      const body = await res.text().catch(() => '');
+      throw new Error(`SqueezeOS signal API error: HTTP ${res.status}${body ? ` — ${body}` : ''}`);
     }
 
-    return (await res.json()) as LeviathanSignal[];
+    return (await res.json()) as LeviathanSignal;
   }
 }
