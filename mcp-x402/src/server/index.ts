@@ -103,13 +103,25 @@ async function runSSE(): Promise<void> {
       { ...common, extra: { name: 'USDC', version: '2', settlement: 'onchain-tx', paymentHeader: 'X-PAYMENT-TX' } },
     ];
   };
+  // Lean variant for the PAYMENT-REQUIRED header: drops inputSchema/outputSchema
+  // (already duplicated in the JSON body) so the header stays well under the
+  // ~8-16KB limit most HTTP clients/proxies enforce on a single header value.
+  const buildAcceptsForHeader = (resource: string, priceUnits: bigint, description: string): unknown[] => {
+    const units = priceUnits.toString();
+    const common = { scheme: 'exact', network: 'base', maxAmountRequired: units, resource, description, mimeType: 'application/json', payTo: X402_PAY_TO, maxTimeoutSeconds: 300, asset: USDC_BASE_ASSET };
+    return [
+      { ...common, extra: { name: 'USD Coin', version: '2' } },
+      { ...common, extra: { name: 'USDC', version: '2', settlement: 'onchain-tx', paymentHeader: 'X-PAYMENT-TX' } },
+    ];
+  };
   const send402 = (res: Response, challenge: Record<string, unknown>, header402: string, extra?: Record<string, unknown>): void => {
     res.status(402).set('PAYMENT-REQUIRED', header402).set('Access-Control-Expose-Headers', 'PAYMENT-REQUIRED').set('Access-Control-Allow-Origin', '*').json(extra ? { ...challenge, ...extra } : challenge);
   };
   const requirePayment = async (req: Request, res: Response, opts: { resource: string; priceUnits: bigint; description: string; inputSchema: unknown; outputSchema: unknown }): Promise<PayResult> => {
     const accepts = buildAccepts(opts.resource, opts.priceUnits, opts.description, opts.inputSchema, opts.outputSchema);
-    const challenge: Record<string, unknown> = { x402Version: 1, error: 'X-PAYMENT header is required', accepts };
-    const header402 = Buffer.from(JSON.stringify(challenge)).toString('base64');
+    const challenge: Record<string, unknown> = { x402Version: 2, error: 'X-PAYMENT header is required', accepts };
+    const headerChallenge: Record<string, unknown> = { x402Version: 2, error: 'X-PAYMENT header is required', accepts: buildAcceptsForHeader(opts.resource, opts.priceUnits, opts.description) };
+    const header402 = Buffer.from(JSON.stringify(headerChallenge)).toString('base64');
 
     const xPayment = typeof req.headers['x-payment'] === 'string' ? req.headers['x-payment'] : '';
     const txHash = typeof req.headers['x-payment-tx'] === 'string' ? req.headers['x-payment-tx'] : '';
