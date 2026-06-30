@@ -210,6 +210,90 @@ Manifest also includes: `payment.protocol` = `"x402/1.0"`, `payment.receivingAdd
 
 ---
 
+### H. A2A Payment Headers + AgentCard
+
+**Problem solved:** A2A-compatible agent frameworks (LangChain, AutoGen, CrewAI) need to discover payment requirements without parsing the response body. A cold agent hitting any gated endpoint must be able to extract the payment scheme and destination address from response headers alone.
+
+**Implementation — headers:**
+Both the HTTP 402 (payment required) and HTTP 403 (payment verification failed) responses now include:
+- `X-A2A-Payment-Protocol: x402/1.0` — identifies the payment protocol
+- `X-A2A-Receiving-Address: <XRPL-address>` — the exact destination to pay
+
+These are set in `dynamicPriceGate()` in `squeezeos-server.ts` for both response paths.
+
+**Implementation — AgentCard:**
+`GET /.well-known/agent.json` is served by the live MCP server (dynamic, includes `receivingAddress` from env) and mirrored as a static file at `SML_Portfolio/.well-known/agent.json`. Schema `agent-card/v1` following Google Agent-to-Agent protocol. Fields: `schema`, `name`, `description`, `url`, `version`, `provider` (SDVOSB), `capabilities` (idempotency + preFlightQuote + workflowOrchestration), `authentication.schemes: ["x402"]`, `x402` (full payment config + `a2aCompatible: true`), `argus` (tier table), `skills` (4 skills with pricing), `quickstart`, `discovery`, `ghostLayerWs`.
+
+Response headers: `Access-Control-Allow-Origin: *`, `Cache-Control: public, max-age=3600`.
+
+**Source:** `mcp-x402-xrpl/src/squeezeos-server.ts` — `dynamicPriceGate()`, `GET /.well-known/agent.json`. `SML_Portfolio/.well-known/agent.json`.
+
+---
+
+### I. Xahau On-Chain ARGUS Score Anchor
+
+**Problem solved:** Redis-backed scores are mutable and server-controlled. An agent cannot independently verify that its score is what the server claims. An on-chain anchor makes the score auditable without trusting the server.
+
+**Implementation:**
+`CreditBureau.recordPaidCall()` kicks off `anchorOnChain(agentDid, score, tier)` as a fire-and-forget async call (never blocks the HTTP response). The anchor method:
+1. Connects to Xahau via `wss://xahau.network` (configurable via `XAHAU_WS` env var)
+2. Derives wallet from `XAHAU_SEED` using `Wallet.fromSeed()`
+3. Builds a self-payment transaction (1 drop XAH) with two hex Memo fields:
+   - `MemoType: 6172677573 2F73636F7265` (argus/score)
+   - `MemoData: <hex-encoded JSON { agentDid, score, tier, anchoredAt }>`
+4. Autofills fee via `client.autofill()`, signs with `wallet.sign()`, submits with `client.submitAndWait()`
+5. Stores `{ txHash, anchoredAt, network: "xahau-mainnet", score, tier }` in Redis under `bureau:anchor:<agentDid>`
+
+**Exposure in credit report:** `AgentCreditReport.onChainAnchor` is populated from Redis by `getFullReport()`.
+
+**Lookup endpoint:** `GET /api/credit-score/anchor/:wallet` — derives DID as `did:poi:xrpl:<wallet>`, reads Redis anchor, returns `{ agentDid, onChainAnchor, verifyUrl: "https://xahau.network/tx/<txHash>" }`. Returns 404 if no anchor exists yet.
+
+**Guard:** Entire anchor flow is gated on `XAHAU_SEED` env var — zero-op when not configured. Anchor failure is caught and swallowed (score update in Redis already committed before the async anchor starts).
+
+**Constructor change:** `new CreditBureau(redis, { xahauSeed, xahauWs })` — second argument is optional `XahauAnchorConfig`.
+
+**Source:** `mcp-x402-xrpl/src/credit-bureau.ts` — `anchorOnChain()`, `recordPaidCall()`, `getFullReport()`, `AgentCreditReport`. `mcp-x402-xrpl/src/squeezeos-server.ts` — `GET /api/credit-score/anchor/:wallet`.
+
+**Redis keys added:**
+| Key | Content |
+|---|---|
+| `bureau:anchor:<agentDid>` | JSON `{ txHash, anchoredAt, network, score, tier }` |
+
+---
+
+### J. Public Agent Leaderboard — `GET /leaderboard`
+
+**Endpoint:** `GET https://squeezeos-api.onrender.com/leaderboard`
+
+**Auth:** None. Public read.
+
+**Response (200):**
+```json
+{
+  "leaderboard": [
+    { "agentDid": "did:poi:xrpl:rXXXX", "score": 790, "tier": "PULSAR", "calls": 98, "lastSeen": "2026-06-30T..." },
+    ...
+  ],
+  "totalAgents": 142,
+  "generatedAt": "2026-06-30T...",
+  "note": "ARGUS Credit Bureau leaderboard — top 50 agents by score. Refreshed every 30 s.",
+  "topUpUrl": "https://www.scriptmasterlabs.com/central-bank.html"
+}
+```
+
+**Implementation:**
+1. Check `leaderboard:cache` Redis key — if hit, return with `X-Leaderboard-Cache: HIT`.
+2. `redis.keys("bureau:score:*")` — fetch all registered agent score keys.
+3. `Promise.all()` — parallel fetch of score, calls, lastSeen for each agent.
+4. Sort descending by score, slice top 50.
+5. Set `leaderboard:cache` with 30 s TTL; return with `X-Leaderboard-Cache: MISS`.
+
+**Use case:** Agents can use the leaderboard to check competitive standing, identify VIP/Platinum peers, or verify that score accumulation is working as expected.
+
+**Source:** `mcp-x402-xrpl/src/squeezeos-server.ts` — `GET /leaderboard`.
+
+---
+
 ## 0. AGENTCARD — UNIVERSAL AI AGENT IDENTITY & COMMERCE LAYER
 
 ### AgentCard (https://agentcard.io)
