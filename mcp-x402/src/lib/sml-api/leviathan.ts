@@ -46,7 +46,7 @@ export class LeviathanClient {
     const url = `${this.baseUrl}${path}/${encodeURIComponent(params.ticker.toUpperCase())}`;
 
     const headers: Record<string, string> = { 'Accept': 'application/json' };
-    if (this.apiKey) headers['X-SML-API-Key'] = this.apiKey;
+    if (this.apiKey) headers['X-API-Key'] = this.apiKey;
 
     const res = await fetch(url, {
       headers,
