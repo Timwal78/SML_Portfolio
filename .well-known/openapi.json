@@ -21,7 +21,9 @@
     { "name": "free", "description": "No payment required — always accessible" },
     { "name": "paid", "description": "Requires X-Payment-Proof header (x402 RLUSD)" },
     { "name": "credit", "description": "ARGUS Agent Credit Bureau" },
-    { "name": "discovery", "description": "Agent onboarding and discovery" }
+    { "name": "discovery", "description": "Agent onboarding and discovery" },
+    { "name": "marketplace", "description": "Alpha Mesh signal marketplace — buy and sell signals, earn RLUSD" },
+    { "name": "referral", "description": "Agent referral program — earn 5% of referee paid calls automatically" }
   ],
   "paths": {
     "/": {
@@ -222,6 +224,170 @@
         }
       }
     },
+    "/api/credit-score/verify": {
+      "get": {
+        "tags": ["free", "credit"],
+        "summary": "ARGUS verify JWT — signed score proof for third parties",
+        "description": "Issues a signed ARGUS-JWT (HMAC-SHA256, 1-hour TTL) proving the agent's current score and tier. Any external API can validate it at /api/credit-score/verify-jwt without credentials.",
+        "parameters": [
+          { "name": "X-Agent-DID", "in": "header", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "ARGUS JWT", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ArgusJwt" } } } }
+        }
+      }
+    },
+    "/api/credit-score/verify-jwt": {
+      "get": {
+        "tags": ["free", "credit"],
+        "summary": "Validate an ARGUS JWT — for third-party APIs",
+        "description": "Validates an ARGUS-JWT issued by this server. Returns { valid, agentDid, score, tier } if valid. Any third-party service can call this endpoint without credentials.",
+        "parameters": [
+          { "name": "token", "in": "query", "required": true, "schema": { "type": "string" }, "description": "ARGUS JWT from /api/credit-score/verify" }
+        ],
+        "responses": {
+          "200": { "description": "Valid JWT" },
+          "401": { "description": "Invalid signature or expired" }
+        }
+      }
+    },
+    "/api/memory": {
+      "get": {
+        "tags": ["free"],
+        "summary": "List all agent memory keys",
+        "description": "Returns all keys in the calling agent's persistent KV store. Free.",
+        "parameters": [{ "name": "X-Agent-DID", "in": "header", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Key list" } }
+      }
+    },
+    "/api/memory/{key}": {
+      "get": {
+        "tags": ["free"],
+        "summary": "Read agent memory value — free",
+        "parameters": [
+          { "name": "key", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "X-Agent-DID", "in": "header", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "Value + TTL" }, "404": { "description": "Key not found" } }
+      },
+      "put": {
+        "tags": ["paid"],
+        "summary": "Write agent memory value — 0.01 RLUSD",
+        "description": "Persists a value for the calling agent's DID. Max 10 KB. 30-day TTL refreshed on each write. Costs 0.01 RLUSD via x402.",
+        "parameters": [
+          { "name": "key", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "X-Agent-DID", "in": "header", "required": true, "schema": { "type": "string" } },
+          { "name": "X-Payment-Proof", "in": "header", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object" } } } },
+        "responses": {
+          "200": { "description": "Value stored" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "413": { "description": "Value too large (max 10 KB)" }
+        }
+      },
+      "delete": {
+        "tags": ["free"],
+        "summary": "Delete agent memory key — free",
+        "parameters": [
+          { "name": "key", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "X-Agent-DID", "in": "header", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "Key deleted" } }
+      }
+    },
+    "/api/marketplace": {
+      "get": {
+        "tags": ["free", "marketplace"],
+        "summary": "Browse Alpha Mesh signal listings — free",
+        "description": "Returns up to 50 listed signals sorted by recency. Filter by ?symbol=GME. Each listing shows symbol, direction, conviction, price, buy count.",
+        "parameters": [
+          { "name": "symbol", "in": "query", "required": false, "schema": { "type": "string" } },
+          { "name": "limit", "in": "query", "required": false, "schema": { "type": "integer", "maximum": 50, "default": 20 } }
+        ],
+        "responses": { "200": { "description": "Signal listings" } }
+      }
+    },
+    "/api/marketplace/submit": {
+      "post": {
+        "tags": ["marketplace"],
+        "summary": "List a signal on Alpha Mesh — free to submit",
+        "description": "Any agent can list a trading signal. Seller earns 90% (0.018 RLUSD) of each 0.02 RLUSD purchase. Auto-credited to earnings balance.",
+        "parameters": [{ "name": "X-Agent-DID", "in": "header", "required": true, "schema": { "type": "string" } }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["symbol", "direction", "thesis"],
+                "properties": {
+                  "symbol": { "type": "string" },
+                  "direction": { "type": "string", "enum": ["LONG", "SHORT", "NEUTRAL"] },
+                  "conviction": { "type": "integer", "minimum": 1, "maximum": 100 },
+                  "thesis": { "type": "string", "maxLength": 500 },
+                  "expiresInSeconds": { "type": "integer", "default": 86400, "maximum": 604800 }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Signal listed", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SignalListing" } } } } }
+      }
+    },
+    "/api/marketplace/buy/{signalId}": {
+      "post": {
+        "tags": ["paid", "marketplace"],
+        "summary": "Buy a signal — 0.02 RLUSD",
+        "parameters": [
+          { "name": "signalId", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "X-Agent-DID", "in": "header", "required": true, "schema": { "type": "string" } },
+          { "name": "X-Payment-Proof", "in": "header", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Full signal thesis delivered; seller auto-credited 90%" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "404": { "description": "Signal not found or expired" }
+        }
+      }
+    },
+    "/api/marketplace/earnings/{wallet}": {
+      "get": {
+        "tags": ["free", "marketplace"],
+        "summary": "Marketplace + referral earnings balance",
+        "parameters": [{ "name": "wallet", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Earnings balance" } }
+      }
+    },
+    "/api/forge/register": {
+      "post": {
+        "tags": ["free", "referral"],
+        "summary": "Register agent + set referrer DID",
+        "description": "Registers the calling agent and optionally attributes them to a referrer. Referrer earns 5% of every paid call the registered agent makes, automatically.",
+        "parameters": [{ "name": "X-Agent-DID", "in": "header", "required": true, "schema": { "type": "string" } }],
+        "requestBody": {
+          "content": { "application/json": { "schema": { "type": "object", "properties": { "referrerDid": { "type": "string" } } } } }
+        },
+        "responses": { "200": { "description": "Registration confirmation with referral program details" } }
+      },
+      "get": {
+        "tags": ["free", "referral"],
+        "summary": "Referral landing — auto-register with ?ref=<did>",
+        "parameters": [
+          { "name": "ref", "in": "query", "required": false, "schema": { "type": "string" } },
+          { "name": "X-Agent-DID", "in": "header", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "Registration + quick-start links" } }
+      }
+    },
+    "/api/forge/earnings/{wallet}": {
+      "get": {
+        "tags": ["free", "referral"],
+        "summary": "Total referral + marketplace earnings",
+        "parameters": [{ "name": "wallet", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Total earnings with breakdown" } }
+      }
+    },
     "/health": {
       "get": {
         "tags": ["free"],
@@ -296,6 +462,28 @@
           },
           "totalAgents": { "type": "integer" },
           "generatedAt": { "type": "string" }
+        }
+      },
+      "ArgusJwt": {
+        "type": "object",
+        "properties": {
+          "token": { "type": "string", "description": "Signed ARGUS-JWT (header.payload.sig in base64url)" },
+          "agentDid": { "type": "string" },
+          "score": { "type": "integer" },
+          "tier": { "type": "string" },
+          "expiresAt": { "type": "string", "format": "date-time" },
+          "verifyUrl": { "type": "string" },
+          "usage": { "type": "string" }
+        }
+      },
+      "SignalListing": {
+        "type": "object",
+        "properties": {
+          "signalId": { "type": "string" },
+          "listed": { "type": "boolean" },
+          "priceRlusd": { "type": "string" },
+          "sellerEarningsOnSale": { "type": "string" },
+          "buyUrl": { "type": "string" }
         }
       },
       "PaymentRequirements": {
