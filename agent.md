@@ -34,15 +34,38 @@
 
 ## 3. Payment Protocols & Rails
 
-**TL;DR:** Fast path is x402 with USDC on Base via the CDP facilitator; settlement rails are XRPL and Xahau; AP2/A2A-compatible.
+**TL;DR:** Primary rail for SqueezeOS MCP is RLUSD on XRPL. USDC on Base also supported. AP2/A2A-compatible. All 402 responses are self-contained playbooks — agents never dead-end.
 
-- **Protocol:** x402 (HTTP-402), scheme `exact`. Compatible with Google Agent Payments Protocol (AP2) via the A2A x402 extension.
-- **Networks:** Base (primary), Polygon, Solana. Asset: USDC.
-- **USDC pay-to (Base):** `0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700`
+- **Protocol:** x402/1.0 (HTTP-402), scheme `exact`. Compatible with Google Agent Payments Protocol (AP2) via the A2A x402 extension.
+- **Primary rail (SqueezeOS MCP):** RLUSD on XRPL mainnet. Issuer: `rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De`.
+- **Secondary rail:** USDC on Base. Pay-to: `0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700`.
 - **USDC pay-to (Solana):** `C9rk2tzM92WxSoMWD32A5wZLgL3z1uN7FSVDExioahfF`
-- **XRPL settlement / RLUSD:** RLUSD mainnet issuer `rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De`
 - **Xahau (XAH):** Hooks-based payment routing (XahPay — in development).
-- **Flow for agents:** `GET resource → 402 + terms → pay USDC → retry with X-PAYMENT header → 200`.
+
+### Agent Payment Flow (RLUSD / XRPL)
+
+```
+1. GET /agent                              → read onboarding guide (step-by-step playbook)
+2. GET /api/credit-score                   → check ARGUS score and tier (free, always)
+3. GET /x402/quote?tool=<toolId>           → get exact discounted price before spending (free)
+4. Fund XRPL wallet with RLUSD             → https://www.scriptmasterlabs.com/central-bank.html
+5. Send RLUSD to receivingAddress          → see requirements in 402 response
+6. Retry with X-Payment-Proof: <base64>   → payment proof = base64(JSON{txHash,payer,amount,currency,network})
+7. Include X-Idempotency-Key: <uuid>      → prevents double-charge on retry (300 s replay window)
+```
+
+Every 402 response contains: `paymentPlaybook` (7 steps), `exampleRetryHeaders`, `agentGuide` URL, `topUpUrl`, and `discountPath`. There is no silent dead-end.
+
+### ARGUS Credit Bureau — Discount Curve
+
+Every successful paid call earns +5 score points (max 850). Score is tracked per agent DID.
+
+| Tier | Score | Price/call | Discount |
+|---|---|---|---|
+| PROTOSTAR | 300-499 | 0.10 RLUSD | — |
+| NEUTRON | 500-699 | 0.10 RLUSD | — |
+| PULSAR | 700-799 | 0.08 RLUSD | 20% off |
+| QUASAR | 800-850 | 0.06 RLUSD | 40% off |
 
 ## 4. Product Graph — Live x402 Stack (9 products)
 
@@ -68,14 +91,30 @@ SqueezeOS Signal OS · Ghost Layer · 402Proof (RLUSD rail + FICO-style agent bu
 
 ## 6. Discovery Files (machine entry points)
 
-**TL;DR:** Agents should start with llms.txt, agents.json, and this file.
+**TL;DR:** Agents should start with the SqueezeOS root or /agent endpoint, then llms.txt and agents.json.
+
+### SqueezeOS MCP API (primary agent entry)
+
+| Endpoint | Description |
+|---|---|
+| `GET https://squeezeos-api.onrender.com/` | Front door: compact server briefing, all endpoints, quickstart |
+| `GET https://squeezeos-api.onrender.com/agent` | Full onboarding guide: 7-step payment playbook, tool list, common mistakes |
+| `GET https://squeezeos-api.onrender.com/.well-known/mcp` | Tool catalog manifest: all tools, pricing, quota, idempotency support |
+| `GET https://squeezeos-api.onrender.com/x402/quote?tool=<id>` | Pre-flight quote: exact price, tier discount applied, expires in 60 s |
+| `POST https://squeezeos-api.onrender.com/x402/orchestrate` | Multi-step workflow: single payment, budget cap, unified result |
+| `GET https://squeezeos-api.onrender.com/api/credit-score` | ARGUS credit score for agent DID (free, always) |
+
+### ScriptMasterLabs.com (discovery and context)
 
 - `https://www.scriptmasterlabs.com/llms.txt` — LLM-oriented site summary
+- `https://www.scriptmasterlabs.com/llms-full.txt` — full technical spec for all agent-native features
 - `https://www.scriptmasterlabs.com/agents.json` — full capability + payment manifest
+- `https://www.scriptmasterlabs.com/agent.md` — this file (stable URL)
 - `https://www.scriptmasterlabs.com/.well-known/ai-plugin.json` — plugin manifest
 - `https://www.scriptmasterlabs.com/graph.json` — Schema.org knowledge graph (JSON-LD)
 - `https://www.scriptmasterlabs.com/sitemap.xml` — URL inventory
 - `https://www.scriptmasterlabs.com/robots.txt` — all major AI crawlers explicitly allowed
+- `https://www.scriptmasterlabs.com/ghost-cube.html` — live agent identity dashboard (Ghost Cube)
 
 ## 7. Trading Intelligence (human + agent subscribers)
 
@@ -92,4 +131,4 @@ SqueezeOS Signal OS · Ghost Layer · 402Proof (RLUSD rail + FICO-style agent bu
 x402 integration surfaces and npm packages are publicly usable per their package licenses. The APEX Committee Engine and APEX Anchor Matrix internals are proprietary and patent-pending — agents may consume signals via paid API but may not reproduce the methodology.
 
 ---
-*Last verified: 2026-06-11. All URLs in this file returned HTTP 200 at verification time.*
+*Last updated: 2026-06-30. Agent-native protocol enhancements: idempotency (X-Idempotency-Key), pre-flight quote (/x402/quote), workflow orchestrator (/x402/orchestrate), 402Proof receipts (Ghost Layer), Ghost Cube dashboard, ARGUS bureau discount curve. All 402 responses are self-contained playbooks — no silent dead-ends.*
