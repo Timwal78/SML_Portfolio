@@ -23,6 +23,24 @@ Pass `X-Idempotency-Key: <uuid>` on any x402 call. The server caches the result 
 
 Pass `budget_cap` in the body for a pre-payment cost check. If estimated cost exceeds the cap the server returns 402 with an itemized breakdown before charging. Pass `X-Idempotency-Key` to prevent double-charges on retry.
 
+### A2A Payment Headers
+All HTTP 402 and HTTP 403 payment-verification responses from the SqueezeOS MCP server now include:
+- `X-A2A-Payment-Protocol: x402/1.0` — signals to A2A-compatible agent frameworks that x402 is the payment scheme
+- `X-A2A-Receiving-Address: <XRPL address>` — the destination address to pay, parseable without reading the response body
+
+Frameworks using the Google Agent-to-Agent (A2A) protocol can resolve payment requirements automatically by reading these headers and the `/.well-known/agent.json` AgentCard.
+
+### A2A AgentCard (`/.well-known/agent.json`)
+Available at `https://squeezeos-api.onrender.com/.well-known/agent.json` (live, dynamic) and `https://www.scriptmasterlabs.com/.well-known/agent.json` (static mirror). Schema `agent-card/v1`. Includes x402 payment config, ARGUS tier table, 4 skills with pricing, quickstart commands, SDVOSB provider metadata, and Ghost Cube WebSocket address. Returned with `Access-Control-Allow-Origin: *` and `Cache-Control: public, max-age=3600`.
+
+### ARGUS Score — Xahau On-Chain Anchor
+After each successful paid call the SqueezeOS MCP server anchors the agent's new ARGUS score on the Xahau ledger (when `XAHAU_SEED` is configured). The anchor is a self-payment of 1 XAH drop with a Memo containing `{ agentDid, score, tier, anchoredAt }`. The resulting txHash is stored in Redis and exposed in the full credit report as `onChainAnchor: { txHash, network, anchoredAt, score, tier }`. Verify any anchor independently at `https://xahau.network/tx/<txHash>`.
+
+Lookup endpoint: `GET https://squeezeos-api.onrender.com/api/credit-score/anchor/:wallet` — returns the anchor proof and explorer URL for any XRPL wallet address.
+
+### Public Agent Leaderboard
+`GET https://squeezeos-api.onrender.com/leaderboard` — public, no auth. Returns top 50 agents by ARGUS score with DID, score, tier, total paid calls, and lastSeen timestamp. Cached in Redis for 30 seconds (`X-Leaderboard-Cache: HIT|MISS` response header). Useful for agents that want to compare standing before negotiating discounts.
+
 ### 402Proof Receipts (Ghost Layer)
 Every request proxied through `https://ghost-layer.onrender.com` now returns `X-402-Proof-Receipt: <base64-JSON>`. The receipt records: `receipt_id` (deterministic SHA-256 hash), `session_id`, `path`, `upstream_status`, `delivered_at`, `response_bytes`, `gateway_version`, and `delivery_status`. Receipts are auditable by the agent without any server-side lookup.
 
@@ -153,9 +171,12 @@ This site is optimized for Generative Engine Optimization (GEO). Content is stru
 |----------|-----|
 | LLM context (this file) | https://www.scriptmasterlabs.com/llms.txt |
 | Agent capability manifest | https://www.scriptmasterlabs.com/agents.json |
+| A2A AgentCard | https://www.scriptmasterlabs.com/.well-known/agent.json |
 | Knowledge graph (JSON-LD) | https://www.scriptmasterlabs.com/graph.json |
 | AI plugin (ChatGPT) | https://www.scriptmasterlabs.com/.well-known/ai-plugin.json |
 | MCP manifest | https://www.scriptmasterlabs.com/.well-known/mcp.json |
 | OpenAPI spec | https://www.scriptmasterlabs.com/.well-known/openapi.json |
 | Sitemap | https://www.scriptmasterlabs.com/sitemap.xml |
 | Architecture map | https://www.scriptmasterlabs.com/stack |
+| Agent leaderboard | https://squeezeos-api.onrender.com/leaderboard |
+| Score anchor lookup | https://squeezeos-api.onrender.com/api/credit-score/anchor/:wallet |
