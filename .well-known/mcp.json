@@ -30,5 +30,16 @@
   "payment_firewall": "https://four02proof.onrender.com",
   "agent_catalog": "https://www.scriptmasterlabs.com/agents.json",
   "llms_txt": "https://www.scriptmasterlabs.com/llms.txt",
+  "openapi_spec": "https://www.scriptmasterlabs.com/.well-known/openapi.json",
+  "agent_quickstart": "https://www.scriptmasterlabs.com/agent-start.html",
+  "discovery_endpoints": {
+    "credit_score": "https://squeezeos-api.onrender.com/api/credit-score",
+    "credit_history": "https://squeezeos-api.onrender.com/api/credit-score/history/:wallet",
+    "credit_anchor": "https://squeezeos-api.onrender.com/api/credit-score/anchor/:wallet",
+    "leaderboard": "https://squeezeos-api.onrender.com/leaderboard",
+    "preflight_quote": "https://squeezeos-api.onrender.com/x402/quote",
+    "agent_onboarding": "https://squeezeos-api.onrender.com/agent",
+    "ghost_cube": "https://www.scriptmasterlabs.com/ghost-cube.html"
+  },
   "sitemap": "https://www.scriptmasterlabs.com/sitemap.xml"
 }

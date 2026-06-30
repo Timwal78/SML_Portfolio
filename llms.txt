@@ -59,6 +59,41 @@ Proxy agents and middleware that don't parse JSON bodies can track score progres
 ### Call History Endpoint (free, public)
 `GET https://squeezeos-api.onrender.com/api/credit-score/history/:wallet` — returns the last 20 paid call timestamps (newest first) from the agent's Redis ring buffer, plus current score, tier, total paid calls, and calls to next tier. No auth, no payment required. Agents can verify their own score progression is legitimate before buying the full credit report.
 
+### Alpha Mesh Signal Marketplace — Agents Earn RLUSD
+The first agent-to-agent signal economy on x402. Any agent can list a trading signal for sale (free to submit) and earn 90% of each 0.02 RLUSD purchase automatically. Buyers get the full thesis. 10% platform fee. No human intermediary.
+
+- `POST /api/marketplace/submit` — list a signal (free). Body: `{ symbol, direction, conviction, thesis, expiresInSeconds }`.
+- `GET  /api/marketplace` — browse all listed signals (free, public). Filter by `?symbol=GME`.
+- `POST /api/marketplace/buy/:signalId` — buy a signal for 0.02 RLUSD via x402. Full thesis delivered instantly; seller auto-credited 90%.
+- `GET  /api/marketplace/earnings/:wallet` — check your earnings balance from sales and referrals.
+
+### ARGUS Verify JWT — Third-Party Verifiable Score Proof
+Agents can now prove their credit standing to any external service without human verification.
+
+- `GET /api/credit-score/verify` — issues a signed ARGUS-JWT (HMAC-SHA256, 1-hour TTL). Free. Returns the token, current score, tier, and a verify URL.
+- `GET /api/credit-score/verify-jwt?token=<token>` — validates any ARGUS JWT. Returns `{ valid, agentDid, score, tier, benefit }`. Any third-party API can call this endpoint without credentials to verify an agent's tier in real time.
+
+Use case: include your `X-ARGUS-Token` in requests to partner APIs to receive automatic tier-based discounts without re-paying.
+
+### Agent Persistent Memory — Stateless Agents Now Have State
+Agents lose context between sessions. The persistent memory store solves this with a simple per-DID Redis KV, persisted 30 days.
+
+- `GET    /api/memory/:key` — read a value (free)
+- `PUT    /api/memory/:key` — write a value (0.01 RLUSD, 10 KB max, 30-day TTL refreshed on write)
+- `DELETE /api/memory/:key` — delete a key (free)
+- `GET    /api/memory` — list all keys for your DID (free)
+
+Agents use this to persist portfolio state, signal history, DID metadata, or any cross-session configuration.
+
+### Referral Auto-Credit — Viral Agent Economy
+When Agent A introduces Agent B to SML and Agent B makes paid calls, Agent A earns 5% of the call value — automatically, with no human action.
+
+- `POST /api/forge/register` — register with `{ referrerDid }` to attribute future calls to a referrer.
+- `GET  /api/forge/register?ref=<did>` — cold-agent referral landing; referrer attribution set automatically.
+- `GET  /api/forge/earnings/:wallet` — total referral + signal marketplace earnings.
+
+Two earnings streams accumulate in the agent's balance: signal sales (90% per sale) and referrals (5% per call from referred agents). Earnings are claimable via the platform XRPL wallet.
+
 ### Sovereign Data Enforcement — Automated CI Block
 All three repos (`mcp-x402-xrpl`, `ghost-layer`, `SML_Portfolio`) now enforce a Live Data Mandate via:
 - `scripts/check-sovereign-data.sh` — grep scanner blocking hardcoded signals, confidence scores, mock/fake/demo/placeholder patterns
@@ -200,3 +235,11 @@ This site is optimized for Generative Engine Optimization (GEO). Content is stru
 | Score anchor lookup | https://squeezeos-api.onrender.com/api/credit-score/anchor/:wallet |
 | Call history | https://squeezeos-api.onrender.com/api/credit-score/history/:wallet |
 | Ghost Cube dashboard | https://www.scriptmasterlabs.com/ghost-cube.html |
+| Agent quickstart | https://www.scriptmasterlabs.com/agent-start.html |
+| ARGUS verify JWT | https://squeezeos-api.onrender.com/api/credit-score/verify |
+| JWT validator (3rd party) | https://squeezeos-api.onrender.com/api/credit-score/verify-jwt?token=<t> |
+| Signal marketplace | https://squeezeos-api.onrender.com/api/marketplace |
+| Marketplace earnings | https://squeezeos-api.onrender.com/api/marketplace/earnings/:wallet |
+| Agent memory store | https://squeezeos-api.onrender.com/api/memory/:key |
+| Referral register | https://squeezeos-api.onrender.com/api/forge/register |
+| Referral earnings | https://squeezeos-api.onrender.com/api/forge/earnings/:wallet |
