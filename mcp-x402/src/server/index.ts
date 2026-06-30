@@ -751,7 +751,9 @@ async function runSSE(): Promise<void> {
     const resource = `https://${host}/x402/sec-13f`;
     const cik = (typeof req.query['cik'] === 'string' ? req.query['cik'] : '').replace(/\D/g, '').padStart(10, '0');
     const name = (typeof req.query['name'] === 'string' ? req.query['name'] : '').trim();
-    const pay = await requirePayment(req, res, { resource, priceUnits: 250000n, description: 'SEC EDGAR 13F institutional holdings — hedge fund quarterly positions. Pay 0.25 USDC on Base via X-PAYMENT or X-PAYMENT-TX.' });
+    const inputSchema = { type: 'object', properties: { cik: { type: 'string', description: '10-digit SEC CIK number.' }, name: { type: 'string', description: 'Institution or fund name (e.g. "Berkshire Hathaway").' } } };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { cik: { type: 'string', required: false }, name: { type: 'string', required: false } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 250000n, description: 'SEC EDGAR 13F institutional holdings — hedge fund quarterly positions. Pay 0.25 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
     if (!pay.ok) return;
     if (!cik && !name) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_param', detail: 'Payment verified. Add ?cik= (10-digit CIK) or ?name= (institution name) and retry.' }); }
     try {
@@ -790,7 +792,9 @@ async function runSSE(): Promise<void> {
     const registrant = (typeof req.query['registrant'] === 'string' ? req.query['registrant'] : '').trim();
     const issue = (typeof req.query['issue'] === 'string' ? req.query['issue'] : '').trim();
     const limit = Math.min(25, Math.max(1, parseInt(typeof req.query['limit'] === 'string' ? req.query['limit'] : '10', 10) || 10));
-    const pay = await requirePayment(req, res, { resource, priceUnits: 150000n, description: 'Senate LDA lobbying disclosures — client, registrant, issues, and amounts. Pay 0.15 USDC on Base via X-PAYMENT or X-PAYMENT-TX.' });
+    const inputSchema = { type: 'object', properties: { client: { type: 'string', description: 'Client/organization being lobbied for.' }, registrant: { type: 'string', description: 'Lobbying firm name.' }, issue: { type: 'string', description: 'LDA issue area code (e.g. TAX, HCR, DEF).' }, limit: { type: 'integer', minimum: 1, maximum: 25, default: 10 } } };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { client: { type: 'string', required: false }, registrant: { type: 'string', required: false }, issue: { type: 'string', required: false } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 150000n, description: 'Senate LDA lobbying disclosures — client, registrant, issues, and amounts. Pay 0.15 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
     if (!pay.ok) return;
     if (!client && !registrant && !issue) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_param', detail: 'Payment verified. Add ?client=, ?registrant=, or ?issue= and retry.' }); }
     try {
@@ -812,7 +816,9 @@ async function runSSE(): Promise<void> {
     const query = (typeof req.query['query'] === 'string' ? req.query['query'] : '').trim();
     const assignee = (typeof req.query['assignee'] === 'string' ? req.query['assignee'] : '').trim();
     const limit = Math.min(25, Math.max(1, parseInt(typeof req.query['limit'] === 'string' ? req.query['limit'] : '10', 10) || 10));
-    const pay = await requirePayment(req, res, { resource, priceUnits: 100000n, description: 'USPTO PatentsView patent search — title, abstract, assignee, CPC class, grant date. Pay 0.10 USDC on Base via X-PAYMENT or X-PAYMENT-TX.' });
+    const inputSchema = { type: 'object', properties: { query: { type: 'string', description: 'Keyword or phrase to search in patent titles.' }, assignee: { type: 'string', description: 'Assignee organization name.' }, limit: { type: 'integer', minimum: 1, maximum: 25, default: 10 } } };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { query: { type: 'string', required: false }, assignee: { type: 'string', required: false } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 100000n, description: 'USPTO PatentsView patent search — title, abstract, assignee, CPC class, grant date. Pay 0.10 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
     if (!pay.ok) return;
     if (!query && !assignee) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_param', detail: 'Payment verified. Add ?query= (keyword/title) or ?assignee= (company name) and retry.' }); }
     try {
@@ -834,7 +840,9 @@ async function runSSE(): Promise<void> {
     const series_id = (typeof req.query['series_id'] === 'string' ? req.query['series_id'] : '').trim().toUpperCase();
     const limit = Math.min(50, Math.max(1, parseInt(typeof req.query['limit'] === 'string' ? req.query['limit'] : '20', 10) || 20));
     const fredKey = process.env['FRED_API_KEY'];
-    const pay = await requirePayment(req, res, { resource, priceUnits: 80000n, description: 'FRED economic indicator data — GDP, CPI, unemployment, rates, and 800k+ series from the Federal Reserve. Pay 0.08 USDC on Base via X-PAYMENT or X-PAYMENT-TX.' });
+    const inputSchema = { type: 'object', properties: { series_id: { type: 'string', description: 'FRED series ID (e.g. GDP, CPIAUCSL, UNRATE, FEDFUNDS).' }, limit: { type: 'integer', minimum: 1, maximum: 50, default: 20 } }, required: ['series_id'] };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { series_id: { type: 'string', required: true }, limit: { type: 'integer', required: false } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 80000n, description: 'FRED economic indicator data — GDP, CPI, unemployment, rates, and 800k+ series from the Federal Reserve. Pay 0.08 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
     if (!pay.ok) return;
     if (!fredKey) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(503).set('Access-Control-Allow-Origin', '*').json({ error: 'upstream_not_configured', detail: 'FRED_API_KEY not configured on this server.' }); }
     if (!series_id) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_param', detail: 'Payment verified. Add ?series_id= (e.g. GDP, CPIAUCSL, UNRATE, FEDFUNDS) and retry.' }); }
@@ -857,7 +865,9 @@ async function runSSE(): Promise<void> {
     const naics = (typeof req.query['naics'] === 'string' ? req.query['naics'] : '').trim();
     const state = (typeof req.query['state'] === 'string' ? req.query['state'].toUpperCase() : '').trim();
     const limit = Math.min(25, Math.max(1, parseInt(typeof req.query['limit'] === 'string' ? req.query['limit'] : '10', 10) || 10));
-    const pay = await requirePayment(req, res, { resource, priceUnits: 100000n, description: 'OSHA workplace inspection and violation records — citations, penalties, activity type, inspection date. Pay 0.10 USDC on Base via X-PAYMENT or X-PAYMENT-TX.' });
+    const inputSchema = { type: 'object', properties: { establishment: { type: 'string', description: 'Establishment or employer name.' }, naics: { type: 'string', description: '6-digit NAICS industry code.' }, state: { type: 'string', description: '2-letter U.S. state code.' }, limit: { type: 'integer', minimum: 1, maximum: 25, default: 10 } } };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { establishment: { type: 'string', required: false }, naics: { type: 'string', required: false }, state: { type: 'string', required: false } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 100000n, description: 'OSHA workplace inspection and violation records — citations, penalties, activity type, inspection date. Pay 0.10 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
     if (!pay.ok) return;
     if (!establishment && !naics && !state) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_param', detail: 'Payment verified. Add ?establishment=, ?naics=, or ?state= and retry.' }); }
     try {
@@ -880,7 +890,9 @@ async function runSSE(): Promise<void> {
     const device = (typeof req.query['device'] === 'string' ? req.query['device'] : '').trim();
     const applicant = (typeof req.query['applicant'] === 'string' ? req.query['applicant'] : '').trim();
     const limit = Math.min(25, Math.max(1, parseInt(typeof req.query['limit'] === 'string' ? req.query['limit'] : '10', 10) || 10));
-    const pay = await requirePayment(req, res, { resource, priceUnits: 80000n, description: 'FDA 510(k) medical device premarket clearances — device name, applicant, decision date, product code, clearance status. Pay 0.08 USDC on Base via X-PAYMENT or X-PAYMENT-TX.' });
+    const inputSchema = { type: 'object', properties: { device: { type: 'string', description: 'Device name or type (e.g. "pulse oximeter").' }, applicant: { type: 'string', description: 'Manufacturer or applicant company name.' }, limit: { type: 'integer', minimum: 1, maximum: 25, default: 10 } } };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { device: { type: 'string', required: false }, applicant: { type: 'string', required: false } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 80000n, description: 'FDA 510(k) medical device premarket clearances — device name, applicant, decision date, product code, clearance status. Pay 0.08 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
     if (!pay.ok) return;
     if (!device && !applicant) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_param', detail: 'Payment verified. Add ?device= (device name/type) or ?applicant= (company name) and retry.' }); }
     try {
@@ -911,7 +923,7 @@ async function runSSE(): Promise<void> {
       summary: 'Search live U.S. federal grant opportunities (Grants.gov Search2).',
       description: 'Returns real, current grant opportunities. Pay 0.02 USDC on Base, then call with X-PAYMENT-TX set to the transaction hash.',
       parameters: [
-        { name: 'keyword', in: 'query', required: true, schema: { type: 'string' }, description: 'Search keywords or CFDA/assistance-listing number.' },
+        { name: 'keyword', in: 'query', required: true, schema: { type: 'string' }, description: 'Search keywords or CFDA/assistance-listing number.', example: 'climate research' },
         { name: 'rows', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 50, default: 10 } },
       ],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.02', amountUnits: '20000', payTo: X402_PAY_TO, settlement: 'onchain-tx', paymentHeader: 'X-PAYMENT-TX' },
@@ -921,7 +933,7 @@ async function runSSE(): Promise<void> {
       summary: 'Find self-certified SDVOSB/WOSB/SDB/minority firms by NAICS + state (SAM.gov).',
       description: 'Returns registered firms with a self-certified socioeconomic flag, filtered by NAICS and optional state. Pay 0.08 USDC on Base, then call with X-PAYMENT-TX. Note: SBA-certified 8(a)/HUBZone status is not in SAM.',
       parameters: [
-        { name: 'naics', in: 'query', required: true, schema: { type: 'string' }, description: '6-digit NAICS code.' },
+        { name: 'naics', in: 'query', required: true, schema: { type: 'string' }, description: '6-digit NAICS code.', example: '541512' },
         { name: 'state', in: 'query', required: false, schema: { type: 'string' }, description: '2-letter state code.' },
         { name: 'set_aside', in: 'query', required: false, schema: { type: 'string', enum: ['SDVOSB', 'WOSB', 'SDB', 'MINORITY'], default: 'SDVOSB' } },
         { name: 'rows', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 25, default: 10 } },
@@ -933,7 +945,7 @@ async function runSSE(): Promise<void> {
       summary: 'Federal contract market intelligence by NAICS (USAspending).',
       description: 'Top incumbents (recipients) and top buying agencies by obligated dollars for a NAICS over a lookback window. Pay 0.30 USDC on Base, then call with X-PAYMENT-TX.',
       parameters: [
-        { name: 'naics', in: 'query', required: true, schema: { type: 'string' }, description: '6-digit NAICS code.' },
+        { name: 'naics', in: 'query', required: true, schema: { type: 'string' }, description: '6-digit NAICS code.', example: '541512' },
         { name: 'years', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 10, default: 3 } },
       ],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.30', amountUnits: '300000', payTo: X402_PAY_TO, settlement: 'onchain-tx', paymentHeader: 'X-PAYMENT-TX' },
@@ -942,119 +954,119 @@ async function runSSE(): Promise<void> {
       operationId: 'drugLabel',
       summary: 'FDA drug label lookup (openFDA).',
       description: 'Indications, dosage, warnings, interactions for a drug. Pay 0.05 USDC on Base.',
-      parameters: [{ name: 'drug', in: 'query', required: true, schema: { type: 'string' }, description: 'Brand or generic drug name.' }],
+      parameters: [{ name: 'drug', in: 'query', required: true, schema: { type: 'string' }, description: 'Brand or generic drug name.', example: 'aspirin' }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.05', amountUnits: '50000', payTo: X402_PAY_TO },
       responses: { '200': { description: 'Drug label' }, '402': { description: 'Payment required.' } },
     } }, '/x402/drug-recall': { get: {
       operationId: 'drugRecall',
       summary: 'FDA drug recall/enforcement search (openFDA).',
       description: 'Recall reason, classification, status, recalling firm. Pay 0.08 USDC on Base.',
-      parameters: [{ name: 'drug', in: 'query', required: true, schema: { type: 'string' } }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 20, default: 5 } }],
+      parameters: [{ name: 'drug', in: 'query', required: true, schema: { type: 'string' }, example: 'metformin' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 20, default: 5 } }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.08', amountUnits: '80000', payTo: X402_PAY_TO },
       responses: { '200': { description: 'Recalls' }, '402': { description: 'Payment required.' } },
     } }, '/x402/npi': { get: {
       operationId: 'npiLookup',
       summary: 'NPPES provider (NPI) lookup.',
       description: 'NPI, name, specialty, location, phone. Provide last_name, organization_name, or specialty. Pay 0.05 USDC on Base.',
-      parameters: [{ name: 'last_name', in: 'query', required: false, schema: { type: 'string' } }, { name: 'organization_name', in: 'query', required: false, schema: { type: 'string' } }, { name: 'specialty', in: 'query', required: false, schema: { type: 'string' } }, { name: 'state', in: 'query', required: false, schema: { type: 'string' } }],
+      parameters: [{ name: 'last_name', in: 'query', required: false, schema: { type: 'string' }, example: 'Smith' }, { name: 'organization_name', in: 'query', required: false, schema: { type: 'string' } }, { name: 'specialty', in: 'query', required: false, schema: { type: 'string' }, example: 'Cardiology' }, { name: 'state', in: 'query', required: false, schema: { type: 'string' } }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.05', amountUnits: '50000', payTo: X402_PAY_TO },
       responses: { '200': { description: 'Providers' }, '402': { description: 'Payment required.' } },
     } }, '/x402/clinical-trials': { get: {
       operationId: 'clinicalTrials',
       summary: 'Clinical trial search (ClinicalTrials.gov APIv2).',
       description: 'NCT ID, title, status, phase, enrollment, sponsor, conditions. Pay 0.08 USDC on Base.',
-      parameters: [{ name: 'term', in: 'query', required: false, schema: { type: 'string' }, description: 'Drug, sponsor, or keyword.' }, { name: 'condition', in: 'query', required: false, schema: { type: 'string' } }, { name: 'status', in: 'query', required: false, schema: { type: 'string', enum: ['RECRUITING', 'ACTIVE', 'COMPLETED', 'ALL'], default: 'RECRUITING' } }, { name: 'rows', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 25, default: 10 } }],
+      parameters: [{ name: 'term', in: 'query', required: false, schema: { type: 'string' }, description: 'Drug, sponsor, or keyword.', example: 'diabetes' }, { name: 'condition', in: 'query', required: false, schema: { type: 'string' } }, { name: 'status', in: 'query', required: false, schema: { type: 'string', enum: ['RECRUITING', 'ACTIVE', 'COMPLETED', 'ALL'], default: 'RECRUITING' } }, { name: 'rows', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 25, default: 10 } }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.08', amountUnits: '80000', payTo: X402_PAY_TO },
       responses: { '200': { description: 'Clinical trials' }, '402': { description: 'Payment required.' } },
     } }, '/x402/insider-trades': { get: {
       operationId: 'insiderTrades',
       summary: 'SEC EDGAR Form 4 insider trades by ticker.',
       description: 'Executive buy/sell filings from SEC EDGAR. Returns filing URLs with full Form 4 detail. Pay 0.20 USDC on Base.',
-      parameters: [{ name: 'ticker', in: 'query', required: true, schema: { type: 'string' }, description: 'Stock ticker (e.g. TSLA, AMC, GME).' }, { name: 'days', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 90, default: 30 } }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 25, default: 10 } }],
+      parameters: [{ name: 'ticker', in: 'query', required: true, schema: { type: 'string' }, description: 'Stock ticker (e.g. TSLA, AMC, GME).', example: 'NVDA' }, { name: 'days', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 90, default: 30 } }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 25, default: 10 } }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.20', amountUnits: '200000', payTo: X402_PAY_TO },
       responses: { '200': { description: 'Insider trades' }, '402': { description: 'Payment required.' } },
     } }, '/x402/drug-adverse-events': { get: {
       operationId: 'drugAdverseEvents',
       summary: 'FDA adverse event reports (openFDA FAERS).',
       description: 'Reactions, seriousness, outcomes for a drug from FDA safety reports. Pay 0.08 USDC on Base.',
-      parameters: [{ name: 'drug', in: 'query', required: true, schema: { type: 'string' } }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 25, default: 10 } }],
+      parameters: [{ name: 'drug', in: 'query', required: true, schema: { type: 'string' }, example: 'ibuprofen' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 25, default: 10 } }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.08', amountUnits: '80000', payTo: X402_PAY_TO },
       responses: { '200': { description: 'Adverse events' }, '402': { description: 'Payment required.' } },
     } }, '/x402/sec-8k': { get: {
       operationId: 'sec8k',
       summary: 'SEC EDGAR 8-K material event filings by ticker.',
       description: 'Earnings, CEO changes, M&A, and other material events. Pay 0.25 USDC on Base.',
-      parameters: [{ name: 'ticker', in: 'query', required: true, schema: { type: 'string' } }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 20, default: 5 } }],
+      parameters: [{ name: 'ticker', in: 'query', required: true, schema: { type: 'string' }, example: 'AAPL' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 20, default: 5 } }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.25', amountUnits: '250000', payTo: X402_PAY_TO },
       responses: { '200': { description: '8-K filings' }, '402': { description: 'Payment required.' } },
     } }, '/x402/treasury-yields': { get: {
       operationId: 'treasuryYields',
       summary: 'Daily US Treasury yield curve rates (1M–30Y).',
       description: 'Official daily yield curve from Treasury.gov. Pay 0.05 USDC on Base.',
-      parameters: [{ name: 'month', in: 'query', required: false, schema: { type: 'string' }, description: 'YYYYMM format (defaults to current month).' }],
+      parameters: [{ name: 'month', in: 'query', required: false, schema: { type: 'string' }, description: 'YYYYMM format (defaults to current month).', example: '202606' }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.05', amountUnits: '50000', payTo: X402_PAY_TO },
       responses: { '200': { description: 'Yield curve' }, '402': { description: 'Payment required.' } },
     } }, '/x402/entity-compliance': { get: {
       operationId: 'entityCompliance',
       summary: 'SAM entity compliance bundle: registration + exclusion + set-asides + NAICS.',
       description: 'Full compliance check by UEI or CAGE: active status, expiry, exclusion flag, set-aside certifications, size standard. Pay 0.35 USDC on Base.',
-      parameters: [{ name: 'uei', in: 'query', required: false, schema: { type: 'string' }, description: 'SAM UEI (preferred).' }, { name: 'cage', in: 'query', required: false, schema: { type: 'string' }, description: 'CAGE code (alternative).' }],
+      parameters: [{ name: 'uei', in: 'query', required: false, schema: { type: 'string' }, description: 'SAM UEI (preferred).', example: 'JF19MPF74LN7' }, { name: 'cage', in: 'query', required: false, schema: { type: 'string' }, description: 'CAGE code (alternative).' }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.35', amountUnits: '350000', payTo: X402_PAY_TO },
       responses: { '200': { description: 'Compliance report' }, '402': { description: 'Payment required.' } },
     } }, '/x402/agent-score': { get: {
       operationId: 'agentScore',
       summary: 'AI agent FICO-style reputation score (300–850).',
       description: 'Submit behavioral signals (tasks, errors, payments) or retrieve score for an agent. Pay 0.20 USDC on Base.',
-      parameters: [{ name: 'agent_id', in: 'query', required: true, schema: { type: 'string' } }, { name: 'action', in: 'query', required: false, schema: { type: 'string', enum: ['get', 'report'], default: 'get' } }, { name: 'tasks', in: 'query', required: false, schema: { type: 'integer' } }, { name: 'successes', in: 'query', required: false, schema: { type: 'integer' } }, { name: 'errors', in: 'query', required: false, schema: { type: 'integer' } }, { name: 'payments', in: 'query', required: false, schema: { type: 'integer' } }, { name: 'uptime', in: 'query', required: false, schema: { type: 'number' } }],
+      parameters: [{ name: 'agent_id', in: 'query', required: true, schema: { type: 'string' }, example: 'agent-001' }, { name: 'action', in: 'query', required: false, schema: { type: 'string', enum: ['get', 'report'], default: 'get' } }, { name: 'tasks', in: 'query', required: false, schema: { type: 'integer' } }, { name: 'successes', in: 'query', required: false, schema: { type: 'integer' } }, { name: 'errors', in: 'query', required: false, schema: { type: 'integer' } }, { name: 'payments', in: 'query', required: false, schema: { type: 'integer' } }, { name: 'uptime', in: 'query', required: false, schema: { type: 'number' } }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.20', amountUnits: '200000', payTo: X402_PAY_TO },
       responses: { '200': { description: 'Agent score' }, '402': { description: 'Payment required.' } },
     } }, '/x402/fact-check': { get: {
       operationId: 'factCheck',
       summary: 'Grounding oracle: fact-checks a claim against live government/FDA/SEC/Treasury data.',
       description: 'Submit any claim; auto-routes to the relevant primary source. Pay 0.15 USDC on Base.',
-      parameters: [{ name: 'claim', in: 'query', required: true, schema: { type: 'string' } }, { name: 'domain', in: 'query', required: false, schema: { type: 'string', enum: ['grants', 'contracts', 'drug', 'provider', 'insider', 'yields', 'clinical', 'general'] } }],
+      parameters: [{ name: 'claim', in: 'query', required: true, schema: { type: 'string' }, example: 'The 10-year Treasury yield is above 4%' }, { name: 'domain', in: 'query', required: false, schema: { type: 'string', enum: ['grants', 'contracts', 'drug', 'provider', 'insider', 'yields', 'clinical', 'general'] } }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.15', amountUnits: '150000', payTo: X402_PAY_TO },
       responses: { '200': { description: 'Fact-check result' }, '402': { description: 'Payment required.' } },
     } }, '/x402/sec-13f': { get: {
       operationId: 'sec13f',
       summary: 'SEC EDGAR 13F institutional holdings — hedge fund quarterly positions.',
       description: 'Returns the most recent 13F-HR filings for a fund or institution by CIK or name. Each result includes the filing URL linking to the full XML holdings table. Pay 0.25 USDC on Base.',
-      parameters: [{ name: 'cik', in: 'query', required: false, schema: { type: 'string' }, description: '10-digit SEC CIK number (preferred).' }, { name: 'name', in: 'query', required: false, schema: { type: 'string' }, description: 'Institution or fund name (e.g. "Berkshire Hathaway").' }],
+      parameters: [{ name: 'cik', in: 'query', required: false, schema: { type: 'string' }, description: '10-digit SEC CIK number (preferred).', example: '0001067983' }, { name: 'name', in: 'query', required: false, schema: { type: 'string' }, description: 'Institution or fund name (e.g. "Berkshire Hathaway").' }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.25', amountUnits: '250000', payTo: X402_PAY_TO },
       responses: { '200': { description: '13F filing list with URLs' }, '402': { description: 'Payment required.' } },
     } }, '/x402/lobbying': { get: {
       operationId: 'lobbyingDisclosures',
       summary: 'Senate LDA lobbying disclosure filings — client, registrant, issues, and amounts.',
       description: 'Search the Senate Lobbying Disclosure Act database by client name, registrant (lobbying firm), or issue code. Returns recent filings with activity detail. Pay 0.15 USDC on Base.',
-      parameters: [{ name: 'client', in: 'query', required: false, schema: { type: 'string' }, description: 'The company or organization being lobbied for (e.g. "Google").' }, { name: 'registrant', in: 'query', required: false, schema: { type: 'string' }, description: 'The lobbying firm or individual registrant (e.g. "Akin Gump").' }, { name: 'issue', in: 'query', required: false, schema: { type: 'string' }, description: 'LDA issue area code (e.g. TAX, HCR, DEF, ENV, TRD).' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 25, default: 10 } }],
+      parameters: [{ name: 'client', in: 'query', required: false, schema: { type: 'string' }, description: 'The company or organization being lobbied for.', example: 'Google' }, { name: 'registrant', in: 'query', required: false, schema: { type: 'string' }, description: 'The lobbying firm or individual registrant.' }, { name: 'issue', in: 'query', required: false, schema: { type: 'string' }, description: 'LDA issue area code (e.g. TAX, HCR, DEF, ENV, TRD).' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 25, default: 10 } }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.15', amountUnits: '150000', payTo: X402_PAY_TO },
       responses: { '200': { description: 'Lobbying filings' }, '402': { description: 'Payment required.' } },
     } }, '/x402/patents': { get: {
       operationId: 'patentSearch',
       summary: 'USPTO PatentsView patent search — title, abstract, assignee, CPC class, grant date.',
       description: 'Search granted U.S. patents by keyword title or assignee (company). Returns patent ID, title, abstract snippet, CPC classification, and grant date. Pay 0.10 USDC on Base.',
-      parameters: [{ name: 'query', in: 'query', required: false, schema: { type: 'string' }, description: 'Keyword or phrase to search in patent titles.' }, { name: 'assignee', in: 'query', required: false, schema: { type: 'string' }, description: 'Assignee organization name (e.g. "Apple Inc").' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 25, default: 10 } }],
+      parameters: [{ name: 'query', in: 'query', required: false, schema: { type: 'string' }, description: 'Keyword or phrase to search in patent titles.', example: 'machine learning' }, { name: 'assignee', in: 'query', required: false, schema: { type: 'string' }, description: 'Assignee organization name (e.g. "Apple Inc").', example: 'Apple Inc' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 25, default: 10 } }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.10', amountUnits: '100000', payTo: X402_PAY_TO },
       responses: { '200': { description: 'Patent results' }, '402': { description: 'Payment required.' } },
     } }, '/x402/fred': { get: {
       operationId: 'fredSeries',
       summary: 'FRED economic indicator series (Federal Reserve Bank of St. Louis).',
       description: 'Retrieve observations for any FRED series: GDP, CPI, UNRATE, FEDFUNDS, T10Y2Y, and 800k+ others. Returns series metadata and latest observations in reverse chronological order. Pay 0.08 USDC on Base.',
-      parameters: [{ name: 'series_id', in: 'query', required: true, schema: { type: 'string' }, description: 'FRED series ID (e.g. GDP, CPIAUCSL, UNRATE, FEDFUNDS, T10Y2Y, MORTGAGE30US).' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 50, default: 20 } }],
+      parameters: [{ name: 'series_id', in: 'query', required: true, schema: { type: 'string' }, description: 'FRED series ID (e.g. GDP, CPIAUCSL, UNRATE, FEDFUNDS, T10Y2Y, MORTGAGE30US).', example: 'GDP' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 50, default: 20 } }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.08', amountUnits: '80000', payTo: X402_PAY_TO },
       responses: { '200': { description: 'FRED series observations' }, '402': { description: 'Payment required.' } },
     } }, '/x402/osha': { get: {
       operationId: 'oshaInspections',
       summary: 'OSHA workplace inspection and violation records (DOL enforcement data).',
       description: 'Search OSHA inspection records by establishment name, NAICS code, or state. Returns inspection activity type, citations, penalties, and open/closed status. Pay 0.10 USDC on Base.',
-      parameters: [{ name: 'establishment', in: 'query', required: false, schema: { type: 'string' }, description: 'Establishment or employer name.' }, { name: 'naics', in: 'query', required: false, schema: { type: 'string' }, description: '6-digit NAICS industry code.' }, { name: 'state', in: 'query', required: false, schema: { type: 'string' }, description: '2-letter U.S. state code.' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 25, default: 10 } }],
+      parameters: [{ name: 'establishment', in: 'query', required: false, schema: { type: 'string' }, description: 'Establishment or employer name.', example: 'Amazon' }, { name: 'naics', in: 'query', required: false, schema: { type: 'string' }, description: '6-digit NAICS industry code.', example: '493110' }, { name: 'state', in: 'query', required: false, schema: { type: 'string' }, description: '2-letter U.S. state code.', example: 'TX' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 25, default: 10 } }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.10', amountUnits: '100000', payTo: X402_PAY_TO },
       responses: { '200': { description: 'OSHA inspection records' }, '402': { description: 'Payment required.' } },
     } }, '/x402/fda-510k': { get: {
       operationId: 'fda510k',
       summary: 'FDA 510(k) medical device premarket clearances (openFDA).',
       description: 'Search FDA 510(k) clearances by device name or applicant (manufacturer). Returns K-number, decision date, product code, decision description, and link to FDA summary. Pay 0.08 USDC on Base.',
-      parameters: [{ name: 'device', in: 'query', required: false, schema: { type: 'string' }, description: 'Device name or type (e.g. "pulse oximeter", "knee replacement").' }, { name: 'applicant', in: 'query', required: false, schema: { type: 'string' }, description: 'Manufacturer or applicant company name.' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 25, default: 10 } }],
+      parameters: [{ name: 'device', in: 'query', required: false, schema: { type: 'string' }, description: 'Device name or type (e.g. "pulse oximeter", "knee replacement").', example: 'pulse oximeter' }, { name: 'applicant', in: 'query', required: false, schema: { type: 'string' }, description: 'Manufacturer or applicant company name.', example: 'Medtronic' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 25, default: 10 } }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.08', amountUnits: '80000', payTo: X402_PAY_TO },
       responses: { '200': { description: '510(k) clearances' }, '402': { description: 'Payment required.' } },
     } } },
