@@ -8,9 +8,8 @@ import { LeviathanClient } from '../../lib/sml-api/leviathan.js';
 import { PriceRegistry } from '../registry/pricing.js';
 
 const InputSchema = z.object({
-  ticker: z.string().regex(/^[A-Z]{1,5}$/).optional(),
-  signal_type: z.enum(['squeeze', 'momentum', 'dark_pool', 'all']),
-  min_confidence: z.number().min(0).max(100).default(60),
+  ticker: z.string().regex(/^[A-Z]{1,10}$/),
+  signal_type: z.enum(['squeeze', 'momentum', 'all']),
   wallet_address: z.string().optional(),
 });
 
@@ -18,9 +17,14 @@ export function registerLeviathan(server: McpServer): void {
   server.tool(
     'leviathan_signal',
     {
-      ticker: z.string().describe('Ticker symbol (e.g. TSLA, MSTR). Optional — omit for top signals.'),
-      signal_type: z.enum(['squeeze', 'momentum', 'dark_pool', 'all']).describe('Signal category.'),
-      min_confidence: z.number().describe('Minimum confidence score 0-100. Default: 60.'),
+      ticker: z.string().describe('Ticker symbol (e.g. TSLA, MSTR, SPY). Required.'),
+      signal_type: z
+        .enum(['squeeze', 'momentum', 'all'])
+        .describe(
+          'squeeze — 741-EMA stack alignment + squeeze_alert flag. ' +
+          'momentum — 365-day EMA trend (ABOVE/BELOW). ' +
+          'all — full multi-engine composite (741 + 365 + TripleLock).',
+        ),
       wallet_address: z.string().describe('Agent wallet address for payment. Auto-provisioned if omitted.'),
     },
     async (rawArgs) => {
@@ -54,10 +58,9 @@ export function registerLeviathan(server: McpServer): void {
       const data = await client.getSignal({
         ticker: args.ticker,
         signalType: args.signal_type,
-        minConfidence: args.min_confidence ?? 60,
       });
 
-      audit.info('leviathan_success', { ticker: args.ticker ?? 'all', receiptId: payment.receiptId });
+      audit.info('leviathan_success', { ticker: args.ticker, signal_type: args.signal_type, receiptId: payment.receiptId });
 
       return {
         content: [
