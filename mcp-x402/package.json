@@ -43,6 +43,8 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.0",
+    "@virtuals-protocol/acp-node-v2": "^0.1.6",
+    "@account-kit/infra": "^4.88.4",
     "zod": "^3.23.8",
     "viem": "^2.21.0",
     "xrpl": "^4.1.0",

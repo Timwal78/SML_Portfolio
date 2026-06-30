@@ -31,6 +31,17 @@ services:
         sync: false
       - key: SOLANA_RPC_URL
         sync: false
+      # LEVIATHAN ACP v2 — Virtuals Protocol seller agent
+      - key: ACP_WALLET_ADDRESS
+        value: "0x0f035c36c4ce65a6f1bf4370f779bac722d59004"
+      - key: ACP_WALLET_ID
+        sync: false
+      - key: ACP_SIGNER_PRIVATE_KEY
+        sync: false
+      - key: LEVIATHAN_BYPASS_SECRET
+        sync: false
+      - key: LEVIATHAN_BASE_URL
+        value: "https://mcp-x402.onrender.com"
       - key: DAILY_SPEND_CAP_USD
         value: "50"
       - key: AUTO_APPROVE_THRESHOLD_USD

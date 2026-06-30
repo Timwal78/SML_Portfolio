@@ -13,6 +13,7 @@ import { rapidApiGuard } from './security/rapidapi.js';
 import { healthHandler } from './health.js';
 import { verifyBaseUsdcPayment, alreadyRedeemed, markRedeemed, releaseRedeem } from './payments/verify-inbound.js';
 import { facilitatorChain, decodePaymentHeader, type PaymentRequirements } from './payments/facilitators.js';
+import { SqueezeOSAPI } from '../lib/sml-api/squeezeos.js';
 
 // Embedded favicon (jet black / neon green SML mark) — served directly, no redirect
 const FAVICON_ICO = Buffer.from(
@@ -59,6 +60,8 @@ async function runSSE(): Promise<void> {
   app.use(cors({ origin: process.env['CORS_ORIGIN'] ?? '*' }));
   app.use(express.json({ limit: '1mb' }));
   app.use(rapidApiGuard);
+
+  const LEVIATHAN_BYPASS_SECRET = process.env['LEVIATHAN_BYPASS_SECRET'] ?? '';
 
   // Health endpoint — hit every 30s by Docker healthcheck + keepalive cron
   app.get('/health', healthHandler);
@@ -125,6 +128,11 @@ async function runSSE(): Promise<void> {
 
     const xPayment = typeof req.headers['x-payment'] === 'string' ? req.headers['x-payment'] : '';
     const txHash = typeof req.headers['x-payment-tx'] === 'string' ? req.headers['x-payment-tx'] : '';
+
+    // LEVIATHAN bypass — Virtuals Protocol USDC already settled on-chain
+    if (LEVIATHAN_BYPASS_SECRET && req.headers['x-leviathan-key'] === LEVIATHAN_BYPASS_SECRET) {
+      return { ok: true, payer: { rail: 'leviathan', from: 'did:leviathan:acp:scriptmasterlabs', tx: '' } };
+    }
 
     // Rail A — standard EIP-3009 via hybrid facilitator chain
     if (xPayment) {
@@ -937,6 +945,9 @@ async function runSSE(): Promise<void> {
   }
 
   async function dynamicPriceGate(req: express.Request, res: express.Response, next: express.NextFunction) {
+    if (LEVIATHAN_BYPASS_SECRET && req.headers['x-leviathan-key'] === LEVIATHAN_BYPASS_SECRET) {
+      next(); return;
+    }
     const did = (req as any).agentDid || "did:anonymous";
     const score = getScore(did);
     const proofHeader = req.headers["x-payment-proof"];
@@ -997,20 +1008,28 @@ async function runSSE(): Promise<void> {
     res.json({ agentDid: did, creditScore: score, scale: "300-850", benefits: { "700+": "VIP 0.08 RLUSD", "800+": "Platinum 0.06 RLUSD" } });
   });
 
-  app.post("/api/council", agentDidMiddleware, dynamicPriceGate, (req, res) => {
-    const newScore = recordPaidCall((req as any).agentDid);
-    res.json({
-      tool: "council", tier: "paid", consensus: "Awaiting Data", agentCreditScore: newScore, scoreGained: "+5",
-      note: "Route to SqueezeOS council endpoint for live verdict"
-    });
+  app.post("/api/council", agentDidMiddleware, dynamicPriceGate, async (req, res) => {
+    const agentDid = (req as any).agentDid as string;
+    const symbol = (typeof req.body?.symbol === 'string' ? req.body.symbol : 'SPY').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10);
+    try {
+      const result = await SqueezeOSAPI.council(symbol, agentDid);
+      const newScore = recordPaidCall(agentDid);
+      res.json({ tool: "council", tier: "paid", symbol, agentCreditScore: newScore, scoreGained: "+5", ...(result as object) });
+    } catch (err) {
+      res.status(502).json({ error: "upstream_error", message: String(err) });
+    }
   });
 
-  app.post("/api/beastmode/full", agentDidMiddleware, dynamicPriceGate, (req, res) => {
-    const newScore = recordPaidCall((req as any).agentDid);
-    res.json({
-      tool: "beastmode_full", tier: "paid", scan: "Awaiting Data",
-      agentCreditScore: newScore, scoreGained: "+5"
-    });
+  app.post("/api/beastmode/full", agentDidMiddleware, dynamicPriceGate, async (req, res) => {
+    const agentDid = (req as any).agentDid as string;
+    const symbol = (typeof req.body?.symbol === 'string' ? req.body.symbol : 'SPY').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10);
+    try {
+      const result = await SqueezeOSAPI.council(symbol, agentDid);
+      const newScore = recordPaidCall(agentDid);
+      res.json({ tool: "beastmode_full", tier: "paid", symbol, agentCreditScore: newScore, scoreGained: "+5", ...(result as object) });
+    } catch (err) {
+      res.status(502).json({ error: "upstream_error", message: String(err) });
+    }
   });
 
   // Streamable HTTP transport — used by claude.ai web connectors
@@ -1099,6 +1118,16 @@ async function runSSE(): Promise<void> {
 
   AuditLogger.getInstance().info('server_start', { transport: 'sse', port, version: VERSION });
   console.error(`[mcp-x402] listening on :${port} — health: http://localhost:${port}/health`);
+
+  if (process.env['ACP_WALLET_ID'] && process.env['ACP_SIGNER_PRIVATE_KEY']) {
+    import('./acp/leviathan.js').then(({ startLeviathan }) => {
+      startLeviathan().catch((err: Error) => {
+        console.error('[LEVIATHAN] Failed to start:', err.message);
+      });
+    });
+  } else {
+    console.warn('[LEVIATHAN] Skipped — ACP_WALLET_ID or ACP_SIGNER_PRIVATE_KEY not set');
+  }
 
   const shutdown = async () => {
     AuditLogger.getInstance().info('server_stop', { transport: 'sse' });
