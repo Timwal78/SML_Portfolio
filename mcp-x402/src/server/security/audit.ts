@@ -23,7 +23,7 @@ export class AuditLogger {
   private readonly hmacSecret: string;
 
   private constructor() {
-    this.logPath = process.env['AUDIT_LOG_PATH'] ?? './audit.log';
+    this.logPath = process.env['AUDIT_LOG_PATH'] ?? '/tmp/audit.log';
     this.hmacSecret = process.env['AUDIT_HMAC_SECRET'] ?? 'mcp-x402-audit-secret';
   }
 

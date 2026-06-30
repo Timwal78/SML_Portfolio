@@ -98,33 +98,26 @@ async function runSSE(): Promise<void> {
   //   directly on Base via viem, no facilitator, no custody.
   // Both advertised in one 402 `accepts` array; agent picks whichever it can fulfil.
   type PayResult = { ok: true; payer: { rail: string; from: string; tx: string } } | { ok: false };
-  const buildAccepts = (resource: string, priceUnits: bigint, description: string, inputSchema: unknown, outputSchema: unknown): unknown[] => {
+  // x402 v2 spec: lean accepts array — no non-spec fields, CAIP-2 network, single standard entry.
+  // The sovereign rail (X-PAYMENT-TX) is documented in description; its extra fields are non-spec.
+  const buildAccepts = (resource: string, priceUnits: bigint, description: string): unknown[] => {
     const units = priceUnits.toString();
-    const common = { scheme: 'exact', network: 'base', maxAmountRequired: units, resource, description, mimeType: 'application/json', outputSchema, inputSchema, payTo: X402_PAY_TO, maxTimeoutSeconds: 300, asset: USDC_BASE_ASSET };
-    return [
-      { ...common, extra: { name: 'USD Coin', version: '2' } },
-      { ...common, extra: { name: 'USDC', version: '2', settlement: 'onchain-tx', paymentHeader: 'X-PAYMENT-TX' } },
-    ];
-  };
-  // Lean variant for the PAYMENT-REQUIRED header: drops inputSchema/outputSchema
-  // (already duplicated in the JSON body) so the header stays well under the
-  // ~8-16KB limit most HTTP clients/proxies enforce on a single header value.
-  const buildAcceptsForHeader = (resource: string, priceUnits: bigint, description: string): unknown[] => {
-    const units = priceUnits.toString();
-    const common = { scheme: 'exact', network: 'base', maxAmountRequired: units, resource, description, mimeType: 'application/json', payTo: X402_PAY_TO, maxTimeoutSeconds: 300, asset: USDC_BASE_ASSET };
-    return [
-      { ...common, extra: { name: 'USD Coin', version: '2' } },
-      { ...common, extra: { name: 'USDC', version: '2', settlement: 'onchain-tx', paymentHeader: 'X-PAYMENT-TX' } },
-    ];
+    const common = { scheme: 'exact', network: 'eip155:8453', maxAmountRequired: units, resource, description, mimeType: 'application/json', payTo: X402_PAY_TO, maxTimeoutSeconds: 300, asset: USDC_BASE_ASSET };
+    return [{ ...common, extra: { name: 'USD Coin', version: '2' } }];
   };
   const send402 = (res: Response, challenge: Record<string, unknown>, header402: string, extra?: Record<string, unknown>): void => {
-    res.status(402).set('PAYMENT-REQUIRED', header402).set('Access-Control-Expose-Headers', 'PAYMENT-REQUIRED').set('Access-Control-Allow-Origin', '*').json(extra ? { ...challenge, ...extra } : challenge);
+    const body = extra ? { ...challenge, ...extra } : challenge;
+    res.status(402)
+      .set('X-PAYMENT-REQUIRED', header402)
+      .set('PAYMENT-REQUIRED', header402)
+      .set('Access-Control-Expose-Headers', 'X-PAYMENT-REQUIRED, PAYMENT-REQUIRED')
+      .set('Access-Control-Allow-Origin', '*')
+      .json(body);
   };
   const requirePayment = async (req: Request, res: Response, opts: { resource: string; priceUnits: bigint; description: string; inputSchema: unknown; outputSchema: unknown }): Promise<PayResult> => {
-    const accepts = buildAccepts(opts.resource, opts.priceUnits, opts.description, opts.inputSchema, opts.outputSchema);
-    const challenge: Record<string, unknown> = { x402Version: 2, error: 'X-PAYMENT header is required', accepts };
-    const headerChallenge: Record<string, unknown> = { x402Version: 2, error: 'X-PAYMENT header is required', accepts: buildAcceptsForHeader(opts.resource, opts.priceUnits, opts.description) };
-    const header402 = Buffer.from(JSON.stringify(headerChallenge)).toString('base64');
+    const accepts = buildAccepts(opts.resource, opts.priceUnits, opts.description);
+    const challenge: Record<string, unknown> = { x402Version: 2, error: 'payment_required', accepts };
+    const header402 = Buffer.from(JSON.stringify(challenge)).toString('base64');
 
     const xPayment = typeof req.headers['x-payment'] === 'string' ? req.headers['x-payment'] : '';
     const txHash = typeof req.headers['x-payment-tx'] === 'string' ? req.headers['x-payment-tx'] : '';
@@ -155,15 +148,21 @@ async function runSSE(): Promise<void> {
     send402(res, challenge, header402);
     return { ok: false };
   };
+  const inlineDiscover402 = (resource: string, description: string): Record<string, unknown> => ({
+    x402Version: 2, error: 'payment_required',
+    accepts: [{ scheme: 'exact', network: 'eip155:8453', asset: USDC_BASE_ASSET, maxAmountRequired: '20000', resource, description, mimeType: 'application/json', payTo: X402_PAY_TO, maxTimeoutSeconds: 120, extra: { name: 'USD Coin', version: '2' } }],
+  });
   app.get('/x402/discover', (req, res) => {
     const resource = `https://${req.headers.host ?? 'mcp-x402.onrender.com'}${req.originalUrl}`;
-    const challenge = { x402Version: 2, error: 'payment_required', accepts: [{ scheme: 'exact', network: 'eip155:8453', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', maxAmountRequired: '20000', resource, description: 'SML pay-per-call data tools — federal grants/contracts, market intel, SEC, FTD. Per-tool pricing via the sml_discover MCP tool.', mimeType: 'application/json', payTo: X402_PAY_TO, maxTimeoutSeconds: 120, inputSchema: { type: 'object', properties: { tool: { type: 'string', description: 'Tool name to price/call. See GET /x402/tool/{name}.' } } }, extra: { name: 'USDC', version: '2' } }] };
-    res.status(402).set('PAYMENT-REQUIRED', Buffer.from(JSON.stringify(challenge)).toString('base64')).set('Access-Control-Expose-Headers', 'PAYMENT-REQUIRED').set('Access-Control-Allow-Origin', '*').json(challenge);
+    const challenge = inlineDiscover402(resource, 'SML pay-per-call data tools — federal grants/contracts, market intel, SEC, FTD. Per-tool pricing via the sml_discover MCP tool.');
+    const h = Buffer.from(JSON.stringify(challenge)).toString('base64');
+    res.status(402).set('X-PAYMENT-REQUIRED', h).set('PAYMENT-REQUIRED', h).set('Access-Control-Expose-Headers', 'X-PAYMENT-REQUIRED, PAYMENT-REQUIRED').set('Access-Control-Allow-Origin', '*').json(challenge);
   });
   app.get('/x402/tool/:name', (req, res) => {
     const resource = `https://${req.headers.host ?? 'mcp-x402.onrender.com'}${req.originalUrl}`;
-    const challenge = { x402Version: 2, error: 'payment_required', accepts: [{ scheme: 'exact', network: 'eip155:8453', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', maxAmountRequired: '20000', resource, description: `Paid SML tool ${req.params.name} — pay-per-call via x402, USDC on Base.`, mimeType: 'application/json', payTo: X402_PAY_TO, maxTimeoutSeconds: 120, inputSchema: { type: 'object', properties: { args: { type: 'object', description: 'Tool-specific arguments.' } } }, extra: { name: 'USDC', version: '2' } }] };
-    res.status(402).set('PAYMENT-REQUIRED', Buffer.from(JSON.stringify(challenge)).toString('base64')).set('Access-Control-Expose-Headers', 'PAYMENT-REQUIRED').set('Access-Control-Allow-Origin', '*').json(challenge);
+    const challenge = inlineDiscover402(resource, `Paid SML tool ${req.params.name} — pay-per-call via x402, USDC on Base.`);
+    const h = Buffer.from(JSON.stringify(challenge)).toString('base64');
+    res.status(402).set('X-PAYMENT-REQUIRED', h).set('PAYMENT-REQUIRED', h).set('Access-Control-Expose-Headers', 'X-PAYMENT-REQUIRED, PAYMENT-REQUIRED').set('Access-Control-Allow-Origin', '*').json(challenge);
   });
 
   // ── REAL fulfilling x402 endpoint: live federal grant search ──────────────
