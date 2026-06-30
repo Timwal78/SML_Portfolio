@@ -376,6 +376,76 @@ Invite-only Pine Script v6 indicators for squeeze detection and institutional fl
 
 ---
 
+### K. X-402-Score-Earned + X-402-Tier Response Headers
+
+Every successful paid call to `/api/council`, `/api/beastmode/full`, and `/api/credit-score/report` now includes:
+
+```
+X-402-Score-Earned: 755
+X-402-Tier: PULSAR
+```
+
+Proxy agents and middleware can parse these headers without reading the JSON body or making a separate call to `/api/credit-score`. Tier upgrades are immediately visible in the response to the call that triggered them.
+
+**Source:** `mcp-x402-xrpl/src/squeezeos-server.ts` — all paid endpoint handlers.
+
+---
+
+### L. Call History Endpoint — `GET /api/credit-score/history/:wallet`
+
+**Endpoint:** `GET https://squeezeos-api.onrender.com/api/credit-score/history/:wallet`
+**Auth:** None — free and public.
+
+Returns the last 20 paid call timestamps (newest first) from the Redis ring buffer `bureau:history:<agentDid>`, plus current score, tier, total paid calls, and calls to next tier. Agents can audit their own score progression without buying the full credit report (0.10 RLUSD).
+
+**Example response:**
+```json
+{
+  "agentDid": "did:poi:xrpl:rXXXX",
+  "wallet": "rXXXX",
+  "creditScore": 755,
+  "tier": "PULSAR",
+  "totalPaidCalls": 91,
+  "callHistory": ["2026-06-30T08:44:00Z", "2026-06-30T08:32:00Z", "..."],
+  "callsToNextTier": 9,
+  "fullReportUrl": "/api/credit-score/report (0.10 RLUSD — includes on-chain anchor + benefit details)"
+}
+```
+
+**Source:** `mcp-x402-xrpl/src/squeezeos-server.ts` — `GET /api/credit-score/history/:wallet`.
+
+---
+
+### M. Xahau Anchor → Ghost Cube Live Broadcast
+
+When the SqueezeOS MCP server anchors an agent's ARGUS score on the Xahau ledger, it immediately POSTs to Ghost Layer's `POST /internal/broadcast` endpoint. Ghost Layer fans the event to all connected Ghost Cube WebSocket clients (`/ws/cube`). Net effect: every browser or agent watching the Ghost Cube sees the score update in real time at the moment of on-chain confirmation — no polling.
+
+**Ghost Layer endpoint:** `POST https://ghost-layer.onrender.com/internal/broadcast`
+- Protected by `GHOST_INTERNAL_SECRET` env var if set (`X-Internal-Secret` header)
+- Payload: `{ event: "xahau_anchor", agentDid, score, tier, txHash, anchoredAt, network }`
+- Returns: `{ ok: true, clients_notified: <count> }`
+
+**Ghost Cube WebSocket event (`xahau_anchor`):**
+```json
+{ "event": "xahau_anchor", "agentDid": "did:poi:xrpl:rXXXX", "score": 755, "tier": "PULSAR", "txHash": "ABCDEF...", "anchoredAt": "2026-06-30T...", "network": "xahau-mainnet" }
+```
+
+**Source:** `mcp-x402-xrpl/src/credit-bureau.ts` → `broadcastCubeEvent()`; `ghost-layer/ghost/gateway.py` → `_handle_internal_broadcast()`.
+
+---
+
+### N. Sovereign Data Enforcement — Automated CI Block
+
+All three repos (`mcp-x402-xrpl`, `ghost-layer`, `SML_Portfolio`) enforce a Live Data Mandate at three layers:
+
+1. **`scripts/check-sovereign-data.sh`** — committed grep scanner; blocks hardcoded signals, confidence scores, `BUY/SELL/HOLD` strings, `mock/fake/demo/placeholder` markers, fake agent names (`QUANT_ALPHA`, etc.), trade levels (`entry`, `stopLoss`, `riskReward`). Run: `bash scripts/check-sovereign-data.sh`
+2. **Pre-commit hook** — installed once via `bash scripts/install-hooks.sh`; blocks every local commit if violations found.
+3. **GitHub Actions CI** — `.github/workflows/sovereign-data-check.yml`; blocks PR merge on any violation.
+
+Policy documented in `AGENT_STANDARDS/SOVEREIGN_DATA_POLICY.md` Section 4 (Live Data Mandate). All paid endpoints must proxy to `SQUEEZEOS_UPSTREAM_URL`; no hardcoded fallback data is permitted under any circumstance.
+
+---
+
 ## 3. ZERO-TRUST & COMPLIANCE
 
 SML enforces a Zero-Trust Architecture (ZTA) across all deployments. We operate strictly as a non-custodial software and infrastructure provider. We do not hold, manage, or custody user funds, digital assets, or fiat currency, nor do we manage private keys. We guarantee zero-telemetry operation, absolute data sovereignty, and compliance with federal SDVOSB procurement standards. Our internal pathways utilize short-lived JWT tokens, and all data at rest is secured with AES-256 encryption.
