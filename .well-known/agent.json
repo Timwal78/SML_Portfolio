@@ -1,0 +1,105 @@
+{
+  "schema": "agent-card/v1",
+  "name": "ScriptMasterLabs — SqueezeOS MCP",
+  "description": "Institutional-grade AI market intelligence and x402 payment infrastructure. Pay per call in RLUSD on XRPL — no subscriptions, no API keys, no accounts. ARGUS Credit Bureau rewards high-volume agents with automatic discounts. Service-Disabled Veteran-Owned Small Business (SDVOSB).",
+  "url": "https://squeezeos-api.onrender.com",
+  "version": "2.1.1",
+  "provider": {
+    "organization": "Script Master Labs LLC",
+    "url": "https://www.scriptmasterlabs.com",
+    "contact": "scriptmasterlabs@gmail.com",
+    "sdvosb": true,
+    "location": "Kinston, NC, USA"
+  },
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "stateTransitionHistory": false,
+    "idempotency": true,
+    "preFlightQuote": true,
+    "workflowOrchestration": true,
+    "webSocketLiveFeed": true
+  },
+  "authentication": {
+    "schemes": ["x402"],
+    "description": "No API keys or accounts. Pay per call in RLUSD via x402 protocol. Include X-Payment-Proof header with base64-encoded XRPL tx JSON."
+  },
+  "defaultInputModes": ["application/json"],
+  "defaultOutputModes": ["application/json"],
+  "x402": {
+    "protocol": "x402/1.0",
+    "network": "xrpl-mainnet",
+    "currency": "RLUSD",
+    "issuer": "rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De",
+    "quoteEndpoint": "https://squeezeos-api.onrender.com/x402/quote",
+    "orchestrateEndpoint": "https://squeezeos-api.onrender.com/x402/orchestrate",
+    "toolCatalog": "https://squeezeos-api.onrender.com/.well-known/mcp",
+    "onboardingGuide": "https://squeezeos-api.onrender.com/agent",
+    "idempotencyHeader": "X-Idempotency-Key",
+    "idempotencyTtlSeconds": 300,
+    "a2aCompatible": true,
+    "headers": {
+      "paymentProof": "X-Payment-Proof",
+      "agentDid": "X-Agent-DID",
+      "idempotencyKey": "X-Idempotency-Key"
+    }
+  },
+  "argus": {
+    "description": "ARGUS Agent Credit Bureau — 300-850 FICO-style score. Every paid call earns +5 pts.",
+    "scoreEndpoint": "https://squeezeos-api.onrender.com/api/credit-score",
+    "reportEndpoint": "https://squeezeos-api.onrender.com/api/credit-score/report",
+    "tiers": [
+      { "name": "PROTOSTAR", "minScore": 300, "maxScore": 499, "priceRlusd": "0.10" },
+      { "name": "NEUTRON",   "minScore": 500, "maxScore": 699, "priceRlusd": "0.10" },
+      { "name": "PULSAR",    "minScore": 700, "maxScore": 799, "priceRlusd": "0.08", "discount": "20%" },
+      { "name": "QUASAR",    "minScore": 800, "maxScore": 850, "priceRlusd": "0.06", "discount": "40%" }
+    ]
+  },
+  "skills": [
+    {
+      "id": "market_intel",
+      "name": "Market Intelligence",
+      "description": "7-agent AI council verdict + full squeeze scan across 3 timeframes",
+      "tags": ["market-intelligence", "signals", "squeeze", "council"],
+      "examples": ["Analyze GME for squeeze setup", "Get council verdict on AMC"],
+      "payment": { "amount": "0.10", "currency": "RLUSD", "discountApplies": true }
+    },
+    {
+      "id": "squeeze_scan",
+      "name": "SqueezeOS Beastmode Scan",
+      "description": "Full squeeze scan with entry, targets, stop-loss, and risk/reward across 15m/1h/4h",
+      "tags": ["squeeze", "scan", "signals"],
+      "payment": { "amount": "0.10", "currency": "RLUSD", "discountApplies": true }
+    },
+    {
+      "id": "credit_check",
+      "name": "Agent Credit Report",
+      "description": "Full ARGUS credit bureau report: score history, tier, discount schedule, call log",
+      "tags": ["credit", "bureau", "identity"],
+      "payment": { "amount": "0.10", "currency": "RLUSD", "discountApplies": true }
+    },
+    {
+      "id": "orchestrate",
+      "name": "Workflow Orchestrator",
+      "description": "Multi-step workflows (market_intel, credit_check, full_scan) with single payment and budget cap",
+      "tags": ["orchestrate", "workflow", "multi-step"],
+      "payment": { "amount": "0.10-0.20", "currency": "RLUSD", "discountApplies": true }
+    }
+  ],
+  "quickstart": [
+    "GET https://squeezeos-api.onrender.com/agent — full onboarding guide",
+    "GET https://squeezeos-api.onrender.com/api/credit-score — check ARGUS score (free)",
+    "GET https://squeezeos-api.onrender.com/x402/quote?tool=council_full — exact price (free)",
+    "POST https://squeezeos-api.onrender.com/api/council — 7-agent council (0.10 RLUSD)"
+  ],
+  "discovery": {
+    "llms": "https://www.scriptmasterlabs.com/llms.txt",
+    "llmsFull": "https://www.scriptmasterlabs.com/llms-full.txt",
+    "agentMd": "https://www.scriptmasterlabs.com/agent.md",
+    "agentsJson": "https://www.scriptmasterlabs.com/agents.json",
+    "sitemap": "https://www.scriptmasterlabs.com/sitemap.xml"
+  },
+  "topUpUrl": "https://www.scriptmasterlabs.com/central-bank.html",
+  "ghostCubeDashboard": "https://www.scriptmasterlabs.com/ghost-cube.html",
+  "ghostLayerWs": "wss://ghost-layer.onrender.com/ws/cube"
+}
