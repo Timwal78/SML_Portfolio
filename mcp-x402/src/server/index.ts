@@ -911,6 +911,309 @@ async function runSSE(): Promise<void> {
     } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'fda_510k_error', message: String(err) }); }
   });
 
+  // ── /x402/sec-10k — SEC EDGAR 10-K annual report filings by ticker ($0.20) ──────
+  app.get('/x402/sec-10k', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/sec-10k`;
+    const ticker = cleanTerm(typeof req.query['ticker'] === 'string' ? req.query['ticker'] : '').toUpperCase();
+    const limit = Math.min(Math.max(parseInt(String(req.query['limit'] ?? '5'), 10) || 5, 1), 10);
+    const inputSchema = { type: 'object', properties: { ticker: { type: 'string', description: 'Stock ticker (required). e.g. AAPL, TSLA.' }, limit: { type: 'integer', minimum: 1, maximum: 10, default: 5 } }, required: ['ticker'] };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { ticker: { type: 'string', required: true } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 200000n, description: 'SEC EDGAR 10-K annual report filings by ticker. Links to full 10-K documents. Pay 0.20 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    if (!ticker || !/^[A-Z]{1,5}$/.test(ticker)) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_or_invalid_ticker', detail: 'Payment verified. Add ?ticker=AAPL and retry.' }); }
+    try {
+      const cik = await resolveTickerToCik(ticker);
+      if (!cik) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(404).set('Access-Control-Allow-Origin', '*').json({ error: 'ticker_not_found', ticker }); }
+      const r = await fetch(`https://data.sec.gov/submissions/CIK${cik}.json`, { headers: { 'User-Agent': 'ScriptMasterLabs ScriptMasterLabs@gmail.com' } });
+      if (!r.ok) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'edgar_error', status: r.status }); }
+      const sub = await r.json() as { name?: string; filings?: { recent?: { form?: string[]; filingDate?: string[]; primaryDocument?: string[]; accessionNumber?: string[] } } };
+      const rec = sub.filings?.recent ?? {}; const forms = rec.form ?? []; const dates = rec.filingDate ?? []; const docs = rec.primaryDocument ?? []; const acc = rec.accessionNumber ?? [];
+      const cikShort = cik.replace(/^0+/, '');
+      const filings = forms.map((f, i) => ({ form: f, date: dates[i] ?? '', doc: docs[i] ?? '', acc: acc[i] ?? '' })).filter(x => x.form === '10-K').slice(0, limit).map(x => { const accFmt = x.acc.replace(/-/g, ''); return { date: x.date, form: x.form, accession: x.acc, filing_url: `https://www.sec.gov/Archives/edgar/data/${cikShort}/${accFmt}/${x.doc}`, index_url: `https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=${cikShort}&type=10-K&dateb=&owner=include&count=5` }; });
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'sec.gov/EDGAR', ticker, company: sub.name ?? '', cik: cikShort, form_type: '10-K', count: filings.length, filings, note: 'Each filing_url links to the full 10-K annual report HTML/XBRL document.', _disclaimer: 'SEC EDGAR public filing data. Not investment advice.', _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'edgar_fetch_failed', message: String(err) }); }
+  });
+
+  // ── /x402/sec-10q — SEC EDGAR 10-Q quarterly filings by ticker ($0.15) ─────────
+  app.get('/x402/sec-10q', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/sec-10q`;
+    const ticker = cleanTerm(typeof req.query['ticker'] === 'string' ? req.query['ticker'] : '').toUpperCase();
+    const limit = Math.min(Math.max(parseInt(String(req.query['limit'] ?? '5'), 10) || 5, 1), 10);
+    const inputSchema = { type: 'object', properties: { ticker: { type: 'string', description: 'Stock ticker (required).' }, limit: { type: 'integer', minimum: 1, maximum: 10, default: 5 } }, required: ['ticker'] };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { ticker: { type: 'string', required: true } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 150000n, description: 'SEC EDGAR 10-Q quarterly report filings by ticker. Links to full 10-Q documents. Pay 0.15 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    if (!ticker || !/^[A-Z]{1,5}$/.test(ticker)) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_or_invalid_ticker', detail: 'Payment verified. Add ?ticker=AAPL and retry.' }); }
+    try {
+      const cik = await resolveTickerToCik(ticker);
+      if (!cik) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(404).set('Access-Control-Allow-Origin', '*').json({ error: 'ticker_not_found', ticker }); }
+      const r = await fetch(`https://data.sec.gov/submissions/CIK${cik}.json`, { headers: { 'User-Agent': 'ScriptMasterLabs ScriptMasterLabs@gmail.com' } });
+      if (!r.ok) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'edgar_error', status: r.status }); }
+      const sub = await r.json() as { name?: string; filings?: { recent?: { form?: string[]; filingDate?: string[]; primaryDocument?: string[]; accessionNumber?: string[] } } };
+      const rec = sub.filings?.recent ?? {}; const forms = rec.form ?? []; const dates = rec.filingDate ?? []; const docs = rec.primaryDocument ?? []; const acc = rec.accessionNumber ?? [];
+      const cikShort = cik.replace(/^0+/, '');
+      const filings = forms.map((f, i) => ({ form: f, date: dates[i] ?? '', doc: docs[i] ?? '', acc: acc[i] ?? '' })).filter(x => x.form === '10-Q').slice(0, limit).map(x => { const accFmt = x.acc.replace(/-/g, ''); return { date: x.date, form: x.form, accession: x.acc, filing_url: `https://www.sec.gov/Archives/edgar/data/${cikShort}/${accFmt}/${x.doc}` }; });
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'sec.gov/EDGAR', ticker, company: sub.name ?? '', cik: cikShort, form_type: '10-Q', count: filings.length, filings, _disclaimer: 'SEC EDGAR public filing data. Not investment advice.', _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'edgar_fetch_failed', message: String(err) }); }
+  });
+
+  // ── /x402/sec-13dg — SEC EDGAR 13D/13G activist investor filings ($0.20) ────────
+  app.get('/x402/sec-13dg', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/sec-13dg`;
+    const ticker = cleanTerm(typeof req.query['ticker'] === 'string' ? req.query['ticker'] : '').toUpperCase();
+    const limit = Math.min(Math.max(parseInt(String(req.query['limit'] ?? '10'), 10) || 10, 1), 20);
+    const inputSchema = { type: 'object', properties: { ticker: { type: 'string', description: 'Stock ticker (required). e.g. TSLA, GME.' }, limit: { type: 'integer', minimum: 1, maximum: 20, default: 10 } }, required: ['ticker'] };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { ticker: { type: 'string', required: true } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 200000n, description: 'SEC EDGAR 13D and 13G activist investor filings by ticker — who holds 5%+ stakes. Pay 0.20 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    if (!ticker || !/^[A-Z]{1,5}$/.test(ticker)) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_or_invalid_ticker', detail: 'Payment verified. Add ?ticker=TSLA and retry.' }); }
+    try {
+      const cik = await resolveTickerToCik(ticker);
+      if (!cik) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(404).set('Access-Control-Allow-Origin', '*').json({ error: 'ticker_not_found', ticker }); }
+      const p = new URLSearchParams({ forms: 'SC 13D,SC 13G', dateRange: 'custom', startdt: new Date(Date.now() - 365 * 86400000).toISOString().slice(0,10), enddt: new Date().toISOString().slice(0,10) });
+      const r = await fetch(`https://efts.sec.gov/LATEST/search-index?${p.toString()}`, { headers: { 'User-Agent': 'ScriptMasterLabs ScriptMasterLabs@gmail.com' } });
+      if (!r.ok) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'edgar_search_error', status: r.status }); }
+      const j = await r.json() as { hits?: { hits?: Array<{ _id?: string; _source?: { display_names?: string[]; period_ending?: string; ciks?: string[]; form_type?: string; file_date?: string; entity_name?: string } }> } };
+      const cikShort = cik.replace(/^0+/, '');
+      const allHits = j.hits?.hits ?? [];
+      const filtered = allHits.filter(h => (h._source?.ciks ?? []).some(c => c.replace(/^0+/, '') === cikShort)).slice(0, limit);
+      const filings = filtered.map(h => { const s = h._source ?? {}; return { accession: h._id ?? '', form: s.form_type ?? '', filed: s.file_date ?? '', period: s.period_ending ?? '', filer: (s.display_names ?? []).join(', '), url: h._id ? `https://www.sec.gov/Archives/edgar/data/${cikShort}/${h._id.replace(/-/g, '')}/` : '' }; });
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'sec.gov/EDGAR', ticker, cik: cikShort, forms: ['SC 13D', 'SC 13G'], count: filings.length, filings, note: '13D=activist stake (intent to influence). 13G=passive 5%+ holder. Filed within last 365 days.', _disclaimer: 'SEC EDGAR public filing data. Not investment advice.', _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'edgar_fetch_failed', message: String(err) }); }
+  });
+
+  // ── /x402/finra-broker — FINRA BrokerCheck ($0.15) ───────────────────────────────
+  app.get('/x402/finra-broker', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/finra-broker`;
+    const name = (typeof req.query['name'] === 'string' ? req.query['name'] : '').trim().slice(0, 80);
+    const type = typeof req.query['type'] === 'string' && req.query['type'] === 'firm' ? 'firm' : 'individual';
+    const inputSchema = { type: 'object', properties: { name: { type: 'string', description: 'Broker, advisor, or firm name (required).' }, type: { type: 'string', enum: ['individual', 'firm'], default: 'individual', description: 'Search individual brokers or firms.' } }, required: ['name'] };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { name: { type: 'string', required: true }, type: { type: 'string', required: false } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 150000n, description: 'FINRA BrokerCheck broker/advisor registration status and disclosure history. Pay 0.15 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    if (!name) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_name', detail: 'Payment verified. Add ?name= and retry.' }); }
+    try {
+      const p = new URLSearchParams({ query: name, hl: 'true', includePrevious: 'true', nrows: '10', wt: 'json' });
+      const r = await fetch(`https://api.brokercheck.finra.org/search/${type}?${p.toString()}`, { headers: { Accept: 'application/json', 'User-Agent': 'ScriptMasterLabs ScriptMasterLabs@gmail.com' }, signal: AbortSignal.timeout(15000) });
+      if (!r.ok) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'finra_api_error', status: r.status }); }
+      const j = await r.json() as { hits?: { total?: number; hits?: Array<{ _source?: Record<string, unknown> }> } };
+      const total = j.hits?.total ?? 0;
+      const results = (j.hits?.hits ?? []).map(h => {
+        const s = h._source ?? {};
+        return { name: String(s['ind_firstname'] ?? s['biz_nm'] ?? ''), last_name: String(s['ind_lastname'] ?? ''), firm: String(s['ind_empl_nm'] ?? ''), crd: String(s['ind_source_id'] ?? s['biz_source_id'] ?? ''), disclosures: Number(s['ind_disc_ev_disclosure_cnt'] ?? s['biz_disc_ev_disclosure_cnt'] ?? 0), registrations: Number(s['ind_regn_cnt'] ?? 0), status: String(s['ind_regn_active'] === 'Y' ? 'ACTIVE' : 'INACTIVE'), url: s['ind_source_id'] ? `https://brokercheck.finra.org/individual/summary/${s['ind_source_id']}` : (s['biz_source_id'] ? `https://brokercheck.finra.org/firm/summary/${s['biz_source_id']}` : '') };
+      });
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'FINRA BrokerCheck', query: { name, type }, total_found: total, returned: results.length, results, _disclaimer: 'FINRA BrokerCheck public data. Disclosures include regulatory actions, customer disputes, and criminal/civil matters.', _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'finra_fetch_failed', message: String(err) }); }
+  });
+
+  // ── /x402/fec-finance — FEC campaign finance contributions ($0.10) ─────────────
+  app.get('/x402/fec-finance', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/fec-finance`;
+    const name = (typeof req.query['name'] === 'string' ? req.query['name'] : '').trim();
+    const committee = (typeof req.query['committee'] === 'string' ? req.query['committee'] : '').trim();
+    const cycle = typeof req.query['cycle'] === 'string' && /^\d{4}$/.test(req.query['cycle']) ? req.query['cycle'] : String(new Date().getFullYear() % 2 === 0 ? new Date().getFullYear() : new Date().getFullYear() - 1);
+    const fecKey = process.env['FEC_API_KEY'] ?? 'DEMO_KEY';
+    const inputSchema = { type: 'object', properties: { name: { type: 'string', description: 'Candidate or contributor name.' }, committee: { type: 'string', description: 'Committee name or ID.' }, cycle: { type: 'string', description: 'Election cycle year (e.g. 2024). Defaults to latest.' } } };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { name: { type: 'string', required: false }, committee: { type: 'string', required: false } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 100000n, description: 'FEC campaign finance — candidates, committees, and contribution totals. Pay 0.10 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    if (!name && !committee) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_param', detail: 'Payment verified. Add ?name= (candidate name) or ?committee= and retry.' }); }
+    try {
+      const p = new URLSearchParams({ api_key: fecKey, per_page: '10', sort: '-receipts', cycle });
+      if (name) p.set('q', name);
+      if (committee) p.set('q', committee);
+      const endpoint = committee ? 'committees' : 'candidates';
+      const r = await fetch(`https://api.open.fec.gov/v1/${endpoint}/?${p.toString()}`, { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(15000) });
+      if (r.status === 429) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(429).set('Access-Control-Allow-Origin', '*').json({ error: 'fec_rate_limited', detail: 'FEC DEMO_KEY rate limit hit. Server operator may set FEC_API_KEY (free at api.data.gov).', _paid: pay.payer }); }
+      if (!r.ok) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'fec_api_error', status: r.status }); }
+      const j = await r.json() as { pagination?: { count?: number }; results?: Array<Record<string, unknown>> };
+      const results = (j.results ?? []).map(x => ({ name: String(x['name'] ?? x['candidate_name'] ?? ''), id: String(x['candidate_id'] ?? x['committee_id'] ?? ''), party: String(x['party_full'] ?? ''), office: String(x['office_full'] ?? ''), state: String(x['state'] ?? ''), cycle: x['election_years'] ?? [], receipts: x['receipts'] ?? x['total_receipts'] ?? 0, disbursements: x['disbursements'] ?? x['total_disbursements'] ?? 0 }));
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'FEC Open Data (api.open.fec.gov)', cycle, query: { name: name || null, committee: committee || null }, total_found: j.pagination?.count ?? results.length, returned: results.length, results, _disclaimer: 'Federal Election Commission public data. Campaign finance figures are self-reported filings.', _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'fec_fetch_failed', message: String(err) }); }
+  });
+
+  // ── /x402/epa-violations — EPA ECHO enforcement and violation records ($0.12) ──
+  app.get('/x402/epa-violations', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/epa-violations`;
+    const facility = (typeof req.query['facility'] === 'string' ? req.query['facility'] : '').trim().slice(0, 80);
+    const state = (typeof req.query['state'] === 'string' ? req.query['state'].toUpperCase() : '').trim().slice(0, 2);
+    const naics = (typeof req.query['naics'] === 'string' ? req.query['naics'] : '').trim().slice(0, 8);
+    const inputSchema = { type: 'object', properties: { facility: { type: 'string', description: 'Facility or company name.' }, state: { type: 'string', description: '2-letter U.S. state code.' }, naics: { type: 'string', description: 'NAICS code filter.' } } };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { facility: { type: 'string', required: false }, state: { type: 'string', required: false } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 120000n, description: 'EPA ECHO enforcement and environmental violation records — facility inspections, penalties, and compliance status. Pay 0.12 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    if (!facility && !state && !naics) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_param', detail: 'Payment verified. Add ?facility=, ?state=, or ?naics= and retry.' }); }
+    try {
+      const p = new URLSearchParams({ output: 'JSON', p_rows: '20' });
+      if (facility) p.set('p_fn', facility);
+      if (state) p.set('p_st', state);
+      if (naics) p.set('p_naics', naics);
+      const r = await fetch(`https://ofmpub.epa.gov/echo/echo_rest_services.get_facilities?${p.toString()}`, { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(20000) });
+      if (!r.ok) {
+        if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+        return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'epa_api_error', status: r.status });
+      }
+      const j = await r.json() as { Results?: { Message?: string; BadSystemIDs?: string; Facilities?: Array<Record<string, unknown>> } };
+      const facilities = j.Results?.Facilities ?? [];
+      const results = facilities.slice(0, 15).map(f => ({
+        name: String(f['FacName'] ?? ''), id: String(f['RegistryID'] ?? ''), address: [f['Street'], f['City'], f['State'], f['Zip']].filter(Boolean).join(', '), naics_code: String(f['NAICSCodes'] ?? ''), violations: Number(f['EPASystem'] ?? 0), inspections: Number(f['InspCount'] ?? 0), penalties: Number(f['PenaltyCount'] ?? 0), last_inspection: String(f['LastInspDT'] ?? ''), compliance_status: String(f['CompStatus'] ?? ''), programs: String(f['ActivePrograms'] ?? ''),
+      }));
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'EPA ECHO (echo.epa.gov)', query: { facility: facility || null, state: state || null, naics: naics || null }, returned: results.length, facilities: results, _disclaimer: 'EPA ECHO public enforcement data. Violations are regulatory findings under Clean Air/Water/RCRA/TSCA programs.', _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'epa_fetch_failed', message: String(err) }); }
+  });
+
+  // ── /x402/sbir-grants — SBIR/STTR small business innovation grants ($0.05) ─────
+  app.get('/x402/sbir-grants', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/sbir-grants`;
+    const keyword = (typeof req.query['keyword'] === 'string' ? req.query['keyword'] : '').trim().slice(0, 150);
+    const agency = (typeof req.query['agency'] === 'string' ? req.query['agency'] : '').trim().toUpperCase().slice(0, 10);
+    const phase = typeof req.query['phase'] === 'string' && ['1', '2'].includes(req.query['phase']) ? req.query['phase'] : '';
+    const limit = Math.min(Math.max(parseInt(String(req.query['limit'] ?? '10'), 10) || 10, 1), 25);
+    const inputSchema = { type: 'object', properties: { keyword: { type: 'string', description: 'Technology keywords (required).' }, agency: { type: 'string', description: 'Federal agency abbreviation (e.g. DOD, NIH, NASA, NSF, DOE).' }, phase: { type: 'string', enum: ['1', '2'], description: 'SBIR/STTR phase (1=feasibility, 2=development).' }, limit: { type: 'integer', minimum: 1, maximum: 25, default: 10 } }, required: ['keyword'] };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { keyword: { type: 'string', required: true }, agency: { type: 'string', required: false } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 50000n, description: 'SBIR/STTR small business innovation research grants. Search by keyword, agency (DOD, NIH, NASA, NSF). Pay 0.05 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    if (!keyword) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_keyword', detail: 'Payment verified. Add ?keyword= and retry.' }); }
+    try {
+      const p = new URLSearchParams({ q: keyword, rows: String(limit), sort: 'AwardDate desc' });
+      if (agency) p.set('agency', agency);
+      if (phase) p.set('phase', phase);
+      const r = await fetch(`https://api.sbir.gov/public/api/projects?${p.toString()}`, { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(15000) });
+      if (!r.ok) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'sbir_api_error', status: r.status }); }
+      const j = await r.json() as { response?: { numFound?: number; docs?: Array<Record<string, unknown>> } };
+      const docs = j.response?.docs ?? [];
+      const grants = docs.map(d => ({ title: String(d['project_title'] ?? ''), company: String(d['firm'] ?? ''), agency: String(d['agency'] ?? ''), branch: String(d['branch'] ?? ''), phase: String(d['phase'] ?? ''), award_year: String(d['award_year'] ?? ''), award_amount: Number(d['award_amount'] ?? 0), abstract: (String(d['abstract'] ?? '')).slice(0, 400), solicitation: String(d['solicitation_number'] ?? ''), topic: String(d['topic_code'] ?? '') }));
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'SBIR.gov / SBA', query: { keyword, agency: agency || 'all', phase: phase || 'all' }, total_found: j.response?.numFound ?? grants.length, returned: grants.length, grants, _disclaimer: 'SBIR/STTR public award data from SBA. Amounts reflect total project award value.', _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'sbir_fetch_failed', message: String(err) }); }
+  });
+
+  // ── /x402/congress-bills — Congress.gov bill search ($0.08) ──────────────────────
+  app.get('/x402/congress-bills', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/congress-bills`;
+    const query = (typeof req.query['query'] === 'string' ? req.query['query'] : '').trim().slice(0, 150);
+    const congress = typeof req.query['congress'] === 'string' && /^\d{3}$/.test(req.query['congress']) ? req.query['congress'] : '119';
+    const status = typeof req.query['status'] === 'string' ? req.query['status'] : '';
+    const limit = Math.min(Math.max(parseInt(String(req.query['limit'] ?? '10'), 10) || 10, 1), 20);
+    const congressKey = process.env['CONGRESS_API_KEY'];
+    const inputSchema = { type: 'object', properties: { query: { type: 'string', description: 'Bill keyword search (required).' }, congress: { type: 'string', description: 'Congress number (e.g. 119 for 119th Congress, 2025-2026). Default: 119.' }, limit: { type: 'integer', minimum: 1, maximum: 20, default: 10 } }, required: ['query'] };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { query: { type: 'string', required: true } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 80000n, description: 'Congress.gov bill search — legislation by keyword, congress number, and status. Pay 0.08 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    if (!congressKey) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(503).set('Access-Control-Allow-Origin', '*').json({ error: 'service_unconfigured', detail: 'CONGRESS_API_KEY not configured. Free key at api.congress.gov. No payment taken.' }); }
+    if (!query) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_query', detail: 'Payment verified. Add ?query= and retry.' }); }
+    try {
+      const p = new URLSearchParams({ query, limit: String(limit), format: 'json', api_key: congressKey });
+      if (status) p.set('status', status);
+      const r = await fetch(`https://api.congress.gov/v3/bill/${congress}?${p.toString()}`, { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(15000) });
+      if (!r.ok) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'congress_api_error', status: r.status }); }
+      const j = await r.json() as { bills?: Array<Record<string, unknown>>; pagination?: { count?: number } };
+      const bills = (j.bills ?? []).map(b => ({ number: String(b['number'] ?? ''), type: String(b['type'] ?? ''), title: String(b['title'] ?? ''), congress: String(b['congress'] ?? congress), introduced_date: String(b['introducedDate'] ?? ''), latest_action: (b['latestAction'] as Record<string, unknown> | undefined)?.['text'] ?? '', sponsor: ((b['sponsors'] as Array<Record<string, unknown>> | undefined)?.[0])?.['fullName'] ?? '', url: String((b['url'] ?? '')) }));
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'Congress.gov API v3', congress: `${congress}th`, query: { search: query, status: status || 'all' }, total_found: j.pagination?.count ?? bills.length, returned: bills.length, bills, _disclaimer: 'Congress.gov public legislative data. Bill status is from official congressional records.', _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'congress_fetch_failed', message: String(err) }); }
+  });
+
+  // ── /x402/fda-warnings — FDA warning letters (openFDA) ($0.10) ───────────────────
+  app.get('/x402/fda-warnings', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/fda-warnings`;
+    const company = cleanTerm(typeof req.query['company'] === 'string' ? req.query['company'] : '');
+    const product = cleanTerm(typeof req.query['product'] === 'string' ? req.query['product'] : '');
+    const limit = Math.min(Math.max(parseInt(String(req.query['limit'] ?? '10'), 10) || 10, 1), 25);
+    const inputSchema = { type: 'object', properties: { company: { type: 'string', description: 'Company or issuer name.' }, product: { type: 'string', description: 'Product, drug, or device name.' }, limit: { type: 'integer', minimum: 1, maximum: 25, default: 10 } } };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { company: { type: 'string', required: false }, product: { type: 'string', required: false } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 100000n, description: 'FDA warning letters — regulatory enforcement letters for violations of FDA regulations. Pay 0.10 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    if (!company && !product) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_param', detail: 'Payment verified. Add ?company= or ?product= and retry.' }); }
+    try {
+      const parts: string[] = [];
+      if (company) parts.push(`company_name:"${company}"`);
+      if (product) parts.push(`product_type:"${product}" OR subject:"${product}"`);
+      const search = parts.join(' AND ');
+      const p = new URLSearchParams({ search, limit: String(limit), sort: 'date_issued:desc' });
+      if (fdaKey) p.set('api_key', fdaKey);
+      const r = await fetch(`https://api.fda.gov/other/warning_letters.json?${p.toString()}`, { signal: AbortSignal.timeout(15000) });
+      if (r.status === 404) return res.set('Access-Control-Allow-Origin', '*').json({ source: 'openFDA/other/warning_letters', count: 0, letters: [], _disclaimer: 'FDA warning letter reference data.', _paid: pay.payer });
+      if (!r.ok) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'openfda_error', status: r.status }); }
+      const j = await r.json() as { meta?: { results?: { total?: number } }; results?: Array<Record<string, unknown>> };
+      const letters = (j.results ?? []).map(x => ({ company: String(x['company_name'] ?? ''), subject: String(x['subject'] ?? ''), issued: String(x['date_issued'] ?? ''), posted: String(x['date_posted'] ?? ''), product_type: String(x['product_type'] ?? ''), issuing_office: String(x['issuing_office'] ?? ''), response_url: String(x['related_documents'] ?? '') }));
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'openFDA/other/warning_letters', total: j.meta?.results?.total ?? letters.length, count: letters.length, letters, _disclaimer: 'FDA warning letters are regulatory enforcement actions — not criminal charges. Full letters at fda.gov.', _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'fda_warnings_fetch_failed', message: String(err) }); }
+  });
+
+  // ── /x402/cms-providers — CMS Medicare hospital and provider quality data ($0.10) ─
+  app.get('/x402/cms-providers', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/cms-providers`;
+    const name = (typeof req.query['name'] === 'string' ? req.query['name'] : '').trim().slice(0, 80);
+    const state = (typeof req.query['state'] === 'string' ? req.query['state'].toUpperCase() : '').trim().slice(0, 2);
+    const type = typeof req.query['type'] === 'string' && req.query['type'] === 'physician' ? 'physician' : 'hospital';
+    const limit = Math.min(Math.max(parseInt(String(req.query['limit'] ?? '10'), 10) || 10, 1), 20);
+    const inputSchema = { type: 'object', properties: { name: { type: 'string', description: 'Hospital or provider name.' }, state: { type: 'string', description: '2-letter state code.' }, type: { type: 'string', enum: ['hospital', 'physician'], default: 'hospital' }, limit: { type: 'integer', minimum: 1, maximum: 20, default: 10 } } };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { name: { type: 'string', required: false }, state: { type: 'string', required: false } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 100000n, description: 'CMS Medicare hospital quality data and physician provider information. Pay 0.10 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    if (!name && !state) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_param', detail: 'Payment verified. Add ?name= or ?state= and retry.' }); }
+    try {
+      let r: Response; let j: { meta?: Record<string, unknown>; data?: Array<Record<string, unknown>> };
+      if (type === 'hospital') {
+        const p = new URLSearchParams({ '$limit': String(limit) });
+        if (name) p.set('$q', name);
+        if (state) p.set('state', state);
+        r = await fetch(`https://data.cms.gov/data-api/v1/dataset/xubh-q36u/data?${p.toString()}`, { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(15000) });
+        if (!r.ok) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'cms_api_error', status: r.status }); }
+        const arr = await r.json() as Array<Record<string, unknown>>;
+        const providers = arr.slice(0, limit).map(x => ({ name: String(x['HOSP_NAME'] ?? x['hospital_name'] ?? ''), address: String(x['ADDRESS'] ?? ''), city: String(x['CITY'] ?? ''), state: String(x['STATE'] ?? ''), zip: String(x['ZIP_CODE'] ?? ''), phone: String(x['PHONE_NUMBER'] ?? ''), type: String(x['HOSPITAL_TYPE'] ?? ''), ownership: String(x['HOSPITAL_OWNERSHIP'] ?? ''), emergency: String(x['EMERGENCY_SERVICES'] ?? ''), overall_rating: String(x['HOSPITAL_OVERALL_RATING'] ?? 'N/A'), mortality_national: String(x['MORTALITY_NATIONAL_COMPARISON'] ?? ''), readmission_national: String(x['READMISSION_NATIONAL_COMPARISON'] ?? '') }));
+        return res.set('Access-Control-Allow-Origin', '*').json({ source: 'CMS Hospital General Information (data.cms.gov)', query: { name: name || null, state: state || null, type }, returned: providers.length, providers, _disclaimer: 'CMS Medicare quality data. Ratings are based on Medicare claims and quality measures.', _paid: pay.payer });
+      } else {
+        const p = new URLSearchParams({ '$limit': String(limit) });
+        if (state) p.set('Rndrng_Prvdr_State_Abrvtn', state);
+        if (name) p.set('$q', name);
+        r = await fetch(`https://data.cms.gov/data-api/v1/dataset/9767f658-3c4f-4ac8-a71f-e7a93dab47c0/data?${p.toString()}`, { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(15000) });
+        if (!r.ok) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'cms_api_error', status: r.status }); }
+        const arr2 = await r.json() as Array<Record<string, unknown>>;
+        const providers2 = arr2.slice(0, limit).map(x => ({ name: String(x['Rndrng_Prvdr_Last_Org_Name'] ?? ''), first_name: String(x['Rndrng_Prvdr_First_Name'] ?? ''), npi: String(x['Rndrng_NPI'] ?? ''), specialty: String(x['Rndrng_Prvdr_Type'] ?? ''), state: String(x['Rndrng_Prvdr_State_Abrvtn'] ?? ''), city: String(x['Rndrng_Prvdr_City'] ?? ''), services: Number(x['Tot_Srvcs'] ?? 0), beneficiaries: Number(x['Tot_Benes'] ?? 0), total_payment: Number(x['Tot_Mdcr_Pymt_Amt'] ?? 0) }));
+        return res.set('Access-Control-Allow-Origin', '*').json({ source: 'CMS Medicare Part D Prescribers (data.cms.gov)', query: { name: name || null, state: state || null, type }, returned: providers2.length, providers: providers2, _disclaimer: 'CMS Medicare utilization data. Not a measure of physician quality or competence.', _paid: pay.payer });
+      }
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'cms_fetch_failed', message: String(err) }); }
+  });
+
+  // ── /x402/nih-grants — NIH Reporter research grant database ($0.05) ─────────────
+  app.get('/x402/nih-grants', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/nih-grants`;
+    const query = (typeof req.query['query'] === 'string' ? req.query['query'] : '').trim().slice(0, 150);
+    const agency = (typeof req.query['agency'] === 'string' ? req.query['agency'].toUpperCase() : '').trim().slice(0, 10);
+    const fiscal_year = typeof req.query['fiscal_year'] === 'string' && /^\d{4}$/.test(req.query['fiscal_year']) ? parseInt(req.query['fiscal_year']) : new Date().getFullYear();
+    const limit = Math.min(Math.max(parseInt(String(req.query['limit'] ?? '10'), 10) || 10, 1), 25);
+    const inputSchema = { type: 'object', properties: { query: { type: 'string', description: 'Research topic keywords (required).' }, agency: { type: 'string', description: 'NIH institute abbreviation (e.g. NCI, NHLBI, NIAID, NINDS).' }, fiscal_year: { type: 'integer', description: 'Fiscal year filter (default: current year).' }, limit: { type: 'integer', minimum: 1, maximum: 25, default: 10 } }, required: ['query'] };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { query: { type: 'string', required: true }, agency: { type: 'string', required: false } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 50000n, description: 'NIH Reporter research grant database — active NIH grants by keyword and agency (NCI, NHLBI, NIAID, etc). Pay 0.05 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    if (!query) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_query', detail: 'Payment verified. Add ?query= and retry.' }); }
+    try {
+      const body: Record<string, unknown> = { criteria: { use_relevance: true, include_active_projects: true, fiscal_years: [fiscal_year] }, limit, offset: 0, include_fields: ['ProjectTitle', 'AbstractText', 'FiscalYear', 'AwardAmount', 'PrincipalInvestigators', 'Organization', 'ProjectEndDate', 'AgencyIcAdmin', 'ActivityCode', 'OpportunityNumber'] };
+      if (query) body.criteria = { ...(body.criteria as Record<string, unknown>), terms: [query] };
+      if (agency) body.criteria = { ...(body.criteria as Record<string, unknown>), agencies: [{ abbreviation: agency }] };
+      const r = await fetch('https://api.reporter.nih.gov/v2/projects/search', { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(body), signal: AbortSignal.timeout(20000) });
+      if (!r.ok) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'nih_api_error', status: r.status }); }
+      const j = await r.json() as { total: number; results?: Array<Record<string, unknown>> };
+      const grants = (j.results ?? []).map(g => {
+        const pis = (g['principal_investigators'] as Array<Record<string, unknown>> | undefined ?? []).map(p => String(p['full_name'] ?? '')).filter(Boolean).join(', ');
+        const org = (g['organization'] as Record<string, unknown> | undefined) ?? {};
+        return { title: String(g['project_title'] ?? ''), abstract: (String(g['abstract_text'] ?? '')).slice(0, 400), pi: pis, organization: String(org['org_name'] ?? ''), state: String(org['org_state'] ?? ''), agency: String(g['agency_ic_admin'] ?? ''), activity_code: String(g['activity_code'] ?? ''), award_amount: Number(g['award_amount'] ?? 0), fiscal_year: Number(g['fiscal_year'] ?? fiscal_year), end_date: String(g['project_end_date'] ?? ''), opportunity: String(g['opportunity_number'] ?? '') };
+      });
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'NIH Reporter API v2', query: { search: query, agency: agency || 'all', fiscal_year }, total_found: j.total, returned: grants.length, grants, _disclaimer: 'NIH Reporter public award data. Amounts reflect total cost including direct and indirect costs.', _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'nih_fetch_failed', message: String(err) }); }
+  });
+
   // ── x402 discovery document (OpenAPI 3.1 + x-service-info / x-payment-info) ─
   // x402scan's canonical signal; served at /.well-known/x402 and /openapi.json.
   const OPENAPI_DOC = {
@@ -1069,6 +1372,83 @@ async function runSSE(): Promise<void> {
       parameters: [{ name: 'device', in: 'query', required: false, schema: { type: 'string' }, description: 'Device name or type (e.g. "pulse oximeter", "knee replacement").', example: 'pulse oximeter' }, { name: 'applicant', in: 'query', required: false, schema: { type: 'string' }, description: 'Manufacturer or applicant company name.', example: 'Medtronic' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 25, default: 10 } }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.08', amountUnits: '80000', payTo: X402_PAY_TO },
       responses: { '200': { description: '510(k) clearances' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/sec-10k': { get: {
+      operationId: 'sec10k',
+      summary: 'SEC EDGAR 10-K annual report filings by ticker.',
+      description: 'Annual report (10-K) filing history for any public company. Returns dates and links to full 10-K documents on sec.gov. Pay 0.20 USDC on Base.',
+      parameters: [{ name: 'ticker', in: 'query', required: true, schema: { type: 'string' }, example: 'AAPL' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 10, default: 5 } }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.20', amountUnits: '200000', payTo: X402_PAY_TO },
+      responses: { '200': { description: '10-K annual filings' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/sec-10q': { get: {
+      operationId: 'sec10q',
+      summary: 'SEC EDGAR 10-Q quarterly report filings by ticker.',
+      description: 'Quarterly report (10-Q) filing history for any public company. Returns dates and links to full 10-Q documents on sec.gov. Pay 0.15 USDC on Base.',
+      parameters: [{ name: 'ticker', in: 'query', required: true, schema: { type: 'string' }, example: 'TSLA' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 10, default: 5 } }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.15', amountUnits: '150000', payTo: X402_PAY_TO },
+      responses: { '200': { description: '10-Q quarterly filings' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/sec-13dg': { get: {
+      operationId: 'sec13dg',
+      summary: 'SEC EDGAR 13D/13G activist investor filings by ticker.',
+      description: 'Who holds 5%+ stakes? Activist (13D) and passive (13G) large holder filings from SEC EDGAR. Pay 0.20 USDC on Base.',
+      parameters: [{ name: 'ticker', in: 'query', required: true, schema: { type: 'string' }, example: 'GME' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 20, default: 10 } }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.20', amountUnits: '200000', payTo: X402_PAY_TO },
+      responses: { '200': { description: '13D/13G activist filings' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/finra-broker': { get: {
+      operationId: 'finraBroker',
+      summary: 'FINRA BrokerCheck broker/advisor registration and disclosure history.',
+      description: 'Search FINRA BrokerCheck for individual brokers or firms. Returns CRD number, registration status, disclosure count, and profile URL. Pay 0.15 USDC on Base.',
+      parameters: [{ name: 'name', in: 'query', required: true, schema: { type: 'string' }, example: 'John Smith' }, { name: 'type', in: 'query', required: false, schema: { type: 'string', enum: ['individual', 'firm'], default: 'individual' } }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.15', amountUnits: '150000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'BrokerCheck results' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/fec-finance': { get: {
+      operationId: 'fecFinance',
+      summary: 'FEC campaign finance — candidates, committees, and contribution totals.',
+      description: 'Search FEC open data for political candidates or committees by name. Returns receipts, disbursements, party, and election cycle data. Pay 0.10 USDC on Base.',
+      parameters: [{ name: 'name', in: 'query', required: false, schema: { type: 'string' }, example: 'Biden' }, { name: 'committee', in: 'query', required: false, schema: { type: 'string' } }, { name: 'cycle', in: 'query', required: false, schema: { type: 'string' }, example: '2024' }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.10', amountUnits: '100000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'FEC campaign finance data' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/epa-violations': { get: {
+      operationId: 'epaViolations',
+      summary: 'EPA ECHO environmental enforcement and violation records.',
+      description: 'Facility inspection history, citations, penalties, and compliance status from EPA ECHO. Search by facility name, state, or NAICS code. Pay 0.12 USDC on Base.',
+      parameters: [{ name: 'facility', in: 'query', required: false, schema: { type: 'string' }, example: 'ExxonMobil' }, { name: 'state', in: 'query', required: false, schema: { type: 'string' }, example: 'TX' }, { name: 'naics', in: 'query', required: false, schema: { type: 'string' } }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.12', amountUnits: '120000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'EPA enforcement records' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/sbir-grants': { get: {
+      operationId: 'sbirGrants',
+      summary: 'SBIR/STTR small business innovation research grants.',
+      description: 'Search SBA/SBIR.gov for small business innovation grants. Filter by agency (DOD, NIH, NASA, NSF, DOE) and phase (1 or 2). Pay 0.05 USDC on Base.',
+      parameters: [{ name: 'keyword', in: 'query', required: true, schema: { type: 'string' }, example: 'cybersecurity AI' }, { name: 'agency', in: 'query', required: false, schema: { type: 'string' }, example: 'DOD' }, { name: 'phase', in: 'query', required: false, schema: { type: 'string', enum: ['1', '2'] } }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 25, default: 10 } }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.05', amountUnits: '50000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'SBIR/STTR grants' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/congress-bills': { get: {
+      operationId: 'congressBills',
+      summary: 'Congress.gov bill search — legislation by keyword and congress number.',
+      description: 'Search bills by keyword for any Congress session. Returns bill number, title, latest action, sponsor, and Congress.gov URL. Requires CONGRESS_API_KEY (free at api.congress.gov). Pay 0.08 USDC on Base.',
+      parameters: [{ name: 'query', in: 'query', required: true, schema: { type: 'string' }, example: 'artificial intelligence' }, { name: 'congress', in: 'query', required: false, schema: { type: 'string', default: '119' }, example: '119' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 20, default: 10 } }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.08', amountUnits: '80000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'Congressional bills' }, '402': { description: 'Payment required.' }, '503': { description: 'CONGRESS_API_KEY not configured on this server.' } },
+    } }, '/x402/fda-warnings': { get: {
+      operationId: 'fdaWarnings',
+      summary: 'FDA warning letters — regulatory enforcement actions.',
+      description: 'Search FDA warning letters by company or product type. Returns issuing office, subject, dates, and product category. Pay 0.10 USDC on Base.',
+      parameters: [{ name: 'company', in: 'query', required: false, schema: { type: 'string' }, example: 'Purdue Pharma' }, { name: 'product', in: 'query', required: false, schema: { type: 'string' }, example: 'dietary supplement' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 25, default: 10 } }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.10', amountUnits: '100000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'FDA warning letters' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/cms-providers': { get: {
+      operationId: 'cmsProviders',
+      summary: 'CMS Medicare hospital quality data and physician provider information.',
+      description: 'Hospital ratings, emergency services, and ownership from CMS Hospital General Information. Or Medicare Part D physician utilization data by state. Pay 0.10 USDC on Base.',
+      parameters: [{ name: 'name', in: 'query', required: false, schema: { type: 'string' }, example: 'Mayo Clinic' }, { name: 'state', in: 'query', required: false, schema: { type: 'string' }, example: 'MN' }, { name: 'type', in: 'query', required: false, schema: { type: 'string', enum: ['hospital', 'physician'], default: 'hospital' } }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 20, default: 10 } }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.10', amountUnits: '100000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'CMS provider data' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/nih-grants': { get: {
+      operationId: 'nihGrants',
+      summary: 'NIH Reporter research grant database.',
+      description: 'Active NIH grants by keyword, institute (NCI, NHLBI, NIAID, NINDS, etc.), and fiscal year. Returns title, PI, organization, and award amount. Pay 0.05 USDC on Base.',
+      parameters: [{ name: 'query', in: 'query', required: true, schema: { type: 'string' }, example: 'cancer immunotherapy' }, { name: 'agency', in: 'query', required: false, schema: { type: 'string' }, example: 'NCI' }, { name: 'fiscal_year', in: 'query', required: false, schema: { type: 'integer' }, example: 2025 }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 25, default: 10 } }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.05', amountUnits: '50000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'NIH research grants' }, '402': { description: 'Payment required.' } },
     } } },
   };
   // x402scan/Bazaar discovery validation (per their docs/DISCOVERY.md) requires
