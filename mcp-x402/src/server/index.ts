@@ -1450,6 +1450,8 @@ async function runSSE(): Promise<void> {
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.05', amountUnits: '50000', payTo: X402_PAY_TO },
       responses: { '200': { description: 'NIH research grants' }, '402': { description: 'Payment required.' } },
     } } },
+    '/.well-known/x402': { get: { operationId: 'openApiDiscovery', summary: 'OpenAPI/x402 discovery document (free).', security: [], responses: { '200': { description: 'OpenAPI spec.' } } } },
+    '/openapi.json': { get: { operationId: 'openApiJson', summary: 'OpenAPI spec (free).', security: [], responses: { '200': { description: 'OpenAPI spec.' } } } },
   };
   // x402scan/Bazaar discovery validation (per their docs/DISCOVERY.md) requires
   // every paid operation's x-payment-info to carry a `protocols` array and a
