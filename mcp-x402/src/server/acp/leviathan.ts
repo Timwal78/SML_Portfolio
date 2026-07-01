@@ -46,8 +46,8 @@ const WALLET_ADDRESS = (
   process.env['ACP_WALLET_ADDRESS'] ?? '0x0f035c36c4ce65a6f1bf4370f779bac722d59004'
 ) as `0x${string}`;
 
-const WALLET_ID = process.env['ACP_WALLET_ID'] ?? '';
-const SIGNER_PRIVATE_KEY = process.env['ACP_SIGNER_PRIVATE_KEY'] ?? '';
+const WALLET_ID = (process.env['ACP_WALLET_ID'] ?? '').trim();
+const SIGNER_PRIVATE_KEY = (process.env['ACP_SIGNER_PRIVATE_KEY'] ?? '').trim().replace(/^["']|["']$/g, '');
 const BYPASS_SECRET = process.env['LEVIATHAN_BYPASS_SECRET'] ?? '';
 const MCP_BASE = (
   process.env['LEVIATHAN_BASE_URL'] ?? 'https://mcp-x402.onrender.com'
@@ -393,6 +393,16 @@ export async function startLeviathan(): Promise<void> {
   }
   if (!SML_API_KEY) {
     console.warn('[LEVIATHAN] SML_API_KEY is not set — SqueezeOS signal calls will fail auth');
+  }
+
+  // Validate key format before handing to Privy — helps diagnose Render env var issues.
+  const keyBytes = Buffer.from(SIGNER_PRIVATE_KEY, 'base64');
+  console.log(`[LEVIATHAN] key bytes=${keyBytes.length} starts=${SIGNER_PRIVATE_KEY.slice(0,8)} ends=${SIGNER_PRIVATE_KEY.slice(-8)}`);
+  if (keyBytes.indexOf(Buffer.from([0x04, 0x20])) === -1) {
+    throw new Error(
+      `Invalid wallet authorization private key — decoded to ${keyBytes.length} bytes, ` +
+      `pattern 0x04 0x20 not found. Key may be truncated, URL-encoded, or wrong format.`,
+    );
   }
 
   const seller = await AcpAgent.create({
