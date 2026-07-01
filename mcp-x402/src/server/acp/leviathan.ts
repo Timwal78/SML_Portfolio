@@ -2,7 +2,7 @@
  * LEVIATHAN — Virtuals Protocol ACP Seller Agent
  * ScriptMasterLabs | mcp-x402
  *
- * 20 institutional-grade offerings backed by live routes in this server.
+ * 54 institutional-grade offerings backed by live routes in this server.
  * Buyers pay USDC on Base via Virtuals Protocol ACP v2.
  * Calls are forwarded to the appropriate backend with X-Leviathan-Key bypass
  * (for x402 federal-data routes) or X-API-Key (for SqueezeOS signal routes).
@@ -282,6 +282,83 @@ export const OFFERINGS: Record<string, Offering> = {
     description:
       'NIH Reporter research grant database — active NIH grants by keyword and institute (NCI, NHLBI, NIAID, etc). ' +
       'Req: { query: string, agency?: string, fiscal_year?: number, limit?: number }',
+  },
+  // ── New SqueezeOS routes (require operator-key bypass fix — SqueezeOS PR #249/#250) ──
+  'FTD Threshold List': {
+    price: 0.02,
+    description:
+      'Current SEC Reg SHO Threshold Securities List (persistent fails-to-deliver). Req: {}',
+  },
+  'FTD Time Series': {
+    price: 0.02,
+    description:
+      'Historical SEC Reg SHO fails-to-deliver time series for a symbol (default 90 days, max 180). ' +
+      'Req: { symbol: string, limit?: number }',
+  },
+  'FTD Ratio': {
+    price: 0.03,
+    description:
+      'Latest FTD record plus percentile rank within the rolling window, and threshold-list status. ' +
+      'Req: { symbol: string }',
+  },
+  'FTD ETF Basket Concentration': {
+    price: 0.05,
+    description:
+      'ETF constituents ranked by current FTD notional (supported: XRT, IWM, IJR, KRE). Req: { etf: string }',
+  },
+  'FTD Settlement Cycle': {
+    price: 0.05,
+    description:
+      'Settlement-cycle descriptive bundle — FTD stats, threshold-list status, T+21/T+35 calendar markers, ' +
+      'Reg SHO 204 13-day marker. Req: { symbol: string }',
+  },
+  'Options Flow Intelligence': {
+    price: 0.05,
+    description:
+      'Institutional options flow — sweeps, whale detection, unusual volume, dark-pool prints (Tradier brokerage-grade). ' +
+      'Req: { symbol?: string } (default IWM)',
+  },
+  'CASCADE Accumulator Signal': {
+    price: 0.25,
+    description:
+      'CASCADE ACCUMULATOR directive — ACCUMULATE/PYRAMID/EXIT/STOP mode for a symbol. Req: { symbol: string }',
+  },
+  'IAM Inevitable Action Model': {
+    price: 0.05,
+    description:
+      'Inevitable Action Model resolution — obligation committee verdict, Truth Layer state, and mandatory action. ' +
+      'Req: { symbol: string }',
+  },
+  'Compliance Anomaly Report': {
+    price: 5.00,
+    description:
+      'Submit a bank compliance anomaly to the Leviathan Matrix swarm for scoring. ' +
+      'Req: { bank_id: string, agent_id: string, trigger: string, detail: string, severity?: string }',
+  },
+  'Compliance Bank Audit': {
+    price: 5.00,
+    description:
+      'Full Leviathan Matrix compliance audit cycle for a bank. Req: { bank_id: string }',
+  },
+  'Compliance Regulator Query': {
+    price: 2.50,
+    description:
+      'Real-time regulator compliance dashboard query for a bank. Req: { bank_id: string }',
+  },
+  'SqueezeOS Max-Conviction Rare Signal': {
+    price: 0.25,
+    description:
+      'TRIPLE_LOCK_VERDICT — distinct from and rarer than the standard Triple Lock Signal job above. ' +
+      'Returns BULL or BEAR only when three independent proprietary engines (macro price stretch, dark-pool ' +
+      'volume kinetics, ribbon harmonics) all agree; otherwise NO_TRIPLE_LOCK with the blocking engine named. ' +
+      'Req: { symbol: string }',
+  },
+  'Content & Wallet Trust Score': {
+    price: 0.01,
+    description:
+      'Content misinformation trust scoring and on-chain wallet trust ledger — distinct mechanism from AI Fact Check ' +
+      '(which cross-references live government data; this scores text content and sender wallet reputation). ' +
+      'Req: { content: string, sender_wallet?: string }',
   },
 };
 
@@ -576,6 +653,58 @@ async function routeOffering(offering: string, req: Requirement): Promise<unknow
         ...(req.limit ? { limit: str(req.limit) } : {}),
       });
 
+    // ── New SqueezeOS routes ──────────────────────────────────────────────────
+    case 'FTD Threshold List':
+      return callSqueezeOS('/api/ftd/threshold-list');
+
+    case 'FTD Time Series':
+      return callSqueezeOS(
+        `/api/ftd/series/${encodeURIComponent(str(req.symbol).toUpperCase())}` +
+        (req.limit ? `?limit=${encodeURIComponent(str(req.limit))}` : ''),
+      );
+
+    case 'FTD Ratio':
+      return callSqueezeOS(`/api/ftd/ratio/${encodeURIComponent(str(req.symbol).toUpperCase())}`);
+
+    case 'FTD ETF Basket Concentration':
+      return callSqueezeOS(`/api/ftd/etf-basket/${encodeURIComponent(str(req.etf).toUpperCase())}`);
+
+    case 'FTD Settlement Cycle':
+      return callSqueezeOS(`/api/ftd/cycle/${encodeURIComponent(str(req.symbol).toUpperCase())}`);
+
+    case 'Options Flow Intelligence':
+      return callSqueezeOS(`/api/options?symbol=${encodeURIComponent(str(req.symbol, 'IWM').toUpperCase())}`);
+
+    case 'CASCADE Accumulator Signal':
+      return callSqueezeOSPost('/api/cascade/signal', { symbol: str(req.symbol).toUpperCase() });
+
+    case 'IAM Inevitable Action Model':
+      return callSqueezeOS(`/api/iam/${encodeURIComponent(str(req.symbol).toUpperCase())}`);
+
+    case 'Compliance Anomaly Report':
+      return callSqueezeOSPost('/api/compliance/anomaly', {
+        bank_id: str(req.bank_id),
+        agent_id: str(req.agent_id),
+        trigger: str(req.trigger),
+        detail: str(req.detail),
+        ...(req.severity ? { severity: str(req.severity) } : {}),
+      });
+
+    case 'Compliance Bank Audit':
+      return callSqueezeOSPost('/api/compliance/audit', { bank_id: str(req.bank_id) });
+
+    case 'Compliance Regulator Query':
+      return callSqueezeOS(`/api/compliance/regulator/query/${encodeURIComponent(str(req.bank_id))}`);
+
+    case 'SqueezeOS Max-Conviction Rare Signal':
+      return callSqueezeOSPost('/api/triple-lock', { symbol: str(req.symbol).toUpperCase() });
+
+    case 'Content & Wallet Trust Score':
+      return callSqueezeOSPost('/api/ccs/validate', {
+        content: str(req.content),
+        ...(req.sender_wallet ? { sender_wallet: str(req.sender_wallet) } : {}),
+      });
+
     default:
       throw new Error(`Unknown offering: ${offering}`);
   }
@@ -721,7 +850,7 @@ export async function startLeviathan(): Promise<void> {
 
   try {
     await seller.start(() => {
-      console.log('LEVIATHAN online — 41 offerings on Virtuals ACP marketplace');
+      console.log('LEVIATHAN online — 54 offerings on Virtuals ACP marketplace');
       console.log(`  wallet : ${WALLET_ADDRESS}`);
       console.log(`  mcp    : ${MCP_BASE}`);
       console.log(`  squeeze: ${SQUEEZEOS_BASE}`);
