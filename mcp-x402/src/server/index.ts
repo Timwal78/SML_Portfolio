@@ -1361,8 +1361,10 @@ async function runSSE(): Promise<void> {
 
   if (process.env['ACP_WALLET_ID'] && process.env['ACP_SIGNER_PRIVATE_KEY']) {
     import('./acp/leviathan.js').then(({ startLeviathan }) => {
-      startLeviathan().catch((err: Error) => {
-        console.error('[LEVIATHAN] Failed to start:', err.message);
+      startLeviathan().catch((err: unknown) => {
+        const e = err as Error & { details?: unknown; shortMessage?: string; statusCode?: number };
+        console.error('[LEVIATHAN] Failed to start:', e.message,
+          e.shortMessage ?? '', JSON.stringify(e.details ?? ''));
       });
     });
   } else {
