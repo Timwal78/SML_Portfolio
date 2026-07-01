@@ -1162,7 +1162,7 @@ async function runSSE(): Promise<void> {
     if (!pay.ok) return;
     if (!name && !state) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_param', detail: 'Payment verified. Add ?name= or ?state= and retry.' }); }
     try {
-      let r: Response; let j: { meta?: Record<string, unknown>; data?: Array<Record<string, unknown>> };
+      let r: globalThis.Response; let j: { meta?: Record<string, unknown>; data?: Array<Record<string, unknown>> };
       if (type === 'hospital') {
         const p = new URLSearchParams({ '$limit': String(limit) });
         if (name) p.set('$q', name);
