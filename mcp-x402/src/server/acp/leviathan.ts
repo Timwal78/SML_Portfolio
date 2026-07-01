@@ -390,14 +390,21 @@ export async function startLeviathan(): Promise<void> {
     );
   }
 
-  const seller = await AcpAgent.create({
-    provider: await PrivyAlchemyEvmProviderAdapter.create({
+  console.log(`[LEVIATHAN] walletId=${WALLET_ID} walletAddress=${WALLET_ADDRESS}`);
+  let provider: Awaited<ReturnType<typeof PrivyAlchemyEvmProviderAdapter.create>>;
+  try {
+    provider = await PrivyAlchemyEvmProviderAdapter.create({
       walletAddress: WALLET_ADDRESS,
       walletId: WALLET_ID,
       signerPrivateKey: SIGNER_PRIVATE_KEY as `0x${string}`,
       chains: [base],
-    }),
-  });
+    });
+  } catch (err: unknown) {
+    const e = err as Error & { details?: unknown; statusCode?: number };
+    console.error('[LEVIATHAN] PrivyAlchemyEvmProviderAdapter.create failed:', e.message, JSON.stringify(e.details ?? ''));
+    throw err;
+  }
+  const seller = await AcpAgent.create({ provider });
 
   seller.on('entry', handleEntry);
 
