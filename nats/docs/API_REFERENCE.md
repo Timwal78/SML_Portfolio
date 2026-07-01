@@ -135,15 +135,16 @@ non-negotiable #6).
 | `src/ensemble/*` | Fully implemented (used by the full 20-agent swarm; the v1 paper-trading loop uses a simpler equal-weight bootstrap — see below) |
 | `src/shadow_flow/*` | Fully implemented (scoring model only — factor inputs come from `src/factors/`) |
 | `src/regime/*` | Implemented; centroid-to-label heuristic in `_label_clusters` needs Phase 2 tuning against real regime features. Not yet wired into `scripts/paper_trade.py` (uses a fixed `default_regime_confidence` from config.yaml in the interim) |
-| `src/agents/agent_01,02,03,07,08,09,10,11_*.py` | **Fully implemented** — MomentumHunter, MeanReversionSniper, VolRegimeDetector, SeasonalityExpert, BollingerBouncer, VolumeConfirmer, TrendFollower, FearGreedContrarian. Only need free Yahoo data. |
-| `src/agents/` (remaining 12) | Interface + metadata complete; `generate_signal` bodies are stubs — need Tradier/Polygon/Alpha Vantage/Binance/FINRA/SEC EDGAR credentials |
-| `src/data/yahoo_client.py` | **Fully implemented** (yfinance, no API key required) |
-| `src/data/` (Tradier, Polygon, Alpaca market-data, Alpha Vantage, Binance, SEC EDGAR, FINRA) | Interface only; live HTTP calls are stubs pending credentials |
+| `src/agents/agent_01,02,03,07,08,09,10,11_*.py` | **Fully implemented** — MomentumHunter, MeanReversionSniper, VolRegimeDetector, SeasonalityExpert, BollingerBouncer, VolumeConfirmer, TrendFollower, FearGreedContrarian. Only need OHLCV + VIX data (Tradier). |
+| `src/agents/` (remaining 12) | Interface + metadata complete; `generate_signal` bodies are stubs — need Polygon/Alpha Vantage/Binance/FINRA/SEC EDGAR credentials |
+| `src/data/tradier_client.py` | **Fully implemented** (direct REST calls via `requests`, Bearer auth, production or sandbox via `TRADIER_SANDBOX`) — primary data source for the v1 launch |
+| `src/data/yahoo_client.py` | Fully implemented (yfinance, no API key) — kept as a free/no-key fallback but not used by `scripts/paper_trade.py` |
+| `src/data/` (Polygon, Alpaca market-data, Alpha Vantage, Binance, SEC EDGAR, FINRA) | Interface only; live HTTP calls are stubs pending credentials |
 | `src/execution/alpaca_adapter.py` | **Fully implemented** (alpaca-py SDK, bracket orders with stop-loss leg, paper-only by construction) |
-| `src/execution/tradier_adapter.py` | Interface only; stub pending Tradier credentials |
-| `src/pipeline/factor_builder.py` | **Fully implemented** — builds the factor frame for the 8 Yahoo-only agents |
+| `src/execution/tradier_adapter.py` | Interface only — the operator's Tradier account is for market data, not brokerage execution here; Alpaca paper remains the execution venue |
+| `src/pipeline/factor_builder.py` | **Fully implemented** — data-source-agnostic; builds the factor frame for the 8 implemented agents from any OHLCV+VIX input |
 | `src/monitoring/metrics.py`, `audit_log.py` | Fully implemented |
-| `scripts/paper_trade.py` | **Fully implemented and runnable** — daily loop: Yahoo data → factors → 8 agents → equal-weight ensemble → risk gate → Alpaca paper order → audit log. Requires `ALPACA_API_KEY`/`ALPACA_SECRET_KEY` env vars; run with `--dry-run` to see signals without submitting orders. **This sandboxed dev session cannot reach any external API (Yahoo, Alpaca, Tradier, etc. all blocked by network policy) — this script has only been verified with synthetic/mocked data here. It must be run somewhere with real internet access** (see `render.yaml`, a Render Cron Job) before being trusted with real paper orders. |
+| `scripts/paper_trade.py` | **Fully implemented and runnable** — daily loop: Tradier data → factors → 8 agents → equal-weight ensemble → risk gate → Alpaca paper order → audit log. Requires `TRADIER_ACCESS_TOKEN`/`TRADIER_SANDBOX` and `ALPACA_API_KEY`/`ALPACA_SECRET_KEY` env vars; run with `--dry-run` to see signals without submitting orders. **This sandboxed dev session cannot reach any external API (Tradier, Alpaca, Yahoo, etc. all blocked by network policy) — this script has only been verified with synthetic/mocked data here, including the Tradier response parsing (mocked JSON matching Tradier's documented schema). It must be run somewhere with real internet access** (see `render.yaml`, a Render Cron Job) before being trusted with real paper orders — in particular, verify `paper_trading.vix_symbol` in `config.yaml` resolves correctly against the live Tradier account before relying on VolRegimeDetector/FearGreedContrarian signals. |
 | `scripts/backtest.py` | Orchestration stub — wire once more agents/data sources are implemented |
 | `scripts/live_trade.py` | Intentionally locked/unimplemented until the Phase 5 PSR/DSR gate passes |
 | `scripts/validate.py`, `monitor.py` | Fully implemented and runnable today |
@@ -151,7 +152,7 @@ non-negotiable #6).
 ### v1 paper-trading launch scope
 
 `config.yaml`'s `paper_trading:` block controls the initial launch: a
-3-symbol universe (SPY, QQQ, IWM), the 8 Yahoo-only agents, and a fixed
+3-symbol universe (SPY, QQQ, IWM), the 8 Tradier-data agents, and a fixed
 `default_regime_confidence` (the real expanding-window regime detector
 isn't wired into the loop yet). Ensemble weighting is a straight average
 across the 8 agents — the full `MetaLearningEnsemble` weekly-rebalance
