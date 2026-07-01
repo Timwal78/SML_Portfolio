@@ -1214,13 +1214,214 @@ async function runSSE(): Promise<void> {
     } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'nih_fetch_failed', message: String(err) }); }
   });
 
+  // ── SqueezeOS-backed x402 routes ────────────────────────────────────────────
+  // Each proxies through SqueezeOSAPI (X-API-Key operator bypass, not tied to
+  // the caller's own payment) after this server's own requirePayment clears.
+
+  app.get('/x402/ftd-threshold-list', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/ftd-threshold-list`;
+    const inputSchema = { type: 'object', properties: {} };
+    const outputSchema = { input: { type: 'http', method: 'GET' }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 20000n, description: 'Current SEC Reg SHO Threshold Securities List — persistent fails-to-deliver names. Pay 0.02 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    try {
+      const result = await SqueezeOSAPI.ftdThresholdList();
+      return res.set('Access-Control-Allow-Origin', '*').json({ ...(result as object), _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'upstream_error', message: String(err) }); }
+  });
+
+  app.get('/x402/ftd-time-series', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/ftd-time-series`;
+    const symbol = (typeof req.query['symbol'] === 'string' ? req.query['symbol'] : '').toUpperCase().replace(/[^A-Z0-9.]/g, '').slice(0, 10);
+    const limit = req.query['limit'] ? Math.min(Math.max(parseInt(String(req.query['limit']), 10) || 90, 1), 180) : undefined;
+    const inputSchema = { type: 'object', properties: { symbol: { type: 'string', description: 'Equity ticker.' }, limit: { type: 'integer', minimum: 1, maximum: 180, default: 90 } }, required: ['symbol'] };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { symbol: { type: 'string', required: true } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 20000n, description: 'Historical SEC Reg SHO fails-to-deliver time series for a symbol, up to 180 days. Pay 0.02 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    if (!symbol) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_symbol', detail: 'Payment verified. Add ?symbol= and retry.' }); }
+    try {
+      const result = await SqueezeOSAPI.ftdTimeSeries(symbol, limit);
+      return res.set('Access-Control-Allow-Origin', '*').json({ ...(result as object), _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'upstream_error', message: String(err) }); }
+  });
+
+  app.get('/x402/ftd-ratio', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/ftd-ratio`;
+    const symbol = (typeof req.query['symbol'] === 'string' ? req.query['symbol'] : '').toUpperCase().replace(/[^A-Z0-9.]/g, '').slice(0, 10);
+    const inputSchema = { type: 'object', properties: { symbol: { type: 'string', description: 'Equity ticker.' } }, required: ['symbol'] };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { symbol: { type: 'string', required: true } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 30000n, description: 'Latest FTD record with percentile rank and threshold-list status for a symbol. Pay 0.03 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    if (!symbol) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_symbol', detail: 'Payment verified. Add ?symbol= and retry.' }); }
+    try {
+      const result = await SqueezeOSAPI.ftdRatio(symbol);
+      return res.set('Access-Control-Allow-Origin', '*').json({ ...(result as object), _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'upstream_error', message: String(err) }); }
+  });
+
+  app.get('/x402/ftd-etf-basket', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/ftd-etf-basket`;
+    const etf = (typeof req.query['etf'] === 'string' ? req.query['etf'] : '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10);
+    const inputSchema = { type: 'object', properties: { etf: { type: 'string', description: 'ETF ticker (XRT, IWM, IJR, KRE).' } }, required: ['etf'] };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { etf: { type: 'string', required: true } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 50000n, description: 'ETF constituents ranked by current FTD notional concentration (XRT, IWM, IJR, KRE). Pay 0.05 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    if (!etf) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_etf', detail: 'Payment verified. Add ?etf= and retry.' }); }
+    try {
+      const result = await SqueezeOSAPI.ftdEtfBasket(etf);
+      return res.set('Access-Control-Allow-Origin', '*').json({ ...(result as object), _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'upstream_error', message: String(err) }); }
+  });
+
+  app.get('/x402/ftd-settlement-cycle', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/ftd-settlement-cycle`;
+    const symbol = (typeof req.query['symbol'] === 'string' ? req.query['symbol'] : '').toUpperCase().replace(/[^A-Z0-9.]/g, '').slice(0, 10);
+    const inputSchema = { type: 'object', properties: { symbol: { type: 'string', description: 'Equity ticker.' } }, required: ['symbol'] };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { symbol: { type: 'string', required: true } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 50000n, description: 'Settlement-cycle bundle: FTD stats, threshold-list status, T+21/T+35 markers, Reg SHO 204 13-day marker. Pay 0.05 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    if (!symbol) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_symbol', detail: 'Payment verified. Add ?symbol= and retry.' }); }
+    try {
+      const result = await SqueezeOSAPI.ftdSettlementCycle(symbol);
+      return res.set('Access-Control-Allow-Origin', '*').json({ ...(result as object), _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'upstream_error', message: String(err) }); }
+  });
+
+  app.get('/x402/options-flow', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/options-flow`;
+    const inputSchema = { type: 'object', properties: { symbol: { type: 'string', description: 'Equity ticker (defaults to IWM).' } } };
+    const outputSchema = { input: { type: 'http', method: 'GET' }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 50000n, description: 'Institutional options flow — sweeps, whale detection, unusual volume, dark-pool prints (Tradier brokerage-grade). Pay 0.05 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    try {
+      const result = await SqueezeOSAPI.options(pay.payer.from);
+      return res.set('Access-Control-Allow-Origin', '*').json({ ...(result as object), _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'upstream_error', message: String(err) }); }
+  });
+
+  app.post('/x402/cascade-signal', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/cascade-signal`;
+    const symbol = (typeof req.body?.symbol === 'string' ? req.body.symbol : (typeof req.query['symbol'] === 'string' ? req.query['symbol'] : '')).toUpperCase().replace(/[^A-Z0-9.]/g, '').slice(0, 10);
+    const inputSchema = { type: 'object', properties: { symbol: { type: 'string', description: 'Equity ticker.' } }, required: ['symbol'] };
+    const outputSchema = { input: { type: 'http', method: 'POST', body: { symbol: { type: 'string', required: true } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 250000n, description: 'CASCADE ACCUMULATOR directive — ACCUMULATE/PYRAMID/EXIT/STOP mode for a symbol. Pay 0.25 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    if (!symbol) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_symbol', detail: 'Payment verified. Add symbol and retry.' }); }
+    try {
+      const result = await SqueezeOSAPI.cascadeSignal(symbol);
+      return res.set('Access-Control-Allow-Origin', '*').json({ ...(result as object), _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'upstream_error', message: String(err) }); }
+  });
+
+  app.get('/x402/iam-model', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/iam-model`;
+    const symbol = (typeof req.query['symbol'] === 'string' ? req.query['symbol'] : '').toUpperCase().replace(/[^A-Z0-9.]/g, '').slice(0, 10);
+    const inputSchema = { type: 'object', properties: { symbol: { type: 'string', description: 'Equity ticker.' } }, required: ['symbol'] };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { symbol: { type: 'string', required: true } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 50000n, description: 'Inevitable Action Model — obligation committee verdict, Truth Layer state, and mandatory action for a symbol. Pay 0.05 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    if (!symbol) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_symbol', detail: 'Payment verified. Add ?symbol= and retry.' }); }
+    try {
+      const result = await SqueezeOSAPI.iamResolve(symbol);
+      return res.set('Access-Control-Allow-Origin', '*').json({ ...(result as object), _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'upstream_error', message: String(err) }); }
+  });
+
+  app.post('/x402/compliance-anomaly', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/compliance-anomaly`;
+    const bank_id = typeof req.body?.bank_id === 'string' ? req.body.bank_id : '';
+    const agent_id = typeof req.body?.agent_id === 'string' ? req.body.agent_id : '';
+    const trigger = typeof req.body?.trigger === 'string' ? req.body.trigger : '';
+    const detail = typeof req.body?.detail === 'string' ? req.body.detail : '';
+    const severity = typeof req.body?.severity === 'string' ? req.body.severity : undefined;
+    const inputSchema = { type: 'object', properties: { bank_id: { type: 'string' }, agent_id: { type: 'string' }, trigger: { type: 'string' }, detail: { type: 'string' }, severity: { type: 'string' } }, required: ['bank_id', 'agent_id', 'trigger', 'detail'] };
+    const outputSchema = { input: { type: 'http', method: 'POST' }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 5000000n, description: 'Submit a bank compliance anomaly to the Leviathan Matrix swarm for scoring. Pay 5.00 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    if (!bank_id || !agent_id || !trigger || !detail) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_fields', detail: 'Payment verified. Provide bank_id, agent_id, trigger, detail and retry.' }); }
+    try {
+      const result = await SqueezeOSAPI.complianceAnomalyReport({ bank_id, agent_id, trigger, detail, severity });
+      return res.set('Access-Control-Allow-Origin', '*').json({ ...(result as object), _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'upstream_error', message: String(err) }); }
+  });
+
+  app.post('/x402/compliance-audit', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/compliance-audit`;
+    const bank_id = typeof req.body?.bank_id === 'string' ? req.body.bank_id : (typeof req.query['bank_id'] === 'string' ? req.query['bank_id'] : '');
+    const inputSchema = { type: 'object', properties: { bank_id: { type: 'string' } }, required: ['bank_id'] };
+    const outputSchema = { input: { type: 'http', method: 'POST' }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 5000000n, description: 'Full Leviathan Matrix compliance audit cycle for a bank. Pay 5.00 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    if (!bank_id) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_bank_id', detail: 'Payment verified. Provide bank_id and retry.' }); }
+    try {
+      const result = await SqueezeOSAPI.complianceBankAudit(bank_id);
+      return res.set('Access-Control-Allow-Origin', '*').json({ ...(result as object), _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'upstream_error', message: String(err) }); }
+  });
+
+  app.get('/x402/compliance-regulator-query', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/compliance-regulator-query`;
+    const bank_id = typeof req.query['bank_id'] === 'string' ? req.query['bank_id'] : '';
+    const inputSchema = { type: 'object', properties: { bank_id: { type: 'string' } }, required: ['bank_id'] };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { bank_id: { type: 'string', required: true } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 2500000n, description: 'Real-time regulator compliance dashboard query for a bank. Pay 2.50 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    if (!bank_id) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_bank_id', detail: 'Payment verified. Add ?bank_id= and retry.' }); }
+    try {
+      const result = await SqueezeOSAPI.complianceRegulatorQuery(bank_id);
+      return res.set('Access-Control-Allow-Origin', '*').json({ ...(result as object), _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'upstream_error', message: String(err) }); }
+  });
+
+  app.post('/x402/max-conviction-signal', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/max-conviction-signal`;
+    const symbol = (typeof req.body?.symbol === 'string' ? req.body.symbol : (typeof req.query['symbol'] === 'string' ? req.query['symbol'] : '')).toUpperCase().replace(/[^A-Z0-9.]/g, '').slice(0, 10);
+    const inputSchema = { type: 'object', properties: { symbol: { type: 'string', description: 'Equity ticker.' } }, required: ['symbol'] };
+    const outputSchema = { input: { type: 'http', method: 'POST', body: { symbol: { type: 'string', required: true } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 250000n, description: 'TRIPLE_LOCK_VERDICT — BULL or BEAR only when three independent engines (macro price stretch, dark-pool volume kinetics, ribbon harmonics) all agree; otherwise NO_TRIPLE_LOCK with the blocking engine named. Distinct from and rarer than a standard squeeze signal. Pay 0.25 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    if (!symbol) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_symbol', detail: 'Payment verified. Provide symbol and retry.' }); }
+    try {
+      const result = await SqueezeOSAPI.maxConvictionSignal(symbol);
+      return res.set('Access-Control-Allow-Origin', '*').json({ ...(result as object), _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'upstream_error', message: String(err) }); }
+  });
+
+  app.post('/x402/content-trust-score', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/content-trust-score`;
+    const content = typeof req.body?.content === 'string' ? req.body.content : '';
+    const sender_wallet = typeof req.body?.sender_wallet === 'string' ? req.body.sender_wallet : undefined;
+    const inputSchema = { type: 'object', properties: { content: { type: 'string' }, sender_wallet: { type: 'string' } }, required: ['content'] };
+    const outputSchema = { input: { type: 'http', method: 'POST' }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 10000n, description: 'Content misinformation trust scoring plus on-chain wallet trust ledger. Distinct mechanism from AI Fact Check (which cross-references live government data; this scores text content and sender wallet reputation). Pay 0.01 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    if (!content) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_content', detail: 'Payment verified. Provide content and retry.' }); }
+    try {
+      const result = await SqueezeOSAPI.contentWalletTrustScore(content, sender_wallet);
+      return res.set('Access-Control-Allow-Origin', '*').json({ ...(result as object), _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'upstream_error', message: String(err) }); }
+  });
+
   // ── x402 discovery document (OpenAPI 3.1 + x-service-info / x-payment-info) ─
   // x402scan's canonical signal; served at /.well-known/x402 and /openapi.json.
   const OPENAPI_DOC = {
     openapi: '3.1.0',
     info: { title: 'Script Master Labs — x402 Data API', version: VERSION, description: 'Pay-per-call U.S. federal data, settled in USDC on Base via x402.', contact: { name: 'Script Master Labs', email: 'ScriptMasterLabs@gmail.com', url: 'https://scriptmasterlabs.com' } },
     servers: [{ url: 'https://mcp-x402.onrender.com' }],
-    'x-service-info': { categories: ['government-data', 'grants', 'federal-contracts', 'market-intelligence', 'medical-reference', 'drug-data', 'healthcare-providers', 'clinical-trials', 'sec-filings', 'insider-trading', 'finance', 'drug-safety', 'treasury', 'yield-curve', 'compliance', 'entity-verification', 'agent-reputation', 'fact-checking', 'veteran-services', 'federal-procurement', 'institutional-holdings', 'lobbying', 'patent-data', 'economic-indicators', 'labor-safety', 'medical-devices', 'campaign-finance', 'environmental-compliance', 'innovation-grants', 'congressional-legislation', 'regulatory-enforcement', 'medicare-data', 'research-grants', 'broker-verification', 'activist-investing'], payment: { protocol: 'x402', rails: [{ id: 'standard', scheme: 'exact', network: 'base', settlement: 'facilitator', note: 'EIP-3009 via X-PAYMENT — settled through a hybrid facilitator chain.' }, { id: 'sovereign', scheme: 'exact', network: 'base', settlement: 'onchain-tx', note: 'Pay USDC then send X-PAYMENT-TX — verified directly on-chain, no facilitator.' }], facilitators: '/x402/facilitators' }, docs: { homepage: 'https://scriptmasterlabs.com', llms: 'https://mcp-x402.onrender.com/llms.txt', apiReference: 'https://github.com/Timwal78/SML_Portfolio/tree/main/mcp-x402' } },
+    'x-service-info': { categories: ['government-data', 'grants', 'federal-contracts', 'market-intelligence', 'medical-reference', 'drug-data', 'healthcare-providers', 'clinical-trials', 'sec-filings', 'insider-trading', 'finance', 'drug-safety', 'treasury', 'yield-curve', 'compliance', 'entity-verification', 'agent-reputation', 'fact-checking', 'veteran-services', 'federal-procurement', 'institutional-holdings', 'lobbying', 'patent-data', 'economic-indicators', 'labor-safety', 'medical-devices', 'campaign-finance', 'environmental-compliance', 'innovation-grants', 'congressional-legislation', 'regulatory-enforcement', 'medicare-data', 'research-grants', 'broker-verification', 'activist-investing', 'fails-to-deliver', 'short-squeeze-data', 'reg-sho', 'options-flow', 'dark-pool-data', 'position-sizing', 'trading-signals', 'aml-compliance', 'bank-audit', 'financial-crime-detection', 'content-moderation', 'misinformation-detection', 'wallet-reputation'], payment: { protocol: 'x402', rails: [{ id: 'standard', scheme: 'exact', network: 'base', settlement: 'facilitator', note: 'EIP-3009 via X-PAYMENT — settled through a hybrid facilitator chain.' }, { id: 'sovereign', scheme: 'exact', network: 'base', settlement: 'onchain-tx', note: 'Pay USDC then send X-PAYMENT-TX — verified directly on-chain, no facilitator.' }], facilitators: '/x402/facilitators' }, docs: { homepage: 'https://scriptmasterlabs.com', llms: 'https://mcp-x402.onrender.com/llms.txt', apiReference: 'https://github.com/Timwal78/SML_Portfolio/tree/main/mcp-x402' } },
     paths: { '/x402/grants': { get: {
       operationId: 'searchGrants',
       summary: 'Search live U.S. federal grant opportunities (Grants.gov Search2).',
@@ -1449,6 +1650,97 @@ async function runSSE(): Promise<void> {
       parameters: [{ name: 'query', in: 'query', required: true, schema: { type: 'string' }, example: 'cancer immunotherapy' }, { name: 'agency', in: 'query', required: false, schema: { type: 'string' }, example: 'NCI' }, { name: 'fiscal_year', in: 'query', required: false, schema: { type: 'integer' }, example: 2025 }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 25, default: 10 } }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.05', amountUnits: '50000', payTo: X402_PAY_TO },
       responses: { '200': { description: 'NIH research grants' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/ftd-threshold-list': { get: {
+      operationId: 'ftdThresholdList',
+      summary: 'SEC Reg SHO Threshold Securities List — persistent fails-to-deliver names.',
+      description: 'Current SEC Reg SHO threshold securities list. Keywords: reg sho, threshold securities, ftd threshold list, persistent fails to deliver, short squeeze data. Pay 0.02 USDC on Base.',
+      parameters: [],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.02', amountUnits: '20000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'Threshold securities list' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/ftd-time-series': { get: {
+      operationId: 'ftdTimeSeries',
+      summary: 'Historical SEC Reg SHO fails-to-deliver time series for a symbol.',
+      description: 'Up to 180 days of FTD history for a symbol. Keywords: ftd time series, fails to deliver history, ftd data, reg sho history, short interest data. Pay 0.02 USDC on Base.',
+      parameters: [{ name: 'symbol', in: 'query', required: true, schema: { type: 'string' }, example: 'GME' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 180, default: 90 } }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.02', amountUnits: '20000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'FTD time series' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/ftd-ratio': { get: {
+      operationId: 'ftdRatio',
+      summary: 'Latest FTD ratio and percentile rank for a symbol.',
+      description: 'Latest FTD record, percentile rank within the rolling window, and threshold-list status. Keywords: ftd ratio, ftd percentile, fails to deliver ratio, threshold list status. Pay 0.03 USDC on Base.',
+      parameters: [{ name: 'symbol', in: 'query', required: true, schema: { type: 'string' }, example: 'AMC' }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.03', amountUnits: '30000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'FTD ratio and percentile' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/ftd-etf-basket': { get: {
+      operationId: 'ftdEtfBasket',
+      summary: 'ETF constituents ranked by FTD notional concentration.',
+      description: 'ETF constituents ranked by current FTD notional (XRT, IWM, IJR, KRE). Keywords: etf ftd basket, etf constituent ftd, meme etf concentration. Pay 0.05 USDC on Base.',
+      parameters: [{ name: 'etf', in: 'query', required: true, schema: { type: 'string', enum: ['XRT', 'IWM', 'IJR', 'KRE'] }, example: 'IWM' }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.05', amountUnits: '50000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'ETF FTD basket breakdown' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/ftd-settlement-cycle': { get: {
+      operationId: 'ftdSettlementCycle',
+      summary: 'Settlement-cycle bundle — FTD stats, T+21/T+35 markers, Reg SHO 204 marker.',
+      description: 'FTD stats, threshold-list status, T+21/T+35 calendar markers, and Reg SHO 204 13-day marker for a symbol. Keywords: settlement cycle, t+21 t+35, reg sho 204, close out marker. Pay 0.05 USDC on Base.',
+      parameters: [{ name: 'symbol', in: 'query', required: true, schema: { type: 'string' }, example: 'GME' }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.05', amountUnits: '50000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'Settlement-cycle bundle' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/options-flow': { get: {
+      operationId: 'optionsFlow',
+      summary: 'Institutional options flow — sweeps, whale detection, dark-pool prints.',
+      description: 'Institutional options flow intelligence: sweeps, whale detection, unusual volume, dark-pool prints, Tradier brokerage-grade feed. Keywords: options flow, options sweep, whale options, dark pool options, unusual options volume. Pay 0.05 USDC on Base.',
+      parameters: [{ name: 'symbol', in: 'query', required: false, schema: { type: 'string' }, example: 'IWM' }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.05', amountUnits: '50000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'Options flow intelligence' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/cascade-signal': { post: {
+      operationId: 'cascadeSignal',
+      summary: 'CASCADE ACCUMULATOR directive — ACCUMULATE/PYRAMID/EXIT/STOP.',
+      description: 'Position-sizing directive for a symbol: ACCUMULATE, PYRAMID, EXIT, or STOP. Keywords: cascade accumulator, accumulate pyramid exit stop, position sizing signal. Pay 0.25 USDC on Base.',
+      requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', properties: { symbol: { type: 'string' } }, required: ['symbol'] } } } },
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.25', amountUnits: '250000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'CASCADE directive' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/iam-model': { get: {
+      operationId: 'iamModel',
+      summary: 'Inevitable Action Model — obligation committee verdict and mandatory action.',
+      description: 'Obligation committee verdict, Truth Layer state, and mandatory action for a symbol. Keywords: inevitable action model, obligation committee, truth layer, mandatory action signal. Pay 0.05 USDC on Base.',
+      parameters: [{ name: 'symbol', in: 'query', required: true, schema: { type: 'string' }, example: 'TSLA' }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.05', amountUnits: '50000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'IAM resolution' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/compliance-anomaly': { post: {
+      operationId: 'complianceAnomaly',
+      summary: 'Submit a bank compliance anomaly for scoring.',
+      description: 'Submit a bank compliance anomaly to the Leviathan Matrix swarm for scoring. Keywords: bank compliance anomaly, financial crime detection, aml anomaly report, compliance swarm. Pay 5.00 USDC on Base.',
+      requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', properties: { bank_id: { type: 'string' }, agent_id: { type: 'string' }, trigger: { type: 'string' }, detail: { type: 'string' }, severity: { type: 'string' } }, required: ['bank_id', 'agent_id', 'trigger', 'detail'] } } } },
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '5.00', amountUnits: '5000000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'Anomaly record and swarm response' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/compliance-audit': { post: {
+      operationId: 'complianceAudit',
+      summary: 'Full Leviathan Matrix compliance audit cycle for a bank.',
+      description: 'Full compliance audit cycle for a financial institution. Keywords: bank audit, aml compliance audit, financial institution audit, regulatory audit cycle. Pay 5.00 USDC on Base.',
+      requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', properties: { bank_id: { type: 'string' } }, required: ['bank_id'] } } } },
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '5.00', amountUnits: '5000000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'Full audit cycle result' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/compliance-regulator-query': { get: {
+      operationId: 'complianceRegulatorQuery',
+      summary: 'Real-time regulator compliance dashboard query for a bank.',
+      description: 'Real-time regulator compliance dashboard data for a bank. Keywords: regulator dashboard, real time bank compliance, regulatory query. Pay 2.50 USDC on Base.',
+      parameters: [{ name: 'bank_id', in: 'query', required: true, schema: { type: 'string' } }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '2.50', amountUnits: '2500000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'Regulator dashboard data' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/max-conviction-signal': { post: {
+      operationId: 'maxConvictionSignal',
+      summary: 'TRIPLE_LOCK_VERDICT — max-conviction rare signal, distinct from the standard squeeze signal.',
+      description: 'BULL or BEAR only when three independent engines (macro price stretch, dark-pool volume kinetics, ribbon harmonics) all agree; otherwise NO_TRIPLE_LOCK with the blocking engine named. Keywords: max conviction signal, rare squeeze signal, triple lock verdict, three engine consensus. Pay 0.25 USDC on Base.',
+      requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', properties: { symbol: { type: 'string' } }, required: ['symbol'] } } } },
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.25', amountUnits: '250000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'Max-conviction verdict' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/content-trust-score': { post: {
+      operationId: 'contentTrustScore',
+      summary: 'Content misinformation trust scoring plus on-chain wallet trust ledger.',
+      description: 'Content misinformation scoring and wallet trust ledger, distinct mechanism from AI Fact Check. Keywords: content trust score, misinformation detection, wallet trust score, agent content vetting. Pay 0.01 USDC on Base.',
+      requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', properties: { content: { type: 'string' }, sender_wallet: { type: 'string' } }, required: ['content'] } } } },
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.01', amountUnits: '10000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'Trust score, verdict, flags' }, '402': { description: 'Payment required.' } },
     } } },
     '/.well-known/x402': { get: { operationId: 'openApiDiscovery', summary: 'OpenAPI/x402 discovery document (free).', security: [], responses: { '200': { description: 'OpenAPI spec.' } } } },
     '/openapi.json': { get: { operationId: 'openApiJson', summary: 'OpenAPI spec (free).', security: [], responses: { '200': { description: 'OpenAPI spec.' } } } },
@@ -1458,11 +1750,13 @@ async function runSSE(): Promise<void> {
   // nested `price` object. Our existing flat fields (method/amount/etc.) stay
   // for richer clients; these two are added so the doc validates as x402.
   for (const pathItem of Object.values(OPENAPI_DOC.paths) as Array<Record<string, { 'x-payment-info'?: Record<string, unknown> }>>) {
-    const op = pathItem['get'];
-    const pi = op?.['x-payment-info'];
-    if (pi && typeof pi === 'object') {
-      pi['protocols'] = ['x402'];
-      pi['price'] = { mode: 'fixed', currency: 'USD', amount: pi['amount'] };
+    for (const method of ['get', 'post'] as const) {
+      const op = pathItem[method];
+      const pi = op?.['x-payment-info'];
+      if (pi && typeof pi === 'object') {
+        pi['protocols'] = ['x402'];
+        pi['price'] = { mode: 'fixed', currency: 'USD', amount: pi['amount'] };
+      }
     }
   }
   app.get('/.well-known/x402', (_req, res) => { res.set('Access-Control-Allow-Origin', '*').json(OPENAPI_DOC); });

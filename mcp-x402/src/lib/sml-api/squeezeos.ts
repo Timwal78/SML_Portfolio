@@ -1,41 +1,22 @@
-import { createHmac } from 'crypto';
-
-const SQUEEZEOS_BASE = process.env['SQUEEZEOS_BASE_URL'] ?? 'https://squeezeos-api.onrender.com';
-const PROOF402_SECRET = process.env['PROOF402_TOKEN_SECRET'] ?? '';
-
-// Endpoint UUIDs — override via env vars if they change
-const ENDPOINT_UUIDS: Record<string, string> = {
-  council: process.env['SQUEEZEOS_UUID_COUNCIL'] ?? '12a0e7a1-0000-0000-0000-000000000001',
-  scan: process.env['SQUEEZEOS_UUID_SCAN'] ?? '160cf28d-0000-0000-0000-000000000002',
-  options: process.env['SQUEEZEOS_UUID_OPTIONS'] ?? 'c951a374-0000-0000-0000-000000000003',
-  iwm: process.env['SQUEEZEOS_UUID_IWM'] ?? '60f48ce0-0000-0000-0000-000000000004',
-  marketplace_read: process.env['SQUEEZEOS_UUID_MARKETPLACE_READ'] ?? 'd1a2b3c4-0000-0000-0000-000000000005',
-};
+const SQUEEZEOS_BASE = process.env['SQUEEZEOS_BASE_URL'] ?? process.env['SQUEEZEOS_API_BASE'] ?? 'https://squeezeos-api.onrender.com';
+const SML_API_KEY = process.env['SML_API_KEY'] ?? '';
 
 /**
- * Generate a SqueezeOS JWT for a premium endpoint.
- * Format: base64(json).HMAC-SHA256(secret, encoded)
+ * Auth note: SqueezeOS's premium routes are gated by two different decorators.
+ * `require_payment` (proof402_integration.py) recognizes X-Payment-Token JWTs
+ * AND an X-API-Key operator-key bypass. `x402_guard` (x402_flask.py) — which
+ * gates /api/council, /api/scan, /api/options, /api/iwm — never recognized
+ * X-Payment-Token at all, only a real on-chain X-PAYMENT header or (as of
+ * SqueezeOS PR #249) the same X-API-Key operator-key bypass. This module
+ * previously minted a self-signed X-Payment-Token JWT for these four calls,
+ * which meant they always 402'd against x402_guard, regardless of the caller
+ * already having paid mcp-x402 for the call. Using X-API-Key uniformly here
+ * works against both gate types and matches the same bypass LEVIATHAN
+ * already uses successfully on the ACP side.
  */
-export function generateSqueezeOSToken(endpointKey: string, walletAddress: string): string {
-  const eid = ENDPOINT_UUIDS[endpointKey];
-  if (!eid) throw new Error(`Unknown SqueezeOS endpoint key: ${endpointKey}`);
-  if (!PROOF402_SECRET) throw new Error('PROOF402_TOKEN_SECRET is not set — cannot mint SqueezeOS JWT');
-
-  const payload = {
-    eid,
-    wlt: walletAddress,
-    iid: `mcp-x402-${Date.now()}`,
-    exp: Math.floor(Date.now() / 1000) + 3600, // 1 hour
-  };
-
-  const encoded = Buffer.from(JSON.stringify(payload)).toString('base64url');
-  const sig = createHmac('sha256', PROOF402_SECRET).update(encoded).digest('hex');
-  return `${encoded}.${sig}`;
-}
-
-async function squeezeGet(path: string, token?: string): Promise<unknown> {
+async function squeezeGet(path: string): Promise<unknown> {
   const headers: Record<string, string> = { 'Accept': 'application/json' };
-  if (token) headers['X-Payment-Token'] = token;
+  if (SML_API_KEY) headers['X-API-Key'] = SML_API_KEY;
   const res = await fetch(`${SQUEEZEOS_BASE}${path}`, {
     headers,
     signal: AbortSignal.timeout(15_000),
@@ -44,12 +25,12 @@ async function squeezeGet(path: string, token?: string): Promise<unknown> {
   return res.json();
 }
 
-async function squeezePost(path: string, body: unknown, token?: string): Promise<unknown> {
+async function squeezePost(path: string, body: unknown): Promise<unknown> {
   const headers: Record<string, string> = {
     'Accept': 'application/json',
     'Content-Type': 'application/json',
   };
-  if (token) headers['X-Payment-Token'] = token;
+  if (SML_API_KEY) headers['X-API-Key'] = SML_API_KEY;
   const res = await fetch(`${SQUEEZEOS_BASE}${path}`, {
     method: 'POST',
     headers,
@@ -71,25 +52,31 @@ export const SqueezeOSAPI = {
   marketplaceBrowse: () => squeezeGet('/api/marketplace'),
   futuresLeaderboard: () => squeezeGet('/api/futures/leaderboard'),
 
-  // PAID — caller must supply walletAddress so we can mint the token
-  council: (symbol: string, walletAddress: string) => {
-    const token = generateSqueezeOSToken('council', walletAddress);
-    return squeezePost('/api/council', { symbol }, token);
-  },
-  scan: (walletAddress: string) => {
-    const token = generateSqueezeOSToken('scan', walletAddress);
-    return squeezeGet('/api/scan', token);
-  },
-  options: (walletAddress: string) => {
-    const token = generateSqueezeOSToken('options', walletAddress);
-    return squeezeGet('/api/options', token);
-  },
-  iwm: (walletAddress: string) => {
-    const token = generateSqueezeOSToken('iwm', walletAddress);
-    return squeezeGet('/api/iwm', token);
-  },
-  marketplaceRead: (listingId: string, walletAddress: string) => {
-    const token = generateSqueezeOSToken('marketplace_read', walletAddress);
-    return squeezePost('/api/marketplace/read', { listing_id: listingId }, token);
-  },
+  // PAID — walletAddress is retained in the signature for logging/attribution
+  // by callers; auth to SqueezeOS itself is the X-API-Key operator bypass
+  // above, not anything derived from the wallet address.
+  council: (symbol: string, _walletAddress: string) => squeezePost('/api/council', { symbol }),
+  scan: (_walletAddress: string) => squeezeGet('/api/scan'),
+  options: (_walletAddress: string) => squeezeGet('/api/options'),
+  iwm: (_walletAddress: string) => squeezeGet('/api/iwm'),
+  marketplaceRead: (listingId: string, _walletAddress: string) => squeezePost('/api/marketplace/read', { listing_id: listingId }),
+
+  // PAID — FTD series (SEC Reg SHO fails-to-deliver)
+  ftdThresholdList: () => squeezeGet('/api/ftd/threshold-list'),
+  ftdTimeSeries: (symbol: string, limit?: number) =>
+    squeezeGet(`/api/ftd/series/${encodeURIComponent(symbol)}${limit ? `?limit=${limit}` : ''}`),
+  ftdRatio: (symbol: string) => squeezeGet(`/api/ftd/ratio/${encodeURIComponent(symbol)}`),
+  ftdEtfBasket: (etf: string) => squeezeGet(`/api/ftd/etf-basket/${encodeURIComponent(etf)}`),
+  ftdSettlementCycle: (symbol: string) => squeezeGet(`/api/ftd/cycle/${encodeURIComponent(symbol)}`),
+
+  // PAID — CASCADE, IAM, Compliance, Max-Conviction, Content/Wallet Trust
+  cascadeSignal: (symbol: string) => squeezePost('/api/cascade/signal', { symbol }),
+  iamResolve: (symbol: string) => squeezeGet(`/api/iam/${encodeURIComponent(symbol)}`),
+  complianceAnomalyReport: (opts: { bank_id: string; agent_id: string; trigger: string; detail: string; severity?: string }) =>
+    squeezePost('/api/compliance/anomaly', opts),
+  complianceBankAudit: (bankId: string) => squeezePost('/api/compliance/audit', { bank_id: bankId }),
+  complianceRegulatorQuery: (bankId: string) => squeezeGet(`/api/compliance/regulator/query/${encodeURIComponent(bankId)}`),
+  maxConvictionSignal: (symbol: string) => squeezePost('/api/triple-lock', { symbol }),
+  contentWalletTrustScore: (content: string, senderWallet?: string) =>
+    squeezePost('/api/ccs/validate', { content, ...(senderWallet ? { sender_wallet: senderWallet } : {}) }),
 };
