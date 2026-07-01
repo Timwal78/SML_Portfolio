@@ -2,7 +2,7 @@ services:
   # ---------------------------------------------------------------------------
   # nats-paper-trader — daily paper-trading run (spec non-negotiable #1: 90
   # days minimum paper before any real capital). Runs once per weekday near
-  # market open; each run pulls fresh Yahoo Finance data, computes signals
+  # market open; each run pulls fresh Tradier market data, computes signals
   # from the 8 implemented agents, and submits Alpaca PAPER orders only —
   # scripts/paper_trade.py refuses to run if ALPACA_PAPER != "true".
   #
@@ -20,6 +20,10 @@ services:
     schedule: "35 13 * * 1-5"  # ~9:35am ET (UTC-4) on weekdays; 8:35am ET during EST — check DST
     startCommand: python scripts/paper_trade.py
     envVars:
+      - key: TRADIER_ACCESS_TOKEN
+        sync: false
+      - key: TRADIER_SANDBOX
+        value: "false"  # production account, per operator confirmation
       - key: ALPACA_API_KEY
         sync: false
       - key: ALPACA_SECRET_KEY

@@ -51,12 +51,15 @@ regime:
   labels: [risk_on, risk_off, neutral, crisis]
 
 # Paper-trading v1 launch universe. Restricted to the 8 agents that only
-# need free Yahoo Finance OHLCV + VIX data (src/data/yahoo_client.py) —
-# no paid API keys wired yet. Widen once Tradier/Polygon/etc. are live
+# need plain OHLCV + VIX data — Tradier (src/data/tradier_client.py) is the
+# live source. Widen once Polygon/Alpha Vantage/Binance/etc. are live
 # (see docs/API_REFERENCE.md's implementation-status table).
 paper_trading:
   universe: [SPY, QQQ, IWM]
-  vix_symbol: "^VIX"
+  # Tradier's index-quote symbol convention for VIX — verify against a real
+  # account once this runs somewhere with network access; some Tradier
+  # entitlements use a different symbol/prefix for index history.
+  vix_symbol: "VIX"
   lookback_days: 400  # >= 200dma + buffer for rolling factor windows
   # Bootstrap ensemble: equal-weight across the 8 implemented agents until
   # enough live signal history exists to compute rolling_30d_sharpe for the

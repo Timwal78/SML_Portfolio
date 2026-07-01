@@ -5,13 +5,18 @@ before any real capital). Pulls live data -> factors -> agents -> ensemble
 script daily — e.g. a Render cron job or background worker loop — rather
 than looping in-process, so a crash doesn't silently stop future days).
 
-v1 launch scope: only the 8 agents that run on free Yahoo Finance data are
+v1 launch scope: only the 8 agents that run on plain OHLCV + VIX data are
 wired (see config.yaml's `paper_trading.implemented_agents`). The other 12
-agents need Tradier/Polygon/Alpha Vantage/Binance credentials that aren't
-configured yet — see docs/API_REFERENCE.md's implementation-status table.
-Ensemble weighting is equal-weight across the 8 agents (bootstrap scheme)
-until enough live signal history accumulates to compute the real
+agents need Polygon/Alpha Vantage/Binance/FINRA/SEC EDGAR credentials that
+aren't configured yet — see docs/API_REFERENCE.md's implementation-status
+table. Ensemble weighting is equal-weight across the 8 agents (bootstrap
+scheme) until enough live signal history accumulates to compute the real
 rolling-30-day-Sharpe meta-learning weights.
+
+Data source: Tradier (real-time, requires TRADIER_ACCESS_TOKEN +
+TRADIER_SANDBOX). Falls back to nothing else — if Tradier is unreachable
+or misconfigured, the run fails loudly rather than silently degrading to
+a lower-quality source.
 """
 
 from __future__ import annotations
@@ -35,7 +40,7 @@ from src.agents import (
     VolumeConfirmer,
 )
 from src.data.base_client import UpstreamUnavailableError
-from src.data.yahoo_client import YahooClient
+from src.data.tradier_client import TradierClient
 from src.execution.alpaca_adapter import AlpacaExecutionAdapter
 from src.execution.base_adapter import OrderRequest
 from src.monitoring.audit_log import AuditLogger
@@ -61,7 +66,7 @@ def load_config(config_path: Path) -> dict:
 
 def run_symbol(
     symbol: str,
-    yahoo: YahooClient,
+    data_client: TradierClient,
     vix_close: pd.Series,
     agents: dict,
     lookback_days: int,
@@ -69,7 +74,7 @@ def run_symbol(
 ) -> tuple[float, float]:
     """Returns (ensemble_signal, latest_close)."""
     start = (pd.Timestamp.today().normalize() - pd.Timedelta(days=lookback_days)).strftime("%Y-%m-%d")
-    ohlcv = yahoo.get_ohlcv(symbol, start=start)
+    ohlcv = data_client.get_ohlcv(symbol, start=start)
     factor_frame = build_factor_frame(ohlcv, vix_close)
 
     signals = {}
@@ -105,7 +110,10 @@ def main() -> int:
     trade_threshold = config["ensemble"]["trade_threshold"]
 
     audit = AuditLogger(Path(__file__).parent.parent / "logs" / "audit.jsonl")
-    yahoo = YahooClient()
+    data_client = TradierClient(
+        TRADIER_ACCESS_TOKEN=os.getenv("TRADIER_ACCESS_TOKEN", ""),
+        TRADIER_SANDBOX=os.getenv("TRADIER_SANDBOX", "false"),
+    )
     risk_engine = RiskEngine(risk_cfg)
     agents = {name: cls() for name, cls in IMPLEMENTED_AGENTS.items() if name in pt_cfg["implemented_agents"]}
 
@@ -121,12 +129,12 @@ def main() -> int:
         daily_pnl_pct = (account["equity"] - account["last_equity"]) / account["last_equity"]
 
     vix_start = (pd.Timestamp.today().normalize() - pd.Timedelta(days=pt_cfg["lookback_days"])).strftime("%Y-%m-%d")
-    vix_close = yahoo.get_ohlcv(pt_cfg["vix_symbol"], start=vix_start)["close"]
+    vix_close = data_client.get_ohlcv(pt_cfg["vix_symbol"], start=vix_start)["close"]
 
     for symbol in pt_cfg["universe"]:
         try:
             ensemble_signal, latest_close = run_symbol(
-                symbol, yahoo, vix_close, agents, pt_cfg["lookback_days"], audit
+                symbol, data_client, vix_close, agents, pt_cfg["lookback_days"], audit
             )
         except UpstreamUnavailableError as exc:
             print(f"[{symbol}] SKIPPED — data unavailable: {exc}")
