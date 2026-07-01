@@ -1,0 +1,51 @@
+# NATS v2.0 — all tunable parameters. No values here should be hardcoded
+# elsewhere in src/; every module reads from this file at startup.
+
+backtest:
+  start_date: "2018-01-01"
+  end_date: "2024-12-31"
+  min_bars: 1250
+  regimes_required: [bull, bear, crisis, recovery, high_vol, low_vol]
+
+ensemble:
+  base_allocation_weight: 0.60
+  performance_weight: 0.40
+  trade_threshold: 0.05
+  rebalance_frequency: weekly
+  min_agent_weight: 0.02
+  max_agent_weight: 0.20
+  shadow_flow_cap: 0.01
+
+risk:
+  max_position_pct: 0.02
+  daily_circuit_breaker: -0.03
+  kelly_fraction: 0.25
+  var_confidence: 0.95
+  regime_confidence_min: 0.60
+  crypto_max_allocation: 0.10
+
+execution:
+  slippage_bps: 5
+  commission_per_share: 0.005
+  market_impact_bps: 3
+  no_trade_open_minutes: 15
+  no_trade_close_minutes: 15
+
+validation:
+  min_psr: 0.95
+  min_deflated_sr: 0.90
+  monte_carlo_simulations: 10000
+  max_realistic_sharpe_flag: 2.5
+  purged_kfold:
+    n_splits: 5
+    embargo_bars: 5
+  regime_coverage:
+    bull_market: 0.20
+    bear_market: 0.15
+    high_volatility: 0.15
+    crisis: 0.05
+
+regime:
+  n_clusters: 4
+  min_window_bars: 252
+  labels: [risk_on, risk_off, neutral, crisis]
