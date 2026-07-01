@@ -596,13 +596,36 @@ function extractRequirement(session: JobSession): Requirement {
 
 // ─── ENTRY HANDLER ───────────────────────────────────────────────────────────
 
+/**
+ * ACP job.description is a free-text field set at import time and echoed back
+ * verbatim on the on-chain job. OFFERINGS keys are the canonical short titles
+ * used for routing. Exact match handles the historical short-title imports;
+ * the prefix fallback handles longer marketing copy (title + " — " + Triggers
+ * keywords) that ACP may store as the job description, so long as it still
+ * begins with the exact canonical title.
+ */
+function resolveOffering(rawDescription: string): { key: string; spec: Offering } | undefined {
+  const exact = OFFERINGS[rawDescription];
+  if (exact) return { key: rawDescription, spec: exact };
+
+  let best: { key: string; spec: Offering } | undefined;
+  for (const [key, spec] of Object.entries(OFFERINGS)) {
+    if (rawDescription.startsWith(key) && (!best || key.length > best.key.length)) {
+      best = { key, spec };
+    }
+  }
+  return best;
+}
+
 async function handleEntry(session: JobSession, entry: JobRoomEntry): Promise<void> {
   if (entry.kind === 'system') {
     if (entry.event.type === 'job.funded') {
-      const offering = session.job?.description ?? '';
+      const rawDescription = session.job?.description ?? '';
+      const resolved = resolveOffering(rawDescription);
       const requirement = extractRequirement(session);
       try {
-        const result = await routeOffering(offering, requirement);
+        if (!resolved) throw new Error(`Unknown offering: ${rawDescription}`);
+        const result = await routeOffering(resolved.key, requirement);
         await session.submit(JSON.stringify(result));
       } catch (err) {
         await session.reject(`LEVIATHAN error: ${(err as Error).message}`);
@@ -613,14 +636,14 @@ async function handleEntry(session: JobSession, entry: JobRoomEntry): Promise<vo
 
   if (entry.kind === 'message' && entry.contentType === 'requirement' && session.status === 'open') {
     const msgEntry = entry as AgentMessage;
-    const offering = session.job?.description ?? '';
-    const spec = OFFERINGS[offering];
-    if (!spec) {
-      await session.reject(`LEVIATHAN does not offer: ${offering}`);
+    const rawDescription = session.job?.description ?? '';
+    const resolved = resolveOffering(rawDescription);
+    if (!resolved) {
+      await session.reject(`LEVIATHAN does not offer: ${rawDescription}`);
       return;
     }
-    if (spec.price > 0) {
-      await session.setBudget(AssetToken.usdc(spec.price, session.chainId));
+    if (resolved.spec.price > 0) {
+      await session.setBudget(AssetToken.usdc(resolved.spec.price, session.chainId));
     }
     void msgEntry;
   }
