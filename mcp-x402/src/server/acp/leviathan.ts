@@ -17,7 +17,6 @@
  *   SML_API_KEY             — SqueezeOS OPERATOR_API_KEY for X-API-Key auth
  */
 
-import { createPrivateKey } from 'crypto';
 import {
   AcpAgent,
   PrivyAlchemyEvmProviderAdapter,
@@ -25,20 +24,6 @@ import {
 } from '@virtuals-protocol/acp-node-v2';
 import type { JobSession, JobRoomEntry, AgentMessage } from '@virtuals-protocol/acp-node-v2';
 import { base } from '@account-kit/infra';
-
-// Virtuals "Add Signer" UI gives a PKCS#8 base64 private key.
-// PrivyAlchemyEvmProviderAdapter expects the raw 32-byte scalar as 0x hex.
-// This function normalises both formats so either works in ACP_SIGNER_PRIVATE_KEY.
-function parseSignerKey(key: string): `0x${string}` {
-  if (key.startsWith('0x')) return key as `0x${string}`;
-  try {
-    const der = Buffer.from(key, 'base64');
-    const pk = createPrivateKey({ key: der, format: 'der', type: 'pkcs8' });
-    const jwk = pk.export({ format: 'jwk' }) as { d?: string };
-    if (jwk.d) return `0x${Buffer.from(jwk.d, 'base64url').toString('hex')}` as `0x${string}`;
-  } catch { /* fall through */ }
-  return key as `0x${string}`;
-}
 
 // ─── CONFIG ──────────────────────────────────────────────────────────────────
 
@@ -405,30 +390,63 @@ export async function startLeviathan(): Promise<void> {
     );
   }
 
+  // Log raw ACP/Privy responses to diagnose auth failures.
+  const _origFetch = globalThis.fetch;
+  globalThis.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.href : (input as Request).url;
+    const res = await _origFetch(input, init);
+    if (url.includes('acp.virtuals.io') || url.includes('privy.io')) {
+      const clone = res.clone();
+      clone.text().then(body => {
+        console.log(`[LEVIATHAN] ${init?.method ?? 'GET'} ${url} → ${res.status} ${body.slice(0, 400)}`);
+      }).catch(() => {});
+    }
+    return res;
+  };
+
   console.log(`[LEVIATHAN] walletId=${WALLET_ID} walletAddress=${WALLET_ADDRESS}`);
   let provider: Awaited<ReturnType<typeof PrivyAlchemyEvmProviderAdapter.create>>;
   try {
     provider = await PrivyAlchemyEvmProviderAdapter.create({
       walletAddress: WALLET_ADDRESS,
       walletId: WALLET_ID,
-      signerPrivateKey: parseSignerKey(SIGNER_PRIVATE_KEY),
+      // ACP SDK passes this directly to Privy's importPKCS8PrivateKey, which expects
+      // PKCS#8 base64 — pass the key as-is from the Virtuals "Add Signer" UI.
+      signerPrivateKey: SIGNER_PRIVATE_KEY as `0x${string}`,
       chains: [base],
     });
   } catch (err: unknown) {
-    const e = err as Error & { details?: unknown; statusCode?: number };
-    console.error('[LEVIATHAN] PrivyAlchemyEvmProviderAdapter.create failed:', e.message, JSON.stringify(e.details ?? ''));
+    const e = err as Error & { details?: unknown; statusCode?: number; shortMessage?: string };
+    console.error('[LEVIATHAN] PrivyAlchemyEvmProviderAdapter.create failed:', e.message,
+      e.shortMessage ?? '', JSON.stringify(e.details ?? ''));
     throw err;
   }
-  const seller = await AcpAgent.create({ provider });
+
+  let seller: Awaited<ReturnType<typeof AcpAgent.create>>;
+  try {
+    seller = await AcpAgent.create({ provider });
+  } catch (err: unknown) {
+    const e = err as Error & { details?: unknown; statusCode?: number; shortMessage?: string };
+    console.error('[LEVIATHAN] AcpAgent.create failed:', e.message,
+      e.shortMessage ?? '', JSON.stringify(e.details ?? ''));
+    throw err;
+  }
 
   seller.on('entry', handleEntry);
 
-  await seller.start(() => {
-    console.log('LEVIATHAN online — 20 offerings on Virtuals ACP marketplace');
-    console.log(`  wallet : ${WALLET_ADDRESS}`);
-    console.log(`  mcp    : ${MCP_BASE}`);
-    console.log(`  squeeze: ${SQUEEZEOS_BASE}`);
-    console.log(`  bypass : ${BYPASS_SECRET ? 'configured' : 'WARNING: not set'}`);
-    console.log(`  apikey : ${SML_API_KEY ? 'configured' : 'WARNING: not set'}`);
-  });
+  try {
+    await seller.start(() => {
+      console.log('LEVIATHAN online — 20 offerings on Virtuals ACP marketplace');
+      console.log(`  wallet : ${WALLET_ADDRESS}`);
+      console.log(`  mcp    : ${MCP_BASE}`);
+      console.log(`  squeeze: ${SQUEEZEOS_BASE}`);
+      console.log(`  bypass : ${BYPASS_SECRET ? 'configured' : 'WARNING: not set'}`);
+      console.log(`  apikey : ${SML_API_KEY ? 'configured' : 'WARNING: not set'}`);
+    });
+  } catch (err: unknown) {
+    const e = err as Error & { details?: unknown; statusCode?: number; shortMessage?: string };
+    console.error('[LEVIATHAN] seller.start failed:', e.message,
+      e.shortMessage ?? '', JSON.stringify(e.details ?? ''));
+    throw err;
+  }
 }
