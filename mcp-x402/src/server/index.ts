@@ -112,13 +112,13 @@ async function runSSE(): Promise<void> {
   const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v);
   const buildAccepts = (resource: string, priceUnits: bigint, description: string, maxTimeoutSeconds = 300): unknown[] => {
     const units = priceUnits.toString();
-    return [{
-      scheme: 'exact', network: 'eip155:8453',
-      amount: units, maxAmountRequired: units,
-      asset: USDC_BASE_ASSET, payTo: X402_PAY_TO, maxTimeoutSeconds,
-      resource, description, mimeType: 'application/json',
-      extra: { name: 'USD Coin', version: '2' },
-    }];
+    const common = { scheme: 'exact', amount: units, maxAmountRequired: units, asset: USDC_BASE_ASSET, payTo: X402_PAY_TO, maxTimeoutSeconds, resource, description, mimeType: 'application/json' };
+    return [
+      // x402scan / standard x402 v1 clients expect x402Version:1 + network:"base"
+      { ...common, network: 'base', extra: { name: 'USD Coin', version: '2' } },
+      // Virtuals/Bazaar ACP v2 validator expects network:"eip155:8453"
+      { ...common, network: 'eip155:8453', extra: { name: 'USD Coin', version: '2' } },
+    ];
   };
   // extensions.bazaar.schema — the v2 location the crawler reads input/output from.
   const buildBazaarExtensions = (inputSchema: unknown, outputSchema: unknown): Record<string, unknown> => ({
@@ -139,9 +139,8 @@ async function runSSE(): Promise<void> {
   const requirePayment = async (req: Request, res: Response, opts: { resource: string; priceUnits: bigint; description: string; inputSchema: unknown; outputSchema: unknown }): Promise<PayResult> => {
     const accepts = buildAccepts(opts.resource, opts.priceUnits, opts.description);
     const challenge: Record<string, unknown> = {
-      x402Version: 2,
-      error: 'payment_required',
-      resource: { url: opts.resource, description: opts.description, mimeType: 'application/json' },
+      x402Version: 1,
+      error: 'X-PAYMENT header is required',
       accepts,
       extensions: buildBazaarExtensions(opts.inputSchema, opts.outputSchema),
     };
