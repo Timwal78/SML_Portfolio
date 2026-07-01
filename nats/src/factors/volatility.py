@@ -39,3 +39,10 @@ def parkinson(high: pd.Series, low: pd.Series, n: int = 20) -> pd.Series:
     factor = 1.0 / (4.0 * np.log(2.0))
     park = np.sqrt((factor * hl_ratio).rolling(n).mean())
     return park.shift(1)
+
+
+def vix_momentum(vix_close: pd.Series, n: int = 5) -> pd.Series:
+    """Rate of change of the VIX level itself — used by Agent 03/11 to
+    detect vol-spike vs vol-contraction regimes.
+    """
+    return vix_close.pct_change(n).shift(1)

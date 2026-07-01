@@ -30,7 +30,11 @@ class MeanReversionSniper(BaseAgent):
         """See module docstring for the signal rule. `factor_frame` columns
         must already be `.shift(1)`'d (see factors/lint_check.py).
         """
-        raise NotImplementedError(
-            "MeanReversionSniper.generate_signal is a scaffold stub — implement per the "
-            "signal rule in the module docstring during Phase 1/2."
-        )
+        volume_spike = factor_frame["volume_confirmation"] > 0
+        oversold = (factor_frame["rsi_14"] < 30) & volume_spike
+        overbought = (factor_frame["rsi_14"] > 70) & volume_spike
+
+        signal = pd.Series(0, index=factor_frame.index, dtype=int)
+        signal[oversold] = 1
+        signal[overbought] = -1
+        return signal

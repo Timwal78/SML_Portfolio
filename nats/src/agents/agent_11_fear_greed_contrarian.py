@@ -30,7 +30,13 @@ class FearGreedContrarian(BaseAgent):
         """See module docstring for the signal rule. `factor_frame` columns
         must already be `.shift(1)`'d (see factors/lint_check.py).
         """
-        raise NotImplementedError(
-            "FearGreedContrarian.generate_signal is a scaffold stub — implement per the "
-            "signal rule in the module docstring during Phase 1/2."
+        # vix_zscore_90d comes from src/factors/sentiment.py::vix_regime(vix_close, n=90).
+        extreme_fear = factor_frame["vix_zscore_90d"] > 2.0
+        extreme_complacency = (factor_frame["vix_zscore_90d"] < -1.0) & (
+            factor_frame["price_extension_vs_200dma"] > 0.10
         )
+
+        signal = pd.Series(0, index=factor_frame.index, dtype=int)
+        signal[extreme_fear] = 1
+        signal[extreme_complacency] = -1
+        return signal

@@ -43,3 +43,13 @@ def z_score(close: pd.Series, n: int = 20) -> pd.Series:
     std = close.rolling(n).std()
     z = (close - mean) / std
     return z.shift(1)
+
+
+def price_extension_vs_200dma(close: pd.Series, n: int = 200) -> pd.Series:
+    """Fractional distance of price above/below its long moving average —
+    used by Agent 11 to detect euphoric price extension (spec thesis:
+    "low VIX + price extension = sell").
+    """
+    ma = close.rolling(n).mean()
+    extension = (close - ma) / ma
+    return extension.shift(1)

@@ -30,7 +30,14 @@ class VolumeConfirmer(BaseAgent):
         """See module docstring for the signal rule. `factor_frame` columns
         must already be `.shift(1)`'d (see factors/lint_check.py).
         """
-        raise NotImplementedError(
-            "VolumeConfirmer.generate_signal is a scaffold stub — implement per the "
-            "signal rule in the module docstring during Phase 1/2."
-        )
+        price_rising = factor_frame["vwap_deviation"] > 0  # close trading above VWAP
+        obv_rising = factor_frame["obv"].diff() > 0
+        volume_rising = factor_frame["volume_momentum"] > 0
+
+        confirm = price_rising & volume_rising & obv_rising
+        diverge = price_rising & volume_rising & ~obv_rising
+
+        signal = pd.Series(0, index=factor_frame.index, dtype=int)
+        signal[confirm] = 1
+        signal[diverge] = -1
+        return signal
