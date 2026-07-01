@@ -154,6 +154,135 @@ export const OFFERINGS: Record<string, Offering> = {
       'Grounding oracle — fact-checks a claim against live government/FDA/SEC/Treasury data. ' +
       'Req: { claim: string, domain?: string }',
   },
+  // ── Existing x402 routes (SEC/Finance/Patent/Economic/Labor) ──────────────────
+  'SEC 13F Institutional Holdings': {
+    price: 0.25,
+    description:
+      'SEC EDGAR 13F-HR hedge fund and institutional quarterly position filings. ' +
+      'Req: { cik?: string, name?: string }',
+  },
+  'Lobbying Disclosures': {
+    price: 0.15,
+    description:
+      'Senate LDA lobbying disclosure filings — client, registrant, issue codes, and amounts. ' +
+      'Req: { client?: string, registrant?: string, issue?: string, limit?: number }',
+  },
+  'Patent Search': {
+    price: 0.10,
+    description:
+      'USPTO PatentsView patent search by keyword title or assignee company. ' +
+      'Req: { query?: string, assignee?: string, limit?: number }',
+  },
+  'FRED Economic Indicators': {
+    price: 0.08,
+    description:
+      'FRED economic indicator series (Federal Reserve Bank of St. Louis) — GDP, CPI, UNRATE, FEDFUNDS, and 800k+ others. ' +
+      'Req: { series_id: string, limit?: number }',
+  },
+  'OSHA Inspection Records': {
+    price: 0.10,
+    description:
+      'OSHA workplace inspection and violation records (DOL enforcement data). ' +
+      'Req: { establishment?: string, naics?: string, state?: string, limit?: number }',
+  },
+  'FDA 510k Device Clearances': {
+    price: 0.08,
+    description:
+      'FDA 510(k) medical device premarket clearances (openFDA). ' +
+      'Req: { device?: string, applicant?: string, limit?: number }',
+  },
+  // ── SqueezeOS extended intelligence routes ────────────────────────────────────
+  'SqueezeOS Oracle Directive': {
+    price: 0.15,
+    description:
+      'SqueezeOS OracleEngine sovereign directive for any symbol (BUY/HOLD/SELL/SHIELD + regime). ' +
+      'Req: { symbol: string }',
+  },
+  'SqueezeOS Signal History': {
+    price: 0.05,
+    description:
+      'SqueezeOS in-memory signal history ring buffer (last 200 signals for a symbol). ' +
+      'Req: { symbol: string }',
+  },
+  'SqueezeOS IWM 0DTE Scorer': {
+    price: 0.03,
+    description:
+      'SqueezeOS IWM zero-day-to-expiry contract scorer and directional bias. ' +
+      'Req: {}',
+  },
+  'SqueezeOS Full Scanner': {
+    price: 0.05,
+    description:
+      'SqueezeOS full $1–$50 squeeze scanner — 741-EMA, gamma walls, and pressure index. ' +
+      'Req: {}',
+  },
+  // ── New x402 routes ───────────────────────────────────────────────────────────
+  'SEC 10-K Annual Filing': {
+    price: 0.20,
+    description:
+      'SEC EDGAR 10-K annual report filing history by ticker. Links to full 10-K documents on sec.gov. ' +
+      'Req: { ticker: string, limit?: number }',
+  },
+  'SEC 10-Q Quarterly Filing': {
+    price: 0.15,
+    description:
+      'SEC EDGAR 10-Q quarterly report filing history by ticker. Links to full 10-Q documents on sec.gov. ' +
+      'Req: { ticker: string, limit?: number }',
+  },
+  'SEC 13D/13G Activist Filings': {
+    price: 0.20,
+    description:
+      'SEC EDGAR 13D and 13G activist investor filings — who holds 5%+ stakes in a company. ' +
+      'Req: { ticker: string, limit?: number }',
+  },
+  'FINRA BrokerCheck': {
+    price: 0.15,
+    description:
+      'FINRA BrokerCheck broker/advisor registration status and disclosure history. ' +
+      'Req: { name: string, type?: "individual"|"firm" }',
+  },
+  'FEC Campaign Finance': {
+    price: 0.10,
+    description:
+      'FEC campaign finance — candidates, committees, and contribution totals by election cycle. ' +
+      'Req: { name?: string, committee?: string, cycle?: string }',
+  },
+  'EPA Environmental Violations': {
+    price: 0.12,
+    description:
+      'EPA ECHO enforcement and environmental violation records — facility inspections and penalties. ' +
+      'Req: { facility?: string, state?: string, naics?: string }',
+  },
+  'SBIR/STTR Innovation Grants': {
+    price: 0.05,
+    description:
+      'SBIR/STTR small business innovation research grants from SBA. ' +
+      'Req: { keyword: string, agency?: string, phase?: "1"|"2", limit?: number }',
+  },
+  'Congressional Bills Search': {
+    price: 0.08,
+    description:
+      'Congress.gov bill search — legislation by keyword, congress number, and status. ' +
+      'Req: { query: string, congress?: string, limit?: number }',
+  },
+  'FDA Warning Letters': {
+    price: 0.10,
+    description:
+      'FDA warning letters — regulatory enforcement actions for violations of FDA regulations. ' +
+      'Req: { company?: string, product?: string, limit?: number }',
+  },
+  'CMS Medicare Provider Data': {
+    price: 0.10,
+    description:
+      'CMS Medicare hospital quality data (ratings, emergency services) or physician provider information. ' +
+      'Req: { name?: string, state?: string, type?: "hospital"|"physician", limit?: number }',
+  },
+  'NIH Research Grants': {
+    price: 0.05,
+    description:
+      'NIH Reporter research grant database — active NIH grants by keyword and institute (NCI, NHLBI, NIAID, etc). ' +
+      'Req: { query: string, agency?: string, fiscal_year?: number, limit?: number }',
+  },
 };
 
 // ─── BACKEND ROUTING ─────────────────────────────────────────────────────────
@@ -314,6 +443,139 @@ async function routeOffering(offering: string, req: Requirement): Promise<unknow
         ...(req.domain ? { domain: str(req.domain) } : {}),
       });
 
+    // ── Existing x402 routes (previously missing from routeOffering) ──────────
+    case 'SEC 13F Institutional Holdings':
+      return callMcp('GET', '/x402/sec-13f', undefined, {
+        ...(req.cik ? { cik: str(req.cik) } : {}),
+        ...(req.name ? { name: str(req.name) } : {}),
+      });
+
+    case 'Lobbying Disclosures':
+      return callMcp('GET', '/x402/lobbying', undefined, {
+        ...(req.client ? { client: str(req.client) } : {}),
+        ...(req.registrant ? { registrant: str(req.registrant) } : {}),
+        ...(req.issue ? { issue: str(req.issue) } : {}),
+        ...(req.limit ? { limit: str(req.limit) } : {}),
+      });
+
+    case 'Patent Search':
+      return callMcp('GET', '/x402/patents', undefined, {
+        ...(req.query ? { query: str(req.query) } : {}),
+        ...(req.assignee ? { assignee: str(req.assignee) } : {}),
+        ...(req.limit ? { limit: str(req.limit) } : {}),
+      });
+
+    case 'FRED Economic Indicators':
+      return callMcp('GET', '/x402/fred', undefined, {
+        series_id: str(req.series_id, 'GDP'),
+        ...(req.limit ? { limit: str(req.limit) } : {}),
+      });
+
+    case 'OSHA Inspection Records':
+      return callMcp('GET', '/x402/osha', undefined, {
+        ...(req.establishment ? { establishment: str(req.establishment) } : {}),
+        ...(req.naics ? { naics: str(req.naics) } : {}),
+        ...(req.state ? { state: str(req.state) } : {}),
+        ...(req.limit ? { limit: str(req.limit) } : {}),
+      });
+
+    case 'FDA 510k Device Clearances':
+      return callMcp('GET', '/x402/fda-510k', undefined, {
+        ...(req.device ? { device: str(req.device) } : {}),
+        ...(req.applicant ? { applicant: str(req.applicant) } : {}),
+        ...(req.limit ? { limit: str(req.limit) } : {}),
+      });
+
+    // ── SqueezeOS extended intelligence routes ────────────────────────────────
+    case 'SqueezeOS Oracle Directive':
+      return callSqueezeOS(`/api/oracle/${encodeURIComponent(str(req.symbol, 'SPY').toUpperCase())}`);
+
+    case 'SqueezeOS Signal History':
+      return callSqueezeOS(`/api/history/${encodeURIComponent(str(req.symbol, 'SPY').toUpperCase())}`);
+
+    case 'SqueezeOS IWM 0DTE Scorer':
+      return callSqueezeOS('/api/iwm');
+
+    case 'SqueezeOS Full Scanner':
+      return callSqueezeOS('/api/scan');
+
+    // ── New x402 routes ────────────────────────────────────────────────────────
+    case 'SEC 10-K Annual Filing':
+      return callMcp('GET', '/x402/sec-10k', undefined, {
+        ticker: str(req.ticker, str(req.symbol)),
+        ...(req.limit ? { limit: str(req.limit) } : {}),
+      });
+
+    case 'SEC 10-Q Quarterly Filing':
+      return callMcp('GET', '/x402/sec-10q', undefined, {
+        ticker: str(req.ticker, str(req.symbol)),
+        ...(req.limit ? { limit: str(req.limit) } : {}),
+      });
+
+    case 'SEC 13D/13G Activist Filings':
+      return callMcp('GET', '/x402/sec-13dg', undefined, {
+        ticker: str(req.ticker, str(req.symbol)),
+        ...(req.limit ? { limit: str(req.limit) } : {}),
+      });
+
+    case 'FINRA BrokerCheck':
+      return callMcp('GET', '/x402/finra-broker', undefined, {
+        name: str(req.name),
+        ...(req.type ? { type: str(req.type) } : {}),
+      });
+
+    case 'FEC Campaign Finance':
+      return callMcp('GET', '/x402/fec-finance', undefined, {
+        ...(req.name ? { name: str(req.name) } : {}),
+        ...(req.committee ? { committee: str(req.committee) } : {}),
+        ...(req.cycle ? { cycle: str(req.cycle) } : {}),
+      });
+
+    case 'EPA Environmental Violations':
+      return callMcp('GET', '/x402/epa-violations', undefined, {
+        ...(req.facility ? { facility: str(req.facility) } : {}),
+        ...(req.state ? { state: str(req.state) } : {}),
+        ...(req.naics ? { naics: str(req.naics) } : {}),
+      });
+
+    case 'SBIR/STTR Innovation Grants':
+      return callMcp('GET', '/x402/sbir-grants', undefined, {
+        keyword: str(req.keyword, str(req.query)),
+        ...(req.agency ? { agency: str(req.agency) } : {}),
+        ...(req.phase ? { phase: str(req.phase) } : {}),
+        ...(req.limit ? { limit: str(req.limit) } : {}),
+      });
+
+    case 'Congressional Bills Search':
+      return callMcp('GET', '/x402/congress-bills', undefined, {
+        query: str(req.query),
+        ...(req.congress ? { congress: str(req.congress) } : {}),
+        ...(req.limit ? { limit: str(req.limit) } : {}),
+      });
+
+    case 'FDA Warning Letters':
+      return callMcp('GET', '/x402/fda-warnings', undefined, {
+        ...(req.company ? { company: str(req.company) } : {}),
+        ...(req.product ? { product: str(req.product) } : {}),
+        ...(req.limit ? { limit: str(req.limit) } : {}),
+      });
+
+    case 'CMS Medicare Provider Data':
+      return callMcp('GET', '/x402/cms-providers', undefined, {
+        ...(req.name ? { name: str(req.name) } : {}),
+        ...(req.state ? { state: str(req.state) } : {}),
+        ...(req.type ? { type: str(req.type) } : {}),
+        ...(req.limit ? { limit: str(req.limit) } : {}),
+      });
+
+    case 'NIH Research Grants':
+      return callMcp('GET', '/x402/nih-grants', undefined, {
+        query: str(req.query),
+        ...(req.agency ? { agency: str(req.agency) } : {}),
+        ...(req.fiscal_year ? { fiscal_year: str(req.fiscal_year) } : {}),
+        ...(req.limit ? { limit: str(req.limit) } : {}),
+      });
+
     default:
       throw new Error(`Unknown offering: ${offering}`);
   }
@@ -436,7 +698,7 @@ export async function startLeviathan(): Promise<void> {
 
   try {
     await seller.start(() => {
-      console.log('LEVIATHAN online — 20 offerings on Virtuals ACP marketplace');
+      console.log('LEVIATHAN online — 41 offerings on Virtuals ACP marketplace');
       console.log(`  wallet : ${WALLET_ADDRESS}`);
       console.log(`  mcp    : ${MCP_BASE}`);
       console.log(`  squeeze: ${SQUEEZEOS_BASE}`);
