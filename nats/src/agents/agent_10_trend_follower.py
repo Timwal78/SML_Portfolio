@@ -30,7 +30,13 @@ class TrendFollower(BaseAgent):
         """See module docstring for the signal rule. `factor_frame` columns
         must already be `.shift(1)`'d (see factors/lint_check.py).
         """
-        raise NotImplementedError(
-            "TrendFollower.generate_signal is a scaffold stub — implement per the "
-            "signal rule in the module docstring during Phase 1/2."
-        )
+        # atr_stop/kelly_fraction inform position sizing (src/risk/risk_engine.py),
+        # not the directional signal itself — the signal is trend alignment
+        # across the short and long momentum horizons.
+        strong_up = (factor_frame["mom_5d"] > 0) & (factor_frame["mom_20d"] > 0)
+        strong_down = (factor_frame["mom_5d"] < 0) & (factor_frame["mom_20d"] < 0)
+
+        signal = pd.Series(0, index=factor_frame.index, dtype=int)
+        signal[strong_up] = 1
+        signal[strong_down] = -1
+        return signal

@@ -30,7 +30,19 @@ class BollingerBouncer(BaseAgent):
         """See module docstring for the signal rule. `factor_frame` columns
         must already be `.shift(1)`'d (see factors/lint_check.py).
         """
-        raise NotImplementedError(
-            "BollingerBouncer.generate_signal is a scaffold stub — implement per the "
-            "signal rule in the module docstring during Phase 1/2."
+        volume_spike = factor_frame["volume_confirmation"] > 0
+        lower_extreme = (
+            (factor_frame["bollinger_position"] <= 0.05)
+            & (factor_frame["rsi_14"] < 35)
+            & volume_spike
         )
+        upper_extreme = (
+            (factor_frame["bollinger_position"] >= 0.95)
+            & (factor_frame["rsi_14"] > 65)
+            & volume_spike
+        )
+
+        signal = pd.Series(0, index=factor_frame.index, dtype=int)
+        signal[lower_extreme] = 1
+        signal[upper_extreme] = -1
+        return signal

@@ -1,7 +1,6 @@
 """Unit tests for Agent 11 — FearGreedContrarian."""
 
 import pandas as pd
-import pytest
 
 from src.agents.agent_11_fear_greed_contrarian import FearGreedContrarian
 
@@ -14,14 +13,31 @@ def test_metadata_matches_spec():
     assert agent.metadata.long_only is False
 
 
-def test_generate_signal_not_yet_implemented():
-    agent = FearGreedContrarian()
-    with pytest.raises(NotImplementedError):
-        agent.generate_signal(pd.DataFrame())
+def _frame(**overrides):
+    base = {"vix_momentum": 0.0, "vix_zscore_90d": 0.0, "price_extension_vs_200dma": 0.0}
+    base.update(overrides)
+    return pd.DataFrame([base])
 
 
-@pytest.mark.skip(reason="Implement once generate_signal is built (Phase 1/2)")
 def test_signal_values_are_within_allowed_range():
     agent = FearGreedContrarian()
-    signal = agent.generate_signal(pd.DataFrame())
+    signal = agent.generate_signal(_frame())
     agent.validate_output(signal)
+
+
+def test_extreme_fear_buy_signal():
+    agent = FearGreedContrarian()
+    signal = agent.generate_signal(_frame(vix_zscore_90d=2.5))
+    assert signal.iloc[0] == 1
+
+
+def test_extreme_complacency_sell_signal():
+    agent = FearGreedContrarian()
+    signal = agent.generate_signal(_frame(vix_zscore_90d=-1.5, price_extension_vs_200dma=0.15))
+    assert signal.iloc[0] == -1
+
+
+def test_neutral_in_normal_regime():
+    agent = FearGreedContrarian()
+    signal = agent.generate_signal(_frame(vix_zscore_90d=0.5, price_extension_vs_200dma=0.02))
+    assert signal.iloc[0] == 0

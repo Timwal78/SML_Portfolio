@@ -49,3 +49,31 @@ regime:
   n_clusters: 4
   min_window_bars: 252
   labels: [risk_on, risk_off, neutral, crisis]
+
+# Paper-trading v1 launch universe. Restricted to the 8 agents that only
+# need free Yahoo Finance OHLCV + VIX data (src/data/yahoo_client.py) —
+# no paid API keys wired yet. Widen once Tradier/Polygon/etc. are live
+# (see docs/API_REFERENCE.md's implementation-status table).
+paper_trading:
+  universe: [SPY, QQQ, IWM]
+  vix_symbol: "^VIX"
+  lookback_days: 400  # >= 200dma + buffer for rolling factor windows
+  # Bootstrap ensemble: equal-weight across the 8 implemented agents until
+  # enough live signal history exists to compute rolling_30d_sharpe for the
+  # real meta-learning weights (src/ensemble/meta_learning_engine.py).
+  implemented_agents:
+    - MomentumHunter
+    - MeanReversionSniper
+    - VolRegimeDetector
+    - SeasonalityExpert
+    - BollingerBouncer
+    - VolumeConfirmer
+    - TrendFollower
+    - FearGreedContrarian
+  # Regime confidence gate needs the live expanding-window detector
+  # (Phase 2); until then this fixed value feeds src/risk/risk_engine.py's
+  # regime_confidence_min check — set >= risk.regime_confidence_min to
+  # avoid blocking every trade, and revisit once RollingRegimeDetector
+  # is wired to this loop.
+  default_regime_confidence: 0.75
+  stop_loss_pct: 0.03

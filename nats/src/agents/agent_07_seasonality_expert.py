@@ -30,7 +30,12 @@ class SeasonalityExpert(BaseAgent):
         """See module docstring for the signal rule. `factor_frame` columns
         must already be `.shift(1)`'d (see factors/lint_check.py).
         """
-        raise NotImplementedError(
-            "SeasonalityExpert.generate_signal is a scaffold stub — implement per the "
-            "signal rule in the module docstring during Phase 1/2."
-        )
+        # day_of_week_effect already carries the base +1/0/-1 calendar signal.
+        # turn_of_month (historically positive institutional rebalancing flow)
+        # can turn a neutral day positive; holiday_proximity (thin, unreliable
+        # liquidity) dampens any signal to neutral regardless of the day.
+        signal = factor_frame["day_of_week_effect"].copy()
+        signal[factor_frame["holiday_proximity"] == 1] = 0
+        turn_of_month_boost = (factor_frame["turn_of_month"] == 1) & (signal == 0)
+        signal[turn_of_month_boost] = 1
+        return signal.astype(int)

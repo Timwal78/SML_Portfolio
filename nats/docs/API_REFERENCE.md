@@ -132,13 +132,34 @@ non-negotiable #6).
 | `src/factors/*` | Fully implemented (pure pandas transforms, anti-lookahead lint passes) |
 | `src/risk/*` | Fully implemented |
 | `src/validation/*` | Fully implemented |
-| `src/ensemble/*` | Fully implemented |
+| `src/ensemble/*` | Fully implemented (used by the full 20-agent swarm; the v1 paper-trading loop uses a simpler equal-weight bootstrap — see below) |
 | `src/shadow_flow/*` | Fully implemented (scoring model only — factor inputs come from `src/factors/`) |
-| `src/regime/*` | Implemented; centroid-to-label heuristic in `_label_clusters` needs Phase 2 tuning against real regime features |
-| `src/agents/*` | Interface + metadata complete; `generate_signal` bodies are stubs (Phase 1/2) |
-| `src/data/*` | Interface only; live HTTP calls are stubs (Phase 1) |
-| `src/execution/*` | Interface only; live order submission is a stub (Phase 3) |
-| `src/monitoring/metrics.py` | Fully implemented (Prometheus) |
-| `scripts/backtest.py`, `paper_trade.py` | Orchestration stubs — wire once data/agents/execution are implemented |
+| `src/regime/*` | Implemented; centroid-to-label heuristic in `_label_clusters` needs Phase 2 tuning against real regime features. Not yet wired into `scripts/paper_trade.py` (uses a fixed `default_regime_confidence` from config.yaml in the interim) |
+| `src/agents/agent_01,02,03,07,08,09,10,11_*.py` | **Fully implemented** — MomentumHunter, MeanReversionSniper, VolRegimeDetector, SeasonalityExpert, BollingerBouncer, VolumeConfirmer, TrendFollower, FearGreedContrarian. Only need free Yahoo data. |
+| `src/agents/` (remaining 12) | Interface + metadata complete; `generate_signal` bodies are stubs — need Tradier/Polygon/Alpha Vantage/Binance/FINRA/SEC EDGAR credentials |
+| `src/data/yahoo_client.py` | **Fully implemented** (yfinance, no API key required) |
+| `src/data/` (Tradier, Polygon, Alpaca market-data, Alpha Vantage, Binance, SEC EDGAR, FINRA) | Interface only; live HTTP calls are stubs pending credentials |
+| `src/execution/alpaca_adapter.py` | **Fully implemented** (alpaca-py SDK, bracket orders with stop-loss leg, paper-only by construction) |
+| `src/execution/tradier_adapter.py` | Interface only; stub pending Tradier credentials |
+| `src/pipeline/factor_builder.py` | **Fully implemented** — builds the factor frame for the 8 Yahoo-only agents |
+| `src/monitoring/metrics.py`, `audit_log.py` | Fully implemented |
+| `scripts/paper_trade.py` | **Fully implemented and runnable** — daily loop: Yahoo data → factors → 8 agents → equal-weight ensemble → risk gate → Alpaca paper order → audit log. Requires `ALPACA_API_KEY`/`ALPACA_SECRET_KEY` env vars; run with `--dry-run` to see signals without submitting orders. **This sandboxed dev session cannot reach any external API (Yahoo, Alpaca, Tradier, etc. all blocked by network policy) — this script has only been verified with synthetic/mocked data here. It must be run somewhere with real internet access** (see `render.yaml`, a Render Cron Job) before being trusted with real paper orders. |
+| `scripts/backtest.py` | Orchestration stub — wire once more agents/data sources are implemented |
 | `scripts/live_trade.py` | Intentionally locked/unimplemented until the Phase 5 PSR/DSR gate passes |
 | `scripts/validate.py`, `monitor.py` | Fully implemented and runnable today |
+
+### v1 paper-trading launch scope
+
+`config.yaml`'s `paper_trading:` block controls the initial launch: a
+3-symbol universe (SPY, QQQ, IWM), the 8 Yahoo-only agents, and a fixed
+`default_regime_confidence` (the real expanding-window regime detector
+isn't wired into the loop yet). Ensemble weighting is a straight average
+across the 8 agents — the full `MetaLearningEnsemble` weekly-rebalance
+scheme needs live rolling-30-day-Sharpe history that doesn't exist on day
+one. Revisit both simplifications once enough paper-trading history
+accumulates and the remaining 12 agents' data sources are live.
+
+Deploy via Render as a **Cron Job** (`render.yaml`, `nats-paper-trader`),
+not a long-running worker — the script runs once per invocation and exits;
+scheduling it daily is the correct pattern for a system whose factors are
+all daily bars.

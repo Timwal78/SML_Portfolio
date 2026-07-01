@@ -1,7 +1,6 @@
 """Unit tests for Agent 07 — SeasonalityExpert."""
 
 import pandas as pd
-import pytest
 
 from src.agents.agent_07_seasonality_expert import SeasonalityExpert
 
@@ -14,14 +13,31 @@ def test_metadata_matches_spec():
     assert agent.metadata.long_only is False
 
 
-def test_generate_signal_not_yet_implemented():
-    agent = SeasonalityExpert()
-    with pytest.raises(NotImplementedError):
-        agent.generate_signal(pd.DataFrame())
+def _frame(**overrides):
+    base = {"day_of_week_effect": 0.0, "turn_of_month": 0.0, "holiday_proximity": 0.0, "options_expiry": 0.0}
+    base.update(overrides)
+    return pd.DataFrame([base])
 
 
-@pytest.mark.skip(reason="Implement once generate_signal is built (Phase 1/2)")
 def test_signal_values_are_within_allowed_range():
     agent = SeasonalityExpert()
-    signal = agent.generate_signal(pd.DataFrame())
+    signal = agent.generate_signal(_frame())
     agent.validate_output(signal)
+
+
+def test_passes_through_day_of_week_effect():
+    agent = SeasonalityExpert()
+    signal = agent.generate_signal(_frame(day_of_week_effect=1.0))
+    assert signal.iloc[0] == 1
+
+
+def test_turn_of_month_boosts_neutral_day():
+    agent = SeasonalityExpert()
+    signal = agent.generate_signal(_frame(day_of_week_effect=0.0, turn_of_month=1.0))
+    assert signal.iloc[0] == 1
+
+
+def test_holiday_proximity_dampens_signal():
+    agent = SeasonalityExpert()
+    signal = agent.generate_signal(_frame(day_of_week_effect=1.0, holiday_proximity=1.0))
+    assert signal.iloc[0] == 0

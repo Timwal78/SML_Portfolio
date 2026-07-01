@@ -30,7 +30,13 @@ class MomentumHunter(BaseAgent):
         """See module docstring for the signal rule. `factor_frame` columns
         must already be `.shift(1)`'d (see factors/lint_check.py).
         """
-        raise NotImplementedError(
-            "MomentumHunter.generate_signal is a scaffold stub — implement per the "
-            "signal rule in the module docstring during Phase 1/2."
-        )
+        horizons = ["mom_3d", "mom_5d", "mom_10d", "mom_15d", "mom_20d"]
+        positive_count = (factor_frame[horizons] > 0).sum(axis=1)
+        negative_count = (factor_frame[horizons] < 0).sum(axis=1)
+        accelerating_up = factor_frame["acceleration"] > 0
+        accelerating_down = factor_frame["acceleration"] < 0
+
+        signal = pd.Series(0, index=factor_frame.index, dtype=int)
+        signal[(positive_count >= 3) & accelerating_up] = 1
+        signal[(negative_count >= 3) & accelerating_down] = -1
+        return signal

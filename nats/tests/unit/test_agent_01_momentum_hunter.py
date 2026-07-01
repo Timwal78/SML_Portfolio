@@ -1,7 +1,6 @@
 """Unit tests for Agent 01 — MomentumHunter."""
 
 import pandas as pd
-import pytest
 
 from src.agents.agent_01_momentum_hunter import MomentumHunter
 
@@ -14,14 +13,34 @@ def test_metadata_matches_spec():
     assert agent.metadata.long_only is False
 
 
-def test_generate_signal_not_yet_implemented():
-    agent = MomentumHunter()
-    with pytest.raises(NotImplementedError):
-        agent.generate_signal(pd.DataFrame())
+def _frame(**overrides):
+    base = {"mom_3d": 0.0, "mom_5d": 0.0, "mom_10d": 0.0, "mom_15d": 0.0, "mom_20d": 0.0, "acceleration": 0.0}
+    base.update(overrides)
+    return pd.DataFrame([base])
 
 
-@pytest.mark.skip(reason="Implement once generate_signal is built (Phase 1/2)")
 def test_signal_values_are_within_allowed_range():
     agent = MomentumHunter()
-    signal = agent.generate_signal(pd.DataFrame())
+    signal = agent.generate_signal(_frame())
     agent.validate_output(signal)
+
+
+def test_buy_signal_on_aligned_accelerating_uptrend():
+    agent = MomentumHunter()
+    frame = _frame(mom_3d=0.02, mom_5d=0.03, mom_10d=0.04, mom_15d=-0.01, mom_20d=0.01, acceleration=0.02)
+    signal = agent.generate_signal(frame)
+    assert signal.iloc[0] == 1
+
+
+def test_sell_signal_on_aligned_decelerating_downtrend():
+    agent = MomentumHunter()
+    frame = _frame(mom_3d=-0.02, mom_5d=-0.03, mom_10d=-0.04, mom_15d=0.01, mom_20d=-0.01, acceleration=-0.02)
+    signal = agent.generate_signal(frame)
+    assert signal.iloc[0] == -1
+
+
+def test_neutral_when_horizons_disagree():
+    agent = MomentumHunter()
+    frame = _frame(mom_3d=0.02, mom_5d=-0.02, mom_10d=0.01, mom_15d=-0.01, mom_20d=0.0, acceleration=0.01)
+    signal = agent.generate_signal(frame)
+    assert signal.iloc[0] == 0

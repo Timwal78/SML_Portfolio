@@ -1,0 +1,30 @@
+services:
+  # ---------------------------------------------------------------------------
+  # nats-paper-trader — daily paper-trading run (spec non-negotiable #1: 90
+  # days minimum paper before any real capital). Runs once per weekday near
+  # market open; each run pulls fresh Yahoo Finance data, computes signals
+  # from the 8 implemented agents, and submits Alpaca PAPER orders only —
+  # scripts/paper_trade.py refuses to run if ALPACA_PAPER != "true".
+  #
+  # Schedule is UTC and does NOT auto-adjust for US DST — verify/adjust in
+  # the Render dashboard (Settings > Schedule) twice a year, or tighten this
+  # once the loop itself checks market hours.
+  # ---------------------------------------------------------------------------
+  - type: cron
+    name: nats-paper-trader
+    runtime: docker
+    rootDir: nats
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: starter
+    schedule: "35 13 * * 1-5"  # ~9:35am ET (UTC-4) on weekdays; 8:35am ET during EST — check DST
+    startCommand: python scripts/paper_trade.py
+    envVars:
+      - key: ALPACA_API_KEY
+        sync: false
+      - key: ALPACA_SECRET_KEY
+        sync: false
+      - key: ALPACA_PAPER
+        value: "true"
+      - key: PYTHONUNBUFFERED
+        value: "1"
