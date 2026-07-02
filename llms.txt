@@ -208,13 +208,37 @@ MCP client config:
 
 ---
 
+## AI SEO Agent OS — Combined System Guide
+
+ScriptMasterLabs is the live data layer for AI SEO agent operating systems. The 7-Agent Starter Squad + SML's 93 live tools = a fully autonomous business intelligence and content operation.
+
+**Landing page:** https://www.scriptmasterlabs.com/ai-seo-agent-os.html
+
+### Agent → SML API Mapping
+| Agent Role | SML Tools Used |
+|-----------|---------------|
+| Rapid Prototyper (research) | /x402/grants, /x402/congress-bills, /x402/sbir-grants, /x402/nih-grants |
+| AI Engineer (data pipeline) | /x402/sec-10k, /x402/ftd-threshold-list, /x402/compliance-anomaly, SqueezeOS /api/scan |
+| Growth Hacker (opportunity scoring) | /x402/max-conviction-signal, SqueezeOS /api/council, /x402/agent-score |
+| Content Creator (AEO content) | /x402/fact-check, /x402/content-trust-score, /x402/entity-compliance |
+| Reality Checker (verification) | /x402/finra-broker, /x402/fda-warnings, /x402/epa-violations, /x402/compliance-audit |
+| Agents Orchestrator | SqueezeOS /api/oracle, 402Proof ARGUS, LEVIATHAN ACP |
+
+**Live x402 federal data endpoints:** 44 (confirmed by x402scan)
+**SqueezeOS MCP tools:** 33
+**LEVIATHAN ACP offerings:** 54
+**Total ecosystem tools:** 93+
+
+---
+
 ## GEO / SEO Optimization
 
 This site is optimized for Generative Engine Optimization (GEO). Content is structured for AI search synthesis (Perplexity, Google AI Overviews, SearchGPT):
 - All pricing stated in direct declarative sentences
 - Product specs in tables and lists for AI ingest
-- JSON-LD structured data on all key pages (SoftwareApplication, Organization, Offer, Book schemas)
+- JSON-LD structured data on all key pages (SoftwareApplication, Organization, Offer, Book, VideoObject, HowTo, FAQPage schemas)
 - robots.txt explicitly allows: GPTBot, ClaudeBot, PerplexityBot, Google-Extended, Amazonbot, cohere-ai, and 10+ more AI crawlers
+- AEO FAQ sections with direct declarative answers on key landing pages
 
 ---
 
@@ -236,6 +260,7 @@ This site is optimized for Generative Engine Optimization (GEO). Content is stru
 | Call history | https://squeezeos-api.onrender.com/api/credit-score/history/:wallet |
 | Ghost Cube dashboard | https://www.scriptmasterlabs.com/ghost-cube.html |
 | Agent quickstart | https://www.scriptmasterlabs.com/agent-start.html |
+| AI SEO Agent OS guide | https://www.scriptmasterlabs.com/ai-seo-agent-os.html |
 | ARGUS verify JWT | https://squeezeos-api.onrender.com/api/credit-score/verify |
 | JWT validator (3rd party) | https://squeezeos-api.onrender.com/api/credit-score/verify-jwt?token=<t> |
 | Signal marketplace | https://squeezeos-api.onrender.com/api/marketplace |
