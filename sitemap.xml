@@ -22,8 +22,15 @@
   <url><loc>https://www.scriptmasterlabs.com/indicators.html</loc><changefreq>weekly</changefreq><priority>0.8</priority><lastmod>2026-06-24</lastmod></url>
   <url><loc>https://www.scriptmasterlabs.com/books.html</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>2026-06-24</lastmod></url>
 
+  <!-- ── SEO / Agent OS landing page ──────────────────────────────── -->
+  <url><loc>https://www.scriptmasterlabs.com/ai-seo-agent-os.html</loc><changefreq>weekly</changefreq><priority>0.95</priority><lastmod>2026-07-02</lastmod></url>
+
+  <!-- ── Agent quickstart / onboarding ─────────────────────────────── -->
+  <url><loc>https://www.scriptmasterlabs.com/agent-start.html</loc><changefreq>weekly</changefreq><priority>0.9</priority><lastmod>2026-07-02</lastmod></url>
+  <url><loc>https://www.scriptmasterlabs.com/agent-credit-bureau.html</loc><changefreq>weekly</changefreq><priority>0.85</priority><lastmod>2026-07-02</lastmod></url>
+
   <!-- ── AI / agent discovery endpoints ───────────────────────────── -->
-  <url><loc>https://www.scriptmasterlabs.com/llms.txt</loc><changefreq>weekly</changefreq><priority>0.6</priority><lastmod>2026-06-24</lastmod></url>
-  <url><loc>https://www.scriptmasterlabs.com/agents.json</loc><changefreq>weekly</changefreq><priority>0.5</priority><lastmod>2026-06-24</lastmod></url>
+  <url><loc>https://www.scriptmasterlabs.com/llms.txt</loc><changefreq>weekly</changefreq><priority>0.6</priority><lastmod>2026-07-02</lastmod></url>
+  <url><loc>https://www.scriptmasterlabs.com/agents.json</loc><changefreq>weekly</changefreq><priority>0.5</priority><lastmod>2026-07-02</lastmod></url>
 
 </urlset>
