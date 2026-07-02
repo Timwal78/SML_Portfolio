@@ -1,0 +1,52 @@
+name: SML Content Factory — Daily SEO Page
+
+on:
+  schedule:
+    # Daily at 06:00 UTC — pages go live before US market open
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+    inputs:
+      keyword_override:
+        description: 'Override keyword slug (e.g. mcp-server-trading-signals)'
+        required: false
+
+jobs:
+  generate-page:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write   # needed to commit the generated page
+
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r agent/requirements.txt
+
+      - name: Generate SEO page
+        env:
+          ANTHROPIC_API_KEY:  ${{ secrets.ANTHROPIC_API_KEY }}
+          SQUEEZEOS_BASE_URL: https://squeezeos-api.onrender.com
+          MCP_X402_BASE_URL:  https://mcp-x402.onrender.com
+          CONTENT_OUTPUT_DIR: .
+          DEPT_MODEL:         claude-opus-4-8
+        run: python agent/content_factory.py
+
+      - name: Commit and push generated page
+        run: |
+          git config user.name  "SML Content Factory"
+          git config user.email "agent@scriptmasterlabs.com"
+          git add -A
+          if git diff --staged --quiet; then
+            echo "No new page generated — nothing to commit"
+          else
+            TODAY=$(date +%Y-%m-%d)
+            git commit -m "feat(seo): auto-generated SEO page [$TODAY] — Content Factory Agent"
+            git push
+          fi
