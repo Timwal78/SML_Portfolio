@@ -885,7 +885,7 @@ html, body {
       </div>
       <div class="metric-row">
         <span class="metric-label">MCP tools</span>
-        <span class="metric-value">49</span>
+        <span class="metric-value">52</span>
       </div>
       <div class="metric-row">
         <span class="metric-label">Last heartbeat</span>
@@ -1016,7 +1016,7 @@ html, body {
             </div>
             <div class="config-row">
               <span class="config-key">MCP Tools</span>
-              <span class="config-val green">49 registered</span>
+              <span class="config-val green">52 registered</span>
             </div>
             <div class="config-row">
               <span class="config-key">AI Indexer</span>
@@ -1228,7 +1228,7 @@ html, body {
             </div>
             <div class="config-row">
               <span class="config-key">MCP tools</span>
-              <span class="config-val green">49 registered</span>
+              <span class="config-val green">52 registered</span>
             </div>
             <div class="config-row">
               <span class="config-key">Auth required</span>
@@ -1450,7 +1450,7 @@ const DISCOVERY_ENDPOINTS = [
 ];
 
 const WELLKNOWN = [
-  {file:'mcp.json',       status:'active', desc:'49 MCP tools registered'},
+  {file:'mcp.json',       status:'active', desc:'52 MCP tools registered'},
   {file:'ai-plugin.json', status:'active', desc:'ChatGPT plugin descriptor'},
   {file:'openapi.json',   status:'active', desc:'OpenAPI 3.1.0 / 44 paths'},
   {file:'agents.json',    status:'active', desc:'Agent capability manifest'},
@@ -1550,7 +1550,7 @@ function renderIndexer() {
     schema_version: 'v1',
     name_for_model: 'SqueezeOS',
     name_for_human: 'Script Master Labs — SqueezeOS',
-    description_for_model: 'Institutional-grade AI trading intelligence. 44 endpoints, 49 MCP tools, x402 RLUSD micropayments.',
+    description_for_model: 'Institutional-grade AI trading intelligence. 44 endpoints, 52 MCP tools, x402 RLUSD micropayments.',
     auth: { type: 'none' },
     api: { type: 'openapi', url: 'https://www.scriptmasterlabs.com/.well-known/openapi.json' },
     logo_url: 'https://www.scriptmasterlabs.com/favicon.ico',
@@ -1799,14 +1799,17 @@ function startHeartbeatCounter() {
 
 /* ── SIS™ — SWARM INTELLIGENCE SCORE ────────────────────── */
 const SIS_MAX = { domain: 25, coverage: 25, reach: 25, uptime: 25 };
-let sisState  = { domain: 0, coverage: 0, reach: 0, uptime: 0, pings: 0 };
+let sisState  = { domain: 0, coverage: 0, reach: 0, uptime: 0 };
 let sisAnimCurrent = 0;
 
-function computeSIS() {
+function computeSIS(networkUp) {
   const domain   = Math.round((72 / 100)  * SIS_MAX.domain);    // 18 — from AgentSwarm AI Domain Score
   const coverage = Math.round((52 / 58)   * SIS_MAX.coverage);  // 22 — 52 live / 58 theoretical endpoints (inc. 8 AEO suite)
   const reach    = Math.round((33 / 40)   * SIS_MAX.reach);     // 21 — 28 directories + 5 AI discovery files + 3 new AEO manifests
-  const uptime   = Math.min(sisState.pings, SIS_MAX.uptime);    // 0→25 — increments on each successful ping
+  // Reflects the real-time health check result — full points while the API is
+  // actually responding, zero while it isn't. Not a session-local counter, so
+  // it can't drift between tabs or reset on reload.
+  const uptime   = networkUp ? SIS_MAX.uptime : 0;
   sisState = { ...sisState, domain, coverage, reach, uptime };
   return domain + coverage + reach + uptime;
 }
@@ -1894,10 +1897,7 @@ function drawSISGauge(score) {
 }
 
 function updateSIS(networkUp) {
-  if (networkUp === true)  sisState.pings = Math.min(sisState.pings + 1, 25);
-  if (networkUp === false) sisState.pings = Math.max(sisState.pings - 2, 0);
-
-  const score = computeSIS();
+  const score = computeSIS(networkUp === true);
   const grade = getSISGrade(score);
 
   // Animate the gauge
