@@ -2,7 +2,7 @@
   "schema_version": "v1",
   "name_for_model": "SqueezeOS",
   "name_for_human": "Script Master Labs — SqueezeOS",
-  "description_for_model": "Plugin for accessing SqueezeOS, an institutional-grade AI trading intelligence MCP server operated by Script Master Labs LLC (SAM UEI: G24VZA4RLMK3). Provides 44 API endpoints including: council verdicts, squeeze scanner, options flow, IWM 0DTE scoring, oracle directives, Neo4j market graph, peer signal marketplace, agent job board, conditional escrow contracts, signal futures, and SSE event streams. Premium endpoints are gated by x402 RLUSD micropayments on the XRP Ledger via 402Proof. MCP server at /mcp exposes 49 JSON-RPC 2.0 tools. Payment flow: call endpoint → receive HTTP 402 + invoice → pay RLUSD on XRPL → retry with X-Payment-Token header.",
+  "description_for_model": "Plugin for accessing SqueezeOS, an institutional-grade AI trading intelligence MCP server operated by Script Master Labs LLC (SAM UEI: G24VZA4RLMK3). Provides 44 API endpoints including: council verdicts, squeeze scanner, options flow, IWM 0DTE scoring, oracle directives, Neo4j market graph, peer signal marketplace, agent job board, conditional escrow contracts, signal futures, and SSE event streams. Premium endpoints are gated by x402 RLUSD micropayments on the XRP Ledger via 402Proof. MCP server at /mcp exposes 52 JSON-RPC 2.0 tools. Payment flow: call endpoint → receive HTTP 402 + invoice → pay RLUSD on XRPL → retry with X-Payment-Token header.",
   "description_for_human": "Access real-time trading signals, squeeze alerts, and AI market intelligence from Script Master Labs. 44 live endpoints. Pay per call with RLUSD — no subscriptions.",
   "auth": { "type": "none" },
   "api": {

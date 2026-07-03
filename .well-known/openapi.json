@@ -59,7 +59,7 @@
     "/.well-known/mcp": {
       "get": {
         "tags": ["discovery"],
-        "summary": "MCP tool catalog (46 tools)",
+        "summary": "MCP tool catalog (52 tools)",
         "responses": { "200": { "description": "Tool catalog manifest" } }
       }
     },
