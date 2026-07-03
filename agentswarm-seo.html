@@ -881,7 +881,7 @@ html, body {
       </div>
       <div class="metric-row">
         <span class="metric-label">API endpoints</span>
-        <span class="metric-value">44</span>
+        <span class="metric-value" data-live-count>44</span>
       </div>
       <div class="metric-row">
         <span class="metric-label">MCP tools</span>
@@ -937,7 +937,7 @@ html, body {
             <span class="stat-label">ENGINES LIVE</span>
           </div>
           <div class="stat-block">
-            <span class="stat-val">44</span>
+            <span class="stat-val" data-live-count>44</span>
             <span class="stat-label">API ENDPOINTS</span>
           </div>
           <div class="stat-block">
@@ -1299,6 +1299,55 @@ const ENDPOINTS = [
   {method:'GET', path:'/.well-known/openapi.json',desc:'Full OpenAPI 3.1.0 specification',                       cat:'Discovery',  free:true},
   {method:'GET', path:'/.well-known/ai-plugin.json',desc:'ChatGPT / LLM plugin descriptor',                     cat:'Discovery',  free:true},
 ];
+
+/* ── LIVE ENDPOINT PRELOAD ──────────────────────────────────
+   Fetches openapi.json from SqueezeOS at load time and merges
+   live paths with local cost/category metadata. Falls back to
+   the hardcoded 44 above if CORS or network blocks the fetch. */
+const EP_META = {};
+ENDPOINTS.forEach(ep => {
+  EP_META[ep.path] = { cat: ep.cat, free: ep.free, cost: ep.cost || null, desc: ep.desc };
+});
+
+async function loadLiveEndpoints() {
+  try {
+    const res = await fetch('https://squeezeos-api.onrender.com/.well-known/openapi.json', {
+      signal: AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const spec = await res.json();
+    const paths = spec.paths || {};
+
+    const live = [];
+    for (const [path, methods] of Object.entries(paths)) {
+      for (const [method, opObj] of Object.entries(methods)) {
+        if (!['get','post','put','delete','patch'].includes(method)) continue;
+        const meta = EP_META[path] || {};
+        live.push({
+          method: method.toUpperCase(),
+          path,
+          desc:  opObj.summary || opObj.description || meta.desc || '',
+          cat:   meta.cat  || 'Other',
+          free:  meta.free !== undefined ? meta.free : true,
+          cost:  meta.cost || null
+        });
+      }
+    }
+
+    if (live.length > 0) {
+      ENDPOINTS.length = 0;
+      live.forEach(ep => ENDPOINTS.push(ep));
+      renderEndpoints();
+      // Sync the count chips to the live number
+      const liveCount = live.length;
+      document.querySelectorAll('[data-live-count]').forEach(el => {
+        el.textContent = liveCount;
+      });
+    }
+  } catch (_) {
+    // CORS or network error — hardcoded fallback already rendered
+  }
+}
 
 const DIRECTORIES = [
   {name:'Smithery.ai',          url:'smithery.ai',               cat:'MCP Registry',  status:'pending'},
@@ -1850,7 +1899,8 @@ function updateSIS(networkUp) {
 }
 
 /* ── BOOT ── */
-renderEndpoints();
+renderEndpoints();   // draw hardcoded 44 immediately
+loadLiveEndpoints(); // async: overwrite with live spec if CORS allows
 renderDirectories();
 renderCampaigns();
 renderIndexer();
