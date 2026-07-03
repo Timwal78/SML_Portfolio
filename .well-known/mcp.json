@@ -4,6 +4,17 @@
   "description": "x402 payment rails, AI-native tools, and MCP servers for the agentic web. USDC on Base · RLUSD on XRPL · XAH on Xahau.",
   "servers": [
     {
+      "name": "x402 Data API",
+      "url": "https://mcp-x402.onrender.com",
+      "transport": "http",
+      "description": "44-endpoint U.S. federal data API — grants, SEC filings, healthcare, FTD registry, compliance, market signals. Pay-per-call in USDC on Base via x402. No subscriptions.",
+      "payment_protocol": "x402",
+      "payment_assets": ["USDC/Base"],
+      "openapi": "https://mcp-x402.onrender.com/.well-known/openapi.json",
+      "health": "https://mcp-x402.onrender.com/health",
+      "stats": "https://mcp-x402.onrender.com/api/stats"
+    },
+    {
       "name": "SqueezeOS MCP",
       "url": "https://squeezeos-api.onrender.com/mcp",
       "transport": "streamable-http",
