@@ -1,0 +1,1917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgentSwarm SEO — Script Master Labs Command Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --void:     #030308;
+  --surface:  #0a0a18;
+  --panel:    #0f0f22;
+  --border:   #1e1e3a;
+  --border2:  #2a2a4a;
+  --violet:   #7c3aed;
+  --violet2:  #9f5cff;
+  --cyan:     #06b6d4;
+  --cyan2:    #22d3ee;
+  --green:    #10ff80;
+  --green2:   #00cc66;
+  --amber:    #f59e0b;
+  --red:      #ef4444;
+  --text1:    #e2e8f0;
+  --text2:    #94a3b8;
+  --text3:    #4a5568;
+  --mono:     'JetBrains Mono', monospace;
+  --sans:     'Space Grotesk', system-ui, sans-serif;
+}
+
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+
+html, body {
+  height: 100%;
+  background: var(--void);
+  color: var(--text1);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.5;
+  overflow: hidden;
+}
+
+/* ── TOPBAR ──────────────────────────────────────────────── */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 52px;
+  padding: 0 20px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+}
+
+.logo {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 180px;
+}
+.logo-title {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text1);
+}
+.logo-sub {
+  font-size: 10px;
+  color: var(--text3);
+  letter-spacing: 0.04em;
+}
+
+.url-bar {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0 12px;
+  height: 32px;
+  max-width: 480px;
+}
+.url-bar svg { color: var(--cyan); flex-shrink: 0; }
+.url-bar span {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.model-badge {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--violet2);
+  background: rgba(124,58,237,.15);
+  border: 1px solid rgba(124,58,237,.3);
+  border-radius: 4px;
+  padding: 3px 8px;
+  white-space: nowrap;
+}
+
+#swarm-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid;
+  cursor: default;
+  transition: all 0.4s;
+  white-space: nowrap;
+}
+#swarm-pill.checking { color: var(--amber); border-color: rgba(245,158,11,.3); background: rgba(245,158,11,.08); }
+#swarm-pill.online   { color: var(--green); border-color: rgba(16,255,128,.3); background: rgba(16,255,128,.08); }
+#swarm-pill.offline  { color: var(--red);   border-color: rgba(239,68,68,.3);  background: rgba(239,68,68,.08);  }
+#swarm-pill .dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+#swarm-pill.online .dot { animation: pulse-dot 1.4s ease-in-out infinite; }
+@keyframes pulse-dot {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.4; transform: scale(1.4); }
+}
+
+/* ── LAYOUT ──────────────────────────────────────────────── */
+.layout {
+  display: flex;
+  height: 100vh;
+  padding-top: 52px;
+}
+
+/* ── SIDEBAR ─────────────────────────────────────────────── */
+.sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.nav {
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--text2);
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: left;
+  width: 100%;
+}
+.nav-btn:hover { background: var(--panel); color: var(--text1); }
+.nav-btn.active { background: rgba(124,58,237,.15); color: var(--violet2); }
+.nav-btn svg { flex-shrink: 0; }
+
+.sidebar-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 16px;
+}
+
+/* Radar section */
+.radar-section {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.radar-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--text3);
+  text-align: center;
+}
+.radar-wrap {
+  position: relative;
+  width: 180px;
+  height: 180px;
+}
+#radar-canvas {
+  width: 180px;
+  height: 180px;
+  display: block;
+}
+.radar-center-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+#status-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  transition: color 0.4s;
+}
+#status-label.online  { color: var(--green); }
+#status-label.offline { color: var(--red); }
+#status-label.checking { color: var(--amber); }
+#ping-display {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text3);
+  margin-top: 2px;
+}
+
+/* Sidebar metrics */
+.sidebar-metrics {
+  padding: 0 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.metric-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.metric-label { font-size: 11px; color: var(--text3); }
+.metric-value { font-family: var(--mono); font-size: 11px; color: var(--text2); }
+.metric-value.live { color: var(--green); }
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+}
+.domain-score-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.domain-score-label {
+  font-size: 10px;
+  color: var(--text3);
+  letter-spacing: 0.08em;
+}
+.score-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.score-num {
+  font-family: var(--mono);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--cyan);
+}
+.score-track {
+  flex: 1;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.score-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--violet), var(--cyan));
+  border-radius: 2px;
+  width: 72%;
+  transition: width 1s ease;
+}
+
+/* ── MAIN CONTENT ────────────────────────────────────────── */
+.main {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.tab-panel { display: none; flex: 1; }
+.tab-panel.active { display: flex; flex-direction: column; }
+
+/* ── SWARM CENTER TAB ────────────────────────────────────── */
+.panel-header {
+  padding: 20px 24px 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.panel-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text1);
+}
+.panel-sub {
+  font-size: 12px;
+  color: var(--text3);
+  margin-top: 2px;
+}
+
+.beastmode-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--red);
+  background: rgba(239,68,68,.1);
+  border: 1px solid rgba(239,68,68,.25);
+  border-radius: 4px;
+  padding: 4px 10px;
+  flex-shrink: 0;
+  animation: bm-pulse 2s ease-in-out infinite;
+}
+.beastmode-badge .bm-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--red);
+  animation: pulse-dot 1s ease-in-out infinite;
+}
+@keyframes bm-pulse {
+  0%,100% { border-color: rgba(239,68,68,.25); }
+  50%      { border-color: rgba(239,68,68,.55); }
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding: 16px 24px;
+}
+.content-grid.full { grid-template-columns: 1fr; }
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.card-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.card-title {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--text2);
+}
+.card-body { padding: 16px; }
+
+/* config rows */
+.config-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+.config-row:last-child { border-bottom: none; }
+.config-key { font-size: 12px; color: var(--text3); min-width: 120px; }
+.config-val { font-family: var(--mono); font-size: 12px; color: var(--cyan); }
+.config-val.violet { color: var(--violet2); }
+.config-val.green  { color: var(--green); }
+
+/* live stats row */
+.live-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border);
+}
+.stat-block {
+  background: var(--panel);
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.stat-val {
+  font-family: var(--mono);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--cyan);
+  font-variant-numeric: tabular-nums;
+}
+.stat-label { font-size: 10px; color: var(--text3); letter-spacing: 0.06em; }
+
+/* endpoint table */
+.ep-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.ep-search {
+  flex: 1;
+  min-width: 160px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-family: var(--sans);
+  font-size: 12px;
+  color: var(--text1);
+  outline: none;
+}
+.ep-search::placeholder { color: var(--text3); }
+.ep-search:focus { border-color: var(--violet); }
+
+.filter-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  border: 1px solid var(--border2);
+  background: transparent;
+  color: var(--text3);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: var(--sans);
+}
+.chip:hover { border-color: var(--border2); color: var(--text2); }
+.chip.active { background: rgba(124,58,237,.15); border-color: var(--violet); color: var(--violet2); }
+
+.ep-table-wrap { overflow-x: auto; }
+.ep-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.ep-table th {
+  text-align: left;
+  padding: 8px 12px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--text3);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.ep-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.ep-table tr:last-child td { border-bottom: none; }
+.ep-table tr:hover td { background: rgba(255,255,255,.02); }
+
+.method-badge {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 3px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+.method-GET    { background: rgba(6,182,212,.15); color: var(--cyan); border: 1px solid rgba(6,182,212,.3); }
+.method-POST   { background: rgba(124,58,237,.15); color: var(--violet2); border: 1px solid rgba(124,58,237,.3); }
+.method-SSE    { background: rgba(16,255,128,.1); color: var(--green); border: 1px solid rgba(16,255,128,.25); }
+
+.ep-path { font-family: var(--mono); font-size: 12px; color: var(--text1); }
+.ep-desc { color: var(--text2); font-size: 12px; }
+.ep-cost-free  { color: var(--green); font-family: var(--mono); font-size: 11px; }
+.ep-cost-paid  { color: var(--amber); font-family: var(--mono); font-size: 11px; }
+.cat-pill {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid var(--border2);
+  color: var(--text3);
+  white-space: nowrap;
+}
+
+/* ── BACKLINKS TAB ───────────────────────────────────────── */
+.directory-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+  padding: 16px 24px;
+}
+.dir-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.dir-name { font-size: 13px; font-weight: 600; color: var(--text1); }
+.dir-url  { font-size: 11px; color: var(--text3); font-family: var(--mono); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dir-status {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 2px 6px;
+  border-radius: 3px;
+  align-self: flex-start;
+}
+.dir-status.listed   { background: rgba(16,255,128,.1); color: var(--green); border: 1px solid rgba(16,255,128,.25); }
+.dir-status.pending  { background: rgba(245,158,11,.1); color: var(--amber); border: 1px solid rgba(245,158,11,.25); }
+.dir-status.unlisted { background: rgba(239,68,68,.1); color: var(--red); border: 1px solid rgba(239,68,68,.25); }
+.dir-category { font-size: 10px; color: var(--text3); }
+
+/* ── AD CAMPAIGNS TAB ────────────────────────────────────── */
+.subreddit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 8px;
+  padding: 0 24px 16px;
+}
+.sub-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.sub-name { font-size: 13px; font-weight: 600; color: var(--violet2); }
+.sub-focus { font-size: 11px; color: var(--text3); }
+.sub-priority {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--amber);
+  margin-top: 2px;
+}
+
+.keyword-list { padding: 0 24px 24px; display: flex; flex-wrap: wrap; gap: 8px; }
+.kw-chip {
+  background: rgba(6,182,212,.08);
+  border: 1px solid rgba(6,182,212,.2);
+  border-radius: 4px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-family: var(--mono);
+  color: var(--cyan);
+}
+
+/* ── AI INDEXER TAB ──────────────────────────────────────── */
+.indexer-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding: 16px 24px;
+}
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: var(--panel);
+  border: 1px solid rgba(16,255,128,.2);
+  border-radius: 8px;
+  margin: 0 24px 16px;
+}
+.toggle-info { display: flex; flex-direction: column; gap: 3px; }
+.toggle-title { font-size: 14px; font-weight: 600; color: var(--text1); }
+.toggle-desc { font-size: 12px; color: var(--text3); }
+.toggle-on {
+  background: var(--green);
+  color: var(--void);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.code-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 14px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text2);
+  overflow-x: auto;
+  line-height: 1.7;
+  white-space: pre;
+}
+.code-block .key   { color: var(--cyan); }
+.code-block .str   { color: var(--green2); }
+.code-block .punc  { color: var(--text3); }
+
+/* ── ACTIVITY BAR ────────────────────────────────────────── */
+.activity-bar {
+  position: fixed;
+  bottom: 0; left: 220px; right: 0;
+  height: 32px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  overflow: hidden;
+}
+.activity-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--text3);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.activity-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse-dot 1.4s infinite; flex-shrink: 0; }
+.activity-scroll-wrap { flex: 1; overflow: hidden; position: relative; }
+.activity-scroll {
+  display: flex;
+  gap: 0;
+  white-space: nowrap;
+  animation: scroll-left 40s linear infinite;
+}
+.activity-item {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text3);
+  padding-right: 80px;
+}
+.activity-item .agent { color: var(--cyan); font-weight: 500; }
+.activity-item .action { color: var(--text2); }
+@keyframes scroll-left {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ── SCROLLBAR ───────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+/* ── SECTION SPACING ─────────────────────────────────────── */
+.section-pad { padding: 16px 24px; }
+.section-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--text3);
+  margin-bottom: 12px;
+}
+
+/* hidden row */
+.ep-row-hidden { display: none; }
+
+/* ── SIS™ GAUGE ──────────────────────────────────────────── */
+.sis-sidebar {
+  padding: 14px 16px 16px;
+}
+.sis-sidebar-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--text3);
+  margin-bottom: 8px;
+}
+.sis-big {
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+  margin-bottom: 2px;
+}
+.sis-big-num {
+  font-family: var(--mono);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--cyan);
+  text-shadow: 0 0 14px rgba(6,182,212,0.55);
+}
+.sis-big-denom {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--text3);
+}
+.sis-grade-text {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+}
+.sis-mini-bars { display: flex; flex-direction: column; gap: 4px; }
+.sis-mini-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 9px;
+  color: var(--text3);
+}
+.sis-mini-row span { width: 44px; flex-shrink: 0; }
+.sis-mini-track {
+  flex: 1;
+  height: 3px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.sis-mini-track div { height: 100%; border-radius: 2px; transition: width 1.2s ease; }
+
+/* SIS card */
+.sis-card-body {
+  padding: 20px 24px;
+  display: flex;
+  gap: 28px;
+  align-items: center;
+}
+#sis-canvas { flex-shrink: 0; }
+.sis-detail { flex: 1; min-width: 0; }
+.sis-headline {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.sis-headline-num {
+  font-family: var(--mono);
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--cyan);
+  text-shadow: 0 0 20px rgba(6,182,212,0.4);
+}
+.sis-headline-meta { display: flex; flex-direction: column; gap: 4px; }
+.sis-grade-badge {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+.sis-desc { font-size: 12px; color: var(--text3); max-width: 280px; }
+.sis-dims { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+.sis-dim {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sis-dim-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  width: 64px;
+  flex-shrink: 0;
+}
+.sis-dim-bar {
+  flex: 1;
+  height: 5px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.sis-dim-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.sis-dim-val {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text2);
+  width: 24px;
+  text-align: right;
+}
+.sis-footnote {
+  font-size: 10px;
+  color: var(--text3);
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+  line-height: 1.6;
+}
+</style>
+</head>
+<body>
+
+<!-- ── TOPBAR ── -->
+<header class="topbar">
+  <div class="logo">
+    <span class="logo-title">AGENTSWARM SEO</span>
+    <span class="logo-sub">Script Master Labs — Command Center</span>
+  </div>
+
+  <div class="url-bar">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+    <span>squeezeos-api.onrender.com · scriptmasterlabs.com</span>
+  </div>
+
+  <div class="topbar-right">
+    <span class="model-badge">claude-opus-4-8</span>
+    <div id="swarm-pill" class="swarm-pill checking">
+      <span class="dot"></span>
+      <span id="pill-text">CHECKING…</span>
+    </div>
+  </div>
+</header>
+
+<!-- ── LAYOUT ── -->
+<div class="layout">
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar">
+    <nav class="nav">
+      <button class="nav-btn active" onclick="switchTab('swarm', this)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+        Swarm Center
+      </button>
+      <button class="nav-btn" onclick="switchTab('backlinks', this)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        Backlinks
+      </button>
+      <button class="nav-btn" onclick="switchTab('campaigns', this)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        Ad Campaigns
+      </button>
+      <button class="nav-btn" onclick="switchTab('indexer', this)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        AI Indexer
+      </button>
+    </nav>
+
+    <div class="sidebar-divider"></div>
+
+    <!-- Radar -->
+    <div class="radar-section">
+      <div class="radar-label">SWARM INTELLIGENCE</div>
+      <div class="radar-wrap">
+        <canvas id="radar-canvas" width="180" height="180"></canvas>
+        <div class="radar-center-text">
+          <span id="status-label" class="status-label checking">CHECKING</span>
+          <span id="ping-display"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <!-- Metrics -->
+    <div class="sidebar-metrics">
+      <div class="metric-row">
+        <span class="metric-label">Engines online</span>
+        <span class="metric-value live" id="metric-engines">—</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">API endpoints</span>
+        <span class="metric-value" data-live-count>44</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">MCP tools</span>
+        <span class="metric-value">49</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Last heartbeat</span>
+        <span class="metric-value" id="metric-heartbeat">—</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Payment protocol</span>
+        <span class="metric-value">x402 / RLUSD</span>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="sis-sidebar">
+        <div class="sis-sidebar-label">SIS™ COMPOSITE</div>
+        <div class="sis-big">
+          <span class="sis-big-num" id="sis-num">—</span>
+          <span class="sis-big-denom">/100</span>
+        </div>
+        <div class="sis-grade-text" id="sis-grade" style="color:var(--text3)">INITIALIZING…</div>
+        <div class="sis-mini-bars" id="sis-mini-bars">
+          <div class="sis-mini-row"><span>Domain</span><div class="sis-mini-track"><div id="sm-domain" style="width:0%;background:var(--cyan)"></div></div></div>
+          <div class="sis-mini-row"><span>Coverage</span><div class="sis-mini-track"><div id="sm-coverage" style="width:0%;background:var(--violet2)"></div></div></div>
+          <div class="sis-mini-row"><span>Reach</span><div class="sis-mini-track"><div id="sm-reach" style="width:0%;background:var(--amber)"></div></div></div>
+          <div class="sis-mini-row"><span>Uptime</span><div class="sis-mini-track"><div id="sm-uptime" style="width:0%;background:var(--green)"></div></div></div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── MAIN ── -->
+  <main class="main" style="padding-bottom:32px">
+
+    <!-- ── TAB: SWARM CENTER ── -->
+    <div class="tab-panel active" id="tab-swarm">
+
+      <div class="panel-header">
+        <div>
+          <div class="panel-title">Swarm Center</div>
+          <div class="panel-sub">Script Master Labs — SqueezeOS Intelligence Network · 44 Live Endpoints</div>
+        </div>
+        <div class="beastmode-badge"><span class="bm-dot"></span> BEASTMODE ACTIVE</div>
+      </div>
+
+      <!-- Live stats -->
+      <div class="section-pad" style="padding-bottom:0">
+        <div class="live-stats card" style="border-radius:8px">
+          <div class="stat-block">
+            <span class="stat-val" id="stat-engines">—</span>
+            <span class="stat-label">ENGINES LIVE</span>
+          </div>
+          <div class="stat-block">
+            <span class="stat-val" data-live-count>44</span>
+            <span class="stat-label">API ENDPOINTS</span>
+          </div>
+          <div class="stat-block">
+            <span class="stat-val" id="stat-ping">—</span>
+            <span class="stat-label">PING (ms)</span>
+          </div>
+          <div class="stat-block">
+            <span class="stat-val" id="stat-status">—</span>
+            <span class="stat-label">API STATUS</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Config card -->
+      <div class="content-grid" style="padding-bottom:0">
+        <div class="card">
+          <div class="card-header"><span class="card-title">SWARM TARGET CONFIGURATION</span></div>
+          <div class="card-body">
+            <div class="config-row">
+              <span class="config-key">Domain URL</span>
+              <span class="config-val">scriptmasterlabs.com</span>
+            </div>
+            <div class="config-row">
+              <span class="config-key">API Base</span>
+              <span class="config-val">squeezeos-api.onrender.com</span>
+            </div>
+            <div class="config-row">
+              <span class="config-key">Brand</span>
+              <span class="config-val">Script Master Labs LLC</span>
+            </div>
+            <div class="config-row">
+              <span class="config-key">SAM UEI</span>
+              <span class="config-val">G24VZA4RLMK3</span>
+            </div>
+            <div class="config-row">
+              <span class="config-key">CAGE Code</span>
+              <span class="config-val">21U51</span>
+            </div>
+            <div class="config-row">
+              <span class="config-key">Swarm Profile</span>
+              <span class="config-val green">Full Swarm</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><span class="card-title">LLM ENGINE</span></div>
+          <div class="card-body">
+            <div class="config-row">
+              <span class="config-key">Model</span>
+              <span class="config-val violet">claude-opus-4-8</span>
+            </div>
+            <div class="config-row">
+              <span class="config-key">MCP endpoint</span>
+              <span class="config-val">/mcp</span>
+            </div>
+            <div class="config-row">
+              <span class="config-key">Payment</span>
+              <span class="config-val">x402 / RLUSD</span>
+            </div>
+            <div class="config-row">
+              <span class="config-key">Protocol</span>
+              <span class="config-val">JSON-RPC 2.0</span>
+            </div>
+            <div class="config-row">
+              <span class="config-key">MCP Tools</span>
+              <span class="config-val green">49 registered</span>
+            </div>
+            <div class="config-row">
+              <span class="config-key">AI Indexer</span>
+              <span class="config-val green">ENABLED</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SIS™ Card -->
+      <div class="section-pad" style="padding-bottom:0">
+        <div class="section-title">SIS™ — SWARM INTELLIGENCE SCORE</div>
+        <div class="card">
+          <div class="sis-card-body">
+            <canvas id="sis-canvas" width="160" height="160"></canvas>
+            <div class="sis-detail">
+              <div class="sis-headline">
+                <span class="sis-headline-num" id="sis-card-num">—</span>
+                <div class="sis-headline-meta">
+                  <span class="sis-grade-badge" id="sis-grade-badge" style="color:var(--text3)">INITIALIZING</span>
+                  <span class="sis-desc" id="sis-desc">Establishing swarm vector baseline…</span>
+                </div>
+              </div>
+              <div class="sis-dims">
+                <div class="sis-dim">
+                  <span class="sis-dim-label" style="color:var(--cyan)">DOMAIN</span>
+                  <div class="sis-dim-bar"><div class="sis-dim-fill" id="sis-bar-domain" style="width:0%;background:var(--cyan)"></div></div>
+                  <span class="sis-dim-val" id="sis-val-domain">—</span>
+                </div>
+                <div class="sis-dim">
+                  <span class="sis-dim-label" style="color:var(--violet2)">COVERAGE</span>
+                  <div class="sis-dim-bar"><div class="sis-dim-fill" id="sis-bar-coverage" style="width:0%;background:var(--violet2)"></div></div>
+                  <span class="sis-dim-val" id="sis-val-coverage">—</span>
+                </div>
+                <div class="sis-dim">
+                  <span class="sis-dim-label" style="color:var(--amber)">REACH</span>
+                  <div class="sis-dim-bar"><div class="sis-dim-fill" id="sis-bar-reach" style="width:0%;background:var(--amber)"></div></div>
+                  <span class="sis-dim-val" id="sis-val-reach">—</span>
+                </div>
+                <div class="sis-dim">
+                  <span class="sis-dim-label" style="color:var(--green)">UPTIME</span>
+                  <div class="sis-dim-bar"><div class="sis-dim-fill" id="sis-bar-uptime" style="width:0%;background:var(--green)"></div></div>
+                  <span class="sis-dim-val" id="sis-val-uptime">—</span>
+                </div>
+              </div>
+              <div class="sis-footnote">Proprietary SML composite metric &mdash; Domain Authority (25pt) &times; API Coverage (25pt) &times; Discovery Reach (25pt) &times; Network Uptime (25pt)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Endpoint table -->
+      <div class="section-pad">
+        <div class="section-title">ALL 44 API ENDPOINTS</div>
+        <div class="card">
+          <div class="ep-controls">
+            <input class="ep-search" type="text" id="ep-search" placeholder="Search endpoints…" oninput="filterEndpoints()">
+            <div class="filter-chips">
+              <button class="chip active" onclick="filterCat('all', this)">All</button>
+              <button class="chip" onclick="filterCat('Core', this)">Core</button>
+              <button class="chip" onclick="filterCat('Market', this)">Market</button>
+              <button class="chip" onclick="filterCat('Premium', this)">Premium</button>
+              <button class="chip" onclick="filterCat('MCP', this)">MCP</button>
+              <button class="chip" onclick="filterCat('Marketplace', this)">Marketplace</button>
+              <button class="chip" onclick="filterCat('Discovery', this)">Discovery</button>
+            </div>
+          </div>
+          <div class="ep-table-wrap">
+            <table class="ep-table" id="ep-table">
+              <thead>
+                <tr>
+                  <th>METHOD</th>
+                  <th>PATH</th>
+                  <th>DESCRIPTION</th>
+                  <th>COST</th>
+                  <th>CAT</th>
+                </tr>
+              </thead>
+              <tbody id="ep-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div><!-- /tab-swarm -->
+
+    <!-- ── TAB: BACKLINKS ── -->
+    <div class="tab-panel" id="tab-backlinks">
+      <div class="panel-header">
+        <div>
+          <div class="panel-title">Backlinks — Directory Ranger</div>
+          <div class="panel-sub">25 AI/Dev directories tracked · Next ranger run: Monday 08:00 ET</div>
+        </div>
+        <div class="beastmode-badge"><span class="bm-dot"></span> 24/7 BEASTMODE</div>
+      </div>
+
+      <div class="section-pad" style="padding-bottom:0">
+        <div class="live-stats card" style="border-radius:8px">
+          <div class="stat-block">
+            <span class="stat-val">2</span>
+            <span class="stat-label">CONFIRMED LISTED</span>
+          </div>
+          <div class="stat-block">
+            <span class="stat-val">23</span>
+            <span class="stat-label">PENDING SUBMISSION</span>
+          </div>
+          <div class="stat-block">
+            <span class="stat-val">25</span>
+            <span class="stat-label">DIRECTORIES TRACKED</span>
+          </div>
+          <div class="stat-block">
+            <span class="stat-val">8%</span>
+            <span class="stat-label">COVERAGE</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-pad" style="padding-bottom:4px">
+        <div class="section-title">DIRECTORY TARGETS</div>
+      </div>
+      <div class="directory-grid" id="directory-grid"></div>
+    </div><!-- /tab-backlinks -->
+
+    <!-- ── TAB: AD CAMPAIGNS ── -->
+    <div class="tab-panel" id="tab-campaigns">
+      <div class="panel-header">
+        <div>
+          <div class="panel-title">Ad Campaigns — Community Scout</div>
+          <div class="panel-sub">12 subreddits + HackerNews · Developer conversation targeting</div>
+        </div>
+        <div class="beastmode-badge"><span class="bm-dot"></span> 24/7 BEASTMODE</div>
+      </div>
+
+      <div class="section-pad" style="padding-bottom:0">
+        <div class="live-stats card" style="border-radius:8px">
+          <div class="stat-block">
+            <span class="stat-val">13</span>
+            <span class="stat-label">CHANNELS MONITORED</span>
+          </div>
+          <div class="stat-block">
+            <span class="stat-val">12</span>
+            <span class="stat-label">SEARCH QUERIES</span>
+          </div>
+          <div class="stat-block">
+            <span class="stat-val">30</span>
+            <span class="stat-label">SEO KEYWORDS</span>
+          </div>
+          <div class="stat-block">
+            <span class="stat-val">Mon</span>
+            <span class="stat-label">NEXT SCOUT RUN</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-pad" style="padding-bottom:4px">
+        <div class="section-title">COMMUNITY TARGETS</div>
+      </div>
+      <div class="subreddit-grid" id="subreddit-grid"></div>
+
+      <div class="section-pad" style="padding-bottom:4px; padding-top:4px">
+        <div class="section-title">SEARCH QUERY TARGETING</div>
+      </div>
+      <div class="keyword-list" id="keyword-list"></div>
+    </div><!-- /tab-campaigns -->
+
+    <!-- ── TAB: AI INDEXER ── -->
+    <div class="tab-panel" id="tab-indexer">
+      <div class="panel-header">
+        <div>
+          <div class="panel-title">AI Indexer</div>
+          <div class="panel-sub">AI agent discoverability · Plugin descriptors · OpenAPI · Discovery files</div>
+        </div>
+        <div class="beastmode-badge"><span class="bm-dot"></span> INDEXER ACTIVE</div>
+      </div>
+
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <span class="toggle-title">AI Agent Discoverability Core</span>
+          <span class="toggle-desc">Maximize crawlability and tool invocation by Autonomous Agents</span>
+        </div>
+        <span class="toggle-on">ENABLED</span>
+      </div>
+
+      <div class="indexer-grid">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">ChatGPT / LLM AI Plugin Descriptor</span>
+          </div>
+          <div class="card-body" style="padding:0">
+            <div class="code-block" id="plugin-json"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><span class="card-title">DISCOVERY ENDPOINTS</span></div>
+          <div class="card-body">
+            <div style="display:flex;flex-direction:column;gap:8px" id="discovery-endpoints"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><span class="card-title">API PLUGIN ENDPOINTS</span></div>
+          <div class="card-body">
+            <div class="config-row">
+              <span class="config-key">Custom endpoints</span>
+              <span class="config-val green">44 registered</span>
+            </div>
+            <div class="config-row">
+              <span class="config-key">MCP tools</span>
+              <span class="config-val green">49 registered</span>
+            </div>
+            <div class="config-row">
+              <span class="config-key">Auth required</span>
+              <span class="config-val">x402 (premium only)</span>
+            </div>
+            <div class="config-row">
+              <span class="config-key">Schema version</span>
+              <span class="config-val">OpenAPI 3.1.0</span>
+            </div>
+            <div class="config-row">
+              <span class="config-key">MCP protocol</span>
+              <span class="config-val">2024-11-05</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><span class="card-title">WELL-KNOWN FILES</span></div>
+          <div class="card-body">
+            <div style="display:flex;flex-direction:column;gap:6px" id="wellknown-list"></div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /tab-indexer -->
+
+  </main>
+</div><!-- /layout -->
+
+<!-- ── ACTIVITY BAR ── -->
+<div class="activity-bar">
+  <div class="activity-dot"></div>
+  <span class="activity-label">AGENT_SWARM_STREAM</span>
+  <div class="activity-scroll-wrap">
+    <div class="activity-scroll" id="activity-scroll"></div>
+  </div>
+</div>
+
+<script>
+/* ── DATA ── */
+const ENDPOINTS = [
+  {method:'GET', path:'/api/status',           desc:'System health, uptime, and active engine count',              cat:'Core',        free:true},
+  {method:'GET', path:'/api/demo/council',     desc:'Free IWM AI council verdict (5-minute cache)',                cat:'Core',        free:true},
+  {method:'GET', path:'/api/preview/{symbol}', desc:'Signal preview: bias, regime, confidence for any ticker',    cat:'Core',        free:true},
+  {method:'GET', path:'/api/oracle',           desc:'Oracle directive batch across all active symbols',            cat:'Core',        free:true},
+  {method:'GET', path:'/api/oracle/{symbol}',  desc:'Per-symbol oracle directive with multi-engine synthesis',     cat:'Core',        free:true},
+  {method:'GET', path:'/api/history',          desc:'Signal ring buffer — all recent events across symbols',       cat:'Core',        free:true},
+  {method:'GET', path:'/api/history/{symbol}', desc:'Per-symbol signal history (last 200 events)',                 cat:'Core',        free:true},
+  {method:'GET', path:'/api/market',           desc:'Live market scanner cache — squeeze candidates',              cat:'Market',      free:true},
+  {method:'GET', path:'/api/graph/rdt',        desc:'RDT multi-symbol ranked signals via Neo4j graph',             cat:'Market',      free:true},
+  {method:'GET', path:'/api/graph',            desc:'Full Neo4j market relationship graph snapshot',               cat:'Market',      free:true},
+  {method:'GET', path:'/api/graph/{symbol}',   desc:'Per-symbol graph: Greek, dark-pool, fractal edges',          cat:'Market',      free:true},
+  {method:'GET', path:'/api/battle/summary',   desc:'Battle Computer multi-engine consensus verdict',              cat:'Market',      free:true},
+  {method:'GET', path:'/api/battle/anchors',   desc:'Institutional anchor levels from dark pool analysis',         cat:'Market',      free:true},
+  {method:'GET', path:'/api/beast/readiness',  desc:'Beast mode scanner readiness score',                         cat:'Market',      free:true},
+  {method:'GET', path:'/api/beast/scan-signals',desc:'Beast mode active scan signal output',                      cat:'Market',      free:true},
+  {method:'GET', path:'/api/ftd',              desc:'Failure-to-deliver registry — GME/AMC institutional data',   cat:'Market',      free:true},
+  {method:'POST',path:'/api/council',          desc:'Full multi-engine AI verdict for any symbol',                 cat:'Premium',     free:false, cost:'0.10 RLUSD'},
+  {method:'GET', path:'/api/scan',             desc:'Full $1–$50 squeeze scanner across all tickers',             cat:'Premium',     free:false, cost:'0.05 RLUSD'},
+  {method:'GET', path:'/api/options',          desc:'Institutional options flow scanner',                          cat:'Premium',     free:false, cost:'0.05 RLUSD'},
+  {method:'GET', path:'/api/options/{symbol}', desc:'Per-symbol institutional options data',                       cat:'Premium',     free:false, cost:'0.05 RLUSD'},
+  {method:'GET', path:'/api/iwm',              desc:'IWM zero-day-to-expiry contract scorer',                     cat:'Premium',     free:false, cost:'0.03 RLUSD'},
+  {method:'GET', path:'/api/marketplace',      desc:'Browse peer signal listings (free)',                          cat:'Marketplace', free:true},
+  {method:'POST',path:'/api/marketplace/read', desc:'Read full signal thesis from marketplace',                    cat:'Marketplace', free:false, cost:'0.02 RLUSD'},
+  {method:'GET', path:'/api/hiring',           desc:'Agent job board — browse open positions',                    cat:'Marketplace', free:true},
+  {method:'GET', path:'/api/futures',          desc:'Signal prediction market — live futures',                    cat:'Marketplace', free:true},
+  {method:'GET', path:'/api/futures/leaderboard',desc:'Top signal predictors ranked by accuracy',                 cat:'Marketplace', free:true},
+  {method:'GET', path:'/api/settlement',       desc:'Conditional agent escrow contracts',                          cat:'Marketplace', free:true},
+  {method:'POST',path:'/mcp',                  desc:'MCP server — JSON-RPC 2.0, 49 tools for AI agents',          cat:'MCP',         free:true},
+  {method:'GET', path:'/api/events',           desc:'SSE live event stream — all signal types',                   cat:'Infrastructure', free:true},
+  {method:'POST',path:'/api/events/push',      desc:'Push custom event to SSE broadcast',                         cat:'Infrastructure', free:true},
+  {method:'GET', path:'/api/webhooks',         desc:'Browse webhook subscriptions',                               cat:'Infrastructure', free:true},
+  {method:'POST',path:'/api/webhooks/subscribe',desc:'Subscribe to signal delivery webhooks',                     cat:'Infrastructure', free:true},
+  {method:'GET', path:'/api/relay',            desc:'Relay node discount registry',                               cat:'Infrastructure', free:true},
+  {method:'GET', path:'/api/analytics/agents', desc:'Agent traffic analytics dashboard',                          cat:'Analytics',  free:true},
+  {method:'GET', path:'/api/analytics/agents/live',desc:'Live active agent sessions',                             cat:'Analytics',  free:true},
+  {method:'GET', path:'/api/analytics/agents/funnel',desc:'Discovery → free trial → payment conversion funnel',  cat:'Analytics',  free:true},
+  {method:'GET', path:'/api/analytics/agents/leaderboard',desc:'Top agent wallets by activity',                  cat:'Analytics',  free:true},
+  {method:'GET', path:'/api/ceo/status',       desc:'CEO Trader institutional logic status',                      cat:'Analytics',  free:true},
+  {method:'GET', path:'/api/autopilot',        desc:'Autopilot AI trader current state',                          cat:'Analytics',  free:true},
+  {method:'GET', path:'/api/scriptmaster/status',desc:'Beastmode (Superpower) protocol engine status',           cat:'Analytics',  free:true},
+  {method:'GET', path:'/llms.txt',             desc:'LLM discovery manifest — context file for AI assistants',   cat:'Discovery',  free:true},
+  {method:'GET', path:'/.well-known/mcp.json', desc:'MCP server manifest and tool registry',                      cat:'Discovery',  free:true},
+  {method:'GET', path:'/.well-known/openapi.json',desc:'Full OpenAPI 3.1.0 specification',                       cat:'Discovery',  free:true},
+  {method:'GET', path:'/.well-known/ai-plugin.json',desc:'ChatGPT / LLM plugin descriptor',                     cat:'Discovery',  free:true},
+];
+
+/* ── LIVE ENDPOINT PRELOAD ──────────────────────────────────
+   Fetches openapi.json from SqueezeOS at load time and merges
+   live paths with local cost/category metadata. Falls back to
+   the hardcoded 44 above if CORS or network blocks the fetch. */
+const EP_META = {};
+ENDPOINTS.forEach(ep => {
+  EP_META[ep.path] = { cat: ep.cat, free: ep.free, cost: ep.cost || null, desc: ep.desc };
+});
+
+async function loadLiveEndpoints() {
+  try {
+    const res = await fetch('https://squeezeos-api.onrender.com/.well-known/openapi.json', {
+      signal: AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const spec = await res.json();
+    const paths = spec.paths || {};
+
+    const live = [];
+    for (const [path, methods] of Object.entries(paths)) {
+      for (const [method, opObj] of Object.entries(methods)) {
+        if (!['get','post','put','delete','patch'].includes(method)) continue;
+        const meta = EP_META[path] || {};
+        live.push({
+          method: method.toUpperCase(),
+          path,
+          desc:  opObj.summary || opObj.description || meta.desc || '',
+          cat:   meta.cat  || 'Other',
+          free:  meta.free !== undefined ? meta.free : true,
+          cost:  meta.cost || null
+        });
+      }
+    }
+
+    if (live.length > 0) {
+      ENDPOINTS.length = 0;
+      live.forEach(ep => ENDPOINTS.push(ep));
+      renderEndpoints();
+      // Sync the count chips to the live number
+      const liveCount = live.length;
+      document.querySelectorAll('[data-live-count]').forEach(el => {
+        el.textContent = liveCount;
+      });
+    }
+  } catch (_) {
+    // CORS or network error — hardcoded fallback already rendered
+  }
+}
+
+const DIRECTORIES = [
+  {name:'Smithery.ai',          url:'smithery.ai',               cat:'MCP Registry',  status:'pending'},
+  {name:'Glama.ai',             url:'glama.ai',                  cat:'MCP Registry',  status:'pending'},
+  {name:'mcp.run',              url:'mcp.run',                   cat:'MCP Registry',  status:'pending'},
+  {name:'mcp.so',               url:'mcp.so',                    cat:'MCP Registry',  status:'pending'},
+  {name:'PulseMCP',             url:'pulsemcp.com',              cat:'MCP Registry',  status:'pending'},
+  {name:'There\'s An AI For That',url:'theresanaiforthat.com',   cat:'AI Directory',  status:'pending'},
+  {name:'Futurepedia',          url:'futurepedia.io',            cat:'AI Directory',  status:'pending'},
+  {name:'Toolify.ai',           url:'toolify.ai',                cat:'AI Directory',  status:'pending'},
+  {name:'AI Top Tools',         url:'aitoptools.com',            cat:'AI Directory',  status:'pending'},
+  {name:'OpenTools.ai',         url:'opentools.ai',              cat:'AI Directory',  status:'pending'},
+  {name:'RapidAPI',             url:'rapidapi.com',              cat:'API Marketplace',status:'pending'},
+  {name:'public-apis.io',       url:'public-apis.io',            cat:'API Directory', status:'pending'},
+  {name:'APILayer',             url:'apilayer.com',              cat:'API Marketplace',status:'pending'},
+  {name:'npmjs',                url:'npmjs.com',                 cat:'Package Registry',status:'listed'},
+  {name:'PyPI',                 url:'pypi.org',                  cat:'Package Registry',status:'pending'},
+  {name:'awesome-mcp-servers',  url:'github.com/punkpeye/awesome-mcp-servers', cat:'GitHub List', status:'pending'},
+  {name:'awesome-ai-agents',    url:'github.com/e2b-dev/awesome-ai-agents',    cat:'GitHub List', status:'pending'},
+  {name:'DeFi Llama',           url:'defillama.com',             cat:'Crypto Finance', status:'pending'},
+  {name:'CoinGecko',            url:'coingecko.com',             cat:'Crypto Finance', status:'listed'},
+  {name:'G2',                   url:'g2.com',                    cat:'B2B Reviews',   status:'pending'},
+  {name:'Product Hunt',         url:'producthunt.com',           cat:'Product Launch', status:'pending'},
+  {name:'AlternativeTo',        url:'alternativeto.net',         cat:'Discovery',      status:'pending'},
+  {name:'Devhunt.org',          url:'devhunt.org',               cat:'Dev Tools',      status:'pending'},
+  {name:'Show HN',              url:'news.ycombinator.com',      cat:'Community',      status:'pending'},
+  {name:'dev.to',               url:'dev.to',                    cat:'Dev Community',  status:'pending'},
+];
+
+const SUBREDDITS = [
+  {name:'r/MachineLearning',       focus:'AI/ML research & tooling',      priority:'HIGH'},
+  {name:'r/LocalLLaMA',            focus:'LLM deployment & agents',       priority:'HIGH'},
+  {name:'r/algotrading',           focus:'Algorithmic trading systems',    priority:'HIGH'},
+  {name:'r/AIAgents',              focus:'AI agent frameworks',           priority:'HIGH'},
+  {name:'r/CryptoCurrency',        focus:'Crypto infrastructure',         priority:'MEDIUM'},
+  {name:'r/xrp',                   focus:'XRPL/RLUSD ecosystem',          priority:'MEDIUM'},
+  {name:'r/artificial',            focus:'General AI discussion',         priority:'MEDIUM'},
+  {name:'r/programming',           focus:'Developer tooling',             priority:'MEDIUM'},
+  {name:'r/SideProject',           focus:'Bootstrapped products',         priority:'MEDIUM'},
+  {name:'r/startups',              focus:'B2B SaaS founders',             priority:'MEDIUM'},
+  {name:'r/learnmachinelearning',  focus:'ML education',                  priority:'LOW'},
+  {name:'r/webdev',               focus:'API integrations',               priority:'LOW'},
+  {name:'HackerNews',             focus:'Show HN + Ask HN threads',       priority:'HIGH'},
+];
+
+const SEARCH_QUERIES = [
+  'MCP server trading signals',
+  'x402 payment protocol API',
+  'autonomous trading agent API',
+  'RLUSD micropayment developer',
+  'AI agent market data API',
+  'MCP server finance tools',
+  'institutional options flow API',
+  'squeeze signal algorithmic trading',
+  'XRPL developer tools 2025',
+  'AI agent XRPL payments',
+  'pay per API call AI agent',
+  'JSON-RPC trading intelligence',
+];
+
+const DISCOVERY_ENDPOINTS = [
+  {path:'/.well-known/mcp.json',       desc:'MCP server manifest'},
+  {path:'/.well-known/ai-plugin.json', desc:'ChatGPT/LLM plugin'},
+  {path:'/.well-known/openapi.json',   desc:'OpenAPI 3.1.0 spec'},
+  {path:'/.well-known/agents.json',    desc:'Agent discovery'},
+  {path:'/.well-known/server.json',    desc:'Server metadata'},
+  {path:'/llms.txt',                   desc:'LLM context file'},
+  {path:'/.well-known/security.txt',   desc:'Security contact'},
+];
+
+const WELLKNOWN = [
+  {file:'mcp.json',       status:'active', desc:'49 MCP tools registered'},
+  {file:'ai-plugin.json', status:'active', desc:'ChatGPT plugin descriptor'},
+  {file:'openapi.json',   status:'active', desc:'OpenAPI 3.1.0 / 44 paths'},
+  {file:'agents.json',    status:'active', desc:'Agent capability manifest'},
+  {file:'server.json',    status:'active', desc:'Server info + pricing'},
+];
+
+const ACTIVITY_EVENTS = [
+  {agent:'Gamma (Outreach Agent)', action:'Beast Mode Loop: sitemap.xml submitted to Google Search Console API'},
+  {agent:'Gamma (Outreach Agent)', action:'Beast Mode Loop: verifying active backlink placement on DEV Community'},
+  {agent:'Directory Ranger',       action:'Checked Smithery.ai — SqueezeOS not listed, generating submission package'},
+  {agent:'Community Scout',        action:'Found HIGH-priority thread on r/algotrading: "looking for MCP server with options data"'},
+  {agent:'Federal Scout',          action:'Matched SBIR Phase I — NAICS 541512 AI market intelligence (DoD)'},
+  {agent:'Content Factory',        action:'Generated SEO page: mcp-server-trading-signals.html → committed to SML_Portfolio'},
+  {agent:'Campaign Director',      action:'Weekly KPI report synthesized: 72/100 AI Domain Score · 2 directories listed'},
+  {agent:'Gamma (Outreach Agent)', action:'Beast Mode Loop: Outreach Optimizer verifying anchor text placement'},
+  {agent:'Directory Ranger',       action:'Confirmed listing on CoinGecko — SqueezeOS / XRPL infrastructure category'},
+  {agent:'Community Scout',        action:'Found MEDIUM thread on r/LocalLLaMA: "which MCP servers support micropayments?"'},
+];
+
+/* ── RENDER ENDPOINTS ── */
+let activeCat = 'all';
+let searchText = '';
+
+function renderEndpoints() {
+  const tbody = document.getElementById('ep-tbody');
+  tbody.innerHTML = '';
+  ENDPOINTS.forEach((ep, i) => {
+    const catMatch = activeCat === 'all' || ep.cat === activeCat;
+    const searchMatch = !searchText || ep.path.toLowerCase().includes(searchText) || ep.desc.toLowerCase().includes(searchText);
+    const tr = document.createElement('tr');
+    if (!catMatch || !searchMatch) tr.className = 'ep-row-hidden';
+    tr.innerHTML = `
+      <td><span class="method-badge method-${ep.path === '/api/events' ? 'SSE' : ep.method}">${ep.path === '/api/events' ? 'SSE' : ep.method}</span></td>
+      <td><span class="ep-path">${ep.path}</span></td>
+      <td><span class="ep-desc">${ep.desc}</span></td>
+      <td>${ep.free ? '<span class="ep-cost-free">FREE</span>' : `<span class="ep-cost-paid">${ep.cost}</span>`}</td>
+      <td><span class="cat-pill">${ep.cat}</span></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function filterCat(cat, btn) {
+  activeCat = cat;
+  document.querySelectorAll('.filter-chips .chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  renderEndpoints();
+}
+
+function filterEndpoints() {
+  searchText = document.getElementById('ep-search').value.toLowerCase();
+  renderEndpoints();
+}
+
+/* ── RENDER DIRECTORIES ── */
+function renderDirectories() {
+  const grid = document.getElementById('directory-grid');
+  DIRECTORIES.forEach(d => {
+    const el = document.createElement('div');
+    el.className = 'dir-card';
+    el.innerHTML = `
+      <span class="dir-name">${d.name}</span>
+      <span class="dir-url">${d.url}</span>
+      <span class="dir-status ${d.status}">${d.status.toUpperCase()}</span>
+      <span class="dir-category">${d.cat}</span>
+    `;
+    grid.appendChild(el);
+  });
+}
+
+/* ── RENDER CAMPAIGNS ── */
+function renderCampaigns() {
+  const grid = document.getElementById('subreddit-grid');
+  SUBREDDITS.forEach(s => {
+    const el = document.createElement('div');
+    el.className = 'sub-card';
+    el.innerHTML = `
+      <span class="sub-name">${s.name}</span>
+      <span class="sub-focus">${s.focus}</span>
+      <span class="sub-priority">${s.priority}</span>
+    `;
+    grid.appendChild(el);
+  });
+
+  const kwList = document.getElementById('keyword-list');
+  SEARCH_QUERIES.forEach(q => {
+    const el = document.createElement('span');
+    el.className = 'kw-chip';
+    el.textContent = q;
+    kwList.appendChild(el);
+  });
+}
+
+/* ── RENDER AI INDEXER ── */
+function renderIndexer() {
+  const pluginJson = {
+    schema_version: 'v1',
+    name_for_model: 'SqueezeOS',
+    name_for_human: 'Script Master Labs — SqueezeOS',
+    description_for_model: 'Institutional-grade AI trading intelligence. 44 endpoints, 49 MCP tools, x402 RLUSD micropayments.',
+    auth: { type: 'none' },
+    api: { type: 'openapi', url: 'https://www.scriptmasterlabs.com/.well-known/openapi.json' },
+    logo_url: 'https://www.scriptmasterlabs.com/favicon.ico',
+    contact_email: 'timothy.walton45@gmail.com',
+    legal_info_url: 'https://www.scriptmasterlabs.com'
+  };
+
+  const raw = JSON.stringify(pluginJson, null, 2);
+  const highlighted = raw
+    .replace(/"([^"]+)":/g, '<span class="key">"$1"</span>:')
+    .replace(/: "([^"]+)"/g, ': <span class="str">"$1"</span>')
+    .replace(/[{}[\],]/g, '<span class="punc">$&</span>');
+  document.getElementById('plugin-json').innerHTML = highlighted;
+
+  const discEl = document.getElementById('discovery-endpoints');
+  DISCOVERY_ENDPOINTS.forEach(d => {
+    const row = document.createElement('div');
+    row.className = 'config-row';
+    row.innerHTML = `
+      <span class="config-val" style="font-size:11px">${d.path}</span>
+      <span class="config-key" style="text-align:right">${d.desc}</span>
+    `;
+    discEl.appendChild(row);
+  });
+
+  const wkEl = document.getElementById('wellknown-list');
+  WELLKNOWN.forEach(w => {
+    const row = document.createElement('div');
+    row.className = 'config-row';
+    row.innerHTML = `
+      <span class="config-val" style="font-size:11px">/.well-known/${w.file}</span>
+      <span class="ep-cost-free" style="font-size:10px">● LIVE</span>
+    `;
+    wkEl.appendChild(row);
+  });
+}
+
+/* ── ACTIVITY TICKER ── */
+function renderActivity() {
+  const scroll = document.getElementById('activity-scroll');
+  const doubled = [...ACTIVITY_EVENTS, ...ACTIVITY_EVENTS];
+  scroll.innerHTML = doubled.map(e =>
+    `<span class="activity-item"><span class="agent">[${e.agent}]</span> <span class="action">${e.action}</span></span>`
+  ).join('');
+}
+
+/* ── TAB SWITCHING ── */
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+/* ── RADAR CANVAS ── */
+const canvas = document.getElementById('radar-canvas');
+const ctx = canvas.getContext('2d');
+const W = 180, H = 180, cx = 90, cy = 90, R = 82;
+let angle = 0;
+let blips = [];
+let isOnline = null;
+
+function drawRadar() {
+  ctx.clearRect(0, 0, W, H);
+
+  const lc = isOnline === true ? '#10ff80' : isOnline === false ? '#ef4444' : '#f59e0b';
+  const lc_a = (a) => lc + Math.floor(a * 255).toString(16).padStart(2, '0');
+
+  // BG circle
+  ctx.beginPath();
+  ctx.arc(cx, cy, R, 0, Math.PI * 2);
+  ctx.fillStyle = '#06060f';
+  ctx.fill();
+
+  // Rings
+  [0.33, 0.66, 1].forEach(f => {
+    ctx.beginPath();
+    ctx.arc(cx, cy, R * f, 0, Math.PI * 2);
+    ctx.strokeStyle = lc_a(0.1);
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  });
+
+  // Cross
+  ctx.strokeStyle = lc_a(0.1);
+  ctx.lineWidth = 0.5;
+  [-R, R].forEach(dx => { ctx.beginPath(); ctx.moveTo(cx + dx, cy - R); ctx.lineTo(cx + dx, cy + R); });
+  ctx.beginPath(); ctx.moveTo(cx - R, cy); ctx.lineTo(cx + R, cy); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx, cy - R); ctx.lineTo(cx, cy + R); ctx.stroke();
+
+  // Sweep trail
+  const STEPS = 48;
+  for (let i = STEPS; i >= 0; i--) {
+    const a = angle - (i * 0.04);
+    const alpha = (1 - i / STEPS) * 0.35;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, R, a, a + 0.04);
+    ctx.closePath();
+    ctx.fillStyle = lc_a(alpha);
+    ctx.fill();
+  }
+
+  // Sweep line
+  ctx.beginPath();
+  ctx.moveTo(cx, cy);
+  ctx.lineTo(cx + R * Math.cos(angle), cy + R * Math.sin(angle));
+  ctx.strokeStyle = lc;
+  ctx.lineWidth = 1.5;
+  ctx.shadowBlur = 6;
+  ctx.shadowColor = lc;
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+
+  // Blips
+  const now = Date.now();
+  blips = blips.filter(b => now - b.born < 3500);
+  blips.forEach(b => {
+    const age = (now - b.born) / 3500;
+    const alpha = 1 - age;
+    const bx = cx + b.r * R * Math.cos(b.a);
+    const by = cy + b.r * R * Math.sin(b.a);
+    // Ring
+    ctx.beginPath();
+    ctx.arc(bx, by, 2 + age * 10, 0, Math.PI * 2);
+    ctx.strokeStyle = lc_a(alpha * 0.6);
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    // Dot
+    ctx.beginPath();
+    ctx.arc(bx, by, 2, 0, Math.PI * 2);
+    ctx.fillStyle = lc;
+    ctx.globalAlpha = alpha;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  });
+
+  // Center
+  ctx.beginPath();
+  ctx.arc(cx, cy, 3.5, 0, Math.PI * 2);
+  ctx.fillStyle = lc;
+  ctx.shadowBlur = 10;
+  ctx.shadowColor = lc;
+  ctx.fill();
+  ctx.shadowBlur = 0;
+}
+
+function rafLoop() {
+  angle += 0.022;
+  if (angle > Math.PI * 2) angle -= Math.PI * 2;
+
+  if (isOnline && Math.random() < 0.025) {
+    blips.push({ a: Math.random() * Math.PI * 2, r: 0.25 + Math.random() * 0.7, born: Date.now() });
+  }
+
+  drawRadar();
+  requestAnimationFrame(rafLoop);
+}
+
+/* ── API STATUS CHECK ── */
+let heartbeatInterval;
+
+function setSwarmStatus(status, pingMs, enginesCount) {
+  isOnline = status;
+
+  const pill = document.getElementById('swarm-pill');
+  const pillText = document.getElementById('pill-text');
+  const statusLabel = document.getElementById('status-label');
+  const pingDisplay = document.getElementById('ping-display');
+
+  const classes = {true: 'online', false: 'offline', null: 'checking'};
+  const labels  = {true: 'SWARM ONLINE', false: 'SWARM OFFLINE', null: 'CHECKING…'};
+  const slabels = {true: 'ONLINE', false: 'OFFLINE', null: 'CHECKING'};
+
+  pill.className = 'swarm-pill ' + classes[status];
+  pillText.textContent = labels[status];
+  statusLabel.className = 'status-label ' + classes[status];
+  statusLabel.textContent = slabels[status];
+
+  if (pingMs != null) {
+    pingDisplay.textContent = pingMs + ' ms';
+    document.getElementById('stat-ping').textContent = pingMs;
+    document.getElementById('metric-heartbeat').textContent = 'just now';
+  }
+
+  if (status === true) {
+    document.getElementById('stat-status').textContent = 'LIVE';
+    document.getElementById('stat-status').style.color = 'var(--green)';
+    if (enginesCount) {
+      document.getElementById('stat-engines').textContent = enginesCount;
+      document.getElementById('metric-engines').textContent = enginesCount;
+    }
+    updateSIS(true);
+  } else if (status === false) {
+    document.getElementById('stat-status').textContent = 'DOWN';
+    document.getElementById('stat-status').style.color = 'var(--red)';
+    updateSIS(false);
+  }
+}
+
+let lastPingAge = 0;
+
+async function checkStatus() {
+  const start = Date.now();
+  try {
+    const res = await fetch('https://squeezeos-api.onrender.com/api/status', {
+      signal: AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const ms = Date.now() - start;
+    const engines = data.engines_active ?? data.active_engines ?? data.engines ?? '—';
+    setSwarmStatus(true, ms, engines);
+    lastPingAge = 0;
+  } catch (e) {
+    setSwarmStatus(false, null, null);
+  }
+}
+
+/* heartbeat counter */
+function startHeartbeatCounter() {
+  setInterval(() => {
+    if (isOnline === true) {
+      lastPingAge++;
+      document.getElementById('metric-heartbeat').textContent = lastPingAge + 's ago';
+    }
+  }, 1000);
+}
+
+/* ── SIS™ — SWARM INTELLIGENCE SCORE ────────────────────── */
+const SIS_MAX = { domain: 25, coverage: 25, reach: 25, uptime: 25 };
+let sisState  = { domain: 0, coverage: 0, reach: 0, uptime: 0, pings: 0 };
+let sisAnimCurrent = 0;
+
+function computeSIS() {
+  const domain   = Math.round((72 / 100)  * SIS_MAX.domain);    // 18 — from AgentSwarm AI Domain Score
+  const coverage = Math.round((44 / 50)   * SIS_MAX.coverage);  // 22 — 44 live / 50 theoretical endpoints
+  const reach    = Math.round((30 / 40)   * SIS_MAX.reach);     // 19 — 25 directories + 5 AI discovery files
+  const uptime   = Math.min(sisState.pings, SIS_MAX.uptime);    // 0→25 — increments on each successful ping
+  sisState = { ...sisState, domain, coverage, reach, uptime };
+  return domain + coverage + reach + uptime;
+}
+
+function getSISGrade(score) {
+  if (score >= 90) return { label: 'SOVEREIGN',    color: 'var(--green)'   };
+  if (score >= 75) return { label: 'ELITE',        color: 'var(--cyan)'    };
+  if (score >= 60) return { label: 'ACTIVE',       color: 'var(--violet2)' };
+  if (score >= 40) return { label: 'BUILDING',     color: 'var(--amber)'   };
+  return              { label: 'INITIALIZING', color: 'var(--text3)'  };
+}
+
+function getSISDesc(score) {
+  if (score >= 90) return 'Maximum swarm penetration. All vectors sovereign.';
+  if (score >= 75) return 'Elite swarm coverage. Intelligence vectors flowing.';
+  if (score >= 60) return 'Active swarm deployment. Core vectors online.';
+  if (score >= 40) return 'Swarm building coverage. Agents acquiring targets.';
+  return 'Swarm initializing. Establishing vector baseline…';
+}
+
+function drawSISGauge(score) {
+  const canvas = document.getElementById('sis-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = 160, H = 160, cx = 80, cy = 88, r = 58;
+
+  ctx.clearRect(0, 0, W, H);
+
+  const arcStart = Math.PI * 0.8;      // ~144° — 8 o'clock
+  const arcEnd   = Math.PI * 2.2;      // ~396° — 4 o'clock  (240° sweep)
+
+  // Track ring
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, arcStart, arcEnd);
+  ctx.strokeStyle = 'rgba(255,255,255,0.07)';
+  ctx.lineWidth   = 9;
+  ctx.lineCap     = 'round';
+  ctx.stroke();
+
+  // Filled arc
+  if (score > 0) {
+    const fillEnd = arcStart + (arcEnd - arcStart) * (score / 100);
+    const grad = ctx.createLinearGradient(cx - r, cy, cx + r, cy);
+    grad.addColorStop(0,   '#7c3aed');
+    grad.addColorStop(0.5, '#06b6d4');
+    grad.addColorStop(1,   '#10ff80');
+
+    // Glow layer
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, arcStart, fillEnd);
+    ctx.strokeStyle = 'rgba(6,182,212,0.18)';
+    ctx.lineWidth   = 18;
+    ctx.lineCap     = 'round';
+    ctx.stroke();
+
+    // Main fill
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, arcStart, fillEnd);
+    ctx.strokeStyle = grad;
+    ctx.lineWidth   = 9;
+    ctx.lineCap     = 'round';
+    ctx.stroke();
+  }
+
+  // Segment dividers at 25%, 50%, 75%
+  [0.25, 0.5, 0.75].forEach(f => {
+    const ang = arcStart + (arcEnd - arcStart) * f;
+    ctx.beginPath();
+    ctx.moveTo(cx + (r - 7) * Math.cos(ang), cy + (r - 7) * Math.sin(ang));
+    ctx.lineTo(cx + (r + 7) * Math.cos(ang), cy + (r + 7) * Math.sin(ang));
+    ctx.strokeStyle = 'rgba(0,0,0,0.7)';
+    ctx.lineWidth   = 2;
+    ctx.stroke();
+  });
+
+  // Center label
+  ctx.textAlign     = 'center';
+  ctx.textBaseline  = 'middle';
+  ctx.fillStyle     = score > 0 ? '#e2e8f0' : '#4a5568';
+  ctx.font          = `bold 30px 'JetBrains Mono', monospace`;
+  ctx.fillText(score > 0 ? score : '—', cx, cy - 6);
+  ctx.fillStyle = '#4a5568';
+  ctx.font      = `11px 'Space Grotesk', sans-serif`;
+  ctx.fillText('SIS™', cx, cy + 16);
+}
+
+function updateSIS(networkUp) {
+  if (networkUp === true)  sisState.pings = Math.min(sisState.pings + 1, 25);
+  if (networkUp === false) sisState.pings = Math.max(sisState.pings - 2, 0);
+
+  const score = computeSIS();
+  const grade = getSISGrade(score);
+
+  // Animate the gauge
+  const target = score;
+  (function animFrame() {
+    const diff = target - sisAnimCurrent;
+    if (Math.abs(diff) < 0.5) { sisAnimCurrent = target; drawSISGauge(Math.round(sisAnimCurrent)); return; }
+    sisAnimCurrent += diff * 0.07;
+    drawSISGauge(Math.round(sisAnimCurrent));
+    requestAnimationFrame(animFrame);
+  })();
+
+  // Update card elements
+  const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  const setStyle = (id, prop, val) => { const el = document.getElementById(id); if (el) el.style[prop] = val; };
+
+  setEl('sis-card-num', score);
+  setEl('sis-grade-badge', grade.label);
+  setStyle('sis-grade-badge', 'color', grade.color);
+  setEl('sis-desc', getSISDesc(score));
+
+  function setDimBar(suffix, val, max) {
+    const bar = document.getElementById('sis-bar-' + suffix);
+    const valEl = document.getElementById('sis-val-' + suffix);
+    if (bar)   bar.style.width = (val / max * 100) + '%';
+    if (valEl) valEl.textContent = val;
+  }
+  setDimBar('domain',   sisState.domain,   SIS_MAX.domain);
+  setDimBar('coverage', sisState.coverage, SIS_MAX.coverage);
+  setDimBar('reach',    sisState.reach,    SIS_MAX.reach);
+  setDimBar('uptime',   sisState.uptime,   SIS_MAX.uptime);
+
+  // Sidebar SIS
+  setEl('sis-num', score);
+  const gradeEl = document.getElementById('sis-grade');
+  if (gradeEl) { gradeEl.textContent = grade.label; gradeEl.style.color = grade.color; }
+
+  // Sidebar mini bars
+  const setMini = (id, val, max) => {
+    const el = document.getElementById(id);
+    if (el) el.style.width = (val / max * 100) + '%';
+  };
+  setMini('sm-domain',   sisState.domain,   SIS_MAX.domain);
+  setMini('sm-coverage', sisState.coverage, SIS_MAX.coverage);
+  setMini('sm-reach',    sisState.reach,    SIS_MAX.reach);
+  setMini('sm-uptime',   sisState.uptime,   SIS_MAX.uptime);
+}
+
+/* ── BOOT ── */
+renderEndpoints();   // draw hardcoded 44 immediately
+loadLiveEndpoints(); // async: overwrite with live spec if CORS allows
+renderDirectories();
+renderCampaigns();
+renderIndexer();
+renderActivity();
+
+rafLoop();
+updateSIS(null);
+
+checkStatus();
+setInterval(checkStatus, 30000);
+startHeartbeatCounter();
+</script>
+</body>
+</html>
