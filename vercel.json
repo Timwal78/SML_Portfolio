@@ -1,5 +1,17 @@
 {
+  "rewrites": [
+    {
+      "source": "/:path*",
+      "has": [{"type": "host", "value": "aeo.scriptmasterlabs.com"}],
+      "destination": "/aeo.html"
+    }
+  ],
   "redirects": [
+    {
+      "source": "/aeo",
+      "destination": "/aeo.html",
+      "permanent": false
+    },
     {
       "source": "/:path*",
       "has": [
