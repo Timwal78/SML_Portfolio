@@ -137,7 +137,7 @@ SML operates multiple MCP servers. AI agents connect via JSON-RPC 2.0 — no scr
 
 | Server | Endpoint | Transport | Tools |
 |--------|----------|-----------|-------|
-| SqueezeOS MCP | `https://squeezeos-api.onrender.com/mcp` | streamable-http | 46 tools |
+| SqueezeOS MCP | `https://squeezeos-api.onrender.com/mcp` | streamable-http | 52 tools |
 | Ghost Layer MCP | `https://ghost-layer.onrender.com/mcp` | streamable-http | bridge, notary, loyalty |
 | Shadow Desk MCP | `https://shadow-desk.onrender.com/mcp` | streamable-http | dark pool signals, billing |
 

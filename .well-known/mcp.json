@@ -18,7 +18,7 @@
       "name": "SqueezeOS MCP",
       "url": "https://squeezeos-api.onrender.com/mcp",
       "transport": "streamable-http",
-      "description": "46-tool market intelligence MCP server — squeeze scanner, council verdicts, options flow, FTD oracle, IAM resolver, macro matrix. Free + paid (0.02–0.10 RLUSD).",
+      "description": "52-tool market intelligence MCP server — squeeze scanner, council verdicts, options flow, FTD oracle, IAM resolver, macro matrix. Free + paid (0.02–0.10 RLUSD).",
       "payment_protocol": "x402",
       "payment_assets": ["RLUSD/XRPL", "USDC/Base"]
     },
