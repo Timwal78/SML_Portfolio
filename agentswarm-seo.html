@@ -1320,6 +1320,15 @@ const ENDPOINTS = [
   {method:'GET',path:'/x402/agent-score',         desc:'ARGUS agent credit score (300–850) and tier',                     cat:'Signals',    free:false, cost:'0.01 USDC'},
   {method:'GET',path:'/x402/fact-check',          desc:'AI-powered fact verification against live sources',                cat:'Signals',    free:false, cost:'0.05 USDC'},
   {method:'GET',path:'/x402/content-trust-score', desc:'Content authenticity and trust scoring',                           cat:'Signals',    free:false, cost:'0.05 USDC'},
+  // ── AEO / GEO Intelligence Suite (SqueezeOS) ─────────────────
+  {method:'GET',path:'/api/citation-score/',        desc:'AgentRank™ — citation authority scores for SML APIs on Reddit/HN', cat:'AEO',         free:true,  cost:null},
+  {method:'POST',path:'/api/citation-score/probe',  desc:'Trigger on-demand AgentRank citation probe (async)',               cat:'AEO',         free:true,  cost:null},
+  {method:'GET',path:'/api/scriptmaster/narrative', desc:'P04 API Narrative Optimizer — AI discoverability copy audit',      cat:'AEO',         free:true,  cost:null},
+  {method:'GET',path:'/x402/provider-score/',       desc:'ARGUS AgentPageRank™ — provider quality score 0–850 from live AI agent traffic', cat:'AEO', free:true, cost:null},
+  {method:'GET',path:'/api/graph/gaps/',            desc:'Semantic Gap Detector™ — unmet API demand leaderboard from forums','cat':'AEO',       free:true,  cost:null},
+  {method:'POST',path:'/api/graph/gaps/scan',       desc:'Trigger semantic gap scan (async)',                                 cat:'AEO',         free:true,  cost:null},
+  {method:'GET',path:'/x402/agent-economy/',        desc:'AEIN™ — AI agent commerce summary: which AI systems call us and why', cat:'AEO',      free:true,  cost:null},
+  {method:'GET',path:'/x402/agent-economy/report',  desc:'AEIN™ full report — heatmap, wallet analytics, anomaly flags',     cat:'AEO',         free:false, cost:'0.25 RLUSD'},
 ];
 
 /* ── LIVE ENDPOINT PRELOAD ──────────────────────────────────
@@ -1795,8 +1804,8 @@ let sisAnimCurrent = 0;
 
 function computeSIS() {
   const domain   = Math.round((72 / 100)  * SIS_MAX.domain);    // 18 — from AgentSwarm AI Domain Score
-  const coverage = Math.round((44 / 50)   * SIS_MAX.coverage);  // 22 — 44 live / 50 theoretical endpoints
-  const reach    = Math.round((30 / 40)   * SIS_MAX.reach);     // 19 — 25 directories + 5 AI discovery files
+  const coverage = Math.round((52 / 58)   * SIS_MAX.coverage);  // 22 — 52 live / 58 theoretical endpoints (inc. 8 AEO suite)
+  const reach    = Math.round((33 / 40)   * SIS_MAX.reach);     // 21 — 28 directories + 5 AI discovery files + 3 new AEO manifests
   const uptime   = Math.min(sisState.pings, SIS_MAX.uptime);    // 0→25 — increments on each successful ping
   sisState = { ...sisState, domain, coverage, reach, uptime };
   return domain + coverage + reach + uptime;
