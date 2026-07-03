@@ -9,7 +9,7 @@ import { type Request, type Response, type NextFunction } from 'express';
 // middleware inside each route handler issues the 402 challenge. Blocking here with
 // a 403 prevents x402scan from seeing the challenge, so those endpoints never get
 // indexed. Pass them through; requirePayment still protects them.
-const PUBLIC_PREFIXES = ['/health', '/.well-known/', '/openapi.json', '/llms.txt', '/favicon.ico', '/x402/'];
+const PUBLIC_PREFIXES = ['/health', '/api/stats', '/.well-known/', '/openapi.json', '/llms.txt', '/agents.json', '/favicon.ico', '/x402/'];
 
 export function rapidApiGuard(req: Request, res: Response, next: NextFunction): void {
   const secret = process.env['RAPIDAPI_PROXY_SECRET'];
