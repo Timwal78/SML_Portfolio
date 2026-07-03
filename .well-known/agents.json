@@ -15,6 +15,18 @@
   },
   "mcp_servers": [
     {
+      "name": "x402 Data API",
+      "endpoint": "https://mcp-x402.onrender.com",
+      "transport": "http",
+      "description": "44 pay-per-call U.S. federal data endpoints — grants, SEC filings, healthcare, FTD, compliance, signals. USDC on Base.",
+      "endpoint_count": 44,
+      "currency": "USDC",
+      "chain": "Base",
+      "openapi": "https://mcp-x402.onrender.com/.well-known/openapi.json",
+      "stats": "https://mcp-x402.onrender.com/api/stats",
+      "categories": ["Federal", "Healthcare", "SEC", "FTD", "Compliance", "Signals", "Economic"]
+    },
+    {
       "name": "SqueezeOS",
       "endpoint": "https://squeezeos-api.onrender.com/mcp",
       "transport": "streamable-http",

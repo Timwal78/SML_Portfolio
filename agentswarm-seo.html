@@ -892,6 +892,14 @@ html, body {
         <span class="metric-value" id="metric-heartbeat">—</span>
       </div>
       <div class="metric-row">
+        <span class="metric-label">AI agents today</span>
+        <span class="metric-value live" id="metric-agents-today">—</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Agent hits total</span>
+        <span class="metric-value" id="metric-agents-total">—</span>
+      </div>
+      <div class="metric-row">
         <span class="metric-label">Payment protocol</span>
         <span class="metric-value">x402 / USDC</span>
       </div>
@@ -943,6 +951,10 @@ html, body {
           <div class="stat-block">
             <span class="stat-val" id="stat-ping">—</span>
             <span class="stat-label">PING (ms)</span>
+          </div>
+          <div class="stat-block">
+            <span class="stat-val" id="stat-agents-today">—</span>
+            <span class="stat-label">AI AGENTS TODAY</span>
           </div>
           <div class="stat-block">
             <span class="stat-val" id="stat-status">—</span>
@@ -1732,6 +1744,27 @@ function setSwarmStatus(status, pingMs, enginesCount) {
 
 let lastPingAge = 0;
 
+async function loadAgentStats() {
+  try {
+    const res = await fetch('https://mcp-x402.onrender.com/api/stats', {
+      signal: AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    const today = data.aiAgentsToday ?? 0;
+    const total = data.aiAgentsAllTime ?? 0;
+
+    const fmt = n => n >= 1000 ? (n / 1000).toFixed(1) + 'k' : String(n);
+
+    ['metric-agents-today', 'stat-agents-today'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = fmt(today);
+    });
+    const totalEl = document.getElementById('metric-agents-total');
+    if (totalEl) totalEl.textContent = fmt(total);
+  } catch (_) { /* non-critical */ }
+}
+
 async function checkStatus() {
   const start = Date.now();
   try {
@@ -1922,6 +1955,8 @@ updateSIS(null);
 checkStatus();
 setInterval(checkStatus, 30000);
 startHeartbeatCounter();
+loadAgentStats();
+setInterval(loadAgentStats, 60000);
 </script>
 </body>
 </html>

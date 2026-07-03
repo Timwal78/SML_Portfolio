@@ -18,10 +18,10 @@
     "mcp-sse"
   ],
   "endpoints": {
-    "mcp": "https://mcp-x402.scriptmasterlabs.com",
-    "health": "https://mcp-x402.scriptmasterlabs.com/health",
-    "agents": "https://mcp-x402.scriptmasterlabs.com/agents.json",
-    "llms": "https://mcp-x402.scriptmasterlabs.com/llms.txt"
+    "mcp": "https://mcp-x402.onrender.com",
+    "health": "https://mcp-x402.onrender.com/health",
+    "openapi": "https://mcp-x402.onrender.com/.well-known/openapi.json",
+    "stats": "https://mcp-x402.onrender.com/api/stats"
   },
   "payment": {
     "protocol": "x402",
