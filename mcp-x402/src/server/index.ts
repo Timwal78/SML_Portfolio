@@ -61,10 +61,34 @@ async function runSSE(): Promise<void> {
   app.use(express.json({ limit: '1mb' }));
   app.use(rapidApiGuard);
 
+  // ── In-memory AI agent traffic counter ──────────────────────────────────────
+  const _statsStartMs = Date.now();
+  const _agentCounts = { today: 0, allTime: 0 };
+  let _agentCountDay = new Date().toDateString();
+  const _isAiAgent = (ua: string): boolean =>
+    /claude|anthropic|openai|chatgpt|gpt-4|gemini|grok|mistral|cohere|llm|mcp-client|agent|langchain|llamaindex|perplexity/i.test(ua);
+  app.use((req, _res, next) => {
+    const today = new Date().toDateString();
+    if (today !== _agentCountDay) { _agentCounts.today = 0; _agentCountDay = today; }
+    if (_isAiAgent(String(req.headers['user-agent'] ?? ''))) { _agentCounts.today++; _agentCounts.allTime++; }
+    next();
+  });
+
   const LEVIATHAN_BYPASS_SECRET = process.env['LEVIATHAN_BYPASS_SECRET'] ?? '';
 
   // Health endpoint — hit every 30s by Docker healthcheck + keepalive cron
   app.get('/health', healthHandler);
+
+  // Agent traffic stats — polled by dashboard every 60s
+  app.get('/api/stats', (_req, res) => {
+    res.set('Access-Control-Allow-Origin', '*').json({
+      aiAgentsToday: _agentCounts.today,
+      aiAgentsAllTime: _agentCounts.allTime,
+      uptime_seconds: Math.floor((Date.now() - _statsStartMs) / 1000),
+      endpoint_count: 44,
+      version: VERSION,
+    });
+  });
 
   // Wallet info — shows the server's derived wallet address (safe to expose, no private key)
   app.get('/wallet', async (_req, res) => {
