@@ -821,7 +821,7 @@ html, body {
 
   <div class="url-bar">
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-    <span>squeezeos-api.onrender.com · scriptmasterlabs.com</span>
+    <span>mcp-x402.onrender.com · scriptmasterlabs.com</span>
   </div>
 
   <div class="topbar-right">
@@ -893,7 +893,7 @@ html, body {
       </div>
       <div class="metric-row">
         <span class="metric-label">Payment protocol</span>
-        <span class="metric-value">x402 / RLUSD</span>
+        <span class="metric-value">x402 / USDC</span>
       </div>
     </div>
 
@@ -924,7 +924,7 @@ html, body {
       <div class="panel-header">
         <div>
           <div class="panel-title">Swarm Center</div>
-          <div class="panel-sub">Script Master Labs — SqueezeOS Intelligence Network · 44 Live Endpoints</div>
+          <div class="panel-sub">Script Master Labs — x402 Data API · Pay-per-call U.S. federal data, settled in USDC on Base via x402 · 44 Live Endpoints</div>
         </div>
         <div class="beastmode-badge"><span class="bm-dot"></span> BEASTMODE ACTIVE</div>
       </div>
@@ -962,7 +962,7 @@ html, body {
             </div>
             <div class="config-row">
               <span class="config-key">API Base</span>
-              <span class="config-val">squeezeos-api.onrender.com</span>
+              <span class="config-val">mcp-x402.onrender.com</span>
             </div>
             <div class="config-row">
               <span class="config-key">Brand</span>
@@ -996,7 +996,7 @@ html, body {
             </div>
             <div class="config-row">
               <span class="config-key">Payment</span>
-              <span class="config-val">x402 / RLUSD</span>
+              <span class="config-val">x402 / USDC (Base)</span>
             </div>
             <div class="config-row">
               <span class="config-key">Protocol</span>
@@ -1064,10 +1064,13 @@ html, body {
             <input class="ep-search" type="text" id="ep-search" placeholder="Search endpoints…" oninput="filterEndpoints()">
             <div class="filter-chips">
               <button class="chip active" onclick="filterCat('all', this)">All</button>
-              <button class="chip" onclick="filterCat('Core', this)">Core</button>
-              <button class="chip" onclick="filterCat('Market', this)">Market</button>
-              <button class="chip" onclick="filterCat('Premium', this)">Premium</button>
-              <button class="chip" onclick="filterCat('MCP', this)">MCP</button>
+              <button class="chip" onclick="filterCat('Federal', this)">Federal</button>
+              <button class="chip" onclick="filterCat('Healthcare', this)">Healthcare</button>
+              <button class="chip" onclick="filterCat('SEC', this)">SEC</button>
+              <button class="chip" onclick="filterCat('FTD', this)">FTD</button>
+              <button class="chip" onclick="filterCat('Compliance', this)">Compliance</button>
+              <button class="chip" onclick="filterCat('Signals', this)">Signals</button>
+              <button class="chip" onclick="filterCat('Economic', this)">Economic</button>
               <button class="chip" onclick="filterCat('Marketplace', this)">Marketplace</button>
               <button class="chip" onclick="filterCat('Discovery', this)">Discovery</button>
             </div>
@@ -1254,56 +1257,63 @@ html, body {
 <script>
 /* ── DATA ── */
 const ENDPOINTS = [
-  {method:'GET', path:'/api/status',           desc:'System health, uptime, and active engine count',              cat:'Core',        free:true},
-  {method:'GET', path:'/api/demo/council',     desc:'Free IWM AI council verdict (5-minute cache)',                cat:'Core',        free:true},
-  {method:'GET', path:'/api/preview/{symbol}', desc:'Signal preview: bias, regime, confidence for any ticker',    cat:'Core',        free:true},
-  {method:'GET', path:'/api/oracle',           desc:'Oracle directive batch across all active symbols',            cat:'Core',        free:true},
-  {method:'GET', path:'/api/oracle/{symbol}',  desc:'Per-symbol oracle directive with multi-engine synthesis',     cat:'Core',        free:true},
-  {method:'GET', path:'/api/history',          desc:'Signal ring buffer — all recent events across symbols',       cat:'Core',        free:true},
-  {method:'GET', path:'/api/history/{symbol}', desc:'Per-symbol signal history (last 200 events)',                 cat:'Core',        free:true},
-  {method:'GET', path:'/api/market',           desc:'Live market scanner cache — squeeze candidates',              cat:'Market',      free:true},
-  {method:'GET', path:'/api/graph/rdt',        desc:'RDT multi-symbol ranked signals via Neo4j graph',             cat:'Market',      free:true},
-  {method:'GET', path:'/api/graph',            desc:'Full Neo4j market relationship graph snapshot',               cat:'Market',      free:true},
-  {method:'GET', path:'/api/graph/{symbol}',   desc:'Per-symbol graph: Greek, dark-pool, fractal edges',          cat:'Market',      free:true},
-  {method:'GET', path:'/api/battle/summary',   desc:'Battle Computer multi-engine consensus verdict',              cat:'Market',      free:true},
-  {method:'GET', path:'/api/battle/anchors',   desc:'Institutional anchor levels from dark pool analysis',         cat:'Market',      free:true},
-  {method:'GET', path:'/api/beast/readiness',  desc:'Beast mode scanner readiness score',                         cat:'Market',      free:true},
-  {method:'GET', path:'/api/beast/scan-signals',desc:'Beast mode active scan signal output',                      cat:'Market',      free:true},
-  {method:'GET', path:'/api/ftd',              desc:'Failure-to-deliver registry — GME/AMC institutional data',   cat:'Market',      free:true},
-  {method:'POST',path:'/api/council',          desc:'Full multi-engine AI verdict for any symbol',                 cat:'Premium',     free:false, cost:'0.10 RLUSD'},
-  {method:'GET', path:'/api/scan',             desc:'Full $1–$50 squeeze scanner across all tickers',             cat:'Premium',     free:false, cost:'0.05 RLUSD'},
-  {method:'GET', path:'/api/options',          desc:'Institutional options flow scanner',                          cat:'Premium',     free:false, cost:'0.05 RLUSD'},
-  {method:'GET', path:'/api/options/{symbol}', desc:'Per-symbol institutional options data',                       cat:'Premium',     free:false, cost:'0.05 RLUSD'},
-  {method:'GET', path:'/api/iwm',              desc:'IWM zero-day-to-expiry contract scorer',                     cat:'Premium',     free:false, cost:'0.03 RLUSD'},
-  {method:'GET', path:'/api/marketplace',      desc:'Browse peer signal listings (free)',                          cat:'Marketplace', free:true},
-  {method:'POST',path:'/api/marketplace/read', desc:'Read full signal thesis from marketplace',                    cat:'Marketplace', free:false, cost:'0.02 RLUSD'},
-  {method:'GET', path:'/api/hiring',           desc:'Agent job board — browse open positions',                    cat:'Marketplace', free:true},
-  {method:'GET', path:'/api/futures',          desc:'Signal prediction market — live futures',                    cat:'Marketplace', free:true},
-  {method:'GET', path:'/api/futures/leaderboard',desc:'Top signal predictors ranked by accuracy',                 cat:'Marketplace', free:true},
-  {method:'GET', path:'/api/settlement',       desc:'Conditional agent escrow contracts',                          cat:'Marketplace', free:true},
-  {method:'POST',path:'/mcp',                  desc:'MCP server — JSON-RPC 2.0, 49 tools for AI agents',          cat:'MCP',         free:true},
-  {method:'GET', path:'/api/events',           desc:'SSE live event stream — all signal types',                   cat:'Infrastructure', free:true},
-  {method:'POST',path:'/api/events/push',      desc:'Push custom event to SSE broadcast',                         cat:'Infrastructure', free:true},
-  {method:'GET', path:'/api/webhooks',         desc:'Browse webhook subscriptions',                               cat:'Infrastructure', free:true},
-  {method:'POST',path:'/api/webhooks/subscribe',desc:'Subscribe to signal delivery webhooks',                     cat:'Infrastructure', free:true},
-  {method:'GET', path:'/api/relay',            desc:'Relay node discount registry',                               cat:'Infrastructure', free:true},
-  {method:'GET', path:'/api/analytics/agents', desc:'Agent traffic analytics dashboard',                          cat:'Analytics',  free:true},
-  {method:'GET', path:'/api/analytics/agents/live',desc:'Live active agent sessions',                             cat:'Analytics',  free:true},
-  {method:'GET', path:'/api/analytics/agents/funnel',desc:'Discovery → free trial → payment conversion funnel',  cat:'Analytics',  free:true},
-  {method:'GET', path:'/api/analytics/agents/leaderboard',desc:'Top agent wallets by activity',                  cat:'Analytics',  free:true},
-  {method:'GET', path:'/api/ceo/status',       desc:'CEO Trader institutional logic status',                      cat:'Analytics',  free:true},
-  {method:'GET', path:'/api/autopilot',        desc:'Autopilot AI trader current state',                          cat:'Analytics',  free:true},
-  {method:'GET', path:'/api/scriptmaster/status',desc:'Beastmode (Superpower) protocol engine status',           cat:'Analytics',  free:true},
-  {method:'GET', path:'/llms.txt',             desc:'LLM discovery manifest — context file for AI assistants',   cat:'Discovery',  free:true},
-  {method:'GET', path:'/.well-known/mcp.json', desc:'MCP server manifest and tool registry',                      cat:'Discovery',  free:true},
-  {method:'GET', path:'/.well-known/openapi.json',desc:'Full OpenAPI 3.1.0 specification',                       cat:'Discovery',  free:true},
-  {method:'GET', path:'/.well-known/ai-plugin.json',desc:'ChatGPT / LLM plugin descriptor',                     cat:'Discovery',  free:true},
+  // ── Federal ───────────────────────────────────────────────
+  {method:'GET',path:'/x402/grants',              desc:'Live federal grants data from USASpending.gov',                      cat:'Federal',    free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/sbir-grants',         desc:'SBIR/STTR federal research & technology grants',                    cat:'Federal',    free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/nih-grants',          desc:'NIH research grants via NIH Reporter',                               cat:'Federal',    free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/congress-bills',      desc:'Congress.gov live bill tracker and legislative status',              cat:'Federal',    free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/lobbying',            desc:'Federal lobbying disclosure reports (Senate LDA)',                   cat:'Federal',    free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/fec-finance',         desc:'FEC campaign finance filings and donor data',                       cat:'Federal',    free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/patents',             desc:'USPTO patent search and IP intelligence',                            cat:'Federal',    free:false, cost:'0.05 USDC'},
+  // ── Healthcare / FDA ──────────────────────────────────────
+  {method:'GET',path:'/x402/drug-label',          desc:'FDA drug label information via OpenFDA',                             cat:'Healthcare', free:false, cost:'0.03 USDC'},
+  {method:'GET',path:'/x402/drug-recall',         desc:'FDA drug recall enforcement reports via OpenFDA',                   cat:'Healthcare', free:false, cost:'0.03 USDC'},
+  {method:'GET',path:'/x402/npi',                 desc:'National Provider Identifier (NPI) registry lookup',                cat:'Healthcare', free:false, cost:'0.03 USDC'},
+  {method:'GET',path:'/x402/clinical-trials',     desc:'ClinicalTrials.gov study search by condition or sponsor',           cat:'Healthcare', free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/drug-adverse-events', desc:'FDA FAERS adverse event reports for any drug',                      cat:'Healthcare', free:false, cost:'0.03 USDC'},
+  {method:'GET',path:'/x402/fda-510k',            desc:'FDA 510(k) medical device clearance database',                      cat:'Healthcare', free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/fda-warnings',        desc:'FDA warning letters issued to manufacturers',                       cat:'Healthcare', free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/cms-providers',       desc:'CMS Medicare/Medicaid provider enrollment and data',                cat:'Healthcare', free:false, cost:'0.05 USDC'},
+  // ── SEC / FINRA ───────────────────────────────────────────
+  {method:'GET',path:'/x402/sec-8k',              desc:'Real-time SEC 8-K material event filings for any ticker',           cat:'SEC',        free:false, cost:'0.10 USDC'},
+  {method:'GET',path:'/x402/sec-13f',             desc:'SEC 13F institutional holdings — quarterly snapshots',              cat:'SEC',        free:false, cost:'0.10 USDC'},
+  {method:'GET',path:'/x402/sec-10k',             desc:'SEC 10-K annual report filings via EDGAR',                          cat:'SEC',        free:false, cost:'0.10 USDC'},
+  {method:'GET',path:'/x402/sec-10q',             desc:'SEC 10-Q quarterly report filings via EDGAR',                       cat:'SEC',        free:false, cost:'0.10 USDC'},
+  {method:'GET',path:'/x402/sec-13dg',            desc:'SEC 13D/13G activist investor and large position filings',          cat:'SEC',        free:false, cost:'0.10 USDC'},
+  {method:'GET',path:'/x402/insider-trades',      desc:'SEC Form 4 insider trading activity for any ticker',                cat:'SEC',        free:false, cost:'0.10 USDC'},
+  {method:'GET',path:'/x402/finra-broker',        desc:'FINRA BrokerCheck registration and disciplinary records',           cat:'SEC',        free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/firms',               desc:'SEC EDGAR corporate filings search',                                cat:'SEC',        free:false, cost:'0.05 USDC'},
+  // ── Economic ──────────────────────────────────────────────
+  {method:'GET',path:'/x402/treasury-yields',     desc:'Current US Treasury yield curve (1M through 30Y)',                  cat:'Economic',   free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/fred',                desc:'St. Louis Fed FRED economic time-series data',                      cat:'Economic',   free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/market',              desc:'Real-time market intelligence data feed',                            cat:'Economic',   free:false, cost:'0.05 USDC'},
+  // ── FTD Intelligence ──────────────────────────────────────
+  {method:'GET',path:'/x402/ftd-threshold-list',  desc:'SEC Regulation SHO threshold securities list',                     cat:'FTD',        free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/ftd-time-series',     desc:'Failure-to-deliver time-series history by ticker',                  cat:'FTD',        free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/ftd-ratio',           desc:'FTD ratio relative to float and daily volume',                     cat:'FTD',        free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/ftd-etf-basket',      desc:'ETF component FTD basket — constituent-level data',               cat:'FTD',        free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/ftd-settlement-cycle',desc:'T+1 settlement cycle FTD tracking and projections',                cat:'FTD',        free:false, cost:'0.05 USDC'},
+  // ── Compliance ────────────────────────────────────────────
+  {method:'GET',path:'/x402/entity-compliance',   desc:'OFAC sanctions and entity compliance screening',                   cat:'Compliance', free:false, cost:'0.08 USDC'},
+  {method:'GET',path:'/x402/epa-violations',      desc:'EPA enforcement actions and environmental violations',              cat:'Compliance', free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/osha',                desc:'OSHA workplace safety violations and citations',                    cat:'Compliance', free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/compliance-anomaly',  desc:'AI-detected compliance anomaly signals across entities',            cat:'Compliance', free:false, cost:'0.08 USDC'},
+  {method:'GET',path:'/x402/compliance-audit',    desc:'Structured compliance audit trail for any entity',                 cat:'Compliance', free:false, cost:'0.08 USDC'},
+  {method:'GET',path:'/x402/compliance-regulator-query', desc:'Regulatory body query interface — SEC, FINRA, CFTC, FDA',  cat:'Compliance', free:false, cost:'0.08 USDC'},
+  // ── Intelligence / Signals ────────────────────────────────
+  {method:'GET',path:'/x402/options-flow',        desc:'Institutional options flow — unusual activity and sweeps',         cat:'Signals',    free:false, cost:'0.10 USDC'},
+  {method:'GET',path:'/x402/cascade-signal',      desc:'SML Cascade Accumulator directional signal',                       cat:'Signals',    free:false, cost:'0.10 USDC'},
+  {method:'GET',path:'/x402/max-conviction-signal',desc:'Maximum conviction composite trading signal',                    cat:'Signals',    free:false, cost:'0.10 USDC'},
+  {method:'GET',path:'/x402/iam-model',           desc:'IAM institutional accumulation model output',                      cat:'Signals',    free:false, cost:'0.10 USDC'},
+  {method:'GET',path:'/x402/agent-score',         desc:'ARGUS agent credit score (300–850) and tier',                     cat:'Signals',    free:false, cost:'0.01 USDC'},
+  {method:'GET',path:'/x402/fact-check',          desc:'AI-powered fact verification against live sources',                cat:'Signals',    free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/content-trust-score', desc:'Content authenticity and trust scoring',                           cat:'Signals',    free:false, cost:'0.05 USDC'},
 ];
 
 /* ── LIVE ENDPOINT PRELOAD ──────────────────────────────────
-   Fetches openapi.json from SqueezeOS at load time and merges
-   live paths with local cost/category metadata. Falls back to
-   the hardcoded 44 above if CORS or network blocks the fetch. */
+   Fetches openapi.json from mcp-x402.onrender.com at load time
+   and merges live paths with local cost/category metadata.
+   Falls back to the hardcoded 44 above if CORS blocks the fetch. */
 const EP_META = {};
 ENDPOINTS.forEach(ep => {
   EP_META[ep.path] = { cat: ep.cat, free: ep.free, cost: ep.cost || null, desc: ep.desc };
@@ -1311,7 +1321,7 @@ ENDPOINTS.forEach(ep => {
 
 async function loadLiveEndpoints() {
   try {
-    const res = await fetch('https://squeezeos-api.onrender.com/.well-known/openapi.json', {
+    const res = await fetch('https://mcp-x402.onrender.com/.well-known/openapi.json', {
       signal: AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined
     });
     if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -1725,7 +1735,7 @@ let lastPingAge = 0;
 async function checkStatus() {
   const start = Date.now();
   try {
-    const res = await fetch('https://squeezeos-api.onrender.com/api/status', {
+    const res = await fetch('https://mcp-x402.onrender.com/health', {
       signal: AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined
     });
     if (!res.ok) throw new Error('HTTP ' + res.status);
