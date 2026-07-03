@@ -1110,7 +1110,7 @@ html, body {
       <div class="panel-header">
         <div>
           <div class="panel-title">Backlinks — Directory Ranger</div>
-          <div class="panel-sub">25 AI/Dev directories tracked · Next ranger run: Monday 08:00 ET</div>
+          <div class="panel-sub">24 AI/Dev directories tracked · Ranger runs daily at 08:00 ET</div>
         </div>
         <div class="beastmode-badge"><span class="bm-dot"></span> 24/7 BEASTMODE</div>
       </div>
@@ -1118,22 +1118,23 @@ html, body {
       <div class="section-pad" style="padding-bottom:0">
         <div class="live-stats card" style="border-radius:8px">
           <div class="stat-block">
-            <span class="stat-val">2</span>
+            <span class="stat-val" id="dir-stat-listed">—</span>
             <span class="stat-label">CONFIRMED LISTED</span>
           </div>
           <div class="stat-block">
-            <span class="stat-val">23</span>
-            <span class="stat-label">PENDING SUBMISSION</span>
+            <span class="stat-val" id="dir-stat-pending">—</span>
+            <span class="stat-label">NOT YET LISTED</span>
           </div>
           <div class="stat-block">
-            <span class="stat-val">25</span>
+            <span class="stat-val">24</span>
             <span class="stat-label">DIRECTORIES TRACKED</span>
           </div>
           <div class="stat-block">
-            <span class="stat-val">8%</span>
+            <span class="stat-val" id="dir-stat-coverage">—</span>
             <span class="stat-label">COVERAGE</span>
           </div>
         </div>
+        <p style="font-size:.7rem;color:var(--text3);margin-top:6px" id="dir-audit-note">Awaiting first real audit</p>
       </div>
 
       <div class="section-pad" style="padding-bottom:4px">
@@ -1380,32 +1381,34 @@ async function loadLiveEndpoints() {
   }
 }
 
+/* rangerName must match agent/dept/directory_ranger.py's DIRECTORIES list
+   exactly — that's the real agent that actually checks these, so its name
+   is the join key for real status. name is just the display label. */
 const DIRECTORIES = [
-  {name:'Smithery.ai',          url:'smithery.ai',               cat:'MCP Registry',  status:'pending'},
-  {name:'Glama.ai',             url:'glama.ai',                  cat:'MCP Registry',  status:'pending'},
-  {name:'mcp.run',              url:'mcp.run',                   cat:'MCP Registry',  status:'pending'},
-  {name:'mcp.so',               url:'mcp.so',                    cat:'MCP Registry',  status:'pending'},
-  {name:'PulseMCP',             url:'pulsemcp.com',              cat:'MCP Registry',  status:'pending'},
-  {name:'There\'s An AI For That',url:'theresanaiforthat.com',   cat:'AI Directory',  status:'pending'},
-  {name:'Futurepedia',          url:'futurepedia.io',            cat:'AI Directory',  status:'pending'},
-  {name:'Toolify.ai',           url:'toolify.ai',                cat:'AI Directory',  status:'pending'},
-  {name:'AI Top Tools',         url:'aitoptools.com',            cat:'AI Directory',  status:'pending'},
-  {name:'OpenTools.ai',         url:'opentools.ai',              cat:'AI Directory',  status:'pending'},
-  {name:'RapidAPI',             url:'rapidapi.com',              cat:'API Marketplace',status:'pending'},
-  {name:'public-apis.io',       url:'public-apis.io',            cat:'API Directory', status:'pending'},
-  {name:'APILayer',             url:'apilayer.com',              cat:'API Marketplace',status:'pending'},
-  {name:'npmjs',                url:'npmjs.com',                 cat:'Package Registry',status:'listed'},
-  {name:'PyPI',                 url:'pypi.org',                  cat:'Package Registry',status:'pending'},
-  {name:'awesome-mcp-servers',  url:'github.com/punkpeye/awesome-mcp-servers', cat:'GitHub List', status:'pending'},
-  {name:'awesome-ai-agents',    url:'github.com/e2b-dev/awesome-ai-agents',    cat:'GitHub List', status:'pending'},
-  {name:'DeFi Llama',           url:'defillama.com',             cat:'Crypto Finance', status:'pending'},
-  {name:'CoinGecko',            url:'coingecko.com',             cat:'Crypto Finance', status:'listed'},
-  {name:'G2',                   url:'g2.com',                    cat:'B2B Reviews',   status:'pending'},
-  {name:'Product Hunt',         url:'producthunt.com',           cat:'Product Launch', status:'pending'},
-  {name:'AlternativeTo',        url:'alternativeto.net',         cat:'Discovery',      status:'pending'},
-  {name:'Devhunt.org',          url:'devhunt.org',               cat:'Dev Tools',      status:'pending'},
-  {name:'Show HN',              url:'news.ycombinator.com',      cat:'Community',      status:'pending'},
-  {name:'dev.to',               url:'dev.to',                    cat:'Dev Community',  status:'pending'},
+  {name:'Smithery.ai',          rangerName:'Smithery.ai',          url:'smithery.ai',               cat:'MCP Registry'},
+  {name:'Glama.ai',             rangerName:'Glama.ai MCP',         url:'glama.ai',                  cat:'MCP Registry'},
+  {name:'mcp.run',              rangerName:'mcp.run',              url:'mcp.run',                   cat:'MCP Registry'},
+  {name:'mcp.so',               rangerName:'mcp.so (MCP Hub)',     url:'mcp.so',                    cat:'MCP Registry'},
+  {name:'PulseMCP',             rangerName:'PulseMCP',             url:'pulsemcp.com',              cat:'MCP Registry'},
+  {name:'There\'s An AI For That',rangerName:'There\'s An AI',     url:'theresanaiforthat.com',     cat:'AI Directory'},
+  {name:'Futurepedia',          rangerName:'Futurepedia',          url:'futurepedia.io',            cat:'AI Directory'},
+  {name:'Toolify.ai',           rangerName:'Toolify.ai',           url:'toolify.ai',                cat:'AI Directory'},
+  {name:'AI Top Tools',         rangerName:'AI Top Tools',         url:'aitoptools.com',            cat:'AI Directory'},
+  {name:'OpenTools.ai',         rangerName:'OpenTools.ai',         url:'opentools.ai',              cat:'AI Directory'},
+  {name:'RapidAPI',             rangerName:'RapidAPI',             url:'rapidapi.com',              cat:'API Marketplace'},
+  {name:'public-apis.io',       rangerName:'public-apis.io',       url:'public-apis.io',            cat:'API Directory'},
+  {name:'APILayer',             rangerName:'APILayer',             url:'apilayer.com',              cat:'API Marketplace'},
+  {name:'npmjs',                rangerName:'npmjs',                url:'npmjs.com',                 cat:'Package Registry'},
+  {name:'PyPI',                 rangerName:'PyPI',                 url:'pypi.org',                  cat:'Package Registry'},
+  {name:'awesome-mcp-servers',  rangerName:'awesome-mcp-servers',  url:'github.com/punkpeye/awesome-mcp-servers', cat:'GitHub List'},
+  {name:'awesome-ai-agents',    rangerName:'awesome-ai-agents',    url:'github.com/e2b-dev/awesome-ai-agents',    cat:'GitHub List'},
+  {name:'DeFi Llama',           rangerName:'DeFi Llama Tools',     url:'defillama.com',             cat:'Crypto Finance'},
+  {name:'CoinGecko',            rangerName:'CoinGecko Apps',       url:'coingecko.com',             cat:'Crypto Finance'},
+  {name:'G2',                   rangerName:'G2 Software',          url:'g2.com',                    cat:'B2B Reviews'},
+  {name:'Product Hunt',         rangerName:'ProductHunt',          url:'producthunt.com',           cat:'Product Launch'},
+  {name:'AlternativeTo',        rangerName:'AlternativeTo',        url:'alternativeto.net',         cat:'Discovery'},
+  {name:'Devhunt.org',          rangerName:'Devhunt.org',          url:'devhunt.org',               cat:'Dev Tools'},
+  {name:'dev.to',               rangerName:'dev.to',               url:'dev.to',                    cat:'Dev Community'},
 ];
 
 const SUBREDDITS = [
@@ -1457,18 +1460,10 @@ const WELLKNOWN = [
   {file:'server.json',    status:'active', desc:'Server info + pricing'},
 ];
 
-const ACTIVITY_EVENTS = [
-  {agent:'Gamma (Outreach Agent)', action:'Beast Mode Loop: sitemap.xml submitted to Google Search Console API'},
-  {agent:'Gamma (Outreach Agent)', action:'Beast Mode Loop: verifying active backlink placement on DEV Community'},
-  {agent:'Directory Ranger',       action:'Checked Smithery.ai — SqueezeOS not listed, generating submission package'},
-  {agent:'Community Scout',        action:'Found HIGH-priority thread on r/algotrading: "looking for MCP server with options data"'},
-  {agent:'Federal Scout',          action:'Matched SBIR Phase I — NAICS 541512 AI market intelligence (DoD)'},
-  {agent:'Content Factory',        action:'Generated SEO page: mcp-server-trading-signals.html → committed to SML_Portfolio'},
-  {agent:'Campaign Director',      action:'Weekly KPI report synthesized: 72/100 AI Domain Score · 2 directories listed'},
-  {agent:'Gamma (Outreach Agent)', action:'Beast Mode Loop: Outreach Optimizer verifying anchor text placement'},
-  {agent:'Directory Ranger',       action:'Confirmed listing on CoinGecko — SqueezeOS / XRPL infrastructure category'},
-  {agent:'Community Scout',        action:'Found MEDIUM thread on r/LocalLLaMA: "which MCP servers support micropayments?"'},
-];
+/* Real agent activity only — see loadActivity() below. This used to be a
+   hardcoded looping array presented as a live feed. It wasn't real. It's
+   gone. The feed now reads from GET /api/marketing/activity, which only
+   ever contains events a real agent actually posted after doing real work. */
 
 /* ── RENDER ENDPOINTS ── */
 let activeCat = 'all';
@@ -1505,20 +1500,56 @@ function filterEndpoints() {
   renderEndpoints();
 }
 
-/* ── RENDER DIRECTORIES ── */
-function renderDirectories() {
+/* ── RENDER DIRECTORIES — real status only, from the last actual Directory Ranger audit ── */
+function renderDirectoryCards(listedSet, unlistedSet, audited) {
   const grid = document.getElementById('directory-grid');
+  grid.innerHTML = '';
   DIRECTORIES.forEach(d => {
+    let status, label;
+    if (listedSet.has(d.rangerName))        { status = 'listed';    label = 'LISTED'; }
+    else if (unlistedSet.has(d.rangerName)) { status = 'unlisted';  label = 'NOT LISTED'; }
+    else                                     { status = 'pending';   label = audited ? 'UNCHECKED' : 'AWAITING AUDIT'; }
+
     const el = document.createElement('div');
     el.className = 'dir-card';
     el.innerHTML = `
-      <span class="dir-name">${d.name}</span>
-      <span class="dir-url">${d.url}</span>
-      <span class="dir-status ${d.status}">${d.status.toUpperCase()}</span>
-      <span class="dir-category">${d.cat}</span>
+      <span class="dir-name">${escapeHtml(d.name)}</span>
+      <span class="dir-url">${escapeHtml(d.url)}</span>
+      <span class="dir-status ${status}">${label}</span>
+      <span class="dir-category">${escapeHtml(d.cat)}</span>
     `;
     grid.appendChild(el);
   });
+}
+
+async function renderDirectories() {
+  try {
+    const res = await fetch('https://squeezeos-api.onrender.com/api/marketing/directories', {
+      signal: AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const listedSet   = new Set(data.already_listed || []);
+    const unlistedSet = new Set(data.not_listed || []);
+
+    renderDirectoryCards(listedSet, unlistedSet, data.audited);
+
+    const listedCount = DIRECTORIES.filter(d => listedSet.has(d.rangerName)).length;
+    document.getElementById('dir-stat-listed').textContent   = data.audited ? listedCount : '—';
+    document.getElementById('dir-stat-pending').textContent  = data.audited ? (DIRECTORIES.length - listedCount) : '—';
+    document.getElementById('dir-stat-coverage').textContent = data.audited ? Math.round(listedCount / DIRECTORIES.length * 100) + '%' : '—';
+
+    const note = document.getElementById('dir-audit-note');
+    if (data.audited && data.checked_at) {
+      const ago = Math.round((Date.now() / 1000 - data.checked_at) / 3600);
+      note.textContent = `Last real audit: ${ago < 1 ? 'under an hour' : ago + 'h'} ago`;
+    } else {
+      note.textContent = 'Awaiting first real audit';
+    }
+  } catch (e) {
+    renderDirectoryCards(new Set(), new Set(), false);
+    document.getElementById('dir-audit-note').textContent = 'Audit data unavailable — awaiting connection';
+  }
 }
 
 /* ── RENDER CAMPAIGNS ── */
@@ -1588,13 +1619,36 @@ function renderIndexer() {
   });
 }
 
-/* ── ACTIVITY TICKER ── */
-function renderActivity() {
+/* ── ACTIVITY TICKER — real agent runs only, no fallback fabrication ── */
+function escapeHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = String(s);
+  return d.innerHTML;
+}
+
+async function loadActivity() {
   const scroll = document.getElementById('activity-scroll');
-  const doubled = [...ACTIVITY_EVENTS, ...ACTIVITY_EVENTS];
-  scroll.innerHTML = doubled.map(e =>
-    `<span class="activity-item"><span class="agent">[${e.agent}]</span> <span class="action">${e.action}</span></span>`
-  ).join('');
+  try {
+    const res = await fetch('https://squeezeos-api.onrender.com/api/marketing/activity?limit=20', {
+      signal: AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const entries = data.entries || [];
+
+    if (entries.length === 0) {
+      scroll.innerHTML = '<span class="activity-item">No agent activity yet — CEO (Campaign Director) runs daily at 08:00 ET</span>';
+      return;
+    }
+
+    const items = entries.map(e =>
+      `<span class="activity-item"><span class="agent">[${escapeHtml(e.agent)}]</span> <span class="action">${escapeHtml(e.action)}</span></span>`
+    );
+    // Doubled only for the CSS marquee loop to appear seamless — same real entries, not duplicated fake ones
+    scroll.innerHTML = [...items, ...items].join('');
+  } catch (e) {
+    scroll.innerHTML = '<span class="activity-item">Activity feed unavailable — awaiting connection</span>';
+  }
 }
 
 /* ── TAB SWITCHING ── */
@@ -1950,9 +2004,11 @@ function updateSIS(networkUp) {
 renderEndpoints();   // draw hardcoded 44 immediately
 loadLiveEndpoints(); // async: overwrite with live spec if CORS allows
 renderDirectories();
+setInterval(renderDirectories, 300000); // real audit runs once a day — 5-min poll is plenty
 renderCampaigns();
 renderIndexer();
-renderActivity();
+loadActivity();
+setInterval(loadActivity, 60000);
 
 rafLoop();
 updateSIS(null);
