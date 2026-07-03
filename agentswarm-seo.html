@@ -825,7 +825,7 @@ html, body {
   </div>
 
   <div class="topbar-right">
-    <span class="model-badge">claude-opus-4-8</span>
+    <span class="model-badge">claude-sonnet-5</span>
     <div id="swarm-pill" class="swarm-pill checking">
       <span class="dot"></span>
       <span id="pill-text">CHECKING…</span>
@@ -1000,7 +1000,7 @@ html, body {
           <div class="card-body">
             <div class="config-row">
               <span class="config-key">Model</span>
-              <span class="config-val violet">claude-opus-4-8</span>
+              <span class="config-val violet">claude-sonnet-5</span>
             </div>
             <div class="config-row">
               <span class="config-key">MCP endpoint</span>
@@ -1730,10 +1730,6 @@ function setSwarmStatus(status, pingMs, enginesCount) {
   if (status === true) {
     document.getElementById('stat-status').textContent = 'LIVE';
     document.getElementById('stat-status').style.color = 'var(--green)';
-    if (enginesCount) {
-      document.getElementById('stat-engines').textContent = enginesCount;
-      document.getElementById('metric-engines').textContent = enginesCount;
-    }
     updateSIS(true);
   } else if (status === false) {
     document.getElementById('stat-status').textContent = 'DOWN';
