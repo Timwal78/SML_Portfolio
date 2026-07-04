@@ -3,7 +3,14 @@ import { base, baseSepolia } from 'viem/chains';
 import { privateKeyToAccount } from 'viem/accounts';
 import { mnemonicToSeedSync } from 'bip39';
 import HDKey from 'hdkey';
-import { generateJwt } from '@coinbase/cdp-sdk/auth';
+import { HTTPFacilitatorClient } from '@x402/core/http';
+import type { FacilitatorConfig as X402FacilitatorConfig } from '@x402/core/http';
+import { VerifyError, SettleError } from '@x402/core/types';
+import type {
+  PaymentPayload as X402PaymentPayload,
+  PaymentRequirements as X402PaymentRequirements,
+} from '@x402/core/types';
+import { createFacilitatorConfig } from '@coinbase/x402';
 import { WalletManager } from './wallet.js';
 import { AuditLogger } from '../security/audit.js';
 
@@ -179,46 +186,62 @@ export class SelfFacilitator implements Facilitator {
 
 // ── Generic HTTP facilitator: works with ANY x402-compliant facilitator ───────
 // x402.org (Coinbase-operated, open), Coinbase CDP (auth), Thirdweb, partner orgs.
-export class HttpFacilitator implements Facilitator {
+//
+// This used to hand-build the /verify and /settle HTTP requests ourselves —
+// after two rounds of guessing wrong about the wire format (a CAIP-2 network
+// id, then a hardcoded x402Version) while a real payment kept failing with an
+// unexplained "invalid network: <empty>" from CDP, we stopped guessing and
+// switched to delegating to `HTTPFacilitatorClient` from `@x402/core` — the
+// same package @coinbase/x402's createFacilitatorConfig() is built against.
+// It constructs the exact request Coinbase's own client sends — no more
+// hand-rolled request bodies to get subtly wrong.
+class RemoteFacilitator implements Facilitator {
   readonly name: string;
-  private readonly baseUrl: string;
-  private readonly authHeader?: string;
+  private readonly client: HTTPFacilitatorClient;
 
-  constructor(baseUrl: string, opts?: { name?: string; authHeader?: string }) {
-    this.baseUrl = baseUrl.replace(/\/$/, '');
-    this.name = opts?.name ?? baseUrl;
-    if (opts?.authHeader) this.authHeader = opts.authHeader;
-  }
-
-  private headers(): Record<string, string> {
-    const h: Record<string, string> = { 'Content-Type': 'application/json' };
-    if (this.authHeader) h['Authorization'] = this.authHeader;
-    return h;
+  constructor(name: string, config: X402FacilitatorConfig) {
+    this.name = name;
+    this.client = new HTTPFacilitatorClient(config);
   }
 
   async verify(payload: PaymentPayload, requirements: PaymentRequirements): Promise<VerifyResult> {
     try {
-      const r = await fetch(`${this.baseUrl}/verify`, { method: 'POST', headers: this.headers(), body: JSON.stringify({ x402Version: payload.x402Version ?? 1, paymentPayload: payload, paymentRequirements: requirements }) });
-      const rawBody = await r.text();
-      if (!r.ok) return { isValid: false, invalidReason: `facilitator_http_${r.status}:${rawBody.slice(0, 200)}` };
-      const j = JSON.parse(rawBody) as { isValid?: boolean; invalidReason?: string; payer?: string };
-      return { isValid: j.isValid === true, ...(j.invalidReason ? { invalidReason: j.invalidReason } : {}), ...(j.payer ? { payer: j.payer } : {}) };
+      const res = await this.client.verify(payload as unknown as X402PaymentPayload, requirements as unknown as X402PaymentRequirements);
+      return { isValid: res.isValid, ...(res.invalidReason ? { invalidReason: res.invalidReason } : {}), ...(res.payer ? { payer: res.payer } : {}) };
     } catch (err) {
-      return { isValid: false, invalidReason: `facilitator_unreachable:${String(err).slice(0, 60)}` };
+      if (err instanceof VerifyError) {
+        return { isValid: false, invalidReason: `${this.name}_http_${err.statusCode}:${err.invalidReason ?? ''} ${err.invalidMessage ?? err.message}`.trim() };
+      }
+      return { isValid: false, invalidReason: `${this.name}_error:${String(err).slice(0, 300)}` };
     }
   }
 
   async settle(payload: PaymentPayload, requirements: PaymentRequirements): Promise<SettleResult> {
     try {
-      const r = await fetch(`${this.baseUrl}/settle`, { method: 'POST', headers: this.headers(), body: JSON.stringify({ x402Version: payload.x402Version ?? 1, paymentPayload: payload, paymentRequirements: requirements }) });
-      const rawBody = await r.text();
-      if (!r.ok) return { success: false, errorReason: `facilitator_http_${r.status}:${rawBody.slice(0, 200)}` };
-      const j = JSON.parse(rawBody) as { success?: boolean; errorReason?: string; transaction?: string; payer?: string };
-      return { success: j.success === true, ...(j.errorReason ? { errorReason: j.errorReason } : {}), ...(j.transaction ? { transaction: j.transaction } : {}), ...(j.payer ? { payer: j.payer } : {}) };
+      const res = await this.client.settle(payload as unknown as X402PaymentPayload, requirements as unknown as X402PaymentRequirements);
+      return { success: res.success, ...(res.errorReason ? { errorReason: res.errorReason } : {}), ...(res.transaction ? { transaction: res.transaction } : {}), ...(res.payer ? { payer: res.payer } : {}) };
     } catch (err) {
-      return { success: false, errorReason: `facilitator_unreachable:${String(err).slice(0, 60)}` };
+      if (err instanceof SettleError) {
+        return { success: false, errorReason: `${this.name}_http_${err.statusCode}:${err.errorReason ?? ''} ${err.errorMessage ?? err.message}`.trim() };
+      }
+      return { success: false, errorReason: `${this.name}_error:${String(err).slice(0, 300)}` };
     }
   }
+}
+
+export function makeHttpFacilitator(baseUrl: string, opts?: { name?: string; authHeader?: string }): Facilitator {
+  const name = opts?.name ?? baseUrl;
+  const authHeader = opts?.authHeader;
+  return new RemoteFacilitator(name, {
+    url: baseUrl.replace(/\/$/, '') as `${string}://${string}`,
+    ...(authHeader ? {
+      createAuthHeaders: async () => ({
+        verify: { Authorization: authHeader },
+        settle: { Authorization: authHeader },
+        supported: { Authorization: authHeader },
+      }),
+    } : {}),
+  });
 }
 
 // ── Coinbase Developer Platform facilitator ────────────────────────────────────
@@ -227,68 +250,11 @@ export class HttpFacilitator implements Facilitator {
 // (see index.ts buildBazaarExtensions/discoverable) the first time a real
 // payment for it settles specifically through THIS facilitator.
 //
-// Auth is a short-lived (120s default) EdDSA JWT signed per-request with your
-// Ed25519 CDP secret key — not a static bearer token, so a fresh JWT is
-// generated for every verify/settle call. Uses Coinbase's own official
-// @coinbase/cdp-sdk for JWT construction rather than hand-rolled signing.
-const CDP_HOST = 'api.cdp.coinbase.com';
-const CDP_VERIFY_PATH = '/platform/v2/x402/verify';
-const CDP_SETTLE_PATH = '/platform/v2/x402/settle';
-
-export class CdpFacilitator implements Facilitator {
-  readonly name = 'cdp';
-
-  constructor(private readonly apiKeyId: string, private readonly apiKeySecret: string) {}
-
-  private async call(path: string, payload: PaymentPayload, requirements: PaymentRequirements): Promise<{ ok: boolean; status: number; json: Record<string, unknown> | null; rawBody: string }> {
-    const jwt = await generateJwt({
-      apiKeyId: this.apiKeyId,
-      apiKeySecret: this.apiKeySecret,
-      requestMethod: 'POST',
-      requestHost: CDP_HOST,
-      requestPath: path,
-    });
-    const r = await fetch(`https://${CDP_HOST}${path}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jwt}` },
-      body: JSON.stringify({ x402Version: payload.x402Version ?? 1, paymentPayload: payload, paymentRequirements: requirements }),
-    });
-    // Read the body on EVERY response, not just success — a 400/401/etc from
-    // CDP carries the actual reason (bad JWT, malformed request, unsupported
-    // asset, ...) and discarding it left every failure as an opaque
-    // "cdp_http_400" with no way to tell why short of raw Render logs.
-    const rawBody = await r.text();
-    let json: Record<string, unknown> | null = null;
-    try { json = rawBody ? (JSON.parse(rawBody) as Record<string, unknown>) : null; } catch { /* not JSON, rawBody still captured below */ }
-    return { ok: r.ok, status: r.status, json, rawBody };
-  }
-
-  async verify(payload: PaymentPayload, requirements: PaymentRequirements): Promise<VerifyResult> {
-    try {
-      const { ok, status, json, rawBody } = await this.call(CDP_VERIFY_PATH, payload, requirements);
-      if (!ok || !json) return { isValid: false, invalidReason: `cdp_http_${status}:${rawBody.slice(0, 200)}` };
-      const isValid = json['isValid'] === true;
-      const invalidReason = typeof json['invalidReason'] === 'string' ? json['invalidReason'] : undefined;
-      const payer = typeof json['payer'] === 'string' ? json['payer'] : undefined;
-      return { isValid, ...(invalidReason ? { invalidReason } : {}), ...(payer ? { payer } : {}) };
-    } catch (err) {
-      return { isValid: false, invalidReason: `cdp_unreachable:${String(err).slice(0, 60)}` };
-    }
-  }
-
-  async settle(payload: PaymentPayload, requirements: PaymentRequirements): Promise<SettleResult> {
-    try {
-      const { ok, status, json, rawBody } = await this.call(CDP_SETTLE_PATH, payload, requirements);
-      if (!ok || !json) return { success: false, errorReason: `cdp_http_${status}:${rawBody.slice(0, 200)}` };
-      const success = json['success'] === true;
-      const errorReason = typeof json['errorReason'] === 'string' ? json['errorReason'] : undefined;
-      const transaction = typeof json['transaction'] === 'string' ? json['transaction'] : undefined;
-      const payer = typeof json['payer'] === 'string' ? json['payer'] : undefined;
-      return { success, ...(errorReason ? { errorReason } : {}), ...(transaction ? { transaction } : {}), ...(payer ? { payer } : {}) };
-    } catch (err) {
-      return { success: false, errorReason: `cdp_unreachable:${String(err).slice(0, 80)}` };
-    }
-  }
+// createFacilitatorConfig is Coinbase's own official helper (@coinbase/x402) —
+// it builds the same short-lived per-request EdDSA JWT auth (via
+// @coinbase/cdp-sdk under the hood) that CDP's real client uses internally.
+export function makeCdpFacilitator(apiKeyId: string, apiKeySecret: string): Facilitator {
+  return new RemoteFacilitator('cdp', createFacilitatorConfig(apiKeyId, apiKeySecret));
 }
 
 // ── Hybrid chain: try facilitators in order until one verifies AND settles ────
@@ -347,13 +313,13 @@ export function facilitatorChain(): FacilitatorChain {
   const auth = process.env['X402_FACILITATOR_AUTH'];
   const built: Facilitator[] = spec.map((entry) => {
     if (entry === 'self') return new SelfFacilitator();
-    return new HttpFacilitator(entry, { name: new URL(entry).host, ...(auth ? { authHeader: auth.startsWith('Bearer ') ? auth : `Bearer ${auth}` } : {}) });
+    return makeHttpFacilitator(entry, { name: new URL(entry).host, ...(auth ? { authHeader: auth.startsWith('Bearer ') ? auth : `Bearer ${auth}` } : {}) });
   });
   if (built.length === 0) built.push(new SelfFacilitator());
 
   const cdpKeyId = process.env['CDP_API_KEY_ID'];
   const cdpKeySecret = process.env['CDP_API_KEY_SECRET'];
-  if (cdpKeyId && cdpKeySecret) built.unshift(new CdpFacilitator(cdpKeyId, cdpKeySecret));
+  if (cdpKeyId && cdpKeySecret) built.unshift(makeCdpFacilitator(cdpKeyId, cdpKeySecret));
 
   cachedChain = new FacilitatorChain(built);
   return cachedChain;
