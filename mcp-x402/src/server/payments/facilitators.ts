@@ -244,7 +244,7 @@ class RemoteFacilitator implements Facilitator {
       if (err instanceof VerifyError) {
         return { isValid: false, invalidReason: `${this.name}_http_${err.statusCode}:${err.invalidReason ?? ''} ${err.invalidMessage ?? err.message}`.trim() };
       }
-      return { isValid: false, invalidReason: `${this.name}_error:${String(err).slice(0, 300)}` };
+      return { isValid: false, invalidReason: `${this.name}_error:${String(err).slice(0, 1000)}` };
     }
   }
 
@@ -257,7 +257,7 @@ class RemoteFacilitator implements Facilitator {
       if (err instanceof SettleError) {
         return { success: false, errorReason: `${this.name}_http_${err.statusCode}:${err.errorReason ?? ''} ${err.errorMessage ?? err.message}`.trim() };
       }
-      return { success: false, errorReason: `${this.name}_error:${String(err).slice(0, 300)}` };
+      return { success: false, errorReason: `${this.name}_error:${String(err).slice(0, 1000)}` };
     }
   }
 }
