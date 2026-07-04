@@ -217,6 +217,25 @@ function toCaip2Network(network: string): string {
   return CAIP2_BY_NETWORK[network] ?? network;
 }
 
+// The real v2 PaymentPayload shape (@x402/core's own x402Client-CdmxbRFj.d.ts)
+// is NOT the flat {x402Version, scheme, network, payload} our client sends —
+// scheme/network don't even exist at the top level in v2. They live inside a
+// required `accepted: PaymentRequirements` field:
+//   type PaymentPayload = { x402Version, resource?, accepted: PaymentRequirements, payload, extensions? }
+// x402-fetch (built on the older v1-era package) sends the flat v1-style
+// shape while labeling it x402Version: 2, which is why CDP's error was
+// "must match one of [x402V2PaymentPayload, x402V1PaymentPayload].
+// x402V2PaymentPayload requires 'accepted'" — not a network problem at all
+// by this point, a whole different top-level structure. Reshape into the
+// real v2 form specifically for CDP; x402.org accepts the flat shape as-is.
+function toCdpV2Payload(payload: PaymentPayload, requirements: X402PaymentRequirements): X402PaymentPayload {
+  return {
+    x402Version: payload.x402Version,
+    accepted: requirements,
+    payload: payload.payload,
+  } as unknown as X402PaymentPayload;
+}
+
 // @x402/core's HTTPFacilitatorClient truncates any non-x402-shaped error body
 // to 200 chars via its own internal responseExcerpt() helper — confirmed by
 // reading node_modules/@x402/core/dist/cjs/http/index.js directly — before it
@@ -240,12 +259,12 @@ class RemoteFacilitator implements Facilitator {
     this.rawDiagnosticFetch = opts?.rawDiagnosticFetch;
   }
 
-  private normalize(payload: PaymentPayload, requirements: PaymentRequirements): [PaymentPayload, PaymentRequirements] {
-    if (!this.useCaip2Network) return [payload, requirements];
-    return [
-      { ...payload, network: toCaip2Network(payload.network) },
-      { ...requirements, network: toCaip2Network(requirements.network) },
-    ];
+  private normalize(payload: PaymentPayload, requirements: PaymentRequirements): [X402PaymentPayload, X402PaymentRequirements] {
+    if (!this.useCaip2Network) {
+      return [payload as unknown as X402PaymentPayload, requirements as unknown as X402PaymentRequirements];
+    }
+    const r = { ...requirements, network: toCaip2Network(requirements.network) } as unknown as X402PaymentRequirements;
+    return [toCdpV2Payload(payload, r), r];
   }
 
   private async diagnose(stage: 'verify' | 'settle', p: X402PaymentPayload, r: X402PaymentRequirements, fallback: string): Promise<string> {
@@ -260,14 +279,14 @@ class RemoteFacilitator implements Facilitator {
   async verify(payload: PaymentPayload, requirements: PaymentRequirements): Promise<VerifyResult> {
     try {
       const [p, r] = this.normalize(payload, requirements);
-      const res = await this.client.verify(p as unknown as X402PaymentPayload, r as unknown as X402PaymentRequirements);
+      const res = await this.client.verify(p, r);
       return { isValid: res.isValid, ...(res.invalidReason ? { invalidReason: res.invalidReason } : {}), ...(res.payer ? { payer: res.payer } : {}) };
     } catch (err) {
       if (err instanceof VerifyError) {
         return { isValid: false, invalidReason: `${this.name}_http_${err.statusCode}:${err.invalidReason ?? ''} ${err.invalidMessage ?? err.message}`.trim() };
       }
       const [p, r] = this.normalize(payload, requirements);
-      const full = await this.diagnose('verify', p as unknown as X402PaymentPayload, r as unknown as X402PaymentRequirements, String(err));
+      const full = await this.diagnose('verify', p, r, String(err));
       return { isValid: false, invalidReason: `${this.name}_error:${full.slice(0, 1000)}` };
     }
   }
@@ -275,14 +294,14 @@ class RemoteFacilitator implements Facilitator {
   async settle(payload: PaymentPayload, requirements: PaymentRequirements): Promise<SettleResult> {
     try {
       const [p, r] = this.normalize(payload, requirements);
-      const res = await this.client.settle(p as unknown as X402PaymentPayload, r as unknown as X402PaymentRequirements);
+      const res = await this.client.settle(p, r);
       return { success: res.success, ...(res.errorReason ? { errorReason: res.errorReason } : {}), ...(res.transaction ? { transaction: res.transaction } : {}), ...(res.payer ? { payer: res.payer } : {}) };
     } catch (err) {
       if (err instanceof SettleError) {
         return { success: false, errorReason: `${this.name}_http_${err.statusCode}:${err.errorReason ?? ''} ${err.errorMessage ?? err.message}`.trim() };
       }
       const [p, r] = this.normalize(payload, requirements);
-      const full = await this.diagnose('settle', p as unknown as X402PaymentPayload, r as unknown as X402PaymentRequirements, String(err));
+      const full = await this.diagnose('settle', p, r, String(err));
       return { success: false, errorReason: `${this.name}_error:${full.slice(0, 1000)}` };
     }
   }
