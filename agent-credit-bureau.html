@@ -97,8 +97,7 @@
   .gauge-svg-wrap{position:relative;width:220px;height:120px;margin:0 auto 16px}
   .gauge-svg{width:220px;height:120px;overflow:visible}
   .gauge-track{fill:none;stroke:var(--line2);stroke-width:12;stroke-linecap:round}
-  .gauge-fill{fill:none;stroke:var(--green);stroke-width:12;stroke-linecap:round;stroke-dasharray:345;stroke-dashoffset:345;animation:gauge-anim 2.2s cubic-bezier(.4,0,.2,1) 0.5s forwards;filter:drop-shadow(0 0 8px rgba(57,255,20,.6))}
-  @keyframes gauge-anim{to{stroke-dashoffset:52}}
+  .gauge-fill{fill:none;stroke:var(--green);stroke-width:12;stroke-linecap:round;stroke-dasharray:345;stroke-dashoffset:345;transition:stroke-dashoffset 1.4s cubic-bezier(.4,0,.2,1);filter:drop-shadow(0 0 8px rgba(57,255,20,.6))}
   .gauge-score{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:52px;font-weight:900;color:var(--green);line-height:1;text-shadow:0 0 30px rgba(57,255,20,.5);letter-spacing:-3px}
   .gauge-score-sub{font-family:var(--mono);font-size:10px;color:var(--mute2);margin-top:4px;letter-spacing:2px}
   .gauge-grade{display:inline-flex;align-items:center;gap:8px;margin:12px 0;padding:8px 20px;background:rgba(57,255,20,.1);border:1px solid rgba(57,255,20,.3);border-radius:20px;font-family:var(--mono);font-size:14px;font-weight:700;color:var(--green)}
@@ -111,6 +110,8 @@
   .sbar-fill{height:100%;border-radius:3px;background:var(--green);animation:bar-grow 1.8s ease-out forwards;transform-origin:left}
   @keyframes bar-grow{from{width:0}}
   .sbar-pts{font-family:var(--mono);font-size:10px;color:var(--green)}
+  .cb-note{font-size:11px;color:var(--mute);line-height:1.6;margin-top:20px;padding-top:16px;border-top:1px solid var(--line2)}
+  .cb-note a{color:var(--green2)}
 
   /* ── GRADE TABLE ── */
   .grades{margin:80px 0}
@@ -319,55 +320,63 @@
 
       <!-- RIGHT: SCORE GAUGE -->
       <div class="gauge-card">
-        <div class="gauge-label">Live Score Demo — Wallet rHb9...Th</div>
+        <div class="gauge-label" id="cb-label">Live Score Lookup — Wallet rHb9...Th</div>
         <div class="gauge-svg-wrap">
           <svg class="gauge-svg" viewBox="0 0 220 120">
             <!-- Track arc (180°, left to right) -->
             <path class="gauge-track" d="M 20 110 A 90 90 0 0 1 200 110"/>
-            <!-- Fill arc — stroke-dasharray 345 = circumference of arc -->
-            <path class="gauge-fill" d="M 20 110 A 90 90 0 0 1 200 110"/>
+            <!-- Fill arc — stroke-dasharray 345 = circumference of arc, set live via JS from the real score -->
+            <path class="gauge-fill" id="cb-fill" d="M 20 110 A 90 90 0 0 1 200 110"/>
             <!-- Grade ticks -->
             <text x="15" y="118" fill="#4A554C" font-size="9" font-family="monospace">300</text>
             <text x="188" y="118" fill="#4A554C" font-size="9" font-family="monospace">850</text>
           </svg>
-          <div class="gauge-score">762</div>
+          <div class="gauge-score" id="cb-score">—</div>
         </div>
         <div class="gauge-score-sub">CREDIT SCORE · 300–850 RANGE</div>
-        <div class="gauge-grade">AA · LOW RISK</div>
-        <div class="gauge-meta">
-          Credit limit: <span>$1,024 RLUSD</span> · Payments: <span>47/47</span> successful
-        </div>
-        <div class="score-bars">
-          <div class="sbar">
-            <div class="sbar-label">Payment History</div>
-            <div class="sbar-track"><div class="sbar-fill" style="width:100%;background:var(--green)"></div></div>
-            <div class="sbar-pts">30/30</div>
-          </div>
-          <div class="sbar">
-            <div class="sbar-label">Streak</div>
-            <div class="sbar-track"><div class="sbar-fill" style="width:88%;background:var(--green2)"></div></div>
-            <div class="sbar-pts">22/25</div>
-          </div>
-          <div class="sbar">
-            <div class="sbar-label">Timeliness</div>
-            <div class="sbar-track"><div class="sbar-fill" style="width:80%;background:var(--amber)"></div></div>
-            <div class="sbar-pts">16/20</div>
-          </div>
-          <div class="sbar">
-            <div class="sbar-label">Wallet Age</div>
-            <div class="sbar-track"><div class="sbar-fill" style="width:80%;background:var(--blue)"></div></div>
-            <div class="sbar-pts">12/15</div>
-          </div>
-          <div class="sbar">
-            <div class="sbar-label">Volume</div>
-            <div class="sbar-track"><div class="sbar-fill" style="width:80%;background:var(--purple)"></div></div>
-            <div class="sbar-pts">8/10</div>
-          </div>
-        </div>
+        <div class="gauge-grade" id="cb-grade">Fetching live score…</div>
+        <div class="gauge-meta" id="cb-meta">Calling the real API — this is not a mock.</div>
+        <div class="cb-note">Full 5-factor breakdown (payment history, streak, timeliness, wallet age, volume) is in the paid report — <a href="https://sml-agent-credit-bureau.onrender.com/v1/agent/report?wallet=rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh" target="_blank">GET /v1/agent/report</a> (0.05 RLUSD via x402).</div>
       </div>
     </div>
   </div>
 </section>
+
+<script>
+(function(){
+  var WALLET = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh';
+  var BUREAU = 'https://sml-agent-credit-bureau.onrender.com';
+  var scoreEl = document.getElementById('cb-score');
+  var gradeEl = document.getElementById('cb-grade');
+  var metaEl = document.getElementById('cb-meta');
+  var fillEl = document.getElementById('cb-fill');
+  var labelEl = document.getElementById('cb-label');
+
+  function unavailable(){
+    scoreEl.textContent = '—';
+    gradeEl.textContent = 'Score unavailable';
+    metaEl.textContent = 'The live bureau could not be reached just now — try GET /v1/agent/score directly, or check back shortly.';
+    labelEl.textContent = 'Live Score Lookup — Wallet rHb9...Th (unavailable)';
+  }
+
+  fetch(BUREAU + '/v1/agent/score?wallet=' + encodeURIComponent(WALLET), { signal: AbortSignal.timeout(6000) })
+    .then(function(res){ if (!res.ok) throw new Error('http_' + res.status); return res.json(); })
+    .then(function(body){
+      if (typeof body.score !== 'number') throw new Error('bad_response');
+      var score = body.score;
+      var grade = body.grade || '—';
+      var risk = body.risk ? String(body.risk).replace(/_/g, ' ') : '';
+      scoreEl.textContent = score;
+      gradeEl.textContent = risk ? (grade + ' · ' + risk) : grade;
+      metaEl.textContent = (typeof body.creditLimit === 'number')
+        ? 'Credit limit: $' + body.creditLimit.toLocaleString() + ' RLUSD' + (body.cached ? ' · cached' : ' · fetched live just now')
+        : 'Fetched live from the bureau just now.';
+      var pct = Math.max(0, Math.min(1, (score - 300) / (850 - 300)));
+      fillEl.style.strokeDashoffset = String(345 - 345 * pct);
+    })
+    .catch(unavailable);
+})();
+</script>
 
 <!-- TICKER -->
 <div class="ticker">
