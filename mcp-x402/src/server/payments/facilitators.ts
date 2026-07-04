@@ -195,18 +195,50 @@ export class SelfFacilitator implements Facilitator {
 // same package @coinbase/x402's createFacilitatorConfig() is built against.
 // It constructs the exact request Coinbase's own client sends — no more
 // hand-rolled request bodies to get subtly wrong.
+// x402 has two wire versions that disagree on network format — confirmed
+// directly from @x402/core's own schema definitions (schemas/index.d.ts):
+//   V1 (NetworkSchemaV1): loose, any non-empty string ("base" works fine)
+//   V2 (NetworkSchemaV2): strict CAIP-2, e.g. "eip155:8453" — "base" fails
+// Our client (x402-fetch, built on the older v1-era package) sends
+// x402Version: 2 but still uses the plain v1-style network name "base".
+// CDP's facilitator enforces the strict V2 schema, so that combination is
+// invalid on their end — the empty "invalid network: " we kept seeing wasn't
+// a missing/blank field, it was a value that failed CAIP-2 format validation.
+// x402.org's own error ("No facilitator registered for network: base")
+// proves IT parses "base" as a valid network name fine — this conversion is
+// CDP-specific, not applied to other facilitators.
+const CAIP2_BY_NETWORK: Record<string, string> = {
+  base: 'eip155:8453',
+  'base-sepolia': 'eip155:84532',
+};
+
+function toCaip2Network(network: string): string {
+  return CAIP2_BY_NETWORK[network] ?? network;
+}
+
 class RemoteFacilitator implements Facilitator {
   readonly name: string;
   private readonly client: HTTPFacilitatorClient;
+  private readonly useCaip2Network: boolean;
 
-  constructor(name: string, config: X402FacilitatorConfig) {
+  constructor(name: string, config: X402FacilitatorConfig, opts?: { useCaip2Network?: boolean }) {
     this.name = name;
     this.client = new HTTPFacilitatorClient(config);
+    this.useCaip2Network = opts?.useCaip2Network ?? false;
+  }
+
+  private normalize(payload: PaymentPayload, requirements: PaymentRequirements): [PaymentPayload, PaymentRequirements] {
+    if (!this.useCaip2Network) return [payload, requirements];
+    return [
+      { ...payload, network: toCaip2Network(payload.network) },
+      { ...requirements, network: toCaip2Network(requirements.network) },
+    ];
   }
 
   async verify(payload: PaymentPayload, requirements: PaymentRequirements): Promise<VerifyResult> {
     try {
-      const res = await this.client.verify(payload as unknown as X402PaymentPayload, requirements as unknown as X402PaymentRequirements);
+      const [p, r] = this.normalize(payload, requirements);
+      const res = await this.client.verify(p as unknown as X402PaymentPayload, r as unknown as X402PaymentRequirements);
       return { isValid: res.isValid, ...(res.invalidReason ? { invalidReason: res.invalidReason } : {}), ...(res.payer ? { payer: res.payer } : {}) };
     } catch (err) {
       if (err instanceof VerifyError) {
@@ -218,7 +250,8 @@ class RemoteFacilitator implements Facilitator {
 
   async settle(payload: PaymentPayload, requirements: PaymentRequirements): Promise<SettleResult> {
     try {
-      const res = await this.client.settle(payload as unknown as X402PaymentPayload, requirements as unknown as X402PaymentRequirements);
+      const [p, r] = this.normalize(payload, requirements);
+      const res = await this.client.settle(p as unknown as X402PaymentPayload, r as unknown as X402PaymentRequirements);
       return { success: res.success, ...(res.errorReason ? { errorReason: res.errorReason } : {}), ...(res.transaction ? { transaction: res.transaction } : {}), ...(res.payer ? { payer: res.payer } : {}) };
     } catch (err) {
       if (err instanceof SettleError) {
@@ -254,7 +287,7 @@ export function makeHttpFacilitator(baseUrl: string, opts?: { name?: string; aut
 // it builds the same short-lived per-request EdDSA JWT auth (via
 // @coinbase/cdp-sdk under the hood) that CDP's real client uses internally.
 export function makeCdpFacilitator(apiKeyId: string, apiKeySecret: string): Facilitator {
-  return new RemoteFacilitator('cdp', createFacilitatorConfig(apiKeyId, apiKeySecret));
+  return new RemoteFacilitator('cdp', createFacilitatorConfig(apiKeyId, apiKeySecret), { useCaip2Network: true });
 }
 
 // ── Hybrid chain: try facilitators in order until one verifies AND settles ────
