@@ -13,6 +13,7 @@ import { rapidApiGuard } from './security/rapidapi.js';
 import { healthHandler } from './health.js';
 import { verifyBaseUsdcPayment, alreadyRedeemed, markRedeemed, releaseRedeem } from './payments/verify-inbound.js';
 import { facilitatorChain, decodePaymentHeader, type PaymentRequirements } from './payments/facilitators.js';
+import { X402Stats } from './security/x402-stats.js';
 import { SqueezeOSAPI } from '../lib/sml-api/squeezeos.js';
 
 // Embedded favicon (jet black / neon green SML mark) — served directly, no redirect
@@ -1813,6 +1814,12 @@ async function runSSE(): Promise<void> {
       payTo: X402_PAY_TO,
       note: 'Standard rail is settled through the listed facilitator chain (hybrid: tried in order, first success wins). Funds always settle to payTo regardless of facilitator. Sovereign rail needs no facilitator.',
     });
+  });
+
+  // Real, in-memory payment activity — counts and recent events only, no
+  // simulated/seeded data. See security/x402-stats.ts. Resets on restart.
+  app.get('/x402/stats', (_req, res) => {
+    res.set('Access-Control-Allow-Origin', '*').json(X402Stats.getInstance().snapshot());
   });
 
   // Root handler — service discovery for agents hitting / directly
