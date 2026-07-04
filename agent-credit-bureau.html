@@ -365,11 +365,11 @@
       if (typeof body.score !== 'number') throw new Error('bad_response');
       var score = body.score;
       var grade = body.grade || '—';
-      var risk = body.risk ? String(body.risk).replace(/_/g, ' ') : '';
+      var risk = body.risk_level ? String(body.risk_level).replace(/_/g, ' ') : '';
       scoreEl.textContent = score;
       gradeEl.textContent = risk ? (grade + ' · ' + risk) : grade;
-      metaEl.textContent = (typeof body.creditLimit === 'number')
-        ? 'Credit limit: $' + body.creditLimit.toLocaleString() + ' RLUSD' + (body.cached ? ' · cached' : ' · fetched live just now')
+      metaEl.textContent = (typeof body.recommended_credit_limit_rlusd === 'number')
+        ? 'Credit limit: $' + body.recommended_credit_limit_rlusd.toLocaleString() + ' RLUSD' + (body.cached ? ' · cached' : ' · fetched live just now')
         : 'Fetched live from the bureau just now.';
       var pct = Math.max(0, Math.min(1, (score - 300) / (850 - 300)));
       fillEl.style.strokeDashoffset = String(345 - 345 * pct);
