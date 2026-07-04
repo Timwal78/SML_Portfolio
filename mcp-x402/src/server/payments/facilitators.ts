@@ -3,6 +3,7 @@ import { base, baseSepolia } from 'viem/chains';
 import { privateKeyToAccount } from 'viem/accounts';
 import { mnemonicToSeedSync } from 'bip39';
 import HDKey from 'hdkey';
+import { generateJwt } from '@coinbase/cdp-sdk/auth';
 import { HTTPFacilitatorClient } from '@x402/core/http';
 import type { FacilitatorConfig as X402FacilitatorConfig } from '@x402/core/http';
 import { VerifyError, SettleError } from '@x402/core/types';
@@ -216,15 +217,27 @@ function toCaip2Network(network: string): string {
   return CAIP2_BY_NETWORK[network] ?? network;
 }
 
+// @x402/core's HTTPFacilitatorClient truncates any non-x402-shaped error body
+// to 200 chars via its own internal responseExcerpt() helper — confirmed by
+// reading node_modules/@x402/core/dist/cjs/http/index.js directly — before it
+// ever reaches our code. Widening our OWN error-string slicing (a prior fix)
+// was a no-op because the text was already cut upstream. rawDiagnosticFetch
+// is an optional escape hatch: on a generic (non-VerifyError/SettleError)
+// failure, repeat the exact same request ourselves with no truncation, so
+// the real error text is visible without another live test round-trip.
+type RawDiagnosticFetch = (path: 'verify' | 'settle', payload: X402PaymentPayload, requirements: X402PaymentRequirements) => Promise<string>;
+
 class RemoteFacilitator implements Facilitator {
   readonly name: string;
   private readonly client: HTTPFacilitatorClient;
   private readonly useCaip2Network: boolean;
+  private readonly rawDiagnosticFetch?: RawDiagnosticFetch;
 
-  constructor(name: string, config: X402FacilitatorConfig, opts?: { useCaip2Network?: boolean }) {
+  constructor(name: string, config: X402FacilitatorConfig, opts?: { useCaip2Network?: boolean; rawDiagnosticFetch?: RawDiagnosticFetch }) {
     this.name = name;
     this.client = new HTTPFacilitatorClient(config);
     this.useCaip2Network = opts?.useCaip2Network ?? false;
+    this.rawDiagnosticFetch = opts?.rawDiagnosticFetch;
   }
 
   private normalize(payload: PaymentPayload, requirements: PaymentRequirements): [PaymentPayload, PaymentRequirements] {
@@ -233,6 +246,15 @@ class RemoteFacilitator implements Facilitator {
       { ...payload, network: toCaip2Network(payload.network) },
       { ...requirements, network: toCaip2Network(requirements.network) },
     ];
+  }
+
+  private async diagnose(stage: 'verify' | 'settle', p: X402PaymentPayload, r: X402PaymentRequirements, fallback: string): Promise<string> {
+    if (!this.rawDiagnosticFetch) return fallback;
+    try {
+      return await this.rawDiagnosticFetch(stage, p, r);
+    } catch {
+      return fallback;
+    }
   }
 
   async verify(payload: PaymentPayload, requirements: PaymentRequirements): Promise<VerifyResult> {
@@ -244,7 +266,9 @@ class RemoteFacilitator implements Facilitator {
       if (err instanceof VerifyError) {
         return { isValid: false, invalidReason: `${this.name}_http_${err.statusCode}:${err.invalidReason ?? ''} ${err.invalidMessage ?? err.message}`.trim() };
       }
-      return { isValid: false, invalidReason: `${this.name}_error:${String(err).slice(0, 1000)}` };
+      const [p, r] = this.normalize(payload, requirements);
+      const full = await this.diagnose('verify', p as unknown as X402PaymentPayload, r as unknown as X402PaymentRequirements, String(err));
+      return { isValid: false, invalidReason: `${this.name}_error:${full.slice(0, 1000)}` };
     }
   }
 
@@ -257,7 +281,9 @@ class RemoteFacilitator implements Facilitator {
       if (err instanceof SettleError) {
         return { success: false, errorReason: `${this.name}_http_${err.statusCode}:${err.errorReason ?? ''} ${err.errorMessage ?? err.message}`.trim() };
       }
-      return { success: false, errorReason: `${this.name}_error:${String(err).slice(0, 1000)}` };
+      const [p, r] = this.normalize(payload, requirements);
+      const full = await this.diagnose('settle', p as unknown as X402PaymentPayload, r as unknown as X402PaymentRequirements, String(err));
+      return { success: false, errorReason: `${this.name}_error:${full.slice(0, 1000)}` };
     }
   }
 }
@@ -286,8 +312,30 @@ export function makeHttpFacilitator(baseUrl: string, opts?: { name?: string; aut
 // createFacilitatorConfig is Coinbase's own official helper (@coinbase/x402) —
 // it builds the same short-lived per-request EdDSA JWT auth (via
 // @coinbase/cdp-sdk under the hood) that CDP's real client uses internally.
+const CDP_HOST = 'api.cdp.coinbase.com';
+const CDP_PATHS: Record<'verify' | 'settle', string> = {
+  verify: '/platform/v2/x402/verify',
+  settle: '/platform/v2/x402/settle',
+};
+
+function makeCdpRawDiagnosticFetch(apiKeyId: string, apiKeySecret: string): RawDiagnosticFetch {
+  return async (stage, payload, requirements) => {
+    const path = CDP_PATHS[stage];
+    const jwt = await generateJwt({ apiKeyId, apiKeySecret, requestMethod: 'POST', requestHost: CDP_HOST, requestPath: path });
+    const r = await fetch(`https://${CDP_HOST}${path}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jwt}` },
+      body: JSON.stringify({ x402Version: payload.x402Version, paymentPayload: payload, paymentRequirements: requirements }),
+    });
+    return `HTTP ${r.status}: ${await r.text()}`;
+  };
+}
+
 export function makeCdpFacilitator(apiKeyId: string, apiKeySecret: string): Facilitator {
-  return new RemoteFacilitator('cdp', createFacilitatorConfig(apiKeyId, apiKeySecret), { useCaip2Network: true });
+  return new RemoteFacilitator('cdp', createFacilitatorConfig(apiKeyId, apiKeySecret), {
+    useCaip2Network: true,
+    rawDiagnosticFetch: makeCdpRawDiagnosticFetch(apiKeyId, apiKeySecret),
+  });
 }
 
 // ── Hybrid chain: try facilitators in order until one verifies AND settles ────
