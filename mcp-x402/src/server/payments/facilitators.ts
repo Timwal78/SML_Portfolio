@@ -199,8 +199,9 @@ export class HttpFacilitator implements Facilitator {
   async verify(payload: PaymentPayload, requirements: PaymentRequirements): Promise<VerifyResult> {
     try {
       const r = await fetch(`${this.baseUrl}/verify`, { method: 'POST', headers: this.headers(), body: JSON.stringify({ x402Version: 2, paymentPayload: payload, paymentRequirements: requirements }) });
-      if (!r.ok) return { isValid: false, invalidReason: `facilitator_http_${r.status}` };
-      const j = await r.json() as { isValid?: boolean; invalidReason?: string; payer?: string };
+      const rawBody = await r.text();
+      if (!r.ok) return { isValid: false, invalidReason: `facilitator_http_${r.status}:${rawBody.slice(0, 200)}` };
+      const j = JSON.parse(rawBody) as { isValid?: boolean; invalidReason?: string; payer?: string };
       return { isValid: j.isValid === true, ...(j.invalidReason ? { invalidReason: j.invalidReason } : {}), ...(j.payer ? { payer: j.payer } : {}) };
     } catch (err) {
       return { isValid: false, invalidReason: `facilitator_unreachable:${String(err).slice(0, 60)}` };
@@ -210,8 +211,9 @@ export class HttpFacilitator implements Facilitator {
   async settle(payload: PaymentPayload, requirements: PaymentRequirements): Promise<SettleResult> {
     try {
       const r = await fetch(`${this.baseUrl}/settle`, { method: 'POST', headers: this.headers(), body: JSON.stringify({ x402Version: 2, paymentPayload: payload, paymentRequirements: requirements }) });
-      if (!r.ok) return { success: false, errorReason: `facilitator_http_${r.status}` };
-      const j = await r.json() as { success?: boolean; errorReason?: string; transaction?: string; payer?: string };
+      const rawBody = await r.text();
+      if (!r.ok) return { success: false, errorReason: `facilitator_http_${r.status}:${rawBody.slice(0, 200)}` };
+      const j = JSON.parse(rawBody) as { success?: boolean; errorReason?: string; transaction?: string; payer?: string };
       return { success: j.success === true, ...(j.errorReason ? { errorReason: j.errorReason } : {}), ...(j.transaction ? { transaction: j.transaction } : {}), ...(j.payer ? { payer: j.payer } : {}) };
     } catch (err) {
       return { success: false, errorReason: `facilitator_unreachable:${String(err).slice(0, 60)}` };
@@ -238,7 +240,7 @@ export class CdpFacilitator implements Facilitator {
 
   constructor(private readonly apiKeyId: string, private readonly apiKeySecret: string) {}
 
-  private async call(path: string, payload: PaymentPayload, requirements: PaymentRequirements): Promise<{ ok: boolean; status: number; json: Record<string, unknown> | null }> {
+  private async call(path: string, payload: PaymentPayload, requirements: PaymentRequirements): Promise<{ ok: boolean; status: number; json: Record<string, unknown> | null; rawBody: string }> {
     const jwt = await generateJwt({
       apiKeyId: this.apiKeyId,
       apiKeySecret: this.apiKeySecret,
@@ -251,14 +253,20 @@ export class CdpFacilitator implements Facilitator {
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jwt}` },
       body: JSON.stringify({ x402Version: 2, paymentPayload: payload, paymentRequirements: requirements }),
     });
-    const json = r.ok ? (await r.json() as Record<string, unknown>) : null;
-    return { ok: r.ok, status: r.status, json };
+    // Read the body on EVERY response, not just success — a 400/401/etc from
+    // CDP carries the actual reason (bad JWT, malformed request, unsupported
+    // asset, ...) and discarding it left every failure as an opaque
+    // "cdp_http_400" with no way to tell why short of raw Render logs.
+    const rawBody = await r.text();
+    let json: Record<string, unknown> | null = null;
+    try { json = rawBody ? (JSON.parse(rawBody) as Record<string, unknown>) : null; } catch { /* not JSON, rawBody still captured below */ }
+    return { ok: r.ok, status: r.status, json, rawBody };
   }
 
   async verify(payload: PaymentPayload, requirements: PaymentRequirements): Promise<VerifyResult> {
     try {
-      const { ok, status, json } = await this.call(CDP_VERIFY_PATH, payload, requirements);
-      if (!ok || !json) return { isValid: false, invalidReason: `cdp_http_${status}` };
+      const { ok, status, json, rawBody } = await this.call(CDP_VERIFY_PATH, payload, requirements);
+      if (!ok || !json) return { isValid: false, invalidReason: `cdp_http_${status}:${rawBody.slice(0, 200)}` };
       const isValid = json['isValid'] === true;
       const invalidReason = typeof json['invalidReason'] === 'string' ? json['invalidReason'] : undefined;
       const payer = typeof json['payer'] === 'string' ? json['payer'] : undefined;
@@ -270,8 +278,8 @@ export class CdpFacilitator implements Facilitator {
 
   async settle(payload: PaymentPayload, requirements: PaymentRequirements): Promise<SettleResult> {
     try {
-      const { ok, status, json } = await this.call(CDP_SETTLE_PATH, payload, requirements);
-      if (!ok || !json) return { success: false, errorReason: `cdp_http_${status}` };
+      const { ok, status, json, rawBody } = await this.call(CDP_SETTLE_PATH, payload, requirements);
+      if (!ok || !json) return { success: false, errorReason: `cdp_http_${status}:${rawBody.slice(0, 200)}` };
       const success = json['success'] === true;
       const errorReason = typeof json['errorReason'] === 'string' ? json['errorReason'] : undefined;
       const transaction = typeof json['transaction'] === 'string' ? json['transaction'] : undefined;
