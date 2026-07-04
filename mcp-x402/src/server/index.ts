@@ -145,11 +145,19 @@ async function runSSE(): Promise<void> {
     }];
   };
   // extensions.bazaar.schema — the v2 location the crawler reads input/output from.
+  // `discoverable: true` is what actually opts a route into CDP's Bazaar index —
+  // the schema alone isn't enough. CDP still only catalogs it after the FIRST
+  // real payment for this route settles through the CDP facilitator specifically
+  // (see facilitatorChain() in payments/facilitators.ts) — schema + flag get you
+  // eligible, they don't get you listed by themselves.
   const buildBazaarExtensions = (inputSchema: unknown, outputSchema: unknown): Record<string, unknown> => ({
-    bazaar: { schema: { properties: {
-      input: { properties: { queryParams: isRecord(inputSchema) ? inputSchema : { type: 'object' } } },
-      output: { properties: { example: isRecord(outputSchema) ? outputSchema : { type: 'object' } } },
-    } } },
+    bazaar: {
+      discoverable: true,
+      schema: { properties: {
+        input: { properties: { queryParams: isRecord(inputSchema) ? inputSchema : { type: 'object' } } },
+        output: { properties: { example: isRecord(outputSchema) ? outputSchema : { type: 'object' } } },
+      } },
+    },
   });
   const send402 = (res: Response, challenge: Record<string, unknown>, header402: string, extra?: Record<string, unknown>): void => {
     const body = extra ? { ...challenge, ...extra } : challenge;
