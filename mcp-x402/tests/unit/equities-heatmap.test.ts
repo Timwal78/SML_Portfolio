@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { computeRSI } from '../../src/lib/quant/indicators.js';
 import { blackScholesDelta } from '../../src/lib/quant/greeks.js';
 import { buildHeatmap } from '../../src/lib/quant/heatmap.js';
+import { pickExtremes } from '../../src/lib/notify/discord.js';
 
 describe('computeRSI', () => {
   it('approaches 100 for a steadily rising series', () => {
@@ -52,5 +53,24 @@ describe('buildHeatmap', () => {
     const heatmap = buildHeatmap(items, { groupsOf: 1 });
     expect(heatmap.groups).toHaveLength(1);
     expect(heatmap.groups[0]?.items).toHaveLength(5);
+  });
+});
+
+describe('pickExtremes', () => {
+  it('finds the single highest- and lowest-value items across all groups', () => {
+    const items = Array.from({ length: 12 }, (_, i) => ({ symbol: `T${i}`, value: i * 8 }));
+    const heatmap = buildHeatmap(items, { overboughtThreshold: 70, oversoldThreshold: 30, scale: 'test' });
+    const { top, bottom } = pickExtremes(heatmap);
+    expect(top?.symbol).toBe('T11');
+    expect(top?.value).toBe(88);
+    expect(bottom?.symbol).toBe('T0');
+    expect(bottom?.value).toBe(0);
+  });
+
+  it('returns nulls for an empty heatmap', () => {
+    const heatmap = buildHeatmap([]);
+    const { top, bottom } = pickExtremes(heatmap);
+    expect(top).toBeNull();
+    expect(bottom).toBeNull();
   });
 });

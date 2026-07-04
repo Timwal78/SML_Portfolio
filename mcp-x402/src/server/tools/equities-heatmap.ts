@@ -6,6 +6,8 @@ import { Sandbox } from '../security/sandbox.js';
 import { AuditLogger } from '../security/audit.js';
 import { PriceRegistry } from '../registry/pricing.js';
 import { EquitiesHeatmapAPI, OptionsDeltaHeatmapAPI } from '../../lib/sml-api/equities-heatmap.js';
+import { notifyHeatmapSale, type HeatmapToolName } from '../../lib/notify/discord.js';
+import type { HeatmapResult } from '../../lib/quant/heatmap.js';
 
 // ── Schemas ──────────────────────────────────────────────────────────────────
 
@@ -56,6 +58,23 @@ async function paidCall(
   try {
     const data = await fn();
     audit.info(`${toolName}_success`, { receiptId: payment.receiptId });
+
+    // Best-effort Discord sale alert — fire-and-forget, never awaited, never
+    // allowed to affect the tool response. Both heatmap tools return a
+    // { heatmap, swarm: { synthesis } } shape; feature-detect rather than
+    // trusting the (untyped) toolName string.
+    const typedData = data as { heatmap?: HeatmapResult; swarm?: { synthesis?: string } };
+    if (typedData.heatmap && typedData.swarm?.synthesis) {
+      notifyHeatmapSale({
+        toolName: toolName as HeatmapToolName,
+        amountPaid: payment.amountPaid,
+        currency: payment.currency,
+        walletAddress: payment.walletAddress,
+        heatmap: typedData.heatmap,
+        synthesis: typedData.swarm.synthesis,
+      });
+    }
+
     return {
       content: [{
         type: 'text',
