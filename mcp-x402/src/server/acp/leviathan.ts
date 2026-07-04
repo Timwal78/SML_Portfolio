@@ -733,7 +733,19 @@ function extractRequirement(session: JobSession): Requirement {
  * keywords) that ACP may store as the job description, so long as it still
  * begins with the exact canonical title.
  */
-function resolveOffering(rawDescription: string): { key: string; spec: Offering } | undefined {
+// Buyers/listings on the Virtuals marketplace echo back whatever description
+// string was used when the product was listed (e.g. "squeezeos_triple_lock_signal"),
+// which may not match OFFERINGS' Title Case keys byte-for-byte even though it's
+// clearly the same product — normalize away case/spacing/punctuation before
+// falling back to "no such offering".
+function normalize(s: string): string {
+  return s.toLowerCase().replace(/[^a-z0-9]+/g, '');
+}
+
+const NORMALIZED_KEYS: ReadonlyArray<readonly [string, string]> =
+  Object.keys(OFFERINGS).map((key) => [normalize(key), key] as const);
+
+export function resolveOffering(rawDescription: string): { key: string; spec: Offering } | undefined {
   const exact = OFFERINGS[rawDescription];
   if (exact) return { key: rawDescription, spec: exact };
 
@@ -741,6 +753,17 @@ function resolveOffering(rawDescription: string): { key: string; spec: Offering 
   for (const [key, spec] of Object.entries(OFFERINGS)) {
     if (rawDescription.startsWith(key) && (!best || key.length > best.key.length)) {
       best = { key, spec };
+    }
+  }
+  if (best) return best;
+
+  const normalizedDesc = normalize(rawDescription);
+  const normalizedExact = NORMALIZED_KEYS.find(([norm]) => norm === normalizedDesc);
+  if (normalizedExact) return { key: normalizedExact[1], spec: OFFERINGS[normalizedExact[1]]! };
+
+  for (const [normKey, key] of NORMALIZED_KEYS) {
+    if (normalizedDesc.startsWith(normKey) && (!best || key.length > best.key.length)) {
+      best = { key, spec: OFFERINGS[key]! };
     }
   }
   return best;
