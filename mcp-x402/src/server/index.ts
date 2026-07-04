@@ -200,7 +200,7 @@ async function runSSE(): Promise<void> {
       const payload = decodePaymentHeader(xPayment);
       if (!payload) { send402(res, challenge, header402, { error: 'invalid_payment_payload' }); return { ok: false }; }
       const result = await facilitatorChain().process(payload, accepts[0] as PaymentRequirements);
-      if (!result.success) { send402(res, challenge, header402, { error: 'payment_unsettled', detail: result.errorReason ?? '', attempts: result.attempts ?? [] }); return { ok: false }; }
+      if (!result.success) { send402(res, challenge, header402, { error: 'payment_unsettled', detail: result.errorReason ?? '', attempts: result.attempts ?? [], receivedPayload: { x402Version: payload.x402Version, scheme: payload.scheme, network: payload.network } }); return { ok: false }; }
       return { ok: true, payer: { rail: `standard:${result.facilitator ?? ''}`, from: result.payer ?? payload.payload.authorization.from, tx: result.transaction ?? '' } };
     }
 
