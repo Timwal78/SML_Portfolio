@@ -198,7 +198,7 @@ export class HttpFacilitator implements Facilitator {
 
   async verify(payload: PaymentPayload, requirements: PaymentRequirements): Promise<VerifyResult> {
     try {
-      const r = await fetch(`${this.baseUrl}/verify`, { method: 'POST', headers: this.headers(), body: JSON.stringify({ x402Version: 2, paymentPayload: payload, paymentRequirements: requirements }) });
+      const r = await fetch(`${this.baseUrl}/verify`, { method: 'POST', headers: this.headers(), body: JSON.stringify({ x402Version: payload.x402Version ?? 1, paymentPayload: payload, paymentRequirements: requirements }) });
       const rawBody = await r.text();
       if (!r.ok) return { isValid: false, invalidReason: `facilitator_http_${r.status}:${rawBody.slice(0, 200)}` };
       const j = JSON.parse(rawBody) as { isValid?: boolean; invalidReason?: string; payer?: string };
@@ -210,7 +210,7 @@ export class HttpFacilitator implements Facilitator {
 
   async settle(payload: PaymentPayload, requirements: PaymentRequirements): Promise<SettleResult> {
     try {
-      const r = await fetch(`${this.baseUrl}/settle`, { method: 'POST', headers: this.headers(), body: JSON.stringify({ x402Version: 2, paymentPayload: payload, paymentRequirements: requirements }) });
+      const r = await fetch(`${this.baseUrl}/settle`, { method: 'POST', headers: this.headers(), body: JSON.stringify({ x402Version: payload.x402Version ?? 1, paymentPayload: payload, paymentRequirements: requirements }) });
       const rawBody = await r.text();
       if (!r.ok) return { success: false, errorReason: `facilitator_http_${r.status}:${rawBody.slice(0, 200)}` };
       const j = JSON.parse(rawBody) as { success?: boolean; errorReason?: string; transaction?: string; payer?: string };
@@ -251,7 +251,7 @@ export class CdpFacilitator implements Facilitator {
     const r = await fetch(`https://${CDP_HOST}${path}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jwt}` },
-      body: JSON.stringify({ x402Version: 2, paymentPayload: payload, paymentRequirements: requirements }),
+      body: JSON.stringify({ x402Version: payload.x402Version ?? 1, paymentPayload: payload, paymentRequirements: requirements }),
     });
     // Read the body on EVERY response, not just success — a 400/401/etc from
     // CDP carries the actual reason (bad JWT, malformed request, unsupported
