@@ -17,6 +17,11 @@ const BASE_PRICES: Record<string, string> = {
   squeezeos_iwm: '0.03',
   squeezeos_preview: '0.00',
   squeezeos_status: '0.00',
+  // Equities / Options heatmap (self-contained: Polygon.io + Claude swarm)
+  equities_heatmap_preview: '0.00',
+  equities_heatmap_full: '0.10',
+  options_delta_heatmap_preview: '0.00',
+  options_delta_heatmap_full: '0.15',
   // SEC / Earnings
   xmit_edgar_decode: '0.02',
   xdeo_earnings_estimate: '0.02',

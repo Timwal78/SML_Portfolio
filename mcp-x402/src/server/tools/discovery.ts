@@ -47,6 +47,17 @@ const CATALOG = {
       ],
     },
     {
+      product: 'Equities & Options Heatmap (AI Swarm)',
+      description: 'Self-contained RSI heatmap for equities and Black-Scholes Delta heatmap for options — live Polygon.io data, computed locally, each with a real 4-agent Claude swarm verdict (not a rule-based mock).',
+      backend: 'self-contained (Polygon.io + Anthropic Claude)',
+      tools: [
+        { name: 'equities_heatmap_preview',      type: 'FREE', description: '5-ticker RSI(14) preview, 1 group, no AI swarm' },
+        { name: 'equities_heatmap_full',         type: 'PAID', price_usdc: '0.10', description: 'RSI(14) heatmap across up to 20 tickers (default 16-ticker large-cap watchlist), 4 groups + 4-agent Claude swarm verdict (MOMENTUM_QUANT, SECTOR_ROTATION, RISK_SENTINEL, MACRO_ORACLE)' },
+        { name: 'options_delta_heatmap_preview', type: 'FREE', description: '5-contract Delta preview (SPY calls by default), 1 group, no AI swarm' },
+        { name: 'options_delta_heatmap_full',    type: 'PAID', price_usdc: '0.15', description: 'Live options chain snapshot, locally-computed Black-Scholes Delta across up to 40 contracts, 4 groups + 4-agent Claude swarm verdict (GREEKS_ANALYST, IV_SKEW_HUNTER, GAMMA_WATCH, RISK_SENTINEL)' },
+      ],
+    },
+    {
       product: 'Ghost Layer',
       description: 'Ephemeral dual-chain XRPL+Base toll routing gateway for autonomous agents',
       backend: 'https://ghost-layer.onrender.com',
@@ -154,10 +165,10 @@ const CATALOG = {
     },
   ],
   stats: {
-    total_tools: 45,
-    free_tools: 22,
-    paid_tools: 22,
-    products: 12,
+    total_tools: 49,
+    free_tools: 24,
+    paid_tools: 24,
+    products: 13,
     chains_supported: 3,
   },
 };

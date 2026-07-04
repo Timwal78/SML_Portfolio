@@ -17,6 +17,8 @@ const PAID_TOOLS = [
   'squeezeos_scan',
   'squeezeos_options',
   'squeezeos_iwm',
+  'equities_heatmap_full',
+  'options_delta_heatmap_full',
   'xmit_edgar_decode',
   'xdeo_earnings_estimate',
   'ftd_threshold_scan',
