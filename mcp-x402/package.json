@@ -43,6 +43,8 @@
   },
   "dependencies": {
     "@coinbase/cdp-sdk": "^1.51.2",
+    "@coinbase/x402": "^2.1.0",
+    "@x402/core": "^2.17.0",
     "@modelcontextprotocol/sdk": "^1.12.0",
     "@virtuals-protocol/acp-node-v2": "^0.1.6",
     "@account-kit/infra": "^4.88.4",
