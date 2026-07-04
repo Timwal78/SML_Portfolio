@@ -9,7 +9,18 @@ import { type Request, type Response, type NextFunction } from 'express';
 // middleware inside each route handler issues the 402 challenge. Blocking here with
 // a 403 prevents x402scan from seeing the challenge, so those endpoints never get
 // indexed. Pass them through; requirePayment still protects them.
-const PUBLIC_PREFIXES = ['/health', '/api/stats', '/.well-known/', '/openapi.json', '/llms.txt', '/agents.json', '/favicon.ico', '/x402/'];
+//
+// /mcp and /sse are the actual MCP tool-call transports, and /messages is the
+// companion POST endpoint the legacy SSE transport uses to actually send a
+// tool call once GET /sse has opened the stream — all three are load-bearing
+// for every MCP client. The whole product's pitch (agents.json, llms.txt,
+// sml_discover) is "no API keys, agents pay autonomously via x402." Gating the
+// transport itself behind a RapidAPI secret contradicts that: every paid MCP
+// tool now verifies a real payment per call (see payments/x402.ts), so the
+// payment check IS the access control here, exactly like /x402/*. There is no
+// active RapidAPI relationship using this gate, so blocking these would only
+// ever turn away the autonomous agents the server exists to serve.
+const PUBLIC_PREFIXES = ['/health', '/api/stats', '/.well-known/', '/openapi.json', '/llms.txt', '/agents.json', '/favicon.ico', '/x402/', '/mcp', '/sse', '/messages'];
 
 export function rapidApiGuard(req: Request, res: Response, next: NextFunction): void {
   const secret = process.env['RAPIDAPI_PROXY_SECRET'];
