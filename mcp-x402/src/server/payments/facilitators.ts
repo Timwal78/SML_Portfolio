@@ -14,6 +14,7 @@ import type {
 import { createFacilitatorConfig } from '@coinbase/x402';
 import { WalletManager } from './wallet.js';
 import { AuditLogger } from '../security/audit.js';
+import { X402Stats } from '../security/x402-stats.js';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // x402 standard "exact" (EIP-3009) payment types.
@@ -370,6 +371,8 @@ export class FacilitatorChain {
   // without needing to read Render's raw logs.
   async process(payload: PaymentPayload, req: PaymentRequirements): Promise<SettleResult & { facilitator?: string; attempts?: Array<{ facilitator: string; stage: string; reason: string }> }> {
     const audit = AuditLogger.getInstance();
+    const stats = X402Stats.getInstance();
+    stats.recordAttempt(req.resource);
     const attempts: Array<{ facilitator: string; stage: string; reason: string }> = [];
     let lastReason = 'no_facilitator';
     for (const f of this.chain) {
@@ -378,13 +381,19 @@ export class FacilitatorChain {
         lastReason = v.invalidReason ?? 'verify_failed';
         attempts.push({ facilitator: f.name, stage: 'verify', reason: lastReason });
         audit.warn('facilitator_verify_failed', { facilitator: f.name, reason: lastReason });
+        stats.recordFailed('verify', f.name, lastReason, req.resource);
         continue;
       }
       const s = await f.settle(payload, req);
-      if (s.success) { audit.info('facilitator_settled', { facilitator: f.name, tx: s.transaction ?? '' }); return { ...s, facilitator: f.name, attempts }; }
+      if (s.success) {
+        audit.info('facilitator_settled', { facilitator: f.name, tx: s.transaction ?? '' });
+        stats.recordSettled(f.name, s.payer ?? 'unknown', s.transaction ?? '', req.resource);
+        return { ...s, facilitator: f.name, attempts };
+      }
       lastReason = s.errorReason ?? 'settle_failed';
       attempts.push({ facilitator: f.name, stage: 'settle', reason: lastReason });
       audit.warn('facilitator_settle_failed', { facilitator: f.name, reason: lastReason });
+      stats.recordFailed('settle', f.name, lastReason, req.resource);
     }
     return { success: false, errorReason: lastReason, attempts };
   }
