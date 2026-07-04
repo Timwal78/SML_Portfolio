@@ -24,6 +24,8 @@ const ValidateSchema = z.object({
   fees: z.number().min(0).max(0.05).default(0.001),
   slippage: z.number().min(0).max(0.05).default(0.0005),
   wallet_address: z.string().optional(),
+  payment_tx_hash: z.string().optional(),
+  payment_header: z.string().optional(),
 });
 
 export function registerBacktest(server: McpServer): void {
@@ -74,6 +76,8 @@ export function registerBacktest(server: McpServer): void {
       fees: z.number().describe('Round-trip commission rate (default 0.001)'),
       slippage: z.number().describe('Slippage per side (default 0.0005)'),
       wallet_address: z.string().describe('Agent wallet for x402 payment (AP2 required)'),
+      payment_tx_hash: z.string().optional().describe('On-chain Base tx hash proving USDC payment to the operator (sovereign rail). Omit if using payment_header.'),
+      payment_header: z.string().optional().describe('Base64 X-PAYMENT EIP-3009 payload, facilitator-settled (standard rail). Omit if using payment_tx_hash.'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(ValidateSchema, rawArgs);
@@ -87,7 +91,7 @@ export function registerBacktest(server: McpServer): void {
       }
       let payment;
       try {
-        payment = await executeX402Payment({ price, currency: 'USDC', toolName: 'backtest_validate', walletAddress: args.wallet_address });
+        payment = await executeX402Payment({ price, currency: 'USDC', toolName: 'backtest_validate', walletAddress: args.wallet_address, paymentTxHash: args.payment_tx_hash, paymentHeader: args.payment_header });
       } catch (err) {
         audit.warn('backtest_validate_payment_fail', { error: String(err) });
         return { content: [{ type: 'text', text: JSON.stringify({ error: 'payment_failed', message: String(err) }) }], isError: true };

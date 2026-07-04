@@ -13,6 +13,8 @@ const ExecuteSchema = z.object({
   tool: z.string().min(1),
   wallet_address: z.string().min(1),
   symbol: z.string().optional(),
+  payment_tx_hash: z.string().optional(),
+  payment_header: z.string().optional(),
 });
 
 type ToolResult = { content: Array<{ type: 'text'; text: string }>; isError?: true };
@@ -34,6 +36,8 @@ export function registerApmExecute(server: McpServer): void {
       tool: z.string().describe('Tool to execute. Must match the quote and be brokerable (e.g. squeezeos_council).'),
       wallet_address: z.string().describe('Wallet that pays the brokered total.'),
       symbol: z.string().optional().describe('Ticker symbol, when the tool needs one (e.g. squeezeos_council).'),
+      payment_tx_hash: z.string().optional().describe('On-chain Base tx hash proving USDC payment to the operator (sovereign rail). Omit if using payment_header.'),
+      payment_header: z.string().optional().describe('Base64 X-PAYMENT EIP-3009 payload, facilitator-settled (standard rail). Omit if using payment_tx_hash.'),
     },
     async (rawArgs): Promise<ToolResult> => {
       const args = Sandbox.validate(ExecuteSchema, rawArgs);
@@ -64,7 +68,7 @@ export function registerApmExecute(server: McpServer): void {
       const total = brokeredTotal(check.quote.price_usd, check.quote.brokerage_commission_pct);
       let payment;
       try {
-        payment = await executeBrokeredPayment({ amount: total, toolName: `apm_execute:${args.tool}` });
+        payment = await executeBrokeredPayment({ amount: total, toolName: `apm_execute:${args.tool}`, walletAddress: args.wallet_address, paymentTxHash: args.payment_tx_hash, paymentHeader: args.payment_header });
       } catch (err) {
         audit.warn('apm_execute_payment_fail', { error: String(err) });
         return fail('payment_failed', { message: String(err) });

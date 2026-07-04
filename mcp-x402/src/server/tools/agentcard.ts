@@ -23,6 +23,8 @@ const MintSchema = z.object({
   did: z.string().optional(),
   metadata: z.record(z.unknown()).optional(),
   payment_wallet: z.string().optional(),
+  payment_tx_hash: z.string().optional(),
+  payment_header: z.string().optional(),
 });
 
 export function registerAgentCard(server: McpServer): void {
@@ -85,6 +87,8 @@ export function registerAgentCard(server: McpServer): void {
       did: z.string().describe('Optional DID (decentralized identifier) for the agent.'),
       metadata: z.record(z.unknown()).describe('Optional metadata object (capabilities, version, etc.).'),
       payment_wallet: z.string().describe('Wallet to pay x402 fee from (defaults to wallet_address).'),
+      payment_tx_hash: z.string().optional().describe('On-chain Base tx hash proving USDC payment to the operator (sovereign rail). Omit if using payment_header.'),
+      payment_header: z.string().optional().describe('Base64 X-PAYMENT EIP-3009 payload, facilitator-settled (standard rail). Omit if using payment_tx_hash.'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(MintSchema, rawArgs);
@@ -102,7 +106,7 @@ export function registerAgentCard(server: McpServer): void {
 
       let payment;
       try {
-        payment = await executeX402Payment({ price, currency: 'USDC', toolName: 'agentcard_mint', walletAddress: paymentWallet });
+        payment = await executeX402Payment({ price, currency: 'USDC', toolName: 'agentcard_mint', walletAddress: paymentWallet, paymentTxHash: args.payment_tx_hash, paymentHeader: args.payment_header });
       } catch (err) {
         audit.warn('agentcard_mint_payment_fail', { error: String(err) });
         return { content: [{ type: 'text', text: JSON.stringify({ error: 'payment_failed', message: String(err) }) }], isError: true };

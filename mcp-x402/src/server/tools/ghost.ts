@@ -14,6 +14,8 @@ const RouteSchema = z.object({
   currency: z.string().min(1).max(10),
   destination_address: z.string().min(10),
   wallet_address: z.string().optional(),
+  payment_tx_hash: z.string().optional(),
+  payment_header: z.string().optional(),
 });
 
 export function registerGhost(server: McpServer): void {
@@ -43,6 +45,8 @@ export function registerGhost(server: McpServer): void {
       currency: z.string().describe('Token/currency symbol (e.g. RLUSD, XRP, ETH).'),
       destination_address: z.string().describe('Recipient address on the destination chain.'),
       wallet_address: z.string().describe('Agent wallet for x402 payment.'),
+      payment_tx_hash: z.string().optional().describe('On-chain Base tx hash proving USDC payment to the operator (sovereign rail). Omit if using payment_header.'),
+      payment_header: z.string().optional().describe('Base64 X-PAYMENT EIP-3009 payload, facilitator-settled (standard rail). Omit if using payment_tx_hash.'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(RouteSchema, rawArgs);
@@ -59,7 +63,7 @@ export function registerGhost(server: McpServer): void {
 
       let payment;
       try {
-        payment = await executeX402Payment({ price, currency: 'USDC', toolName: 'ghost_route', walletAddress: args.wallet_address });
+        payment = await executeX402Payment({ price, currency: 'USDC', toolName: 'ghost_route', walletAddress: args.wallet_address, paymentTxHash: args.payment_tx_hash, paymentHeader: args.payment_header });
       } catch (err) {
         audit.warn('ghost_route_payment_fail', { error: String(err) });
         return { content: [{ type: 'text', text: JSON.stringify({ error: 'payment_failed', message: String(err) }) }], isError: true };

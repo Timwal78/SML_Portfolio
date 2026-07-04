@@ -12,6 +12,8 @@ const SubscribeSchema = z.object({
   subscriber_address: z.string().min(10),
   max_copy_amount_xrp: z.number().positive(),
   wallet_address: z.string().optional(),
+  payment_tx_hash: z.string().optional(),
+  payment_header: z.string().optional(),
 });
 
 export function registerCopyTrader(server: McpServer): void {
@@ -57,6 +59,8 @@ export function registerCopyTrader(server: McpServer): void {
       subscriber_address: z.string().describe('Your XRPL address that will mirror trades.'),
       max_copy_amount_xrp: z.number().describe('Maximum XRP to allocate per copied trade.'),
       wallet_address: z.string().describe('Agent wallet for x402 payment.'),
+      payment_tx_hash: z.string().optional().describe('On-chain Base tx hash proving USDC payment to the operator (sovereign rail). Omit if using payment_header.'),
+      payment_header: z.string().optional().describe('Base64 X-PAYMENT EIP-3009 payload, facilitator-settled (standard rail). Omit if using payment_tx_hash.'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(SubscribeSchema, rawArgs);
@@ -73,7 +77,7 @@ export function registerCopyTrader(server: McpServer): void {
 
       let payment;
       try {
-        payment = await executeX402Payment({ price, currency: 'USDC', toolName: 'copytrader_subscribe', walletAddress: args.wallet_address });
+        payment = await executeX402Payment({ price, currency: 'USDC', toolName: 'copytrader_subscribe', walletAddress: args.wallet_address, paymentTxHash: args.payment_tx_hash, paymentHeader: args.payment_header });
       } catch (err) {
         audit.warn('copytrader_subscribe_payment_fail', { error: String(err) });
         return { content: [{ type: 'text', text: JSON.stringify({ error: 'payment_failed', message: String(err) }) }], isError: true };

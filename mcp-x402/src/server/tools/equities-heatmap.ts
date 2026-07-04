@@ -19,6 +19,8 @@ const EquitiesHeatmapFullSchema = z.object({
   tickers: z.array(z.string().min(1).max(10)).max(20).optional(),
   timeframe: z.enum(['1h', '1d']).optional(),
   wallet_address: z.string().optional(),
+  payment_tx_hash: z.string().optional(),
+  payment_header: z.string().optional(),
 });
 
 const OptionsDeltaHeatmapFullSchema = z.object({
@@ -26,6 +28,8 @@ const OptionsDeltaHeatmapFullSchema = z.object({
   expiration_date: z.string().optional(),
   option_type: z.enum(['call', 'put']).optional(),
   wallet_address: z.string().optional(),
+  payment_tx_hash: z.string().optional(),
+  payment_header: z.string().optional(),
 });
 
 // ── Helper ────────────────────────────────────────────────────────────────────
@@ -33,6 +37,8 @@ const OptionsDeltaHeatmapFullSchema = z.object({
 async function paidCall(
   toolName: string,
   walletAddress: string | undefined,
+  paymentTxHash: string | undefined,
+  paymentHeader: string | undefined,
   fn: () => Promise<unknown>,
 ): Promise<{ content: Array<{ type: 'text'; text: string }>; isError?: true }> {
   const audit = AuditLogger.getInstance();
@@ -49,7 +55,7 @@ async function paidCall(
 
   let payment;
   try {
-    payment = await executeX402Payment({ price, currency: 'USDC', toolName, walletAddress });
+    payment = await executeX402Payment({ price, currency: 'USDC', toolName, walletAddress, paymentTxHash, paymentHeader });
   } catch (err) {
     audit.warn(`${toolName}_payment_fail`, { error: String(err) });
     return { content: [{ type: 'text', text: JSON.stringify({ error: 'payment_failed', message: String(err) }) }], isError: true };
@@ -126,10 +132,12 @@ export function registerEquitiesHeatmap(server: McpServer): void {
       tickers: z.array(z.string()).describe('Up to 20 ticker symbols. Defaults to a 16-ticker large-cap watchlist.').optional(),
       timeframe: z.enum(['1h', '1d']).describe('Bar timeframe for RSI computation. Defaults to 1h.').optional(),
       wallet_address: z.string().describe('Agent wallet address for x402 payment.').optional(),
+      payment_tx_hash: z.string().describe('On-chain Base tx hash proving USDC payment to the operator (sovereign rail). Omit if using payment_header.').optional(),
+      payment_header: z.string().describe('Base64 X-PAYMENT EIP-3009 payload, facilitator-settled (standard rail). Omit if using payment_tx_hash.').optional(),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(EquitiesHeatmapFullSchema, rawArgs);
-      return paidCall('equities_heatmap_full', args.wallet_address, () =>
+      return paidCall('equities_heatmap_full', args.wallet_address, args.payment_tx_hash, args.payment_header, () =>
         EquitiesHeatmapAPI.full(args.tickers, args.timeframe),
       );
     },
@@ -164,10 +172,12 @@ export function registerEquitiesHeatmap(server: McpServer): void {
       expiration_date: z.string().describe('Options expiration date (YYYY-MM-DD). Defaults to nearest available.').optional(),
       option_type: z.enum(['call', 'put']).describe('Defaults to call.').optional(),
       wallet_address: z.string().describe('Agent wallet address for x402 payment.').optional(),
+      payment_tx_hash: z.string().describe('On-chain Base tx hash proving USDC payment to the operator (sovereign rail). Omit if using payment_header.').optional(),
+      payment_header: z.string().describe('Base64 X-PAYMENT EIP-3009 payload, facilitator-settled (standard rail). Omit if using payment_tx_hash.').optional(),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(OptionsDeltaHeatmapFullSchema, rawArgs);
-      return paidCall('options_delta_heatmap_full', args.wallet_address, () =>
+      return paidCall('options_delta_heatmap_full', args.wallet_address, args.payment_tx_hash, args.payment_header, () =>
         OptionsDeltaHeatmapAPI.full(args.underlying, args.expiration_date, args.option_type),
       );
     },

@@ -19,16 +19,22 @@ const OptionalSymbolSchema = z.object({
 
 const PaidSchema = z.object({
   wallet_address: z.string().optional(),
+  payment_tx_hash: z.string().optional(),
+  payment_header: z.string().optional(),
 });
 
 const CouncilSchema = z.object({
   symbol: z.string().min(1).max(10).toUpperCase(),
   wallet_address: z.string().optional(),
+  payment_tx_hash: z.string().optional(),
+  payment_header: z.string().optional(),
 });
 
 const MarketplaceReadSchema = z.object({
   listing_id: z.string().min(1),
   wallet_address: z.string().optional(),
+  payment_tx_hash: z.string().optional(),
+  payment_header: z.string().optional(),
 });
 
 // ── Helper ────────────────────────────────────────────────────────────────────
@@ -36,6 +42,8 @@ const MarketplaceReadSchema = z.object({
 async function paidCall(
   toolName: string,
   walletAddress: string | undefined,
+  paymentTxHash: string | undefined,
+  paymentHeader: string | undefined,
   fn: (walletAddress: string) => Promise<unknown>,
 ): Promise<{ content: Array<{ type: 'text'; text: string }>; isError?: true }> {
   const audit = AuditLogger.getInstance();
@@ -52,7 +60,7 @@ async function paidCall(
 
   let payment;
   try {
-    payment = await executeX402Payment({ price, currency: 'USDC', toolName, walletAddress });
+    payment = await executeX402Payment({ price, currency: 'USDC', toolName, walletAddress, paymentTxHash, paymentHeader });
   } catch (err) {
     audit.warn(`${toolName}_payment_fail`, { error: String(err) });
     return { content: [{ type: 'text', text: JSON.stringify({ error: 'payment_failed', message: String(err) }) }], isError: true };
@@ -244,10 +252,12 @@ export function registerSqueezeOS(server: McpServer): void {
     {
       symbol: z.string().describe('Ticker symbol to analyze (e.g. TSLA, GME, IWM).'),
       wallet_address: z.string().describe('Agent wallet address for x402 payment.'),
+      payment_tx_hash: z.string().optional().describe('On-chain Base tx hash proving USDC payment to the operator (sovereign rail). Omit if using payment_header.'),
+      payment_header: z.string().optional().describe('Base64 X-PAYMENT EIP-3009 payload, facilitator-settled (standard rail). Omit if using payment_tx_hash.'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(CouncilSchema, rawArgs);
-      return paidCall('squeezeos_council', args.wallet_address, (wlt) =>
+      return paidCall('squeezeos_council', args.wallet_address, args.payment_tx_hash, args.payment_header, (wlt) =>
         SqueezeOSAPI.council(args.symbol, wlt),
       );
     },
@@ -258,10 +268,12 @@ export function registerSqueezeOS(server: McpServer): void {
     'squeezeos_scan',
     {
       wallet_address: z.string().describe('Agent wallet address for x402 payment.'),
+      payment_tx_hash: z.string().optional().describe('On-chain Base tx hash proving USDC payment to the operator (sovereign rail). Omit if using payment_header.'),
+      payment_header: z.string().optional().describe('Base64 X-PAYMENT EIP-3009 payload, facilitator-settled (standard rail). Omit if using payment_tx_hash.'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(PaidSchema, rawArgs);
-      return paidCall('squeezeos_scan', args.wallet_address, (wlt) =>
+      return paidCall('squeezeos_scan', args.wallet_address, args.payment_tx_hash, args.payment_header, (wlt) =>
         SqueezeOSAPI.scan(wlt),
       );
     },
@@ -272,10 +284,12 @@ export function registerSqueezeOS(server: McpServer): void {
     'squeezeos_options',
     {
       wallet_address: z.string().describe('Agent wallet address for x402 payment.'),
+      payment_tx_hash: z.string().optional().describe('On-chain Base tx hash proving USDC payment to the operator (sovereign rail). Omit if using payment_header.'),
+      payment_header: z.string().optional().describe('Base64 X-PAYMENT EIP-3009 payload, facilitator-settled (standard rail). Omit if using payment_tx_hash.'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(PaidSchema, rawArgs);
-      return paidCall('squeezeos_options', args.wallet_address, (wlt) =>
+      return paidCall('squeezeos_options', args.wallet_address, args.payment_tx_hash, args.payment_header, (wlt) =>
         SqueezeOSAPI.options(wlt),
       );
     },
@@ -286,10 +300,12 @@ export function registerSqueezeOS(server: McpServer): void {
     'squeezeos_iwm',
     {
       wallet_address: z.string().describe('Agent wallet address for x402 payment.'),
+      payment_tx_hash: z.string().optional().describe('On-chain Base tx hash proving USDC payment to the operator (sovereign rail). Omit if using payment_header.'),
+      payment_header: z.string().optional().describe('Base64 X-PAYMENT EIP-3009 payload, facilitator-settled (standard rail). Omit if using payment_tx_hash.'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(PaidSchema, rawArgs);
-      return paidCall('squeezeos_iwm', args.wallet_address, (wlt) =>
+      return paidCall('squeezeos_iwm', args.wallet_address, args.payment_tx_hash, args.payment_header, (wlt) =>
         SqueezeOSAPI.iwm(wlt),
       );
     },
@@ -301,10 +317,12 @@ export function registerSqueezeOS(server: McpServer): void {
     {
       listing_id: z.string().describe('Listing ID from squeezeos_marketplace_browse.'),
       wallet_address: z.string().describe('Agent wallet address for x402 payment.'),
+      payment_tx_hash: z.string().optional().describe('On-chain Base tx hash proving USDC payment to the operator (sovereign rail). Omit if using payment_header.'),
+      payment_header: z.string().optional().describe('Base64 X-PAYMENT EIP-3009 payload, facilitator-settled (standard rail). Omit if using payment_tx_hash.'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(MarketplaceReadSchema, rawArgs);
-      return paidCall('squeezeos_marketplace_read', args.wallet_address, (wlt) =>
+      return paidCall('squeezeos_marketplace_read', args.wallet_address, args.payment_tx_hash, args.payment_header, (wlt) =>
         SqueezeOSAPI.marketplaceRead(args.listing_id, wlt),
       );
     },
