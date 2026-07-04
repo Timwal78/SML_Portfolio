@@ -74,9 +74,22 @@ export class CreditBureau {
         { signal: AbortSignal.timeout(5000) }
       );
       if (res.ok) {
-        const body = (await res.json()) as { score: number; grade: string; risk: string; creditLimit: number; cached: boolean };
+        // Real API field names (api/score.py's ScoreResponse): risk_level, recommended_credit_limit_rlusd
+        const body = (await res.json()) as {
+          score: number;
+          grade: string;
+          risk_level: string;
+          recommended_credit_limit_rlusd: number;
+          cached: boolean;
+        };
         this.cache.set(wallet, { score: body.score, grade: body.grade, fetchedAt: Date.now() });
-        return body;
+        return {
+          score: body.score,
+          grade: body.grade,
+          risk: body.risk_level,
+          creditLimit: body.recommended_credit_limit_rlusd,
+          cached: body.cached,
+        };
       }
     } catch {
       // Fall through
