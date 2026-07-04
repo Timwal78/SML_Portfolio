@@ -3,6 +3,7 @@ import { base, baseSepolia } from 'viem/chains';
 import { privateKeyToAccount } from 'viem/accounts';
 import { mnemonicToSeedSync } from 'bip39';
 import HDKey from 'hdkey';
+import { generateJwt } from '@coinbase/cdp-sdk/auth';
 import { WalletManager } from './wallet.js';
 import { AuditLogger } from '../security/audit.js';
 
@@ -218,6 +219,70 @@ export class HttpFacilitator implements Facilitator {
   }
 }
 
+// ── Coinbase Developer Platform facilitator ────────────────────────────────────
+// The managed x402 facilitator at api.cdp.coinbase.com. Distinct from the open,
+// no-account x402.org facilitator: CDP only catalogs a route in the x402 Bazaar
+// (see index.ts buildBazaarExtensions/discoverable) the first time a real
+// payment for it settles specifically through THIS facilitator.
+//
+// Auth is a short-lived (120s default) EdDSA JWT signed per-request with your
+// Ed25519 CDP secret key — not a static bearer token, so a fresh JWT is
+// generated for every verify/settle call. Uses Coinbase's own official
+// @coinbase/cdp-sdk for JWT construction rather than hand-rolled signing.
+const CDP_HOST = 'api.cdp.coinbase.com';
+const CDP_VERIFY_PATH = '/platform/v2/x402/verify';
+const CDP_SETTLE_PATH = '/platform/v2/x402/settle';
+
+export class CdpFacilitator implements Facilitator {
+  readonly name = 'cdp';
+
+  constructor(private readonly apiKeyId: string, private readonly apiKeySecret: string) {}
+
+  private async call(path: string, payload: PaymentPayload, requirements: PaymentRequirements): Promise<{ ok: boolean; status: number; json: Record<string, unknown> | null }> {
+    const jwt = await generateJwt({
+      apiKeyId: this.apiKeyId,
+      apiKeySecret: this.apiKeySecret,
+      requestMethod: 'POST',
+      requestHost: CDP_HOST,
+      requestPath: path,
+    });
+    const r = await fetch(`https://${CDP_HOST}${path}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jwt}` },
+      body: JSON.stringify({ x402Version: 2, paymentPayload: payload, paymentRequirements: requirements }),
+    });
+    const json = r.ok ? (await r.json() as Record<string, unknown>) : null;
+    return { ok: r.ok, status: r.status, json };
+  }
+
+  async verify(payload: PaymentPayload, requirements: PaymentRequirements): Promise<VerifyResult> {
+    try {
+      const { ok, status, json } = await this.call(CDP_VERIFY_PATH, payload, requirements);
+      if (!ok || !json) return { isValid: false, invalidReason: `cdp_http_${status}` };
+      const isValid = json['isValid'] === true;
+      const invalidReason = typeof json['invalidReason'] === 'string' ? json['invalidReason'] : undefined;
+      const payer = typeof json['payer'] === 'string' ? json['payer'] : undefined;
+      return { isValid, ...(invalidReason ? { invalidReason } : {}), ...(payer ? { payer } : {}) };
+    } catch (err) {
+      return { isValid: false, invalidReason: `cdp_unreachable:${String(err).slice(0, 60)}` };
+    }
+  }
+
+  async settle(payload: PaymentPayload, requirements: PaymentRequirements): Promise<SettleResult> {
+    try {
+      const { ok, status, json } = await this.call(CDP_SETTLE_PATH, payload, requirements);
+      if (!ok || !json) return { success: false, errorReason: `cdp_http_${status}` };
+      const success = json['success'] === true;
+      const errorReason = typeof json['errorReason'] === 'string' ? json['errorReason'] : undefined;
+      const transaction = typeof json['transaction'] === 'string' ? json['transaction'] : undefined;
+      const payer = typeof json['payer'] === 'string' ? json['payer'] : undefined;
+      return { success, ...(errorReason ? { errorReason } : {}), ...(transaction ? { transaction } : {}), ...(payer ? { payer } : {}) };
+    } catch (err) {
+      return { success: false, errorReason: `cdp_unreachable:${String(err).slice(0, 80)}` };
+    }
+  }
+}
+
 // ── Hybrid chain: try facilitators in order until one verifies AND settles ────
 export class FacilitatorChain {
   constructor(private readonly chain: Facilitator[]) {}
@@ -246,7 +311,14 @@ export class FacilitatorChain {
 //   "https://x402.org/facilitator"            → public Coinbase facilitator only
 //   "https://x402.org/facilitator,self"       → public first, our wallet as fallback
 //   "self"                                     → fully sovereign (needs gas on our wallet)
-//   "https://api.cdp.coinbase.com/...,self"    → partner/CDP first, sovereign fallback
+//
+// CDP_API_KEY_ID / CDP_API_KEY_SECRET: if BOTH are set, a CdpFacilitator is
+// always prepended to the front of the chain — tried first, before whatever
+// X402_FACILITATOR_CHAIN specifies. Settling through it is what gets this
+// server's routes cataloged in the x402 Bazaar. If CDP is unreachable or a
+// call fails for any reason, the chain falls through to the next facilitator
+// exactly as it already does today — CDP is additive, not a replacement, so
+// this can't make payments less reliable than they already were.
 let cachedChain: FacilitatorChain | null = null;
 export function facilitatorChain(): FacilitatorChain {
   if (cachedChain) return cachedChain;
@@ -257,6 +329,11 @@ export function facilitatorChain(): FacilitatorChain {
     return new HttpFacilitator(entry, { name: new URL(entry).host, ...(auth ? { authHeader: auth.startsWith('Bearer ') ? auth : `Bearer ${auth}` } : {}) });
   });
   if (built.length === 0) built.push(new SelfFacilitator());
+
+  const cdpKeyId = process.env['CDP_API_KEY_ID'];
+  const cdpKeySecret = process.env['CDP_API_KEY_SECRET'];
+  if (cdpKeyId && cdpKeySecret) built.unshift(new CdpFacilitator(cdpKeyId, cdpKeySecret));
+
   cachedChain = new FacilitatorChain(built);
   return cachedChain;
 }

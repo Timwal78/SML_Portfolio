@@ -52,6 +52,14 @@ services:
         value: https://four02proof.onrender.com
       - key: TESTNET
         value: "false"
+      # Coinbase Developer Platform x402 facilitator — optional. If BOTH are set,
+      # CdpFacilitator is tried first in the hybrid chain (facilitators.ts); a real
+      # settled payment through it is what gets these routes cataloged in the x402
+      # Bazaar. Paste the actual key ID/secret only here in Render, never in git.
+      - key: CDP_API_KEY_ID
+        sync: false
+      - key: CDP_API_KEY_SECRET
+        sync: false
     autoDeploy: true
     # Render restarts the service automatically on crash
     # healthCheckPath triggers restart if /health returns non-2xx
