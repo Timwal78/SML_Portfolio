@@ -288,18 +288,31 @@ export class FacilitatorChain {
   constructor(private readonly chain: Facilitator[]) {}
   get names(): string[] { return this.chain.map((f) => f.name); }
 
-  async process(payload: PaymentPayload, req: PaymentRequirements): Promise<SettleResult & { facilitator?: string }> {
+  // Every attempt's reason used to be overwritten by the next one, so the
+  // final error only ever showed the LAST facilitator tried — hiding, e.g.,
+  // whether CDP was even attempted before falling through to x402.org. Now
+  // every attempt is recorded and returned as `attempts` alongside the final
+  // errorReason, so a failure is diagnosable from the API response itself,
+  // without needing to read Render's raw logs.
+  async process(payload: PaymentPayload, req: PaymentRequirements): Promise<SettleResult & { facilitator?: string; attempts?: Array<{ facilitator: string; stage: string; reason: string }> }> {
     const audit = AuditLogger.getInstance();
+    const attempts: Array<{ facilitator: string; stage: string; reason: string }> = [];
     let lastReason = 'no_facilitator';
     for (const f of this.chain) {
       const v = await f.verify(payload, req);
-      if (!v.isValid) { lastReason = v.invalidReason ?? 'verify_failed'; audit.warn('facilitator_verify_failed', { facilitator: f.name, reason: lastReason }); continue; }
+      if (!v.isValid) {
+        lastReason = v.invalidReason ?? 'verify_failed';
+        attempts.push({ facilitator: f.name, stage: 'verify', reason: lastReason });
+        audit.warn('facilitator_verify_failed', { facilitator: f.name, reason: lastReason });
+        continue;
+      }
       const s = await f.settle(payload, req);
-      if (s.success) { audit.info('facilitator_settled', { facilitator: f.name, tx: s.transaction ?? '' }); return { ...s, facilitator: f.name }; }
+      if (s.success) { audit.info('facilitator_settled', { facilitator: f.name, tx: s.transaction ?? '' }); return { ...s, facilitator: f.name, attempts }; }
       lastReason = s.errorReason ?? 'settle_failed';
+      attempts.push({ facilitator: f.name, stage: 'settle', reason: lastReason });
       audit.warn('facilitator_settle_failed', { facilitator: f.name, reason: lastReason });
     }
-    return { success: false, errorReason: lastReason };
+    return { success: false, errorReason: lastReason, attempts };
   }
 }
 
