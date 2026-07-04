@@ -12,6 +12,8 @@ const InputSchema = z.object({
   parse_target: z.enum(['executive_pay', 'holdings', 'ownership_changes', 'all']),
   format: z.enum(['json', 'markdown']).default('json'),
   wallet_address: z.string().optional(),
+  payment_tx_hash: z.string().optional(),
+  payment_header: z.string().optional(),
 });
 
 export function registerXmit(server: McpServer): void {
@@ -22,6 +24,8 @@ export function registerXmit(server: McpServer): void {
       parse_target: z.enum(['executive_pay', 'holdings', 'ownership_changes', 'all']).describe('What to extract.'),
       format: z.enum(['json', 'markdown']).describe('Output format. Default: json.'),
       wallet_address: z.string().describe('Agent wallet for payment.'),
+      payment_tx_hash: z.string().optional().describe('On-chain Base tx hash proving USDC payment to the operator (sovereign rail). Omit if using payment_header.'),
+      payment_header: z.string().optional().describe('Base64 X-PAYMENT EIP-3009 payload, facilitator-settled (standard rail). Omit if using payment_tx_hash.'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(InputSchema, rawArgs);
@@ -45,7 +49,7 @@ export function registerXmit(server: McpServer): void {
 
       let payment;
       try {
-        payment = await executeX402Payment({ price, currency: 'USDC', toolName: 'xmit_edgar_decode', walletAddress: args.wallet_address });
+        payment = await executeX402Payment({ price, currency: 'USDC', toolName: 'xmit_edgar_decode', walletAddress: args.wallet_address, paymentTxHash: args.payment_tx_hash, paymentHeader: args.payment_header });
       } catch (err) {
         return { content: [{ type: 'text', text: JSON.stringify({ error: 'payment_failed', message: String(err) }) }], isError: true };
       }

@@ -26,6 +26,8 @@ export const ManifestSchema = z.object({
   need: z.string().min(2).max(500),
   mode: z.enum(['preview', 'contract']).default('preview'),
   wallet_address: z.string().optional(),
+  payment_tx_hash: z.string().optional(),
+  payment_header: z.string().optional(),
   agent_id: z.string().optional(),
   constraints: ConstraintsSchema.optional(),
 });

@@ -58,7 +58,7 @@ function rpcUrl(): string {
     ? (process.env['BASE_SEPOLIA_RPC_URL'] ?? 'https://sepolia.base.org')
     : (process.env['BASE_RPC_URL'] ?? 'https://mainnet.base.org');
 }
-function usdcAddress(): string { return isTestnet() ? USDC_BASE_SEPOLIA : USDC_BASE; }
+export function usdcAddress(): string { return isTestnet() ? USDC_BASE_SEPOLIA : USDC_BASE; }
 function chainId(): number { return isTestnet() ? baseSepolia.id : base.id; }
 
 // ── Self-hosted facilitator: verify EIP-712 locally, settle via our own wallet ─

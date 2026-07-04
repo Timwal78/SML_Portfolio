@@ -29,6 +29,8 @@ const GrantsSchema = z.object({
   opp_status: z.enum(['forecasted', 'posted', 'closed', 'archived']).default('posted'),
   rows: z.number().int().min(1).max(50).default(10),
   wallet_address: z.string().optional(),
+  payment_tx_hash: z.string().optional(),
+  payment_header: z.string().optional(),
 });
 const ContractsSchema = z.object({
   title: z.string().max(200).optional(),
@@ -38,10 +40,14 @@ const ContractsSchema = z.object({
   days_back: z.number().int().min(1).max(365).default(90),
   limit: z.number().int().min(1).max(100).default(15),
   wallet_address: z.string().optional(),
+  payment_tx_hash: z.string().optional(),
+  payment_header: z.string().optional(),
 });
 const EntitySchema = z.object({
   uei: z.string().length(12),
   wallet_address: z.string().optional(),
+  payment_tx_hash: z.string().optional(),
+  payment_header: z.string().optional(),
 });
 
 export function registerFederal(server: McpServer): void {
@@ -55,6 +61,8 @@ export function registerFederal(server: McpServer): void {
       opp_status: z.enum(['forecasted', 'posted', 'closed', 'archived']).describe('Opportunity status filter. Default: posted (open now).'),
       rows: z.number().describe('Number of results to return (1-50, default 10).'),
       wallet_address: z.string().describe('Agent wallet for x402 payment. Humans bypass automatically.'),
+      payment_tx_hash: z.string().optional().describe('On-chain Base tx hash proving USDC payment to the operator (sovereign rail). Omit if using payment_header.'),
+      payment_header: z.string().optional().describe('Base64 X-PAYMENT EIP-3009 payload, facilitator-settled (standard rail). Omit if using payment_tx_hash.'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(GrantsSchema, rawArgs);
@@ -66,7 +74,7 @@ export function registerFederal(server: McpServer): void {
       if (!price) return { content: [{ type: 'text', text: JSON.stringify({ error: 'price_unavailable' }) }], isError: true };
       let payment;
       try {
-        payment = await executeX402Payment({ price, currency: 'USDC', toolName: 'search_grants', walletAddress: args.wallet_address });
+        payment = await executeX402Payment({ price, currency: 'USDC', toolName: 'search_grants', walletAddress: args.wallet_address, paymentTxHash: args.payment_tx_hash, paymentHeader: args.payment_header });
       } catch (err) {
         return { content: [{ type: 'text', text: JSON.stringify({ error: 'payment_failed', message: String(err) }) }], isError: true };
       }
@@ -95,6 +103,8 @@ export function registerFederal(server: McpServer): void {
       days_back: z.number().describe('How many days of postings to scan (1-365, default 90).'),
       limit: z.number().describe('Max results (1-100, default 15).'),
       wallet_address: z.string().describe('Agent wallet for x402 payment.'),
+      payment_tx_hash: z.string().optional().describe('On-chain Base tx hash proving USDC payment to the operator (sovereign rail). Omit if using payment_header.'),
+      payment_header: z.string().optional().describe('Base64 X-PAYMENT EIP-3009 payload, facilitator-settled (standard rail). Omit if using payment_tx_hash.'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(ContractsSchema, rawArgs);
@@ -110,7 +120,7 @@ export function registerFederal(server: McpServer): void {
       if (!price) return { content: [{ type: 'text', text: JSON.stringify({ error: 'price_unavailable' }) }], isError: true };
       let payment;
       try {
-        payment = await executeX402Payment({ price, currency: 'USDC', toolName: 'search_contracts', walletAddress: args.wallet_address });
+        payment = await executeX402Payment({ price, currency: 'USDC', toolName: 'search_contracts', walletAddress: args.wallet_address, paymentTxHash: args.payment_tx_hash, paymentHeader: args.payment_header });
       } catch (err) {
         return { content: [{ type: 'text', text: JSON.stringify({ error: 'payment_failed', message: String(err) }) }], isError: true };
       }
@@ -142,6 +152,8 @@ export function registerFederal(server: McpServer): void {
     {
       uei: z.string().describe('12-character SAM Unique Entity Identifier (UEI).'),
       wallet_address: z.string().describe('Agent wallet for x402 payment.'),
+      payment_tx_hash: z.string().optional().describe('On-chain Base tx hash proving USDC payment to the operator (sovereign rail). Omit if using payment_header.'),
+      payment_header: z.string().optional().describe('Base64 X-PAYMENT EIP-3009 payload, facilitator-settled (standard rail). Omit if using payment_tx_hash.'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(EntitySchema, rawArgs);
@@ -157,7 +169,7 @@ export function registerFederal(server: McpServer): void {
       if (!price) return { content: [{ type: 'text', text: JSON.stringify({ error: 'price_unavailable' }) }], isError: true };
       let payment;
       try {
-        payment = await executeX402Payment({ price, currency: 'USDC', toolName: 'lookup_entity', walletAddress: args.wallet_address });
+        payment = await executeX402Payment({ price, currency: 'USDC', toolName: 'lookup_entity', walletAddress: args.wallet_address, paymentTxHash: args.payment_tx_hash, paymentHeader: args.payment_header });
       } catch (err) {
         return { content: [{ type: 'text', text: JSON.stringify({ error: 'payment_failed', message: String(err) }) }], isError: true };
       }

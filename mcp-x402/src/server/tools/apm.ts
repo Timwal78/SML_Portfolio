@@ -34,6 +34,8 @@ export function registerApm(server: McpServer): void {
       need: z.string().describe('What you need, in plain language. e.g. "real-time squeeze signal for GME" or "parse a 13F filing".'),
       mode: z.enum(['preview', 'contract']).optional().describe("'preview' (FREE, default) or 'contract' (PAID $0.02, full plan + signed quote)."),
       wallet_address: z.string().optional().describe('Wallet to pay the $0.02 x402 fee from. Required for mode=contract.'),
+      payment_tx_hash: z.string().optional().describe('On-chain Base tx hash proving USDC payment to the operator (sovereign rail). Omit if using payment_header.'),
+      payment_header: z.string().optional().describe('Base64 X-PAYMENT EIP-3009 payload, facilitator-settled (standard rail). Omit if using payment_tx_hash.'),
       agent_id: z.string().optional().describe('Optional agent wallet/DID to bind the quote to.'),
       constraints: z.object({
         max_price_usd: z.number().optional().describe('Max USD you will pay per downstream tool call.'),
@@ -97,6 +99,8 @@ export function registerApm(server: McpServer): void {
           currency: 'USDC',
           toolName: 'apm_negotiate',
           walletAddress: args.wallet_address,
+          paymentTxHash: args.payment_tx_hash,
+          paymentHeader: args.payment_header,
         });
       } catch (err) {
         audit.warn('apm_negotiate_payment_fail', { error: String(err) });

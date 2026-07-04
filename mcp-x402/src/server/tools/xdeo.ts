@@ -6,7 +6,6 @@ import { Sandbox } from '../security/sandbox.js';
 import { AuditLogger } from '../security/audit.js';
 import { XdeoClient } from '../../lib/sml-api/xdeo.js';
 import { CreditBureau } from '../../lib/credit/bureau.js';
-import { WalletManager } from '../payments/wallet.js';
 import { PriceRegistry } from '../registry/pricing.js';
 
 const InputSchema = z.object({
@@ -14,6 +13,8 @@ const InputSchema = z.object({
   fiscal_quarter: z.string().regex(/^Q[1-4]\d{4}$/),
   estimate_type: z.enum(['eps', 'revenue', 'guidance', 'all']),
   wallet_address: z.string().optional(),
+  payment_tx_hash: z.string().optional(),
+  payment_header: z.string().optional(),
 });
 
 export function registerXdeo(server: McpServer): void {
@@ -24,6 +25,8 @@ export function registerXdeo(server: McpServer): void {
       fiscal_quarter: z.string().describe('Quarter in format Q1YYYY (e.g. Q12025).'),
       estimate_type: z.enum(['eps', 'revenue', 'guidance', 'all']).describe('What estimate to fetch.'),
       wallet_address: z.string().describe('Agent wallet for payment.'),
+      payment_tx_hash: z.string().optional().describe('On-chain Base tx hash proving USDC payment to the operator (sovereign rail). Omit if using payment_header.'),
+      payment_header: z.string().optional().describe('Base64 X-PAYMENT EIP-3009 payload, facilitator-settled (standard rail). Omit if using payment_tx_hash.'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(InputSchema, rawArgs);
@@ -41,7 +44,7 @@ export function registerXdeo(server: McpServer): void {
 
       let payment;
       try {
-        payment = await executeX402Payment({ price, currency: 'USDC', toolName: 'xdeo_earnings_estimate', walletAddress: args.wallet_address });
+        payment = await executeX402Payment({ price, currency: 'USDC', toolName: 'xdeo_earnings_estimate', walletAddress: args.wallet_address, paymentTxHash: args.payment_tx_hash, paymentHeader: args.payment_header });
       } catch (err) {
         return { content: [{ type: 'text', text: JSON.stringify({ error: 'payment_failed', message: String(err) }) }], isError: true };
       }
@@ -53,9 +56,9 @@ export function registerXdeo(server: McpServer): void {
         estimateType: args.estimate_type,
       });
 
-      // +2 bureau_score on success (spec requirement)
-      const wallet = await WalletManager.getInstance().getOrCreateWallet();
-      await CreditBureau.getInstance().incrementScore(wallet.address, 2);
+      // +2 bureau_score on success (spec requirement) — credited to the real
+      // verified payer (payment.walletAddress), not the operator's own wallet.
+      await CreditBureau.getInstance().incrementScore(payment.walletAddress, 2);
 
       audit.info('xdeo_success', { ticker: args.ticker, quarter: args.fiscal_quarter, receiptId: payment.receiptId });
 

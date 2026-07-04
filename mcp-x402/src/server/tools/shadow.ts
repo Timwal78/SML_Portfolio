@@ -11,12 +11,16 @@ const QuerySchema = z.object({
   query: z.string().min(1).max(2048),
   context: z.string().max(1024).optional(),
   wallet_address: z.string().optional(),
+  payment_tx_hash: z.string().optional(),
+  payment_header: z.string().optional(),
 });
 
 const IngestSchema = z.object({
   source: z.string().min(1).max(256),
   payload: z.record(z.unknown()),
   wallet_address: z.string().optional(),
+  payment_tx_hash: z.string().optional(),
+  payment_header: z.string().optional(),
 });
 
 export function registerShadow(server: McpServer): void {
@@ -29,6 +33,8 @@ export function registerShadow(server: McpServer): void {
       query: z.string().describe('Natural language query for signal intelligence (max 2048 chars).'),
       context: z.string().describe('Optional context to refine the query (max 1024 chars).'),
       wallet_address: z.string().describe('Agent wallet for x402 payment.'),
+      payment_tx_hash: z.string().optional().describe('On-chain Base tx hash proving USDC payment to the operator (sovereign rail). Omit if using payment_header.'),
+      payment_header: z.string().optional().describe('Base64 X-PAYMENT EIP-3009 payload, facilitator-settled (standard rail). Omit if using payment_tx_hash.'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(QuerySchema, rawArgs);
@@ -45,7 +51,7 @@ export function registerShadow(server: McpServer): void {
 
       let payment;
       try {
-        payment = await executeX402Payment({ price, currency: 'USDC', toolName: 'shadow_query', walletAddress: args.wallet_address });
+        payment = await executeX402Payment({ price, currency: 'USDC', toolName: 'shadow_query', walletAddress: args.wallet_address, paymentTxHash: args.payment_tx_hash, paymentHeader: args.payment_header });
       } catch (err) {
         audit.warn('shadow_query_payment_fail', { error: String(err) });
         return { content: [{ type: 'text', text: JSON.stringify({ error: 'payment_failed', message: String(err) }) }], isError: true };
@@ -81,6 +87,8 @@ export function registerShadow(server: McpServer): void {
       source: z.string().describe('Source identifier for the data being ingested (e.g. "discord", "twitter", "on-chain").'),
       payload: z.record(z.unknown()).describe('Signal data payload as a JSON object.'),
       wallet_address: z.string().describe('Agent wallet for x402 payment.'),
+      payment_tx_hash: z.string().optional().describe('On-chain Base tx hash proving USDC payment to the operator (sovereign rail). Omit if using payment_header.'),
+      payment_header: z.string().optional().describe('Base64 X-PAYMENT EIP-3009 payload, facilitator-settled (standard rail). Omit if using payment_tx_hash.'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(IngestSchema, rawArgs);
@@ -97,7 +105,7 @@ export function registerShadow(server: McpServer): void {
 
       let payment;
       try {
-        payment = await executeX402Payment({ price, currency: 'USDC', toolName: 'shadow_ingest', walletAddress: args.wallet_address });
+        payment = await executeX402Payment({ price, currency: 'USDC', toolName: 'shadow_ingest', walletAddress: args.wallet_address, paymentTxHash: args.payment_tx_hash, paymentHeader: args.payment_header });
       } catch (err) {
         audit.warn('shadow_ingest_payment_fail', { error: String(err) });
         return { content: [{ type: 'text', text: JSON.stringify({ error: 'payment_failed', message: String(err) }) }], isError: true };
