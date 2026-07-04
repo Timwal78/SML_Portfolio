@@ -131,13 +131,21 @@ async function runSSE(): Promise<void> {
   //   2. Top-level `resource` is an OBJECT { url, description, mimeType }, not a string.
   //   3. Input/output JSON schemas live under `extensions.bazaar.schema.properties`,
   //      not inline on the accept. Missing input schema is an ERROR to the crawler.
-  // network is CAIP-2 (`eip155:8453`) as the v2 validator mandates; the facilitator
-  // ignores network, so settlement is unaffected.
+  // network MUST be the plain x402 network name ('base'), not CAIP-2 ('eip155:8453').
+  // The prior comment here claimed a "v2 validator" mandated CAIP-2 and that "the
+  // facilitator ignores network" — both wrong: confirmed live against the official
+  // x402-fetch client, whose bundled schema rejects 'eip155:8453' outright
+  // (ZodError: invalid_enum_value, expected 'base' | 'base-sepolia' | ...) before
+  // the client can even attempt payment. This is also the exact field forwarded
+  // verbatim into every facilitator's /verify+/settle body (see facilitators.ts),
+  // including CDP's, so the wrong value wasn't just a discovery-metadata quirk —
+  // it could have been silently blocking the entire standard (X-PAYMENT) rail for
+  // every real x402 client that validates its own schema before paying.
   const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v);
   const buildAccepts = (resource: string, priceUnits: bigint, description: string, maxTimeoutSeconds = 300): unknown[] => {
     const units = priceUnits.toString();
     return [{
-      scheme: 'exact', network: 'eip155:8453',
+      scheme: 'exact', network: 'base',
       amount: units, maxAmountRequired: units,
       asset: USDC_BASE_ASSET, payTo: X402_PAY_TO, maxTimeoutSeconds,
       resource, description, mimeType: 'application/json',
