@@ -745,6 +745,12 @@ function normalize(s: string): string {
 const NORMALIZED_KEYS: ReadonlyArray<readonly [string, string]> =
   Object.keys(OFFERINGS).map((key) => [normalize(key), key] as const);
 
+// Registered Virtuals job ids whose normalization diverges from the display key
+// (e.g. "sec_13dg" → "sec13dg" but the catalog key "SEC 13D/13G" → "sec13d13g").
+const OFFERING_ALIASES: Record<string, string> = {
+  sec13dgactivistfilings: 'SEC 13D/13G Activist Filings',
+};
+
 export function resolveOffering(rawDescription: string): { key: string; spec: Offering } | undefined {
   const exact = OFFERINGS[rawDescription];
   if (exact) return { key: rawDescription, spec: exact };
@@ -758,6 +764,8 @@ export function resolveOffering(rawDescription: string): { key: string; spec: Of
   if (best) return best;
 
   const normalizedDesc = normalize(rawDescription);
+  const aliasKey = OFFERING_ALIASES[normalizedDesc];
+  if (aliasKey && OFFERINGS[aliasKey]) return { key: aliasKey, spec: OFFERINGS[aliasKey]! };
   const normalizedExact = NORMALIZED_KEYS.find(([norm]) => norm === normalizedDesc);
   if (normalizedExact) return { key: normalizedExact[1], spec: OFFERINGS[normalizedExact[1]]! };
 
