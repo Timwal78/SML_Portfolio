@@ -169,15 +169,29 @@ async function runSSE(): Promise<void> {
   // The `info` block is REQUIRED by the Bazaar SDK — without it the endpoint
   // validates on x402scan but is rejected by Agentic.Market ("Missing bazaar info").
   const isBodyMethod = (m: string): boolean => m === 'POST' || m === 'PUT' || m === 'PATCH';
+  // The Bazaar SDK's `info.input.{queryParams|body}` (DiscoveryInfo shape) wants a
+  // flat Record<string, string> of just the JSON type name per param — NOT the
+  // richer {type, description, required, ...} descriptor object that the OTHER
+  // consumer (x402scan's schema.properties.input.properties) correctly expects.
+  // Reusing the rich descriptor for `info` too was rejected by the Bazaar SDK's
+  // parser: "Invalid type. Expected: string, given: object" for every param.
+  const flattenParamTypes = (properties: Record<string, unknown>): Record<string, string> => {
+    const out: Record<string, string> = {};
+    for (const [k, v] of Object.entries(properties)) {
+      out[k] = isRecord(v) && typeof v['type'] === 'string' ? v['type'] : 'string';
+    }
+    return out;
+  };
   const buildBazaarExtensions = (inputSchema: unknown, outputSchema: unknown): Record<string, unknown> => {
     const oi = isRecord(outputSchema) && isRecord(outputSchema['input']) ? outputSchema['input'] : {};
     const method = typeof oi['method'] === 'string' ? oi['method'] : 'GET';
     const body = isBodyMethod(method);
     const params = isRecord(inputSchema) && isRecord(inputSchema['properties']) ? inputSchema['properties'] : {};
+    const flatParams = flattenParamTypes(params);
     const example = isRecord(outputSchema) && isRecord(outputSchema['output']) ? outputSchema['output'] : {};
     const info = body
-      ? { input: { type: 'http', method, bodyType: 'json', body: params }, output: { example } }
-      : { input: { type: 'http', method, queryParams: params }, output: { example } };
+      ? { input: { type: 'http', method, bodyType: 'json', body: flatParams }, output: { example } }
+      : { input: { type: 'http', method, queryParams: flatParams }, output: { example } };
     const inputProps = body
       ? { type: { type: 'string', const: 'http' }, method: { type: 'string' }, bodyType: { type: 'string' }, body: isRecord(inputSchema) ? inputSchema : { type: 'object' } }
       : { type: { type: 'string', const: 'http' }, method: { type: 'string' }, queryParams: isRecord(inputSchema) ? inputSchema : { type: 'object' } };
