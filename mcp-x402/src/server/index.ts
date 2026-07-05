@@ -1316,7 +1316,7 @@ async function runSSE(): Promise<void> {
       ? req.query['tickers'].split(',').map((t) => t.trim()).filter(Boolean).slice(0, 20)
       : undefined;
     const timeframe = req.query['timeframe'] === '1d' ? '1d' as const : req.query['timeframe'] === '1h' ? '1h' as const : undefined;
-    const inputSchema = { type: 'object', properties: { tickers: { type: 'string', description: 'Comma-separated tickers, up to 20. Defaults to a 16-ticker large-cap watchlist.' }, timeframe: { type: 'string', enum: ['1h', '1d'], default: '1h' } } };
+    const inputSchema = { type: 'object', properties: { tickers: { type: 'string', description: 'Comma-separated tickers, up to 20. Defaults to AMC/GME/IWM plus real dynamically-discovered top movers.' }, timeframe: { type: 'string', enum: ['1h', '1d'], default: '1h' } } };
     const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { tickers: { type: 'string', required: false }, timeframe: { type: 'string', required: false } } }, output: null };
 
     const pay = await requirePayment(req, res, { resource, priceUnits: EQUITIES_HEATMAP_PRICE_UNITS, description: 'Equities RSI(14) heatmap (up to 20 tickers) with a real 4-agent Claude swarm verdict. Pay 0.10 USDC on Base via X-PAYMENT (standard) or X-PAYMENT-TX (sovereign).', inputSchema, outputSchema });
@@ -1347,7 +1347,7 @@ async function runSSE(): Promise<void> {
     const underlying = typeof req.query['underlying'] === 'string' ? req.query['underlying'] : undefined;
     const expirationDate = typeof req.query['expiration_date'] === 'string' ? req.query['expiration_date'] : undefined;
     const optionType = req.query['option_type'] === 'put' ? 'put' as const : req.query['option_type'] === 'call' ? 'call' as const : undefined;
-    const inputSchema = { type: 'object', properties: { underlying: { type: 'string', description: 'Underlying ticker. Defaults to SPY.' }, expiration_date: { type: 'string', description: 'YYYY-MM-DD. Defaults to nearest available.' }, option_type: { type: 'string', enum: ['call', 'put'], default: 'call' } } };
+    const inputSchema = { type: 'object', properties: { underlying: { type: 'string', description: 'Underlying ticker. Defaults to AMC.' }, expiration_date: { type: 'string', description: 'YYYY-MM-DD. Defaults to nearest available.' }, option_type: { type: 'string', enum: ['call', 'put'], default: 'call' } } };
     const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { underlying: { type: 'string', required: false }, expiration_date: { type: 'string', required: false }, option_type: { type: 'string', required: false } } }, output: null };
 
     const pay = await requirePayment(req, res, { resource, priceUnits: OPTIONS_HEATMAP_PRICE_UNITS, description: 'Options Delta heatmap (up to 40 contracts) with a real 4-agent Claude swarm verdict. Pay 0.15 USDC on Base via X-PAYMENT (standard) or X-PAYMENT-TX (sovereign).', inputSchema, outputSchema });
@@ -1903,7 +1903,7 @@ async function runSSE(): Promise<void> {
       summary: 'Options Delta heatmap across up to 40 contracts, with a real 4-agent Claude swarm verdict.',
       description: 'Real options chain data — Tradier real OPRA-fed Greeks preferred, falls back to Polygon.io with a locally modeled Black-Scholes Delta — grouped into a 4-bucket heatmap (deep OTM to deep ITM), plus a real multi-agent Claude swarm verdict. Keywords: options Delta heatmap, ITM OTM screener, Greeks scanner. Pay 0.15 USDC on Base, then call with X-PAYMENT-TX.',
       parameters: [
-        { name: 'underlying', in: 'query', required: false, schema: { type: 'string' }, description: 'Underlying ticker. Defaults to SPY.', example: 'SPY' },
+        { name: 'underlying', in: 'query', required: false, schema: { type: 'string' }, description: 'Underlying ticker. Defaults to AMC.', example: 'AMC' },
         { name: 'expiration_date', in: 'query', required: false, schema: { type: 'string' }, description: 'YYYY-MM-DD. Defaults to nearest available.' },
         { name: 'option_type', in: 'query', required: false, schema: { type: 'string', enum: ['call', 'put'], default: 'call' } },
       ],
@@ -2197,7 +2197,11 @@ async function runSSE(): Promise<void> {
     if (!sessionId) { res.status(400).json({ error: 'missing_session_id' }); return; }
     const transport = transports.get(sessionId);
     if (!transport) { res.status(404).json({ error: 'session_not_found' }); return; }
-    await transport.handlePostMessage(req, res);
+    // req.body is already parsed by the global express.json() middleware, which
+    // consumes the raw request stream — handlePostMessage must be given that
+    // parsed body explicitly (same as the /mcp handler below) or it tries to
+    // re-read an already-drained stream and throws "stream is not readable".
+    await transport.handlePostMessage(req, res, req.body);
   });
 
   const httpServer = await new Promise<ReturnType<typeof app.listen>>(

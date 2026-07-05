@@ -48,13 +48,13 @@ const CATALOG = {
     },
     {
       product: 'Equities & Options Heatmap (AI Swarm)',
-      description: 'Self-contained RSI heatmap for equities and Delta heatmap for options — real market data (Tradier preferred when configured, including real OPRA-fed Greeks on options; falls back to Polygon.io with a locally modeled Black-Scholes Delta), each with a real 4-agent Claude swarm verdict (not a rule-based mock). Every result reports which real provider supplied it.',
+      description: 'Self-contained RSI heatmap for equities and Delta heatmap for options — real market data (Tradier preferred when configured, including real OPRA-fed Greeks on options; falls back to Polygon.io with a locally modeled Black-Scholes Delta), each with a real 4-agent Claude swarm verdict (not a rule-based mock). Every result reports which real provider supplied it. AMC/GME/IWM are always scanned; the rest of the equities watchlist is real dynamically-discovered top movers, never a hardcoded list.',
       backend: 'self-contained (Tradier and/or Polygon.io + Anthropic Claude)',
       tools: [
-        { name: 'equities_heatmap_preview',      type: 'FREE', description: '5-ticker RSI(14) preview, 1 group, no AI swarm' },
-        { name: 'equities_heatmap_full',         type: 'PAID', price_usdc: '0.10', description: 'RSI(14) heatmap across up to 20 tickers (default 16-ticker large-cap watchlist), 4 groups + 4-agent Claude swarm verdict (MOMENTUM_QUANT, SECTOR_ROTATION, RISK_SENTINEL, MACRO_ORACLE)' },
-        { name: 'options_delta_heatmap_preview', type: 'FREE', description: '5-contract Delta preview (SPY calls by default), 1 group, no AI swarm' },
-        { name: 'options_delta_heatmap_full',    type: 'PAID', price_usdc: '0.15', description: 'Live options chain snapshot across up to 40 contracts — real Tradier Greeks when configured, else locally-computed Black-Scholes Delta — 4 groups + 4-agent Claude swarm verdict (GREEKS_ANALYST, IV_SKEW_HUNTER, GAMMA_WATCH, RISK_SENTINEL)' },
+        { name: 'equities_heatmap_preview',      type: 'FREE', description: 'AMC/GME/IWM + 2 dynamically-discovered movers, RSI(14) preview, 1 group, no AI swarm' },
+        { name: 'equities_heatmap_full',         type: 'PAID', price_usdc: '0.10', description: 'RSI(14) heatmap across up to 20 tickers — AMC/GME/IWM always included, rest filled from real day gainers/losers unless explicit tickers are given — 4 groups + 4-agent Claude swarm verdict (MOMENTUM_QUANT, SECTOR_ROTATION, RISK_SENTINEL, MACRO_ORACLE)' },
+        { name: 'options_delta_heatmap_preview', type: 'FREE', description: '5-contract Delta preview (AMC calls by default), 1 group, no AI swarm' },
+        { name: 'options_delta_heatmap_full',    type: 'PAID', price_usdc: '0.15', description: 'Live options chain snapshot across up to 40 contracts — real Tradier Greeks when configured, else locally-computed Black-Scholes Delta — 4 groups + 4-agent Claude swarm verdict, plus a real 0.35-0.40 delta "sweet spot" scan with an explicit BUY/SELL + strike + expiration recommendation (GREEKS_ANALYST, IV_SKEW_HUNTER, GAMMA_WATCH, RISK_SENTINEL)' },
       ],
     },
     {
