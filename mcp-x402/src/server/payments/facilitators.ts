@@ -229,9 +229,17 @@ function toCaip2Network(network: string): string {
 // x402V2PaymentPayload requires 'accepted'" — not a network problem at all
 // by this point, a whole different top-level structure. Reshape into the
 // real v2 form specifically for CDP; x402.org accepts the flat shape as-is.
+//
+// x402Version is hardcoded to 2 here regardless of what the CLIENT declared.
+// A real client sent x402Version: 1 (the older flat-schema label) while this
+// function had already moved `network` off the top level and into `accepted`
+// — CDP's parser saw x402Version: 1, validated against the V1 (flat) schema,
+// found no top-level network field, and returned "invalid network: " (empty).
+// The reshaped body is unconditionally V2-shaped, so the declared version
+// must always say so too, independent of whatever the inbound payload claimed.
 function toCdpV2Payload(payload: PaymentPayload, requirements: X402PaymentRequirements): X402PaymentPayload {
   return {
-    x402Version: payload.x402Version,
+    x402Version: 2,
     accepted: requirements,
     payload: payload.payload,
   } as unknown as X402PaymentPayload;

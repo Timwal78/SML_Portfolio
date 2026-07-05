@@ -17,6 +17,7 @@
     "test:unit": "vitest run tests/unit",
     "test:integration": "vitest run tests/integration",
     "test:coverage": "vitest run --coverage",
+    "pay-standard": "node scripts/pay-standard.mjs",
     "lint": "eslint src tests",
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "npm run build && npm run typecheck"
