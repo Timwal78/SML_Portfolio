@@ -3,27 +3,64 @@
 // market data directly and compute RSI/Delta locally, then run a real
 // multi-agent Claude swarm over the result.
 //
-// Data source priority: Tradier first when TRADIER_API_KEY is configured —
-// same "Tradier preferred for options" priority the main SqueezeOS app uses —
-// falling back to Polygon.io. For options specifically, Tradier also supplies
-// real OPRA-fed Greeks, which are used directly instead of a locally modeled
-// Black-Scholes delta when available: a market-observed delta is strictly
-// better than our own estimate. Every result reports which real provider
-// supplied it (Prime Directive: every data point must have a traceable source).
+// Market-data credentials are BYOK: a caller may supply their own
+// Tradier/Polygon/Alpaca keys (per-call), which always take priority over
+// this server's own env-configured keys. This means the operator never pays
+// another user's market-data bill — only the Claude swarm compute (already
+// covered by the x402 price) runs on the operator's own account. If a caller
+// supplies nothing, this server's own keys are used as a convenience default.
+//
+// Data source priority (whichever set of credentials is in effect): Tradier
+// first — same "Tradier preferred for options" priority the main SqueezeOS
+// app uses — falling back to Polygon.io. For options specifically, Tradier
+// also supplies real OPRA-fed Greeks, used directly instead of a locally
+// modeled Black-Scholes delta when available: a market-observed delta is
+// strictly better than our own estimate. Every result reports which real
+// provider supplied it (Prime Directive: every data point must have a
+// traceable source).
 
-import { fetchEquityCloses as fetchEquityClosesPolygon, fetchOptionsChainSnapshot, fetchTrendingTickers, type EquityTimeframe } from '../market-data/polygon.js';
+import { fetchEquityCloses as fetchEquityClosesPolygon, fetchOptionsChainSnapshot, fetchTrendingTickers as fetchTrendingTickersPolygon, type EquityTimeframe } from '../market-data/polygon.js';
 import { fetchEquityCloses as fetchEquityClosesTradier, fetchOptionsChainWithGreeks } from '../market-data/tradier.js';
+import { fetchTrendingTickers as fetchTrendingTickersAlpaca } from '../market-data/alpaca.js';
 import { computeRSI } from '../quant/indicators.js';
 import { blackScholesDelta } from '../quant/greeks.js';
 import { buildHeatmap, type HeatmapItem, type HeatmapResult } from '../quant/heatmap.js';
 import { runSwarm, EQUITIES_SWARM_PERSONAS, OPTIONS_SWARM_PERSONAS, type SwarmResult } from '../ai/swarm.js';
+import { AuditLogger } from '../../server/security/audit.js';
 
-const POLYGON_API_KEY = process.env['POLYGON_API_KEY'] ?? '';
-const TRADIER_API_KEY = process.env['TRADIER_API_KEY'] ?? '';
+const SERVER_POLYGON_API_KEY = process.env['POLYGON_API_KEY'] ?? '';
+const SERVER_ALPACA_API_KEY = process.env['ALPACA_API_KEY'] ?? '';
+const SERVER_ALPACA_API_SECRET = process.env['ALPACA_API_SECRET'] ?? '';
+const SERVER_TRADIER_API_KEY = process.env['TRADIER_API_KEY'] ?? '';
 const ANTHROPIC_API_KEY = process.env['ANTHROPIC_API_KEY'] ?? '';
 const ANTHROPIC_MODEL = process.env['ANTHROPIC_MODEL'] ?? 'claude-sonnet-4-5';
 
 export type DataSource = 'tradier' | 'polygon';
+
+/** Caller-supplied market-data credentials (BYOK) — always preferred over this server's own keys. */
+export interface DataCredentials {
+  tradierApiKey?: string;
+  polygonApiKey?: string;
+  alpacaApiKey?: string;
+  alpacaApiSecret?: string;
+}
+
+interface ResolvedCredentials {
+  tradier: string;
+  polygon: string;
+  alpacaKey: string;
+  alpacaSecret: string;
+}
+
+/** A caller's own key always wins; this server's env-configured key is only a convenience fallback. */
+function resolveCredentials(creds?: DataCredentials): ResolvedCredentials {
+  return {
+    tradier: creds?.tradierApiKey || SERVER_TRADIER_API_KEY,
+    polygon: creds?.polygonApiKey || SERVER_POLYGON_API_KEY,
+    alpacaKey: creds?.alpacaApiKey || SERVER_ALPACA_API_KEY,
+    alpacaSecret: creds?.alpacaApiSecret || SERVER_ALPACA_API_SECRET,
+  };
+}
 
 /** Always scanned regardless of dynamic discovery — the core squeeze watchlist. */
 export const ALWAYS_WATCH = ['AMC', 'GME', 'IWM'];
@@ -57,21 +94,43 @@ function pickDeltaBand(items: HeatmapItem[]): DeltaBandPick[] {
 }
 
 /**
+ * Real dynamic mover discovery, tried in order: Alpaca (free market-data tier
+ * includes the movers/screener endpoint) first, then Polygon's gainers/losers
+ * snapshot (gated behind a paid plan on some Polygon tiers) as a second real
+ * source. Returns an empty list — never invented tickers — if neither is
+ * configured or both fail.
+ */
+async function discoverTrendingTickers(limit: number, res: ResolvedCredentials): Promise<string[]> {
+  if (res.alpacaKey && res.alpacaSecret) {
+    try {
+      return await fetchTrendingTickersAlpaca(res.alpacaKey, res.alpacaSecret, limit);
+    } catch (err) {
+      AuditLogger.getInstance().warn('alpaca_discovery_unavailable', { error: String(err) });
+    }
+  }
+  if (res.polygon) {
+    try {
+      return await fetchTrendingTickersPolygon(res.polygon, limit);
+    } catch (err) {
+      AuditLogger.getInstance().warn('polygon_discovery_unavailable', { error: String(err) });
+    }
+  }
+  return [];
+}
+
+/**
  * Resolves the ticker list for a scan. An explicit `requested` list from the
  * caller always wins outright. Otherwise: ALWAYS_WATCH first, then real
- * dynamically-discovered top movers (Polygon day gainers/losers) fill the
- * rest — never a hardcoded blue-chip list. Requires POLYGON_API_KEY for the
- * discovery step specifically (Tradier has no market-wide screener endpoint);
- * throws a real error rather than silently falling back to anything static.
+ * dynamically-discovered top movers (Alpaca, then Polygon) fill the rest. If
+ * discovery is unavailable from either provider, this falls back to
+ * ALWAYS_WATCH alone rather than erroring out — AMC/GME/IWM are always real,
+ * live data regardless of discovery working, never a fabricated blue-chip list.
  */
-async function resolveSymbols(requested: string[] | undefined, limit: number): Promise<string[]> {
+async function resolveSymbols(requested: string[] | undefined, limit: number, res: ResolvedCredentials): Promise<string[]> {
   if (requested && requested.length > 0) {
     return requested.slice(0, limit).map((s) => String(s).toUpperCase());
   }
-  if (!POLYGON_API_KEY) {
-    throw new Error('not_configured: missing POLYGON_API_KEY on this server — required to dynamically discover a watchlist (pass explicit tickers to bypass)');
-  }
-  const trending = await fetchTrendingTickers(POLYGON_API_KEY, limit);
+  const trending = await discoverTrendingTickers(limit, res);
   const merged: string[] = [...ALWAYS_WATCH];
   for (const t of trending) {
     if (merged.length >= limit) break;
@@ -80,9 +139,9 @@ async function resolveSymbols(requested: string[] | undefined, limit: number): P
   return merged.slice(0, limit);
 }
 
-function requireConfig(): void {
+function requireConfig(res: ResolvedCredentials): void {
   const missing = [
-    !TRADIER_API_KEY && !POLYGON_API_KEY && 'TRADIER_API_KEY or POLYGON_API_KEY',
+    !res.tradier && !res.polygon && 'a Tradier or Polygon API key (BYOK or server-configured)',
     !ANTHROPIC_API_KEY && 'ANTHROPIC_API_KEY',
   ].filter(Boolean);
   if (missing.length > 0) {
@@ -91,22 +150,22 @@ function requireConfig(): void {
 }
 
 /** Tradier first (if configured), falling back to Polygon. Surfaces the real error if neither works. */
-async function fetchClosesWithFallback(symbol: string, timeframe: EquityTimeframe): Promise<{ closes: number[]; source: DataSource }> {
+async function fetchClosesWithFallback(symbol: string, timeframe: EquityTimeframe, res: ResolvedCredentials): Promise<{ closes: number[]; source: DataSource }> {
   let tradierErr: unknown;
-  if (TRADIER_API_KEY) {
+  if (res.tradier) {
     try {
-      const closes = await fetchEquityClosesTradier(symbol, timeframe, TRADIER_API_KEY);
+      const closes = await fetchEquityClosesTradier(symbol, timeframe, res.tradier);
       if (closes.length > 0) return { closes, source: 'tradier' };
     } catch (err) {
       tradierErr = err;
     }
   }
-  if (POLYGON_API_KEY) {
-    const closes = await fetchEquityClosesPolygon(symbol, timeframe, POLYGON_API_KEY);
+  if (res.polygon) {
+    const closes = await fetchEquityClosesPolygon(symbol, timeframe, res.polygon);
     return { closes, source: 'polygon' };
   }
   if (tradierErr) throw tradierErr;
-  throw new Error('not_configured: missing TRADIER_API_KEY or POLYGON_API_KEY on this server');
+  throw new Error('not_configured: missing a Tradier or Polygon API key (BYOK or server-configured)');
 }
 
 function summarizeSources(sources: Set<DataSource>): string {
@@ -173,16 +232,17 @@ export interface OptionsDeltaHeatmapResult {
 
 export const EquitiesHeatmapAPI = {
   /** Free preview: AMC/GME/IWM + 2 dynamically-discovered movers, 1 group, no AI swarm. */
-  async preview(): Promise<{ tool: string; tier: 'free'; timeframe: EquityTimeframe; dataSource: string; heatmap: HeatmapResult }> {
-    if (!TRADIER_API_KEY && !POLYGON_API_KEY) {
-      throw new Error('not_configured: missing TRADIER_API_KEY or POLYGON_API_KEY on this server');
+  async preview(creds?: DataCredentials): Promise<{ tool: string; tier: 'free'; timeframe: EquityTimeframe; dataSource: string; heatmap: HeatmapResult }> {
+    const res = resolveCredentials(creds);
+    if (!res.tradier && !res.polygon) {
+      throw new Error('not_configured: missing a Tradier or Polygon API key (BYOK or server-configured)');
     }
-    const previewSymbols = await resolveSymbols(undefined, 5);
+    const previewSymbols = await resolveSymbols(undefined, 5, res);
     const items: HeatmapItem[] = [];
     const sources = new Set<DataSource>();
     await Promise.all(
       previewSymbols.map(async (symbol) => {
-        const { closes, source } = await fetchClosesWithFallback(symbol, '1h');
+        const { closes, source } = await fetchClosesWithFallback(symbol, '1h', res);
         const rsi = computeRSI(closes);
         if (rsi !== null) { items.push({ symbol, value: rsi }); sources.add(source); }
       }),
@@ -192,16 +252,17 @@ export const EquitiesHeatmapAPI = {
   },
 
   /** Paid: up to 20 tickers, 4-group heatmap, 4-agent Claude swarm verdict. */
-  async full(tickers: string[] | undefined, timeframe: EquityTimeframe | undefined): Promise<EquitiesHeatmapResult> {
-    requireConfig();
+  async full(tickers: string[] | undefined, timeframe: EquityTimeframe | undefined, creds?: DataCredentials): Promise<EquitiesHeatmapResult> {
+    const res = resolveCredentials(creds);
+    requireConfig(res);
     const resolvedTimeframe: EquityTimeframe = timeframe ?? '1h';
-    const symbols = await resolveSymbols(tickers, 20);
+    const symbols = await resolveSymbols(tickers, 20, res);
 
     const items: HeatmapItem[] = [];
     const sources = new Set<DataSource>();
     await Promise.all(
       symbols.map(async (symbol) => {
-        const { closes, source } = await fetchClosesWithFallback(symbol, resolvedTimeframe);
+        const { closes, source } = await fetchClosesWithFallback(symbol, resolvedTimeframe, res);
         const rsi = computeRSI(closes);
         if (rsi !== null) { items.push({ symbol, value: rsi }); sources.add(source); }
       }),
@@ -224,12 +285,13 @@ export const EquitiesHeatmapAPI = {
 
 export const OptionsDeltaHeatmapAPI = {
   /** Free preview: 5 call contracts, 1 group, no AI swarm. */
-  async preview(underlying = DEFAULT_OPTIONS_UNDERLYING): Promise<{ tool: string; tier: 'free'; underlying: string; underlyingPrice: number; dataSource: string; heatmap: HeatmapResult }> {
+  async preview(underlying = DEFAULT_OPTIONS_UNDERLYING, creds?: DataCredentials): Promise<{ tool: string; tier: 'free'; underlying: string; underlyingPrice: number; dataSource: string; heatmap: HeatmapResult }> {
+    const res = resolveCredentials(creds);
     const symbol = underlying.toUpperCase();
 
-    if (TRADIER_API_KEY) {
+    if (res.tradier) {
       try {
-        const chain = await fetchOptionsChainWithGreeks(symbol, TRADIER_API_KEY, { contractType: 'call' });
+        const chain = await fetchOptionsChainWithGreeks(symbol, res.tradier, { contractType: 'call' });
         const priced = chain.contracts.filter((c) => typeof c.delta === 'number').slice(0, 5);
         if (priced.length > 0 && chain.underlyingPrice > 0) {
           const items: HeatmapItem[] = priced.map((c) => ({
@@ -244,8 +306,8 @@ export const OptionsDeltaHeatmapAPI = {
       }
     }
 
-    if (!POLYGON_API_KEY) throw new Error('not_configured: missing TRADIER_API_KEY or POLYGON_API_KEY on this server');
-    const chain = await fetchOptionsChainSnapshot(symbol, POLYGON_API_KEY, { contractType: 'call', limit: 5 });
+    if (!res.polygon) throw new Error('not_configured: missing a Tradier or Polygon API key (BYOK or server-configured)');
+    const chain = await fetchOptionsChainSnapshot(symbol, res.polygon, { contractType: 'call', limit: 5 });
     if (chain.contracts.length === 0 || chain.underlyingPrice <= 0) {
       throw new Error(`no_data: no options contracts returned for ${symbol}`);
     }
@@ -263,14 +325,16 @@ export const OptionsDeltaHeatmapAPI = {
     underlying: string | undefined,
     expirationDate: string | undefined,
     optionType: 'call' | 'put' | undefined,
+    creds?: DataCredentials,
   ): Promise<OptionsDeltaHeatmapResult> {
-    requireConfig();
+    const res = resolveCredentials(creds);
+    requireConfig(res);
     const symbol = (underlying ?? DEFAULT_OPTIONS_UNDERLYING).toUpperCase();
     const side: 'call' | 'put' = optionType === 'put' ? 'put' : 'call';
 
-    if (TRADIER_API_KEY) {
+    if (res.tradier) {
       try {
-        const chain = await fetchOptionsChainWithGreeks(symbol, TRADIER_API_KEY, { expirationDate, contractType: side });
+        const chain = await fetchOptionsChainWithGreeks(symbol, res.tradier, { expirationDate, contractType: side });
         const priced = chain.contracts.filter((c) => typeof c.delta === 'number').slice(0, 40);
         if (priced.length > 0 && chain.underlyingPrice > 0) {
           const items: HeatmapItem[] = priced.map((c) => ({
@@ -296,8 +360,8 @@ export const OptionsDeltaHeatmapAPI = {
       }
     }
 
-    if (!POLYGON_API_KEY) throw new Error('not_configured: missing TRADIER_API_KEY or POLYGON_API_KEY on this server');
-    const chain = await fetchOptionsChainSnapshot(symbol, POLYGON_API_KEY, { expirationDate, contractType: side, limit: 40 });
+    if (!res.polygon) throw new Error('not_configured: missing a Tradier or Polygon API key (BYOK or server-configured)');
+    const chain = await fetchOptionsChainSnapshot(symbol, res.polygon, { expirationDate, contractType: side, limit: 40 });
     if (chain.contracts.length === 0 || chain.underlyingPrice <= 0) {
       throw new Error(`no_data: no options contracts (or underlying price) returned for ${symbol}`);
     }
