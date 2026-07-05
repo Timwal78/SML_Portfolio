@@ -170,15 +170,34 @@ async function runSSE(): Promise<void> {
   // validates on x402scan but is rejected by Agentic.Market ("Missing bazaar info").
   const isBodyMethod = (m: string): boolean => m === 'POST' || m === 'PUT' || m === 'PATCH';
   // The Bazaar SDK's `info.input.{queryParams|body}` (DiscoveryInfo shape) wants a
-  // flat Record<string, string> of just the JSON type name per param — NOT the
-  // richer {type, description, required, ...} descriptor object that the OTHER
-  // consumer (x402scan's schema.properties.input.properties) correctly expects.
-  // Reusing the rich descriptor for `info` too was rejected by the Bazaar SDK's
-  // parser: "Invalid type. Expected: string, given: object" for every param.
-  const flattenParamTypes = (properties: Record<string, unknown>): Record<string, string> => {
-    const out: Record<string, string> = {};
+  // flat map of ACTUAL typed example values, one per param — NOT the richer
+  // {type, description, required, ...} descriptor object that the OTHER consumer
+  // (x402scan's schema.properties.input.properties) correctly expects, and NOT a
+  // type-NAME string either. Confirmed by two separate live validator errors:
+  // reusing the rich descriptor gave "Invalid type. Expected: string, given:
+  // object" for a string param; putting the type name itself (e.g. the string
+  // "integer") gave "Expected: integer, given: string" for an integer param.
+  // Both are only consistent with "the value must be a real instance of the
+  // declared type" — so an integer param needs an actual number, not the word
+  // "integer". Uses each param's own `example`/`default` when present (most
+  // already carry one), else a type-appropriate zero value.
+  const exampleForParam = (prop: unknown): unknown => {
+    if (!isRecord(prop)) return '';
+    if ('example' in prop) return prop['example'];
+    if ('default' in prop) return prop['default'];
+    switch (prop['type']) {
+      case 'integer':
+      case 'number': return 0;
+      case 'boolean': return false;
+      case 'array': return [];
+      case 'object': return {};
+      default: return '';
+    }
+  };
+  const flattenParamTypes = (properties: Record<string, unknown>): Record<string, unknown> => {
+    const out: Record<string, unknown> = {};
     for (const [k, v] of Object.entries(properties)) {
-      out[k] = isRecord(v) && typeof v['type'] === 'string' ? v['type'] : 'string';
+      out[k] = exampleForParam(v);
     }
     return out;
   };
