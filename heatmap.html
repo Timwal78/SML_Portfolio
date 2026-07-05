@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-QHTHMG61N6"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-QHTHMG61N6');
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <title>SML Live Heatmap — Real-Time Equities RSI &amp; Options Delta</title>
+  <meta name="description" content="Institutional-grade live equities RSI(14) and options Delta heatmaps, computed from real Polygon.io market data with a real multi-agent Claude swarm verdict. No demo data, ever.">
+  <link rel="canonical" href="https://www.scriptmasterlabs.com/heatmap.html">
+  <link rel="alternate" type="text/plain" href="/llms.txt" title="LLM context">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+/* === TOKENS (shared with the rest of scriptmasterlabs.com) === */
+:root {
+  --bg:        #EDF1F7;
+  --bg-2:      #E1E7F1;
+  --surface:   #FFFFFF;
+  --surface-2: #E2E8F2;
+  --border:    #CBD5E4;
+  --text:      #0D1526;
+  --text-2:    #2C3A54;
+  --text-3:    #4D6080;
+  --accent:    #0891B2;
+  --accent-2:  #6D28D9;
+  --accent-bg: rgba(8,145,178,0.08);
+  --amber:     #D97706;
+  --amber-bg:  rgba(217,119,6,0.10);
+  --green:     #059669;
+  --green-bg:  rgba(5,150,105,0.10);
+  --red:       #DC2626;
+  --red-bg:    rgba(220,38,38,0.10);
+  --mono:      'JetBrains Mono', ui-monospace, 'SF Mono', 'Fira Mono', monospace;
+  --sans:      'Inter', system-ui, -apple-system, sans-serif;
+  --shadow:    0 1px 2px rgba(13,21,38,0.04), 0 12px 32px -12px rgba(13,21,38,0.16);
+  --shadow-lg: 0 1px 2px rgba(13,21,38,0.05), 0 24px 56px -16px rgba(13,21,38,0.22);
+  /* diverging data scale — validated dataviz palette (blue <-> red, gray midpoint) */
+  --div-cold:    #1c5cab;
+  --div-neutral: #dcdad3;
+  --div-hot:     #c8302f;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:        #06070d;
+    --bg-2:      #0a0c16;
+    --surface:   #0F1628;
+    --surface-2: #131b30;
+    --border:    #202c46;
+    --text:      #E8EDF8;
+    --text-2:    #C2D2E8;
+    --text-3:    #7c8bab;
+    --accent:    #00D4C8;
+    --accent-2:  #a78bfa;
+    --accent-bg: rgba(0,212,200,0.09);
+    --amber:     #F59E0B;
+    --amber-bg:  rgba(245,158,11,0.12);
+    --green:     #10B981;
+    --green-bg:  rgba(16,185,129,0.12);
+    --red:       #F87171;
+    --red-bg:    rgba(248,113,113,0.12);
+    --shadow:    0 1px 0 rgba(255,255,255,0.03) inset, 0 20px 48px -18px rgba(0,0,0,0.65);
+    --shadow-lg: 0 1px 0 rgba(255,255,255,0.04) inset, 0 32px 80px -20px rgba(0,0,0,0.75);
+    --div-cold:    #3987e5;
+    --div-neutral: #383835;
+    --div-hot:     #e66767;
+  }
+}
+:root[data-theme="light"] {
+  --bg:#EDF1F7; --bg-2:#E1E7F1; --surface:#FFFFFF; --surface-2:#E2E8F2; --border:#CBD5E4;
+  --text:#0D1526; --text-2:#2C3A54; --text-3:#4D6080;
+  --accent:#0891B2; --accent-2:#6D28D9; --accent-bg:rgba(8,145,178,0.08);
+  --amber:#D97706; --green:#059669; --red:#DC2626;
+  --div-cold:#1c5cab; --div-neutral:#dcdad3; --div-hot:#c8302f;
+}
+:root[data-theme="dark"] {
+  --bg:#06070d; --bg-2:#0a0c16; --surface:#0F1628; --surface-2:#131b30; --border:#202c46;
+  --text:#E8EDF8; --text-2:#C2D2E8; --text-3:#7c8bab;
+  --accent:#00D4C8; --accent-2:#a78bfa; --accent-bg:rgba(0,212,200,0.09);
+  --amber:#F59E0B; --green:#10B981; --red:#F87171;
+  --div-cold:#3987e5; --div-neutral:#383835; --div-hot:#e66767;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; }
+body {
+  background:
+    radial-gradient(1100px 520px at 12% -8%, var(--accent-bg), transparent 60%),
+    radial-gradient(900px 480px at 100% 0%, rgba(109,40,217,0.06), transparent 55%),
+    var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.01em;
+}
+a { color: var(--accent); text-decoration: none; }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+.container { max-width: 1220px; margin: 0 auto; padding: 0 24px 96px; }
+
+nav {
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  backdrop-filter: blur(10px) saturate(1.4);
+  position: sticky; top: 0; z-index: 40;
+}
+.nav-inner { max-width: 1220px; margin: 0 auto; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.nav-brand { display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-weight: 700; color: var(--text); font-size: 0.92rem; letter-spacing: -0.01em; }
+.nav-brand .mark { width: 8px; height: 8px; border-radius: 2px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); display: inline-block; }
+.nav-links { display: flex; align-items: center; gap: 24px; list-style: none; font-family: var(--mono); font-size: 0.82rem; color: var(--text-3); }
+.nav-links a:hover { color: var(--accent); }
+
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--accent); background: var(--accent-bg); border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  padding: 6px 12px; border-radius: 999px; margin-bottom: 18px;
+}
+.eyebrow .pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 0 rgba(16,185,129,0.5); animation: pulse 2s infinite; }
+@keyframes pulse {
+  0%   { box-shadow: 0 0 0 0 color-mix(in srgb, var(--green) 55%, transparent); }
+  70%  { box-shadow: 0 0 0 8px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+
+.page-head { padding: 52px 0 28px; }
+.page-head h1 {
+  font-size: clamp(1.9rem, 3.2vw, 2.6rem); font-weight: 800; letter-spacing: -0.03em;
+  margin-bottom: 14px; line-height: 1.1;
+}
+.page-head h1 .accent-word {
+  background: linear-gradient(100deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.page-head p { color: var(--text-3); max-width: 640px; font-size: 1rem; }
+
+/* status pill */
+.status-row { display: flex; align-items: center; gap: 10px; margin-top: 20px; font-family: var(--mono); font-size: 0.8rem; color: var(--text-3); flex-wrap: wrap; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-3); display: inline-block; }
+.dot.live { background: var(--green); box-shadow: 0 0 0 3px var(--green-bg); }
+.dot.stale { background: var(--amber); box-shadow: 0 0 0 3px var(--amber-bg); }
+.dot.down { background: var(--red); box-shadow: 0 0 0 3px var(--red-bg); }
+.status-row label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+
+/* stat tiles */
+.stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 2px; margin: 24px 0; background: var(--border); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow); }
+.stat-tile { background: var(--surface); padding: 18px 20px; }
+.stat-tile .label { font-family: var(--mono); font-size: 0.7rem; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+.stat-tile .value { font-size: 1.7rem; font-weight: 800; letter-spacing: -0.02em; }
+.stat-tile .value.cold { color: var(--div-cold); }
+.stat-tile .value.hot { color: var(--div-hot); }
+
+/* controls row — one row above the content, per dataviz interaction rules */
+.controls {
+  display: flex; flex-wrap: wrap; align-items: end; gap: 14px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+  padding: 18px; margin: 4px 0 20px; box-shadow: var(--shadow);
+}
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-family: var(--mono); font-size: 0.7rem; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.05em; }
+.field input, .field select {
+  font-family: var(--mono); font-size: 0.85rem; padding: 9px 11px;
+  background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; color: var(--text);
+  min-width: 120px;
+}
+.field input:focus, .field select:focus { border-color: var(--accent); }
+.tabs { display: flex; gap: 4px; background: var(--surface-2); padding: 4px; border-radius: 10px; border: 1px solid var(--border); }
+.tab-btn {
+  font-family: var(--mono); font-size: 0.82rem; padding: 8px 14px; border-radius: 7px;
+  border: none; background: transparent; color: var(--text-3); cursor: pointer; font-weight: 600;
+  transition: background 0.12s, color 0.12s;
+}
+.tab-btn[aria-selected="true"] { background: var(--accent); color: var(--bg); }
+.btn {
+  font-family: var(--mono); font-size: 0.82rem; font-weight: 600; padding: 9px 18px; border-radius: 8px;
+  border: 1px solid var(--accent); background: var(--accent-bg); color: var(--accent); cursor: pointer;
+  transition: transform 0.08s, box-shadow 0.12s;
+}
+.btn:hover { background: var(--accent); color: var(--bg); box-shadow: 0 6px 18px -6px color-mix(in srgb, var(--accent) 60%, transparent); }
+.btn:active { transform: translateY(1px); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-ghost { background: transparent; border-color: var(--border); color: var(--text-3); }
+.btn-ghost[aria-pressed="true"] { background: var(--surface-2); color: var(--text); border-color: var(--text-3); }
+.btn-primary-lg {
+  background: linear-gradient(100deg, var(--accent), var(--accent-2)); color: #fff; border: none;
+  font-weight: 700; box-shadow: 0 10px 24px -10px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+.btn-primary-lg:hover { filter: brightness(1.08); box-shadow: 0 14px 28px -10px color-mix(in srgb, var(--accent) 65%, transparent); }
+
+details.unlock {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+  padding: 16px 18px; margin-bottom: 20px; box-shadow: var(--shadow);
+}
+details.unlock summary { cursor: pointer; font-family: var(--mono); font-size: 0.85rem; color: var(--text-2); font-weight: 600; list-style: none; }
+details.unlock summary::-webkit-details-marker { display: none; }
+details.unlock summary::before { content: '▸'; color: var(--accent); margin-right: 8px; display: inline-block; }
+details.unlock[open] summary::before { content: '▾'; }
+.unlock-grid { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 16px; align-items: end; }
+.unlock-note { font-size: 0.8rem; color: var(--text-3); margin-top: 12px; max-width: 660px; }
+
+/* result panel */
+.panel {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+  padding: 22px 24px; margin-bottom: 20px; position: relative; box-shadow: var(--shadow);
+}
+.panel.loading { opacity: 0.6; transition: opacity 0.15s; }
+.panel-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.panel-head h2 { font-size: 1.02rem; font-family: var(--mono); font-weight: 700; }
+.panel-head .meta { font-size: 0.78rem; color: var(--text-3); font-family: var(--mono); }
+
+.msg { font-family: var(--mono); font-size: 0.85rem; padding: 16px; border-radius: 10px; display: flex; gap: 10px; align-items: start; }
+.msg::before { font-size: 1rem; line-height: 1.3; }
+.msg.error { background: var(--red-bg); color: var(--red); border: 1px solid color-mix(in srgb, var(--red) 30%, transparent); }
+.msg.error::before { content: '✕'; }
+.msg.warn { background: var(--amber-bg); color: var(--amber); border: 1px solid color-mix(in srgb, var(--amber) 30%, transparent); }
+.msg.warn::before { content: '!'; font-weight: 800; }
+.msg.info { background: var(--accent-bg); color: var(--accent); border: 1px solid var(--border); }
+.msg.info::before { content: '●'; }
+
+/* legend / colorbar */
+.legend { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; font-family: var(--mono); font-size: 0.74rem; color: var(--text-3); }
+.colorbar { flex: 1; max-width: 340px; height: 12px; border-radius: 6px; background: linear-gradient(90deg, var(--div-cold), var(--div-neutral), var(--div-hot)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--text) 8%, transparent); }
+
+/* top movers */
+.movers-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px; }
+.movers-label { font-family: var(--mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; margin-bottom: 8px; }
+.movers-label.hot { color: var(--div-hot); }
+.movers-label.cold { color: var(--div-cold); }
+.movers-list { display: flex; flex-direction: column; gap: 4px; }
+.mover-chip {
+  display: flex; justify-content: space-between; align-items: center; gap: 8px;
+  font-family: var(--mono); font-size: 0.82rem; padding: 7px 10px; border-radius: 8px;
+  background: var(--surface-2); border: 1px solid var(--border);
+}
+.mover-chip .sym { font-weight: 700; }
+.mover-chip .val { font-variant-numeric: tabular-nums; font-weight: 700; }
+@media (max-width: 640px) { .movers-row { grid-template-columns: 1fr; } }
+
+/* grid of cells */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 3px; background: var(--border); border-radius: 12px; overflow: hidden; }
+.cell {
+  position: relative; padding: 12px 10px; min-height: 68px;
+  display: flex; flex-direction: column; justify-content: space-between; gap: 6px;
+  font-family: var(--mono); cursor: default;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, z-index 0s;
+}
+.cell:hover, .cell:focus-visible { transform: translateY(-2px) scale(1.02); box-shadow: 0 10px 22px -8px rgba(0,0,0,0.35); z-index: 2; outline: none; }
+.cell:focus-visible { outline: 2px solid var(--text); outline-offset: -2px; }
+.cell .sym { font-size: 0.7rem; font-weight: 700; word-break: break-word; opacity: 0.92; letter-spacing: 0.01em; }
+.cell .val { font-size: 1.15rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+
+/* tooltip */
+.tooltip {
+  position: fixed; z-index: 50; pointer-events: none;
+  background: var(--text); color: var(--bg); font-family: var(--mono); font-size: 0.78rem;
+  padding: 10px 12px; border-radius: 8px; max-width: 260px; box-shadow: 0 8px 28px rgba(0,0,0,0.35);
+  display: none;
+}
+.tooltip strong { font-size: 0.88rem; }
+
+/* table view */
+table.data-table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 0.83rem; }
+table.data-table th, table.data-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+table.data-table td.num { font-variant-numeric: tabular-nums; text-align: right; font-weight: 700; }
+table.data-table th { color: var(--text-3); font-weight: 700; text-transform: uppercase; font-size: 0.68rem; letter-spacing: 0.05em; }
+table.data-table tbody tr:hover { background: var(--surface-2); }
+
+/* swarm synthesis — headline feature: real multi-agent verdict */
+.panel.swarm {
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--accent) 5%, var(--surface)), var(--surface));
+  box-shadow: var(--shadow-lg);
+}
+.swarm-badge {
+  display: inline-flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 0.72rem;
+  color: var(--green); background: var(--green-bg); border: 1px solid color-mix(in srgb, var(--green) 30%, transparent);
+  padding: 5px 11px; border-radius: 999px; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase;
+}
+.swarm-badge .pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+.swarm-synthesis { font-size: 1rem; line-height: 1.65; margin: 16px 0 18px; color: var(--text-2); }
+.swarm-members { display: grid; gap: 8px; }
+.swarm-member { border: 1px solid var(--border); border-radius: 10px; padding: 4px 4px; background: var(--surface-2); }
+.swarm-member summary {
+  cursor: pointer; font-family: var(--mono); font-size: 0.78rem; color: var(--accent); font-weight: 700;
+  padding: 10px 12px; list-style: none; display: flex; align-items: center; gap: 8px;
+}
+.swarm-member summary::-webkit-details-marker { display: none; }
+.swarm-member summary::before { content: '▸'; }
+.swarm-member[open] summary::before { content: '▾'; }
+.swarm-member .avatar {
+  width: 20px; height: 20px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center;
+  font-size: 0.62rem; font-weight: 800; color: #fff; background: linear-gradient(135deg, var(--accent), var(--accent-2));
+}
+.swarm-member p { padding: 0 12px 12px 40px; font-size: 0.87rem; color: var(--text-2); }
+
+footer { border-top: 1px solid var(--border); padding: 28px 0; margin-top: 24px; }
+footer p { font-size: 0.75rem; color: var(--text-3); font-family: var(--mono); }
+
+.view-toggle { display: flex; gap: 6px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="https://www.scriptmasterlabs.com" class="nav-brand"><span class="mark"></span>SML · Live Heatmap</a>
+    <ul class="nav-links">
+      <li><a href="/indicators.html">Indicators</a></li>
+      <li><a href="/">scriptmasterlabs.com</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="page-head">
+    <div class="eyebrow"><span class="pulse"></span>Live market intelligence · real multi-agent Claude swarm</div>
+    <h1>Equities RSI &amp; Options Delta <span class="accent-word">Heatmap</span></h1>
+    <p>Real Polygon.io market data, RSI(14) / Black-Scholes Delta computed live, backed by a real 4-agent Claude swarm verdict on the paid tier. Never demo data — if the server can't compute a value, this page shows the real error instead of a number.</p>
+    <div class="status-row">
+      <span id="statusDot" class="dot"></span>
+      <span id="statusText">Not loaded yet</span>
+      <span>·</span>
+      <span id="lastUpdated">—</span>
+      <span>·</span>
+      <label>
+        <input type="checkbox" id="autoRefresh"> auto-refresh (60s)
+      </label>
+    </div>
+  </div>
+
+  <div class="stat-row" id="statRow" style="display:none;">
+    <div class="stat-tile"><div class="label" id="statCountLabel">Names scanned</div><div class="value" id="statCount">—</div></div>
+    <div class="stat-tile"><div class="label" id="statAvgLabel">Average</div><div class="value" id="statAvg">—</div></div>
+    <div class="stat-tile"><div class="label" id="statHotLabel">Overbought</div><div class="value hot" id="statHot">—</div></div>
+    <div class="stat-tile"><div class="label" id="statColdLabel">Oversold</div><div class="value cold" id="statCold">—</div></div>
+  </div>
+
+  <div class="controls" role="group" aria-label="Heatmap filters">
+    <div class="field">
+      <label>Instrument</label>
+      <div class="tabs" role="tablist" aria-label="Instrument">
+        <button class="tab-btn" id="tabEquities" role="tab" aria-selected="true">Equities RSI</button>
+        <button class="tab-btn" id="tabOptions" role="tab" aria-selected="false">Options Delta</button>
+      </div>
+    </div>
+
+    <div class="field" id="fieldTickers">
+      <label for="tickersInput">Tickers (csv, up to 20)</label>
+      <input type="text" id="tickersInput" placeholder="AAPL,MSFT,NVDA (blank = default watchlist)">
+    </div>
+    <div class="field" id="fieldTimeframe">
+      <label for="timeframeSelect">Timeframe</label>
+      <select id="timeframeSelect">
+        <option value="1h">1h</option>
+        <option value="1d">1d</option>
+      </select>
+    </div>
+
+    <div class="field" id="fieldUnderlying" style="display:none;">
+      <label for="underlyingInput">Underlying</label>
+      <input type="text" id="underlyingInput" placeholder="SPY">
+    </div>
+    <div class="field" id="fieldExpiration" style="display:none;">
+      <label for="expirationInput">Expiration (YYYY-MM-DD)</label>
+      <input type="text" id="expirationInput" placeholder="nearest">
+    </div>
+    <div class="field" id="fieldOptionType" style="display:none;">
+      <label for="optionTypeSelect">Type</label>
+      <select id="optionTypeSelect">
+        <option value="call">call</option>
+        <option value="put">put</option>
+      </select>
+    </div>
+
+    <button class="btn" id="refreshBtn">Refresh (free preview)</button>
+    <div class="view-toggle" style="margin-left:auto;">
+      <button class="btn-ghost btn" id="viewGridBtn" aria-pressed="true">Grid</button>
+      <button class="btn-ghost btn" id="viewTableBtn" aria-pressed="false">Table</button>
+      <button class="btn-ghost btn" id="exportCsvBtn">Export CSV</button>
+    </div>
+  </div>
+
+  <details class="unlock">
+    <summary>Unlock full scan — up to 20 tickers / 40 contracts + real Claude swarm verdict (0.10–0.15 USDC on Base)</summary>
+    <div class="unlock-grid">
+      <div class="field">
+        <label for="operatorKeyInput">Operator key</label>
+        <input type="password" id="operatorKeyInput" placeholder="X-Operator-Key">
+      </div>
+      <div class="field">
+        <label for="txHashInput">Or on-chain tx hash</label>
+        <input type="text" id="txHashInput" placeholder="0x… (USDC payment on Base)">
+      </div>
+      <button class="btn btn-primary-lg" id="unlockBtn">Run full scan</button>
+    </div>
+    <p class="unlock-note">
+      The operator key is stored only in this browser's localStorage and sent as a request header — never hardcoded here. A tx hash is verified live on-chain against Base; each hash can only be used once. Full-tier price and pay-to address come straight from the server's real 402 challenge, shown below if payment is required.
+    </p>
+  </details>
+
+  <div class="panel" id="resultPanel">
+    <div class="panel-head">
+      <h2 id="resultTitle">Equities RSI(14) — free preview</h2>
+      <span class="meta" id="resultMeta"></span>
+    </div>
+    <div class="legend" id="legendRow" style="display:none;">
+      <span id="legendLowLabel">Oversold</span>
+      <div class="colorbar" role="img" aria-label="Color scale from cold (oversold) to neutral to hot (overbought)"></div>
+      <span id="legendHighLabel">Overbought</span>
+    </div>
+    <div class="movers-row" id="moversRow" style="display:none;">
+      <div class="movers-col">
+        <div class="movers-label hot" id="moversHotLabel">Top overbought</div>
+        <div class="movers-list" id="moversHot"></div>
+      </div>
+      <div class="movers-col">
+        <div class="movers-label cold" id="moversColdLabel">Top oversold</div>
+        <div class="movers-list" id="moversCold"></div>
+      </div>
+    </div>
+    <div id="resultBody">
+      <p class="msg info">Loading live data…</p>
+    </div>
+  </div>
+
+  <div class="panel swarm" id="swarmPanel" style="display:none;">
+    <div class="panel-head">
+      <h2>Claude swarm verdict</h2>
+      <span class="meta" id="swarmMeta"></span>
+    </div>
+    <div class="swarm-badge"><span class="pulse"></span>4 independent agents + coordinator · real inference, not a template</div>
+    <div class="swarm-synthesis" id="swarmSynthesis"></div>
+    <div class="swarm-members" id="swarmMembers"></div>
+  </div>
+</div>
+
+<footer>
+  <div class="container" style="padding:0;">
+    <p>Live data via Polygon.io + a real Anthropic Claude swarm on the paid tier. Not financial advice. Endpoint: <span id="apiBaseLabel"></span></p>
+  </div>
+</footer>
+
+<div class="tooltip" id="tooltip" role="tooltip"></div>
+
+<script>
+(() => {
+  'use strict';
+
+  const params = new URLSearchParams(location.search);
+  const API_BASE = (params.get('api') || 'https://mcp-x402.onrender.com').replace(/\/$/, '');
+  document.getElementById('apiBaseLabel').textContent = API_BASE;
+
+  const OPKEY_STORAGE = 'sml_heatmap_operator_key';
+
+  let mode = 'equities'; // 'equities' | 'options'
+  let view = 'grid'; // 'grid' | 'table'
+  let lastHeatmap = null;
+  let autoTimer = null;
+
+  const el = (id) => document.getElementById(id);
+  const statusDot = el('statusDot');
+  const statusText = el('statusText');
+  const lastUpdated = el('lastUpdated');
+  const statRow = el('statRow');
+  const resultPanel = el('resultPanel');
+  const resultTitle = el('resultTitle');
+  const resultMeta = el('resultMeta');
+  const resultBody = el('resultBody');
+  const legendRow = el('legendRow');
+  const legendLowLabel = el('legendLowLabel');
+  const legendHighLabel = el('legendHighLabel');
+  const swarmPanel = el('swarmPanel');
+  const swarmMeta = el('swarmMeta');
+  const swarmSynthesis = el('swarmSynthesis');
+  const swarmMembers = el('swarmMembers');
+  const tooltip = el('tooltip');
+
+  el('operatorKeyInput').value = localStorage.getItem(OPKEY_STORAGE) || '';
+
+  // ── diverging color scale (dataviz skill: blue <-> red, gray midpoint) ──
+  function cssVar(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+  function hexToRgb(hex) {
+    const h = hex.replace('#', '');
+    const n = parseInt(h.length === 3 ? h.split('').map((c) => c + c).join('') : h, 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  }
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function mixHex(hexA, hexB, t) {
+    const a = hexToRgb(hexA), b = hexToRgb(hexB);
+    const r = Math.round(lerp(a[0], b[0], t));
+    const g = Math.round(lerp(a[1], b[1], t));
+    const bl = Math.round(lerp(a[2], b[2], t));
+    return `rgb(${r}, ${g}, ${bl})`;
+  }
+  // Diverging scale: cold (oversold/OTM) <-> neutral gray midpoint <-> hot
+  // (overbought/ITM). Values beyond either threshold clamp to the pole color.
+  function colorForValue(value, oversold, overbought) {
+    const cold = cssVar('--div-cold'), neutral = cssVar('--div-neutral'), hot = cssVar('--div-hot');
+    if (value <= oversold) return cold;
+    if (value >= overbought) return hot;
+    const t = (value - oversold) / (overbought - oversold); // 0..1
+    return t <= 0.5 ? mixHex(cold, neutral, t / 0.5) : mixHex(neutral, hot, (t - 0.5) / 0.5);
+  }
+  function textColorFor(bgCss) {
+    let r, g, b;
+    if (bgCss.startsWith('rgb')) {
+      [, r, g, b] = bgCss.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/).map(Number);
+    } else {
+      [r, g, b] = hexToRgb(bgCss);
+    }
+    const lum = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+    return lum > 0.55 ? '#0b0b0b' : '#ffffff';
+  }
+
+  function fmtNum(n) {
+    return typeof n === 'number' ? (Math.round(n * 10) / 10).toString() : '—';
+  }
+
+  function setStatus(kind, text) {
+    statusDot.className = 'dot' + (kind ? ' ' + kind : '');
+    statusText.textContent = text;
+  }
+
+  function showTooltip(evt, html) {
+    tooltip.innerHTML = html;
+    tooltip.style.display = 'block';
+    const x = evt.clientX + 14, y = evt.clientY + 14;
+    const maxX = window.innerWidth - 280, maxY = window.innerHeight - 100;
+    tooltip.style.left = Math.min(x, maxX) + 'px';
+    tooltip.style.top = Math.min(y, maxY) + 'px';
+  }
+  function hideTooltip() { tooltip.style.display = 'none'; }
+
+  async function fetchJSON(path, headers) {
+    const url = `${API_BASE}${path}`;
+    const startedAt = performance.now();
+    try {
+      const res = await fetch(url, { headers, signal: AbortSignal.timeout(20000) });
+      let body = null;
+      try { body = await res.json(); } catch { /* non-JSON error body */ }
+      return { ok: res.ok, status: res.status, body, latencyMs: Math.round(performance.now() - startedAt) };
+    } catch (err) {
+      return { ok: false, status: 0, body: { error: 'network_error', message: String(err) }, latencyMs: Math.round(performance.now() - startedAt) };
+    }
+  }
+
+  function buildQuery() {
+    const q = new URLSearchParams();
+    if (mode === 'equities') {
+      const tickers = el('tickersInput').value.trim();
+      if (tickers) q.set('tickers', tickers);
+      q.set('timeframe', el('timeframeSelect').value);
+    } else {
+      const underlying = el('underlyingInput').value.trim();
+      if (underlying) q.set('underlying', underlying);
+      const exp = el('expirationInput').value.trim();
+      if (exp) q.set('expiration_date', exp);
+      q.set('option_type', el('optionTypeSelect').value);
+    }
+    return q.toString();
+  }
+
+  function renderMessage(container, kind, text) {
+    container.innerHTML = `<p class="msg ${kind}"></p>`;
+    container.querySelector('.msg').textContent = text;
+  }
+
+  function renderPaymentRequired(container, body) {
+    const accepts = (body && body.accepts && body.accepts[0]) || {};
+    const units = accepts.amount || accepts.maxAmountRequired;
+    const usdc = units ? (Number(units) / 1e6).toFixed(2) : '?';
+    container.innerHTML = '';
+    const box = document.createElement('div');
+    box.className = 'msg warn';
+    const strong = document.createElement('strong');
+    strong.textContent = 'Payment required.';
+    const rest = document.createTextNode(
+      ` Send ${usdc} USDC on Base to ${accepts.payTo || '?'}, then either enter the operator key above, or paste the tx hash and click "Run full scan" again.`,
+    );
+    box.append(strong, rest);
+    container.appendChild(box);
+  }
+
+  function computeStats(heatmap) {
+    const items = heatmap.groups.flatMap((g) => g.items);
+    const n = items.length;
+    const avg = n ? items.reduce((s, i) => s + i.value, 0) / n : null;
+    const hot = items.filter((i) => i.value >= heatmap.overboughtThreshold).length;
+    const cold = items.filter((i) => i.value <= heatmap.oversoldThreshold).length;
+    return { n, avg, hot, cold };
+  }
+
+  function renderStats(heatmap) {
+    const { n, avg, hot, cold } = computeStats(heatmap);
+    statRow.style.display = 'grid';
+    el('statCountLabel').textContent = mode === 'equities' ? 'Tickers scanned' : 'Contracts scanned';
+    el('statAvgLabel').textContent = mode === 'equities' ? 'Average RSI' : 'Average |Delta|x100';
+    el('statHotLabel').textContent = mode === 'equities' ? 'Overbought (≥' + heatmap.overboughtThreshold + ')' : 'Deep ITM (≥' + heatmap.overboughtThreshold + ')';
+    el('statColdLabel').textContent = mode === 'equities' ? 'Oversold (≤' + heatmap.oversoldThreshold + ')' : 'Deep OTM (≤' + heatmap.oversoldThreshold + ')';
+    el('statCount').textContent = String(n);
+    el('statAvg').textContent = fmtNum(avg);
+    el('statHot').textContent = String(hot);
+    el('statCold').textContent = String(cold);
+  }
+
+  function renderGrid(container, heatmap) {
+    const items = heatmap.groups.flatMap((g) => g.items);
+    if (items.length === 0) { renderMessage(container, 'warn', 'No items returned — Awaiting data.'); return; }
+    container.innerHTML = '';
+    const grid = document.createElement('div');
+    grid.className = 'grid';
+    for (const item of items) {
+      const bg = colorForValue(item.value, heatmap.oversoldThreshold, heatmap.overboughtThreshold);
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.tabIndex = 0;
+      cell.style.background = bg;
+      cell.style.color = textColorFor(bg);
+      const symSpan = document.createElement('span'); symSpan.className = 'sym'; symSpan.textContent = item.symbol;
+      const valSpan = document.createElement('span'); valSpan.className = 'val'; valSpan.textContent = fmtNum(item.value);
+      cell.append(symSpan, valSpan);
+      const metaLines = item.meta ? Object.entries(item.meta).map(([k, v]) => `${k}: ${v}`).join('<br>') : '';
+      const buildTip = () => {
+        tooltip.innerHTML = '';
+        const strong = document.createElement('strong'); strong.textContent = item.symbol;
+        tooltip.append(strong, document.createElement('br'), document.createTextNode(`Value: ${fmtNum(item.value)} (${heatmap.scale})`));
+        if (metaLines) { tooltip.insertAdjacentHTML('beforeend', '<br>' + metaLines); }
+        return tooltip.innerHTML;
+      };
+      cell.addEventListener('pointerenter', (e) => showTooltip(e, buildTip()));
+      cell.addEventListener('pointermove', (e) => showTooltip(e, tooltip.innerHTML));
+      cell.addEventListener('pointerleave', hideTooltip);
+      cell.addEventListener('focus', (e) => showTooltip(e, buildTip()));
+      cell.addEventListener('blur', hideTooltip);
+      grid.appendChild(cell);
+    }
+    container.appendChild(grid);
+  }
+
+  function renderTable(container, heatmap) {
+    const items = heatmap.groups.flatMap((g) => g.items.map((it) => ({ ...it, group: g.group })));
+    if (items.length === 0) { renderMessage(container, 'warn', 'No items returned — Awaiting data.'); return; }
+    const table = document.createElement('table');
+    table.className = 'data-table';
+    table.innerHTML = `<thead><tr><th>Symbol</th><th>Value</th><th>Group</th></tr></thead>`;
+    const tbody = document.createElement('tbody');
+    for (const it of items) {
+      const tr = document.createElement('tr');
+      const symTd = document.createElement('td'); symTd.textContent = it.symbol;
+      const valTd = document.createElement('td'); valTd.className = 'num'; valTd.textContent = fmtNum(it.value);
+      const groupTd = document.createElement('td'); groupTd.textContent = it.group;
+      tr.append(symTd, valTd, groupTd);
+      tbody.appendChild(tr);
+    }
+    table.appendChild(tbody);
+    container.innerHTML = '';
+    container.appendChild(table);
+  }
+
+  function renderMoverChip(container, item) {
+    const chip = document.createElement('div');
+    chip.className = 'mover-chip';
+    const sym = document.createElement('span'); sym.className = 'sym'; sym.textContent = item.symbol;
+    const val = document.createElement('span'); val.className = 'val'; val.textContent = fmtNum(item.value);
+    chip.append(sym, val);
+    container.appendChild(chip);
+  }
+
+  function renderMovers(heatmap) {
+    const items = heatmap.groups.flatMap((g) => g.items);
+    if (items.length === 0) { el('moversRow').style.display = 'none'; return; }
+    el('moversRow').style.display = 'grid';
+    el('moversHotLabel').textContent = mode === 'equities' ? 'Top overbought' : 'Top deep ITM';
+    el('moversColdLabel').textContent = mode === 'equities' ? 'Top oversold' : 'Top deep OTM';
+    const hotEl = el('moversHot'), coldEl = el('moversCold');
+    hotEl.innerHTML = ''; coldEl.innerHTML = '';
+    [...items].sort((a, b) => b.value - a.value).slice(0, 3).forEach((it) => renderMoverChip(hotEl, it));
+    [...items].sort((a, b) => a.value - b.value).slice(0, 3).forEach((it) => renderMoverChip(coldEl, it));
+  }
+
+  function exportCsv() {
+    if (!lastHeatmap) return;
+    const items = lastHeatmap.groups.flatMap((g) => g.items.map((it) => ({ ...it, group: g.group })));
+    const rows = ['symbol,value,group', ...items.map((it) => `${it.symbol},${it.value},${it.group}`)];
+    const blob = new Blob([rows.join('\n')], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `sml-heatmap-${mode}-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function renderHeatmap(heatmap) {
+    lastHeatmap = heatmap;
+    legendRow.style.display = 'flex';
+    if (mode === 'equities') {
+      legendLowLabel.textContent = `Oversold (≤${heatmap.oversoldThreshold})`;
+      legendHighLabel.textContent = `Overbought (≥${heatmap.overboughtThreshold})`;
+    } else {
+      legendLowLabel.textContent = `Deep OTM (≤${heatmap.oversoldThreshold})`;
+      legendHighLabel.textContent = `Deep ITM (≥${heatmap.overboughtThreshold})`;
+    }
+    renderStats(heatmap);
+    renderMovers(heatmap);
+    if (view === 'grid') renderGrid(resultBody, heatmap);
+    else renderTable(resultBody, heatmap);
+  }
+
+  function renderSwarm(swarm) {
+    if (!swarm) { swarmPanel.style.display = 'none'; return; }
+    swarmPanel.style.display = 'block';
+    swarmMeta.textContent = `${swarm.model} · ${new Date(swarm.generatedAt).toLocaleString()}`;
+    swarmSynthesis.textContent = swarm.synthesis;
+    swarmMembers.innerHTML = '';
+    for (const m of swarm.members || []) {
+      const d = document.createElement('details');
+      d.className = 'swarm-member';
+      const s = document.createElement('summary');
+      const avatar = document.createElement('span');
+      avatar.className = 'avatar';
+      avatar.textContent = (m.name || '?').slice(0, 2).toUpperCase();
+      const nameSpan = document.createElement('span');
+      nameSpan.textContent = m.name;
+      s.append(avatar, nameSpan);
+      const p = document.createElement('p');
+      p.textContent = m.verdict;
+      d.append(s, p);
+      swarmMembers.appendChild(d);
+    }
+  }
+
+  async function loadPreview() {
+    setStatus('', 'Loading…');
+    resultPanel.classList.add('loading');
+    swarmPanel.style.display = 'none';
+    const path = mode === 'equities' ? '/x402/equities-heatmap/preview' : '/x402/options-delta-heatmap/preview';
+    const q = mode === 'options' && el('underlyingInput').value.trim() ? `?underlying=${encodeURIComponent(el('underlyingInput').value.trim())}` : '';
+    const { ok, status, body, latencyMs } = await fetchJSON(path + q);
+    resultPanel.classList.remove('loading');
+    resultTitle.textContent = mode === 'equities' ? 'Equities RSI(14) — free preview' : `Options Delta — free preview`;
+    if (!ok || !body || body.error) {
+      setStatus('down', 'Server error');
+      resultMeta.textContent = '';
+      legendRow.style.display = 'none';
+      statRow.style.display = 'none';
+      el('moversRow').style.display = 'none';
+      renderMessage(resultBody, 'error', (body && body.message) || `HTTP ${status}`);
+      return;
+    }
+    setStatus('live', 'Live (free preview)');
+    lastUpdated.textContent = `Updated ${new Date(body.heatmap.generatedAt).toLocaleTimeString()} · fetched in ${latencyMs}ms`;
+    resultMeta.textContent = mode === 'options' ? `${body.underlying} @ ${body.underlyingPrice}` : `timeframe ${body.timeframe}`;
+    renderHeatmap(body.heatmap);
+  }
+
+  async function loadFull() {
+    const headers = {};
+    const opKey = el('operatorKeyInput').value.trim();
+    const txHash = el('txHashInput').value.trim();
+    if (opKey) { headers['X-Operator-Key'] = opKey; localStorage.setItem(OPKEY_STORAGE, opKey); }
+    if (txHash) headers['X-Payment-Tx'] = txHash;
+
+    setStatus('', 'Requesting full scan…');
+    resultPanel.classList.add('loading');
+    const path = mode === 'equities' ? '/x402/equities-heatmap' : '/x402/options-delta-heatmap';
+    const q = buildQuery();
+    const { ok, status, body, latencyMs } = await fetchJSON(`${path}?${q}`, headers);
+    resultPanel.classList.remove('loading');
+    resultTitle.textContent = mode === 'equities' ? 'Equities RSI(14) — full scan' : 'Options Delta — full scan';
+
+    if (status === 402) {
+      setStatus('stale', 'Payment required');
+      resultMeta.textContent = '';
+      legendRow.style.display = 'none';
+      statRow.style.display = 'none';
+      el('moversRow').style.display = 'none';
+      swarmPanel.style.display = 'none';
+      renderPaymentRequired(resultBody, body);
+      return;
+    }
+    if (!ok || !body || body.error) {
+      setStatus('down', 'Server error');
+      resultMeta.textContent = '';
+      legendRow.style.display = 'none';
+      statRow.style.display = 'none';
+      el('moversRow').style.display = 'none';
+      swarmPanel.style.display = 'none';
+      renderMessage(resultBody, 'error', (body && body.message) || `HTTP ${status}`);
+      return;
+    }
+    const data = body.data;
+    setStatus('live', `Live (full scan — ${body._paid ? body._paid.rail : 'paid'})`);
+    lastUpdated.textContent = `Updated ${new Date(data.heatmap.generatedAt).toLocaleTimeString()} · fetched in ${latencyMs}ms`;
+    resultMeta.textContent = mode === 'options' ? `${data.underlying} @ ${data.underlyingPrice} (${data.optionType})` : `timeframe ${data.timeframe}`;
+    renderHeatmap(data.heatmap);
+    renderSwarm(data.swarm);
+  }
+
+  function switchMode(next) {
+    mode = next;
+    el('tabEquities').setAttribute('aria-selected', String(mode === 'equities'));
+    el('tabOptions').setAttribute('aria-selected', String(mode === 'options'));
+    el('fieldTickers').style.display = mode === 'equities' ? 'flex' : 'none';
+    el('fieldTimeframe').style.display = mode === 'equities' ? 'flex' : 'none';
+    el('fieldUnderlying').style.display = mode === 'options' ? 'flex' : 'none';
+    el('fieldExpiration').style.display = mode === 'options' ? 'flex' : 'none';
+    el('fieldOptionType').style.display = mode === 'options' ? 'flex' : 'none';
+    swarmPanel.style.display = 'none';
+    loadPreview();
+  }
+
+  function switchView(next) {
+    view = next;
+    el('viewGridBtn').setAttribute('aria-pressed', String(view === 'grid'));
+    el('viewTableBtn').setAttribute('aria-pressed', String(view === 'table'));
+    if (lastHeatmap) (view === 'grid' ? renderGrid : renderTable)(resultBody, lastHeatmap);
+  }
+
+  el('tabEquities').addEventListener('click', () => switchMode('equities'));
+  el('tabOptions').addEventListener('click', () => switchMode('options'));
+  el('viewGridBtn').addEventListener('click', () => switchView('grid'));
+  el('viewTableBtn').addEventListener('click', () => switchView('table'));
+  el('refreshBtn').addEventListener('click', loadPreview);
+  el('unlockBtn').addEventListener('click', loadFull);
+  el('exportCsvBtn').addEventListener('click', exportCsv);
+  el('autoRefresh').addEventListener('change', (e) => {
+    if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
+    if (e.target.checked) autoTimer = setInterval(loadPreview, 60000);
+  });
+
+  // Persist filter inputs across visits (convenience only — never used for secrets).
+  const PERSIST_FIELDS = ['tickersInput', 'timeframeSelect', 'underlyingInput', 'expirationInput', 'optionTypeSelect'];
+  const FIELDS_STORAGE = 'sml_heatmap_fields';
+  try {
+    const saved = JSON.parse(localStorage.getItem(FIELDS_STORAGE) || '{}');
+    for (const id of PERSIST_FIELDS) if (saved[id] !== undefined) el(id).value = saved[id];
+  } catch { /* ignore malformed storage */ }
+  for (const id of PERSIST_FIELDS) {
+    el(id).addEventListener('change', () => {
+      const toSave = {};
+      for (const fid of PERSIST_FIELDS) toSave[fid] = el(fid).value;
+      localStorage.setItem(FIELDS_STORAGE, JSON.stringify(toSave));
+    });
+  }
+
+  switchMode('equities');
+})();
+</script>
+</body>
+</html>

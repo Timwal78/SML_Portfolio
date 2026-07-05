@@ -2,6 +2,7 @@ services:
   - type: web
     name: mcp-x402
     runtime: docker
+    branch: main
     dockerfilePath: ./mcp-x402/Dockerfile
     dockerContext: ./mcp-x402
     plan: starter
@@ -59,6 +60,21 @@ services:
       - key: CDP_API_KEY_ID
         sync: false
       - key: CDP_API_KEY_SECRET
+        sync: false
+      # Equities/options heatmap tools (equities-heatmap.ts) — self-contained,
+      # not proxied through SqueezeOS. Required for equities_heatmap_full /
+      # options_delta_heatmap_full and the /x402/equities-heatmap(-preview)
+      # and /x402/options-delta-heatmap(-preview) REST routes.
+      - key: POLYGON_API_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: ANTHROPIC_MODEL
+        value: "claude-sonnet-4-5"
+      # Lets the operator's own dashboard (heatmap.html) call the paid full
+      # endpoints without paying itself — send header X-Operator-Key matching
+      # this value. Leave unset to disable the bypass entirely.
+      - key: SML_OPERATOR_KEY
         sync: false
     autoDeploy: true
     # Render restarts the service automatically on crash

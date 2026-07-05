@@ -15,6 +15,7 @@ import { verifyBaseUsdcPayment, alreadyRedeemed, markRedeemed, releaseRedeem } f
 import { facilitatorChain, decodePaymentHeader, type PaymentRequirements } from './payments/facilitators.js';
 import { X402Stats } from './security/x402-stats.js';
 import { SqueezeOSAPI } from '../lib/sml-api/squeezeos.js';
+import { EquitiesHeatmapAPI, OptionsDeltaHeatmapAPI } from '../lib/sml-api/equities-heatmap.js';
 
 // Embedded favicon (jet black / neon green SML mark) — served directly, no redirect
 const FAVICON_ICO = Buffer.from(
@@ -76,6 +77,7 @@ async function runSSE(): Promise<void> {
   });
 
   const LEVIATHAN_BYPASS_SECRET = process.env['LEVIATHAN_BYPASS_SECRET'] ?? '';
+  const SML_OPERATOR_KEY = process.env['SML_OPERATOR_KEY'] ?? '';
 
   // Health endpoint — hit every 30s by Docker healthcheck + keepalive cron
   app.get('/health', healthHandler);
@@ -221,6 +223,14 @@ async function runSSE(): Promise<void> {
     // LEVIATHAN bypass — Virtuals Protocol USDC already settled on-chain
     if (LEVIATHAN_BYPASS_SECRET && req.headers['x-leviathan-key'] === LEVIATHAN_BYPASS_SECRET) {
       return { ok: true, payer: { rail: 'leviathan', from: 'did:leviathan:acp:scriptmasterlabs', tx: '' } };
+    }
+
+    // Operator bypass — the operator's own private tools (e.g. the trading
+    // dashboard at scriptmasterlabs.com) authenticate with a real secret only
+    // the operator holds server-side, same class of credential as the existing
+    // SqueezeOS X-API-Key operator bypass, just for this server's own REST gate.
+    if (SML_OPERATOR_KEY && req.headers['x-operator-key'] === SML_OPERATOR_KEY) {
+      return { ok: true, payer: { rail: 'operator', from: 'did:sml:operator', tx: '' } };
     }
 
     // Rail A — standard EIP-3009 via hybrid facilitator chain
@@ -1280,6 +1290,75 @@ async function runSSE(): Promise<void> {
       });
       return res.set('Access-Control-Allow-Origin', '*').json({ source: 'NIH Reporter API v2', query: { search: query, agency: agency || 'all', fiscal_year }, total_found: j.total, returned: grants.length, grants, _disclaimer: 'NIH Reporter public award data. Amounts reflect total cost including direct and indirect costs.', _paid: pay.payer });
     } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'nih_fetch_failed', message: String(err) }); }
+  });
+
+  // ── Equities/Options heatmap REST routes ────────────────────────────────────
+  // Same self-contained EquitiesHeatmapAPI/OptionsDeltaHeatmapAPI used by the
+  // MCP tool handlers (equities-heatmap.ts) — real Polygon.io data + real
+  // RSI(14)/Black-Scholes Delta + real Claude swarm on the full tier. Exposed
+  // here as plain REST/JSON so the browser dashboard at scriptmasterlabs.com
+  // can call them directly with fetch(), no MCP client required.
+
+  app.get('/x402/equities-heatmap/preview', async (_req, res) => {
+    try {
+      const data = await EquitiesHeatmapAPI.preview();
+      return res.set('Access-Control-Allow-Origin', '*').json(data);
+    } catch (err) {
+      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'api_error', message: String(err) });
+    }
+  });
+
+  const EQUITIES_HEATMAP_PRICE_UNITS = 100000n; // 0.10 USDC
+  app.get('/x402/equities-heatmap', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/equities-heatmap`;
+    const tickers = typeof req.query['tickers'] === 'string'
+      ? req.query['tickers'].split(',').map((t) => t.trim()).filter(Boolean).slice(0, 20)
+      : undefined;
+    const timeframe = req.query['timeframe'] === '1d' ? '1d' as const : req.query['timeframe'] === '1h' ? '1h' as const : undefined;
+    const inputSchema = { type: 'object', properties: { tickers: { type: 'string', description: 'Comma-separated tickers, up to 20. Defaults to a 16-ticker large-cap watchlist.' }, timeframe: { type: 'string', enum: ['1h', '1d'], default: '1h' } } };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { tickers: { type: 'string', required: false }, timeframe: { type: 'string', required: false } } }, output: null };
+
+    const pay = await requirePayment(req, res, { resource, priceUnits: EQUITIES_HEATMAP_PRICE_UNITS, description: 'Equities RSI(14) heatmap (up to 20 tickers) with a real 4-agent Claude swarm verdict. Pay 0.10 USDC on Base via X-PAYMENT (standard) or X-PAYMENT-TX (sovereign).', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    try {
+      const data = await EquitiesHeatmapAPI.full(tickers, timeframe);
+      return res.set('Access-Control-Allow-Origin', '*').json({ data, _paid: pay.payer });
+    } catch (err) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'api_error', message: String(err) });
+    }
+  });
+
+  app.get('/x402/options-delta-heatmap/preview', async (req, res) => {
+    const underlying = typeof req.query['underlying'] === 'string' ? req.query['underlying'] : undefined;
+    try {
+      const data = await OptionsDeltaHeatmapAPI.preview(underlying);
+      return res.set('Access-Control-Allow-Origin', '*').json(data);
+    } catch (err) {
+      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'api_error', message: String(err) });
+    }
+  });
+
+  const OPTIONS_HEATMAP_PRICE_UNITS = 150000n; // 0.15 USDC
+  app.get('/x402/options-delta-heatmap', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/options-delta-heatmap`;
+    const underlying = typeof req.query['underlying'] === 'string' ? req.query['underlying'] : undefined;
+    const expirationDate = typeof req.query['expiration_date'] === 'string' ? req.query['expiration_date'] : undefined;
+    const optionType = req.query['option_type'] === 'put' ? 'put' as const : req.query['option_type'] === 'call' ? 'call' as const : undefined;
+    const inputSchema = { type: 'object', properties: { underlying: { type: 'string', description: 'Underlying ticker. Defaults to SPY.' }, expiration_date: { type: 'string', description: 'YYYY-MM-DD. Defaults to nearest available.' }, option_type: { type: 'string', enum: ['call', 'put'], default: 'call' } } };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { underlying: { type: 'string', required: false }, expiration_date: { type: 'string', required: false }, option_type: { type: 'string', required: false } } }, output: null };
+
+    const pay = await requirePayment(req, res, { resource, priceUnits: OPTIONS_HEATMAP_PRICE_UNITS, description: 'Options Delta heatmap (up to 40 contracts) with a real 4-agent Claude swarm verdict. Pay 0.15 USDC on Base via X-PAYMENT (standard) or X-PAYMENT-TX (sovereign).', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    try {
+      const data = await OptionsDeltaHeatmapAPI.full(underlying, expirationDate, optionType);
+      return res.set('Access-Control-Allow-Origin', '*').json({ data, _paid: pay.payer });
+    } catch (err) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'api_error', message: String(err) });
+    }
   });
 
   // ── SqueezeOS-backed x402 routes ────────────────────────────────────────────
