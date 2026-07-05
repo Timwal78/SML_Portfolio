@@ -3,6 +3,7 @@ import { computeRSI } from '../../src/lib/quant/indicators.js';
 import { blackScholesDelta } from '../../src/lib/quant/greeks.js';
 import { buildHeatmap } from '../../src/lib/quant/heatmap.js';
 import { pickExtremes } from '../../src/lib/notify/discord.js';
+import { nearestToMoney } from '../../src/lib/sml-api/equities-heatmap.js';
 
 describe('computeRSI', () => {
   it('approaches 100 for a steadily rising series', () => {
@@ -72,5 +73,21 @@ describe('pickExtremes', () => {
     const { top, bottom } = pickExtremes(heatmap);
     expect(top).toBeNull();
     expect(bottom).toBeNull();
+  });
+});
+
+describe('nearestToMoney', () => {
+  it('picks strikes closest to the underlying price, not the lowest strikes', () => {
+    // Regression test: a naive slice(0, N) on a strike-ascending chain always
+    // grabbed the deepest-ITM contracts (real bug — every options preview
+    // showed |delta|≈100 for every contract regardless of ticker).
+    const contracts = [10, 12, 14, 22, 23, 24, 40, 60].map((strike) => ({ strike }));
+    const picked = nearestToMoney(contracts, 22.82, 3);
+    expect(picked.map((c) => c.strike)).toEqual([23, 22, 24]);
+  });
+
+  it('returns all contracts when count exceeds the available list', () => {
+    const contracts = [{ strike: 10 }, { strike: 20 }];
+    expect(nearestToMoney(contracts, 15, 5)).toHaveLength(2);
   });
 });

@@ -72,6 +72,19 @@ export const DEFAULT_OPTIONS_UNDERLYING = 'AMC';
 const DELTA_BAND_LOW = 35;
 const DELTA_BAND_HIGH = 40;
 
+/**
+ * Free-preview contract sampling: takes the `count` contracts whose strikes
+ * sit closest to the live underlying price. Both Tradier and Polygon return
+ * contracts strike-ascending, so a naive slice(0, count) always grabs the
+ * deepest-in-the-money strikes — pinned near |delta|=1.0 for every result,
+ * regardless of ticker. Sorting by proximity to spot instead gives a
+ * representative mix of deltas, same as what an actual near-the-money scan
+ * would show.
+ */
+export function nearestToMoney<T extends { strike: number }>(contracts: T[], underlyingPrice: number, count: number): T[] {
+  return [...contracts].sort((a, b) => Math.abs(a.strike - underlyingPrice) - Math.abs(b.strike - underlyingPrice)).slice(0, count);
+}
+
 export interface DeltaBandPick {
   symbol: string;
   strike: number;
@@ -292,7 +305,7 @@ export const OptionsDeltaHeatmapAPI = {
     if (res.tradier) {
       try {
         const chain = await fetchOptionsChainWithGreeks(symbol, res.tradier, { contractType: 'call' });
-        const priced = chain.contracts.filter((c) => typeof c.delta === 'number').slice(0, 5);
+        const priced = nearestToMoney(chain.contracts.filter((c) => typeof c.delta === 'number'), chain.underlyingPrice, 5);
         if (priced.length > 0 && chain.underlyingPrice > 0) {
           const items: HeatmapItem[] = priced.map((c) => ({
             symbol: `${chain.underlying} ${c.strike}C ${c.expirationDate}`,
@@ -307,10 +320,11 @@ export const OptionsDeltaHeatmapAPI = {
     }
 
     if (!res.polygon) throw new Error('not_configured: missing a Tradier or Polygon API key (BYOK or server-configured)');
-    const chain = await fetchOptionsChainSnapshot(symbol, res.polygon, { contractType: 'call', limit: 5 });
-    if (chain.contracts.length === 0 || chain.underlyingPrice <= 0) {
+    const fullChain = await fetchOptionsChainSnapshot(symbol, res.polygon, { contractType: 'call', limit: 40 });
+    if (fullChain.contracts.length === 0 || fullChain.underlyingPrice <= 0) {
       throw new Error(`no_data: no options contracts returned for ${symbol}`);
     }
+    const chain = { ...fullChain, contracts: nearestToMoney(fullChain.contracts, fullChain.underlyingPrice, 5) };
     const items: HeatmapItem[] = chain.contracts.map((c) => {
       const timeToExpiryYears = Math.max((new Date(c.expirationDate).getTime() - Date.now()) / (365.25 * 24 * 3600 * 1000), 1 / 365.25);
       const delta = blackScholesDelta({ spot: chain.underlyingPrice, strike: c.strike, timeToExpiryYears, volatility: c.impliedVolatility ?? 0.3, optionType: 'call' });
