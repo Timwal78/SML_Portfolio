@@ -403,7 +403,7 @@ footer p { font-size: 0.75rem; color: var(--text-3); font-family: var(--mono); }
     <summary>Unlock full scan — up to 20 tickers / 40 contracts + real Claude swarm verdict (0.10–0.15 USDC on Base)</summary>
     <div class="unlock-grid">
       <div class="field">
-        <label for="operatorKeyInput">Operator key</label>
+        <label for="operatorKeyInput">Operator key (your SML_API_KEY)</label>
         <input type="password" id="operatorKeyInput" placeholder="X-Operator-Key">
       </div>
       <div class="field">
@@ -413,7 +413,7 @@ footer p { font-size: 0.75rem; color: var(--text-3); font-family: var(--mono); }
       <button class="btn btn-primary-lg" id="unlockBtn">Run full scan</button>
     </div>
     <p class="unlock-note">
-      The operator key is stored only in this browser's localStorage and sent as a request header — never hardcoded here. A tx hash is verified live on-chain against Base; each hash can only be used once. Full-tier price and pay-to address come straight from the server's real 402 challenge, shown below if payment is required.
+      The operator key is the same <code>SML_API_KEY</code> already set on the mcp-x402 server — it's stored only in this browser's localStorage and sent as a request header, never hardcoded here. A tx hash is verified live on-chain against Base; each hash can only be used once. Full-tier price and pay-to address come straight from the server's real 402 challenge, shown below if payment is required.
     </p>
   </details>
 
@@ -773,7 +773,8 @@ footer p { font-size: 0.75rem; color: var(--text-3); font-family: var(--mono); }
     }
     setStatus('live', 'Live (free preview)');
     lastUpdated.textContent = `Updated ${new Date(body.heatmap.generatedAt).toLocaleTimeString()} · fetched in ${latencyMs}ms`;
-    resultMeta.textContent = mode === 'options' ? `${body.underlying} @ ${body.underlyingPrice}` : `timeframe ${body.timeframe}`;
+    const baseMeta = mode === 'options' ? `${body.underlying} @ ${body.underlyingPrice}` : `timeframe ${body.timeframe}`;
+    resultMeta.textContent = body.dataSource ? `${baseMeta} · source: ${body.dataSource}` : baseMeta;
     renderHeatmap(body.heatmap);
   }
 
@@ -815,7 +816,8 @@ footer p { font-size: 0.75rem; color: var(--text-3); font-family: var(--mono); }
     const data = body.data;
     setStatus('live', `Live (full scan — ${body._paid ? body._paid.rail : 'paid'})`);
     lastUpdated.textContent = `Updated ${new Date(data.heatmap.generatedAt).toLocaleTimeString()} · fetched in ${latencyMs}ms`;
-    resultMeta.textContent = mode === 'options' ? `${data.underlying} @ ${data.underlyingPrice} (${data.optionType})` : `timeframe ${data.timeframe}`;
+    const baseMeta = mode === 'options' ? `${data.underlying} @ ${data.underlyingPrice} (${data.optionType})` : `timeframe ${data.timeframe}`;
+    resultMeta.textContent = data.dataSource ? `${baseMeta} · source: ${data.dataSource}` : baseMeta;
     renderHeatmap(data.heatmap);
     renderSwarm(data.swarm);
   }

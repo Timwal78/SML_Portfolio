@@ -65,17 +65,19 @@ services:
       # not proxied through SqueezeOS. Required for equities_heatmap_full /
       # options_delta_heatmap_full and the /x402/equities-heatmap(-preview)
       # and /x402/options-delta-heatmap(-preview) REST routes.
+      # Data source priority: TRADIER_API_KEY first (real market-quoted Greeks
+      # on options), falling back to POLYGON_API_KEY. At least one of the two
+      # is required; ANTHROPIC_API_KEY is always required for the swarm verdict.
+      - key: TRADIER_API_KEY
+        sync: false
+      - key: TRADIER_ENV
+        value: "production"
       - key: POLYGON_API_KEY
         sync: false
       - key: ANTHROPIC_API_KEY
         sync: false
       - key: ANTHROPIC_MODEL
         value: "claude-sonnet-4-5"
-      # Lets the operator's own dashboard (heatmap.html) call the paid full
-      # endpoints without paying itself — send header X-Operator-Key matching
-      # this value. Leave unset to disable the bypass entirely.
-      - key: SML_OPERATOR_KEY
-        sync: false
     autoDeploy: true
     # Render restarts the service automatically on crash
     # healthCheckPath triggers restart if /health returns non-2xx

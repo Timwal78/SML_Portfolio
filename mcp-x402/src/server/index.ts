@@ -77,7 +77,7 @@ async function runSSE(): Promise<void> {
   });
 
   const LEVIATHAN_BYPASS_SECRET = process.env['LEVIATHAN_BYPASS_SECRET'] ?? '';
-  const SML_OPERATOR_KEY = process.env['SML_OPERATOR_KEY'] ?? '';
+  const SML_API_KEY = process.env['SML_API_KEY'] ?? '';
 
   // Health endpoint — hit every 30s by Docker healthcheck + keepalive cron
   app.get('/health', healthHandler);
@@ -226,10 +226,10 @@ async function runSSE(): Promise<void> {
     }
 
     // Operator bypass — the operator's own private tools (e.g. the trading
-    // dashboard at scriptmasterlabs.com) authenticate with a real secret only
-    // the operator holds server-side, same class of credential as the existing
-    // SqueezeOS X-API-Key operator bypass, just for this server's own REST gate.
-    if (SML_OPERATOR_KEY && req.headers['x-operator-key'] === SML_OPERATOR_KEY) {
+    // dashboard at scriptmasterlabs.com) authenticate with the same SML_API_KEY
+    // already used as the operator-key bypass for SqueezeOS calls, so there's
+    // only one operator secret to manage instead of two.
+    if (SML_API_KEY && req.headers['x-operator-key'] === SML_API_KEY) {
       return { ok: true, payer: { rail: 'operator', from: 'did:sml:operator', tx: '' } };
     }
 
