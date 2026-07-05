@@ -159,15 +159,42 @@ async function runSSE(): Promise<void> {
   // real payment for this route settles through the CDP facilitator specifically
   // (see facilitatorChain() in payments/facilitators.ts) — schema + flag get you
   // eligible, they don't get you listed by themselves.
-  const buildBazaarExtensions = (inputSchema: unknown, outputSchema: unknown): Record<string, unknown> => ({
-    bazaar: {
-      discoverable: true,
-      schema: { properties: {
-        input: { properties: { queryParams: isRecord(inputSchema) ? inputSchema : { type: 'object' } } },
-        output: { properties: { example: isRecord(outputSchema) ? outputSchema : { type: 'object' } } },
-      } },
-    },
-  });
+  // Bazaar discovery extension. Two consumers, both must pass:
+  //  • x402scan / @agentcash/discovery reads extensions.bazaar.schema.properties
+  //    .input.properties.{queryParams|body} and .output.properties.example.
+  //  • Agentic.Market / CDP Bazaar SDK reads extensions.bazaar.info (the
+  //    @rvk_rishikesh/extensions DiscoveryInfo shape) to extract method + params.
+  // The `info` block is REQUIRED by the Bazaar SDK — without it the endpoint
+  // validates on x402scan but is rejected by Agentic.Market ("Missing bazaar info").
+  const isBodyMethod = (m: string): boolean => m === 'POST' || m === 'PUT' || m === 'PATCH';
+  const buildBazaarExtensions = (inputSchema: unknown, outputSchema: unknown): Record<string, unknown> => {
+    const oi = isRecord(outputSchema) && isRecord(outputSchema['input']) ? outputSchema['input'] : {};
+    const method = typeof oi['method'] === 'string' ? oi['method'] : 'GET';
+    const body = isBodyMethod(method);
+    const params = isRecord(inputSchema) && isRecord(inputSchema['properties']) ? inputSchema['properties'] : {};
+    const example = isRecord(outputSchema) && isRecord(outputSchema['output']) ? outputSchema['output'] : {};
+    const info = body
+      ? { input: { type: 'http', method, bodyType: 'json', body: params }, output: { example } }
+      : { input: { type: 'http', method, queryParams: params }, output: { example } };
+    const inputProps = body
+      ? { type: { type: 'string', const: 'http' }, method: { type: 'string' }, bodyType: { type: 'string' }, body: isRecord(inputSchema) ? inputSchema : { type: 'object' } }
+      : { type: { type: 'string', const: 'http' }, method: { type: 'string' }, queryParams: isRecord(inputSchema) ? inputSchema : { type: 'object' } };
+    return {
+      bazaar: {
+        discoverable: true,
+        info,
+        schema: {
+          $schema: 'https://json-schema.org/draft/2020-12/schema',
+          type: 'object',
+          properties: {
+            input: { type: 'object', properties: inputProps, required: body ? ['type', 'method', 'bodyType', 'body'] : ['type', 'method'] },
+            output: { properties: { example } },
+          },
+          required: ['input'],
+        },
+      },
+    };
+  };
   const send402 = (res: Response, challenge: Record<string, unknown>, header402: string, extra?: Record<string, unknown>): void => {
     const body = extra ? { ...challenge, ...extra } : challenge;
     res.status(402)
