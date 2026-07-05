@@ -1612,6 +1612,7 @@ async function runSSE(): Promise<void> {
         { name: 'state', in: 'query', required: false, schema: { type: 'string' }, description: '2-letter state code.' },
         { name: 'set_aside', in: 'query', required: false, schema: { type: 'string', enum: ['SDVOSB', 'WOSB', 'SDB', 'MINORITY'], default: 'SDVOSB' } },
         { name: 'rows', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 25, default: 10 } },
+        { name: 'X-Sam-Key', in: 'header', required: false, schema: { type: 'string' }, description: 'BYOK: your own SAM.gov API key, takes priority over the server default.' },
       ],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.08', amountUnits: '80000', payTo: X402_PAY_TO, settlement: 'onchain-tx', paymentHeader: 'X-PAYMENT-TX' },
       responses: { '200': { description: 'Matching firms' }, '402': { description: 'Payment required — pay USDC then retry with X-PAYMENT-TX.' } },
@@ -1629,14 +1630,14 @@ async function runSSE(): Promise<void> {
       operationId: 'drugLabel',
       summary: 'FDA drug label lookup (openFDA).',
       description: 'Indications, dosage, warnings, interactions for a drug. Pay 0.05 USDC on Base.',
-      parameters: [{ name: 'drug', in: 'query', required: true, schema: { type: 'string' }, description: 'Brand or generic drug name.', example: 'aspirin' }],
+      parameters: [{ name: 'drug', in: 'query', required: true, schema: { type: 'string' }, description: 'Brand or generic drug name.', example: 'aspirin' }, { name: 'X-Openfda-Key', in: 'header', required: false, schema: { type: 'string' }, description: 'BYOK: your own openFDA API key, takes priority over the server default.' }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.05', amountUnits: '50000', payTo: X402_PAY_TO },
       responses: { '200': { description: 'Drug label' }, '402': { description: 'Payment required.' } },
     } }, '/x402/drug-recall': { get: {
       operationId: 'drugRecall',
       summary: 'FDA drug recall/enforcement search (openFDA).',
       description: 'Recall reason, classification, status, recalling firm. Pay 0.08 USDC on Base.',
-      parameters: [{ name: 'drug', in: 'query', required: true, schema: { type: 'string' }, example: 'metformin' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 20, default: 5 } }],
+      parameters: [{ name: 'drug', in: 'query', required: true, schema: { type: 'string' }, example: 'metformin' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 20, default: 5 } }, { name: 'X-Openfda-Key', in: 'header', required: false, schema: { type: 'string' }, description: 'BYOK: your own openFDA API key, takes priority over the server default.' }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.08', amountUnits: '80000', payTo: X402_PAY_TO },
       responses: { '200': { description: 'Recalls' }, '402': { description: 'Payment required.' } },
     } }, '/x402/npi': { get: {
@@ -1664,7 +1665,7 @@ async function runSSE(): Promise<void> {
       operationId: 'drugAdverseEvents',
       summary: 'FDA adverse event reports (openFDA FAERS).',
       description: 'Reactions, seriousness, outcomes for a drug from FDA safety reports. Pay 0.08 USDC on Base.',
-      parameters: [{ name: 'drug', in: 'query', required: true, schema: { type: 'string' }, example: 'ibuprofen' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 25, default: 10 } }],
+      parameters: [{ name: 'drug', in: 'query', required: true, schema: { type: 'string' }, example: 'ibuprofen' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 25, default: 10 } }, { name: 'X-Openfda-Key', in: 'header', required: false, schema: { type: 'string' }, description: 'BYOK: your own openFDA API key, takes priority over the server default.' }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.08', amountUnits: '80000', payTo: X402_PAY_TO },
       responses: { '200': { description: 'Adverse events' }, '402': { description: 'Payment required.' } },
     } }, '/x402/sec-8k': { get: {
@@ -1685,7 +1686,7 @@ async function runSSE(): Promise<void> {
       operationId: 'entityCompliance',
       summary: 'SAM entity compliance bundle: registration + exclusion + set-asides + NAICS.',
       description: 'Full compliance check by UEI or CAGE: active status, expiry, exclusion flag, set-aside certifications, size standard. Pay 0.35 USDC on Base.',
-      parameters: [{ name: 'uei', in: 'query', required: false, schema: { type: 'string' }, description: 'SAM UEI (preferred).', example: 'JF19MPF74LN7' }, { name: 'cage', in: 'query', required: false, schema: { type: 'string' }, description: 'CAGE code (alternative).' }],
+      parameters: [{ name: 'uei', in: 'query', required: false, schema: { type: 'string' }, description: 'SAM UEI (preferred).', example: 'JF19MPF74LN7' }, { name: 'cage', in: 'query', required: false, schema: { type: 'string' }, description: 'CAGE code (alternative).' }, { name: 'X-Sam-Key', in: 'header', required: false, schema: { type: 'string' }, description: 'BYOK: your own SAM.gov API key, takes priority over the server default.' }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.35', amountUnits: '350000', payTo: X402_PAY_TO },
       responses: { '200': { description: 'Compliance report' }, '402': { description: 'Payment required.' } },
     } }, '/x402/agent-score': { get: {
@@ -1727,7 +1728,7 @@ async function runSSE(): Promise<void> {
       operationId: 'fredSeries',
       summary: 'FRED economic indicator series (Federal Reserve Bank of St. Louis).',
       description: 'Retrieve observations for any FRED series: GDP, CPI, UNRATE, FEDFUNDS, T10Y2Y, and 800k+ others. Returns series metadata and latest observations in reverse chronological order. Pay 0.08 USDC on Base.',
-      parameters: [{ name: 'series_id', in: 'query', required: true, schema: { type: 'string' }, description: 'FRED series ID (e.g. GDP, CPIAUCSL, UNRATE, FEDFUNDS, T10Y2Y, MORTGAGE30US).', example: 'GDP' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 50, default: 20 } }],
+      parameters: [{ name: 'series_id', in: 'query', required: true, schema: { type: 'string' }, description: 'FRED series ID (e.g. GDP, CPIAUCSL, UNRATE, FEDFUNDS, T10Y2Y, MORTGAGE30US).', example: 'GDP' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 50, default: 20 } }, { name: 'X-Fred-Key', in: 'header', required: false, schema: { type: 'string' }, description: 'BYOK: your own FRED API key, takes priority over the server default.' }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.08', amountUnits: '80000', payTo: X402_PAY_TO },
       responses: { '200': { description: 'FRED series observations' }, '402': { description: 'Payment required.' } },
     } }, '/x402/osha': { get: {
@@ -1776,7 +1777,7 @@ async function runSSE(): Promise<void> {
       operationId: 'fecFinance',
       summary: 'FEC campaign finance — candidates, committees, and contribution totals.',
       description: 'Search FEC open data for political candidates or committees by name. Returns receipts, disbursements, party, and election cycle data. Pay 0.10 USDC on Base.',
-      parameters: [{ name: 'name', in: 'query', required: false, schema: { type: 'string' }, example: 'Biden' }, { name: 'committee', in: 'query', required: false, schema: { type: 'string' } }, { name: 'cycle', in: 'query', required: false, schema: { type: 'string' }, example: '2024' }],
+      parameters: [{ name: 'name', in: 'query', required: false, schema: { type: 'string' }, example: 'Biden' }, { name: 'committee', in: 'query', required: false, schema: { type: 'string' } }, { name: 'cycle', in: 'query', required: false, schema: { type: 'string' }, example: '2024' }, { name: 'X-Fec-Key', in: 'header', required: false, schema: { type: 'string' }, description: 'BYOK: your own FEC API key, takes priority over the server default (falls back to the public DEMO_KEY if neither is set).' }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.10', amountUnits: '100000', payTo: X402_PAY_TO },
       responses: { '200': { description: 'FEC campaign finance data' }, '402': { description: 'Payment required.' } },
     } }, '/x402/epa-violations': { get: {
@@ -1797,14 +1798,14 @@ async function runSSE(): Promise<void> {
       operationId: 'congressBills',
       summary: 'Congress.gov bill search — legislation by keyword and congress number.',
       description: 'Search bills by keyword for any Congress session. Returns bill number, title, latest action, sponsor, and Congress.gov URL. Requires CONGRESS_API_KEY (free at api.congress.gov). Pay 0.08 USDC on Base.',
-      parameters: [{ name: 'query', in: 'query', required: true, schema: { type: 'string' }, example: 'artificial intelligence' }, { name: 'congress', in: 'query', required: false, schema: { type: 'string', default: '119' }, example: '119' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 20, default: 10 } }],
+      parameters: [{ name: 'query', in: 'query', required: true, schema: { type: 'string' }, example: 'artificial intelligence' }, { name: 'congress', in: 'query', required: false, schema: { type: 'string', default: '119' }, example: '119' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 20, default: 10 } }, { name: 'X-Congress-Key', in: 'header', required: false, schema: { type: 'string' }, description: 'BYOK: your own Congress.gov API key, takes priority over the server default.' }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.08', amountUnits: '80000', payTo: X402_PAY_TO },
       responses: { '200': { description: 'Congressional bills' }, '402': { description: 'Payment required.' }, '503': { description: 'CONGRESS_API_KEY not configured on this server.' } },
     } }, '/x402/fda-warnings': { get: {
       operationId: 'fdaWarnings',
       summary: 'FDA warning letters — regulatory enforcement actions.',
       description: 'Search FDA warning letters by company or product type. Returns issuing office, subject, dates, and product category. Pay 0.10 USDC on Base.',
-      parameters: [{ name: 'company', in: 'query', required: false, schema: { type: 'string' }, example: 'Purdue Pharma' }, { name: 'product', in: 'query', required: false, schema: { type: 'string' }, example: 'dietary supplement' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 25, default: 10 } }],
+      parameters: [{ name: 'company', in: 'query', required: false, schema: { type: 'string' }, example: 'Purdue Pharma' }, { name: 'product', in: 'query', required: false, schema: { type: 'string' }, example: 'dietary supplement' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 25, default: 10 } }, { name: 'X-Openfda-Key', in: 'header', required: false, schema: { type: 'string' }, description: 'BYOK: your own openFDA API key, takes priority over the server default.' }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.10', amountUnits: '100000', payTo: X402_PAY_TO },
       responses: { '200': { description: 'FDA warning letters' }, '402': { description: 'Payment required.' } },
     } }, '/x402/cms-providers': { get: {
