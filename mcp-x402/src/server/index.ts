@@ -254,6 +254,17 @@ async function runSSE(): Promise<void> {
     send402(res, challenge, header402);
     return { ok: false };
   };
+  // BYOK: a caller's own upstream-provider key (sent as a request header)
+  // always takes priority over this server's own env-configured key — the
+  // operator never burns their own shared, rate-limited registration on
+  // another caller's heavy usage. Falls back to the server's key (or an
+  // explicit `fallback`, e.g. FEC's public DEMO_KEY) when the caller supplies
+  // nothing.
+  const byokKey = (req: Request, header: string, envKey: string, fallback?: string): string | undefined => {
+    const v = req.headers[header];
+    if (typeof v === 'string' && v.trim()) return v.trim();
+    return process.env[envKey] ?? fallback;
+  };
   const inlineDiscover402 = (resource: string, description: string): Record<string, unknown> => ({
     x402Version: 2, error: 'payment_required',
     resource: { url: resource, description, mimeType: 'application/json' },
@@ -315,7 +326,7 @@ async function runSSE(): Promise<void> {
   interface SamEntity { entityRegistration?: { legalBusinessName?: string; ueiSAM?: string; cageCode?: string; registrationStatus?: string; registrationExpirationDate?: string }; coreData?: { physicalAddress?: { city?: string; stateOrProvinceCode?: string }; businessTypes?: { businessTypeList?: Array<{ businessTypeCode?: string; businessTypeDesc?: string }> } }; }
   interface SamResponse { totalRecords?: number; entityData?: SamEntity[] }
   app.get('/x402/firms', async (req, res) => {
-    const samKey = process.env['SAM_API_KEY'];
+    const samKey = byokKey(req, 'x-sam-key', 'SAM_API_KEY');
     if (!samKey) {
       return res.status(503).set('Access-Control-Allow-Origin', '*').json({ error: 'service_unconfigured', detail: 'Operator must set SAM_API_KEY (free at sam.gov). No payment taken.' });
     }
@@ -394,7 +405,6 @@ async function runSSE(): Promise<void> {
 
   // ── Medical reference endpoints (keyless: openFDA + NPPES) ──────────────────
   const cleanTerm = (s: string): string => s.replace(/[^a-zA-Z0-9 .\-]/g, '').trim().slice(0, 60);
-  const fdaKey = process.env['OPENFDA_API_KEY'];
 
   // 1) FDA drug label lookup — $0.05
   app.get('/x402/drug-label', async (req, res) => {
@@ -407,6 +417,7 @@ async function runSSE(): Promise<void> {
     if (!pay.ok) return;
     if (!drug) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_drug', detail: 'Payment verified. Add ?drug= and retry with the same payment.' }); }
     try {
+      const fdaKey = byokKey(req, 'x-openfda-key', 'OPENFDA_API_KEY');
       const p = new URLSearchParams({ search: `openfda.brand_name:"${drug}" OR openfda.generic_name:"${drug}"`, limit: '1' });
       if (fdaKey) p.set('api_key', fdaKey);
       const r = await fetch(`https://api.fda.gov/drug/label.json?${p.toString()}`);
@@ -435,6 +446,7 @@ async function runSSE(): Promise<void> {
     if (!pay.ok) return;
     if (!drug) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_drug', detail: 'Payment verified. Add ?drug= and retry with the same payment.' }); }
     try {
+      const fdaKey = byokKey(req, 'x-openfda-key', 'OPENFDA_API_KEY');
       const p = new URLSearchParams({ search: `openfda.brand_name:"${drug}" OR openfda.generic_name:"${drug}" OR product_description:"${drug}"`, limit: String(limit), sort: 'recall_initiation_date:desc' });
       if (fdaKey) p.set('api_key', fdaKey);
       const r = await fetch(`https://api.fda.gov/drug/enforcement.json?${p.toString()}`);
@@ -590,6 +602,7 @@ async function runSSE(): Promise<void> {
     if (!pay.ok) return;
     if (!drug) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_drug', detail: 'Payment verified. Add ?drug= and retry with the same payment.' }); }
     try {
+      const fdaKey = byokKey(req, 'x-openfda-key', 'OPENFDA_API_KEY');
       const p = new URLSearchParams({ search: `patient.drug.medicinalproduct:"${drug}"`, limit: String(limit), sort: 'receivedate:desc' });
       if (fdaKey) p.set('api_key', fdaKey);
       const r = await fetch(`https://api.fda.gov/drug/event.json?${p.toString()}`);
@@ -665,7 +678,7 @@ async function runSSE(): Promise<void> {
 
   // ── /x402/entity-compliance — SAM registration + exclusion + size standard ($0.35) ─
   app.get('/x402/entity-compliance', async (req, res) => {
-    const samKey = process.env['SAM_API_KEY'];
+    const samKey = byokKey(req, 'x-sam-key', 'SAM_API_KEY');
     if (!samKey) return res.status(503).set('Access-Control-Allow-Origin', '*').json({ error: 'service_unconfigured', detail: 'SAM_API_KEY required. No payment taken.' });
     const host = req.headers.host ?? 'mcp-x402.onrender.com';
     const resource = `https://${host}/x402/entity-compliance`;
@@ -917,7 +930,7 @@ async function runSSE(): Promise<void> {
     const resource = `https://${host}/x402/fred`;
     const series_id = (typeof req.query['series_id'] === 'string' ? req.query['series_id'] : '').trim().toUpperCase();
     const limit = Math.min(50, Math.max(1, parseInt(typeof req.query['limit'] === 'string' ? req.query['limit'] : '20', 10) || 20));
-    const fredKey = process.env['FRED_API_KEY'];
+    const fredKey = byokKey(req, 'x-fred-key', 'FRED_API_KEY');
     const inputSchema = { type: 'object', properties: { series_id: { type: 'string', description: 'FRED series ID (e.g. GDP, CPIAUCSL, UNRATE, FEDFUNDS).' }, limit: { type: 'integer', minimum: 1, maximum: 50, default: 20 } }, required: ['series_id'] };
     const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { series_id: { type: 'string', required: true }, limit: { type: 'integer', required: false } } }, output: null };
     const pay = await requirePayment(req, res, { resource, priceUnits: 80000n, description: 'FRED economic indicator data — GDP, CPI, unemployment, rates, and 800k+ series from the Federal Reserve. Pay 0.08 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
@@ -1095,14 +1108,14 @@ async function runSSE(): Promise<void> {
     const name = (typeof req.query['name'] === 'string' ? req.query['name'] : '').trim();
     const committee = (typeof req.query['committee'] === 'string' ? req.query['committee'] : '').trim();
     const cycle = typeof req.query['cycle'] === 'string' && /^\d{4}$/.test(req.query['cycle']) ? req.query['cycle'] : String(new Date().getFullYear() % 2 === 0 ? new Date().getFullYear() : new Date().getFullYear() - 1);
-    const fecKey = process.env['FEC_API_KEY'] ?? 'DEMO_KEY';
+    const fecKey = byokKey(req, 'x-fec-key', 'FEC_API_KEY', 'DEMO_KEY');
     const inputSchema = { type: 'object', properties: { name: { type: 'string', description: 'Candidate or contributor name.' }, committee: { type: 'string', description: 'Committee name or ID.' }, cycle: { type: 'string', description: 'Election cycle year (e.g. 2024). Defaults to latest.' } } };
     const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { name: { type: 'string', required: false }, committee: { type: 'string', required: false } } }, output: null };
     const pay = await requirePayment(req, res, { resource, priceUnits: 100000n, description: 'FEC campaign finance — candidates, committees, and contribution totals. Pay 0.10 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
     if (!pay.ok) return;
     if (!name && !committee) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_param', detail: 'Payment verified. Add ?name= (candidate name) or ?committee= and retry.' }); }
     try {
-      const p = new URLSearchParams({ api_key: fecKey, per_page: '10', sort: '-receipts', cycle });
+      const p = new URLSearchParams({ api_key: fecKey ?? 'DEMO_KEY', per_page: '10', sort: '-receipts', cycle });
       if (name) p.set('q', name);
       if (committee) p.set('q', committee);
       const endpoint = committee ? 'committees' : 'candidates';
@@ -1180,7 +1193,7 @@ async function runSSE(): Promise<void> {
     const congress = typeof req.query['congress'] === 'string' && /^\d{3}$/.test(req.query['congress']) ? req.query['congress'] : '119';
     const status = typeof req.query['status'] === 'string' ? req.query['status'] : '';
     const limit = Math.min(Math.max(parseInt(String(req.query['limit'] ?? '10'), 10) || 10, 1), 20);
-    const congressKey = process.env['CONGRESS_API_KEY'];
+    const congressKey = byokKey(req, 'x-congress-key', 'CONGRESS_API_KEY');
     const inputSchema = { type: 'object', properties: { query: { type: 'string', description: 'Bill keyword search (required).' }, congress: { type: 'string', description: 'Congress number (e.g. 119 for 119th Congress, 2025-2026). Default: 119.' }, limit: { type: 'integer', minimum: 1, maximum: 20, default: 10 } }, required: ['query'] };
     const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { query: { type: 'string', required: true } } }, output: null };
     const pay = await requirePayment(req, res, { resource, priceUnits: 80000n, description: 'Congress.gov bill search — legislation by keyword, congress number, and status. Pay 0.08 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
@@ -1215,6 +1228,7 @@ async function runSSE(): Promise<void> {
       if (company) parts.push(`company_name:"${company}"`);
       if (product) parts.push(`product_type:"${product}" OR subject:"${product}"`);
       const search = parts.join(' AND ');
+      const fdaKey = byokKey(req, 'x-openfda-key', 'OPENFDA_API_KEY');
       const p = new URLSearchParams({ search, limit: String(limit), sort: 'date_issued:desc' });
       if (fdaKey) p.set('api_key', fdaKey);
       const r = await fetch(`https://api.fda.gov/other/warning_letters.json?${p.toString()}`, { signal: AbortSignal.timeout(15000) });
