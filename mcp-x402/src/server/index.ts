@@ -885,8 +885,13 @@ async function runSSE(): Promise<void> {
       if (!resolvedCik && name) {
         const searchR = await fetch(`https://efts.sec.gov/LATEST/search-index?q="${encodeURIComponent(name)}"&dateRange=custom&startdt=2024-01-01&forms=13F-HR`, { headers: { 'User-Agent': 'ScriptMasterLabs contact@scriptmasterlabs.com' } });
         if (searchR.ok) {
-          const searchJ = await searchR.json() as { hits?: { hits?: { _source?: { entity_id?: string } }[] } };
-          resolvedCik = (searchJ.hits?.hits?.[0]?._source?.entity_id ?? '').padStart(10, '0');
+          // EDGAR full-text search returns ciks as an array on _source (see the
+          // identical shape consumed by /x402/sec-13dg below) — there is no
+          // entity_id field. Reading entity_id always returned undefined, so
+          // every name-based 13F lookup failed with institution_not_found
+          // regardless of whether EDGAR actually found a match.
+          const searchJ = await searchR.json() as { hits?: { hits?: { _source?: { ciks?: string[] } }[] } };
+          resolvedCik = (searchJ.hits?.hits?.[0]?._source?.ciks?.[0] ?? '').padStart(10, '0');
         }
       }
       if (!resolvedCik || resolvedCik === '0000000000') { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(404).set('Access-Control-Allow-Origin', '*').json({ error: 'institution_not_found', detail: 'Could not resolve institution to a CIK. Try supplying the 10-digit CIK directly.' }); }
@@ -1097,15 +1102,23 @@ async function runSSE(): Promise<void> {
     try {
       const cik = await resolveTickerToCik(ticker);
       if (!cik) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(404).set('Access-Control-Allow-Origin', '*').json({ error: 'ticker_not_found', ticker }); }
-      const p = new URLSearchParams({ forms: 'SC 13D,SC 13G', dateRange: 'custom', startdt: new Date(Date.now() - 365 * 86400000).toISOString().slice(0,10), enddt: new Date().toISOString().slice(0,10) });
-      const r = await fetch(`https://efts.sec.gov/LATEST/search-index?${p.toString()}`, { headers: { 'User-Agent': 'ScriptMasterLabs ScriptMasterLabs@gmail.com' } });
-      if (!r.ok) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'edgar_search_error', status: r.status }); }
-      const j = await r.json() as { hits?: { hits?: Array<{ _id?: string; _source?: { display_names?: string[]; period_ending?: string; ciks?: string[]; form_type?: string; file_date?: string; entity_name?: string } }> } };
+      // Previously called efts.sec.gov/LATEST/search-index with only forms+
+      // dateRange and no `q` — EDGAR's full-text search requires a query term
+      // to function at all, so every call was rejected (edgar_search_error).
+      // Switched to the same submissions-API + client-side form filter that
+      // /x402/sec-10k and /x402/sec-10q already use successfully — no search
+      // API, no missing required param.
+      const r = await fetch(`https://data.sec.gov/submissions/CIK${cik}.json`, { headers: { 'User-Agent': 'ScriptMasterLabs ScriptMasterLabs@gmail.com' } });
+      if (!r.ok) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'edgar_error', status: r.status }); }
+      const sub = await r.json() as { filings?: { recent?: { form?: string[]; filingDate?: string[]; primaryDocument?: string[]; accessionNumber?: string[] } } };
+      const rec = sub.filings?.recent ?? {}; const forms = rec.form ?? []; const dates = rec.filingDate ?? []; const docs = rec.primaryDocument ?? []; const acc = rec.accessionNumber ?? [];
       const cikShort = cik.replace(/^0+/, '');
-      const allHits = j.hits?.hits ?? [];
-      const filtered = allHits.filter(h => (h._source?.ciks ?? []).some(c => c.replace(/^0+/, '') === cikShort)).slice(0, limit);
-      const filings = filtered.map(h => { const s = h._source ?? {}; return { accession: h._id ?? '', form: s.form_type ?? '', filed: s.file_date ?? '', period: s.period_ending ?? '', filer: (s.display_names ?? []).join(', '), url: h._id ? `https://www.sec.gov/Archives/edgar/data/${cikShort}/${h._id.replace(/-/g, '')}/` : '' }; });
-      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'sec.gov/EDGAR', ticker, cik: cikShort, forms: ['SC 13D', 'SC 13G'], count: filings.length, filings, note: '13D=activist stake (intent to influence). 13G=passive 5%+ holder. Filed within last 365 days.', _disclaimer: 'SEC EDGAR public filing data. Not investment advice.', _paid: pay.payer });
+      const filings = forms
+        .map((f, i) => ({ form: f, date: dates[i] ?? '', doc: docs[i] ?? '', acc: acc[i] ?? '' }))
+        .filter(x => x.form === 'SC 13D' || x.form === 'SC 13G')
+        .slice(0, limit)
+        .map(x => { const accFmt = x.acc.replace(/-/g, ''); return { accession: x.acc, form: x.form, filed: x.date, url: `https://www.sec.gov/Archives/edgar/data/${cikShort}/${accFmt}/${x.doc}` }; });
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'sec.gov/EDGAR', ticker, cik: cikShort, forms: ['SC 13D', 'SC 13G'], count: filings.length, filings, note: '13D=activist stake (intent to influence). 13G=passive 5%+ holder.', _disclaimer: 'SEC EDGAR public filing data. Not investment advice.', _paid: pay.payer });
     } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'edgar_fetch_failed', message: String(err) }); }
   });
 
