@@ -48,13 +48,13 @@ const CATALOG = {
     },
     {
       product: 'Equities & Options Heatmap (AI Swarm)',
-      description: 'Self-contained RSI heatmap for equities and Black-Scholes Delta heatmap for options — live Polygon.io data, computed locally, each with a real 4-agent Claude swarm verdict (not a rule-based mock).',
-      backend: 'self-contained (Polygon.io + Anthropic Claude)',
+      description: 'Self-contained RSI heatmap for equities and Delta heatmap for options — real market data (Tradier preferred when configured, including real OPRA-fed Greeks on options; falls back to Polygon.io with a locally modeled Black-Scholes Delta), each with a real 4-agent Claude swarm verdict (not a rule-based mock). Every result reports which real provider supplied it.',
+      backend: 'self-contained (Tradier and/or Polygon.io + Anthropic Claude)',
       tools: [
         { name: 'equities_heatmap_preview',      type: 'FREE', description: '5-ticker RSI(14) preview, 1 group, no AI swarm' },
         { name: 'equities_heatmap_full',         type: 'PAID', price_usdc: '0.10', description: 'RSI(14) heatmap across up to 20 tickers (default 16-ticker large-cap watchlist), 4 groups + 4-agent Claude swarm verdict (MOMENTUM_QUANT, SECTOR_ROTATION, RISK_SENTINEL, MACRO_ORACLE)' },
         { name: 'options_delta_heatmap_preview', type: 'FREE', description: '5-contract Delta preview (SPY calls by default), 1 group, no AI swarm' },
-        { name: 'options_delta_heatmap_full',    type: 'PAID', price_usdc: '0.15', description: 'Live options chain snapshot, locally-computed Black-Scholes Delta across up to 40 contracts, 4 groups + 4-agent Claude swarm verdict (GREEKS_ANALYST, IV_SKEW_HUNTER, GAMMA_WATCH, RISK_SENTINEL)' },
+        { name: 'options_delta_heatmap_full',    type: 'PAID', price_usdc: '0.15', description: 'Live options chain snapshot across up to 40 contracts — real Tradier Greeks when configured, else locally-computed Black-Scholes Delta — 4 groups + 4-agent Claude swarm verdict (GREEKS_ANALYST, IV_SKEW_HUNTER, GAMMA_WATCH, RISK_SENTINEL)' },
       ],
     },
     {
