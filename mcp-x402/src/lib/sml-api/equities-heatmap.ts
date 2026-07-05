@@ -11,7 +11,7 @@
 // better than our own estimate. Every result reports which real provider
 // supplied it (Prime Directive: every data point must have a traceable source).
 
-import { fetchEquityCloses as fetchEquityClosesPolygon, fetchOptionsChainSnapshot, type EquityTimeframe } from '../market-data/polygon.js';
+import { fetchEquityCloses as fetchEquityClosesPolygon, fetchOptionsChainSnapshot, fetchTrendingTickers, type EquityTimeframe } from '../market-data/polygon.js';
 import { fetchEquityCloses as fetchEquityClosesTradier, fetchOptionsChainWithGreeks } from '../market-data/tradier.js';
 import { computeRSI } from '../quant/indicators.js';
 import { blackScholesDelta } from '../quant/greeks.js';
@@ -25,12 +25,60 @@ const ANTHROPIC_MODEL = process.env['ANTHROPIC_MODEL'] ?? 'claude-sonnet-4-5';
 
 export type DataSource = 'tradier' | 'polygon';
 
-export const DEFAULT_EQUITY_WATCHLIST = [
-  'AAPL', 'MSFT', 'NVDA', 'AMZN',
-  'GOOGL', 'META', 'TSLA', 'AMD',
-  'NFLX', 'JPM', 'XOM', 'UNH',
-  'V', 'COST', 'AVGO', 'CRM',
-];
+/** Always scanned regardless of dynamic discovery — the core squeeze watchlist. */
+export const ALWAYS_WATCH = ['AMC', 'GME', 'IWM'];
+
+/** Default options underlying when none is requested — the flagship squeeze name. */
+export const DEFAULT_OPTIONS_UNDERLYING = 'AMC';
+
+/** The "sweet spot" delta band traders commonly target for premium buy/sell decisions. */
+const DELTA_BAND_LOW = 35;
+const DELTA_BAND_HIGH = 40;
+
+export interface DeltaBandPick {
+  symbol: string;
+  strike: number;
+  expirationDate: string;
+  /** Real delta (0-1), not the x100 heatmap scale. */
+  delta: number;
+}
+
+/** Real contracts (from actual chain data, never invented) whose |delta| falls in the 0.35-0.40 band. */
+function pickDeltaBand(items: HeatmapItem[]): DeltaBandPick[] {
+  return items
+    .filter((i) => i.value >= DELTA_BAND_LOW && i.value <= DELTA_BAND_HIGH)
+    .map((i) => ({
+      symbol: i.symbol,
+      strike: Number(i.meta?.['strike']),
+      expirationDate: String(i.meta?.['expirationDate'] ?? ''),
+      delta: Math.round((i.value / 100) * 1000) / 1000,
+    }))
+    .filter((p) => Number.isFinite(p.strike) && p.expirationDate.length > 0);
+}
+
+/**
+ * Resolves the ticker list for a scan. An explicit `requested` list from the
+ * caller always wins outright. Otherwise: ALWAYS_WATCH first, then real
+ * dynamically-discovered top movers (Polygon day gainers/losers) fill the
+ * rest — never a hardcoded blue-chip list. Requires POLYGON_API_KEY for the
+ * discovery step specifically (Tradier has no market-wide screener endpoint);
+ * throws a real error rather than silently falling back to anything static.
+ */
+async function resolveSymbols(requested: string[] | undefined, limit: number): Promise<string[]> {
+  if (requested && requested.length > 0) {
+    return requested.slice(0, limit).map((s) => String(s).toUpperCase());
+  }
+  if (!POLYGON_API_KEY) {
+    throw new Error('not_configured: missing POLYGON_API_KEY on this server — required to dynamically discover a watchlist (pass explicit tickers to bypass)');
+  }
+  const trending = await fetchTrendingTickers(POLYGON_API_KEY, limit);
+  const merged: string[] = [...ALWAYS_WATCH];
+  for (const t of trending) {
+    if (merged.length >= limit) break;
+    if (!merged.includes(t)) merged.push(t);
+  }
+  return merged.slice(0, limit);
+}
 
 function requireConfig(): void {
   const missing = [
@@ -76,15 +124,31 @@ function buildEquitiesSwarmContext(heatmap: HeatmapResult, timeframe: string, so
   ].join('\n');
 }
 
-function buildOptionsSwarmContext(heatmap: HeatmapResult, underlying: string, optionType: string, underlyingPrice: number, source: string): string {
+function buildOptionsSwarmContext(
+  heatmap: HeatmapResult,
+  underlying: string,
+  optionType: string,
+  underlyingPrice: number,
+  source: string,
+  deltaBandPicks: DeltaBandPick[],
+): string {
   const lines = heatmap.groups.map(
     (g) => `${g.group}: avg=${g.avg} min=${g.min} max=${g.max} | ${g.items.map((i) => `${i.symbol}=${i.value}`).join(', ')}`,
   );
-  return [
+  const parts = [
     `Options Delta heatmap — underlying ${underlying} @ ${underlyingPrice}, ${optionType}s, scale ${heatmap.scale}, data source: ${source}.`,
     `High bucket (>=${heatmap.overboughtThreshold}) = deep ITM. Low bucket (<=${heatmap.oversoldThreshold}) = deep OTM.`,
     ...lines,
-  ].join('\n');
+  ];
+  if (deltaBandPicks.length > 0) {
+    parts.push(
+      '',
+      `Delta sweet-spot scan (0.35-0.40 delta ${optionType}s) — real contracts from the chain above matching this band:`,
+      ...deltaBandPicks.map((p) => `${p.symbol}: strike=${p.strike}, expiration=${p.expirationDate}, delta=${p.delta}`),
+      `Task: give a clear BUY or SELL call on ${optionType}s of ${underlying}, naming the single best strike and expiration date from the list above, with your reasoning grounded in the heatmap and delta data (not the list order).`,
+    );
+  }
+  return parts.join('\n');
 }
 
 export interface EquitiesHeatmapResult {
@@ -102,16 +166,18 @@ export interface OptionsDeltaHeatmapResult {
   underlyingPrice: number;
   dataSource: string;
   heatmap: HeatmapResult;
+  /** Real contracts from the chain whose delta falls in the 0.35-0.40 sweet spot. */
+  deltaBandPicks: DeltaBandPick[];
   swarm: SwarmResult;
 }
 
 export const EquitiesHeatmapAPI = {
-  /** Free preview: 5 default tickers, 1 group, no AI swarm. */
+  /** Free preview: AMC/GME/IWM + 2 dynamically-discovered movers, 1 group, no AI swarm. */
   async preview(): Promise<{ tool: string; tier: 'free'; timeframe: EquityTimeframe; dataSource: string; heatmap: HeatmapResult }> {
     if (!TRADIER_API_KEY && !POLYGON_API_KEY) {
       throw new Error('not_configured: missing TRADIER_API_KEY or POLYGON_API_KEY on this server');
     }
-    const previewSymbols = DEFAULT_EQUITY_WATCHLIST.slice(0, 5);
+    const previewSymbols = await resolveSymbols(undefined, 5);
     const items: HeatmapItem[] = [];
     const sources = new Set<DataSource>();
     await Promise.all(
@@ -129,9 +195,7 @@ export const EquitiesHeatmapAPI = {
   async full(tickers: string[] | undefined, timeframe: EquityTimeframe | undefined): Promise<EquitiesHeatmapResult> {
     requireConfig();
     const resolvedTimeframe: EquityTimeframe = timeframe ?? '1h';
-    const symbols = (tickers && tickers.length > 0 ? tickers : DEFAULT_EQUITY_WATCHLIST)
-      .slice(0, 20)
-      .map((s) => String(s).toUpperCase());
+    const symbols = await resolveSymbols(tickers, 20);
 
     const items: HeatmapItem[] = [];
     const sources = new Set<DataSource>();
@@ -160,7 +224,7 @@ export const EquitiesHeatmapAPI = {
 
 export const OptionsDeltaHeatmapAPI = {
   /** Free preview: 5 call contracts, 1 group, no AI swarm. */
-  async preview(underlying = 'SPY'): Promise<{ tool: string; tier: 'free'; underlying: string; underlyingPrice: number; dataSource: string; heatmap: HeatmapResult }> {
+  async preview(underlying = DEFAULT_OPTIONS_UNDERLYING): Promise<{ tool: string; tier: 'free'; underlying: string; underlyingPrice: number; dataSource: string; heatmap: HeatmapResult }> {
     const symbol = underlying.toUpperCase();
 
     if (TRADIER_API_KEY) {
@@ -201,7 +265,7 @@ export const OptionsDeltaHeatmapAPI = {
     optionType: 'call' | 'put' | undefined,
   ): Promise<OptionsDeltaHeatmapResult> {
     requireConfig();
-    const symbol = (underlying ?? 'SPY').toUpperCase();
+    const symbol = (underlying ?? DEFAULT_OPTIONS_UNDERLYING).toUpperCase();
     const side: 'call' | 'put' = optionType === 'put' ? 'put' : 'call';
 
     if (TRADIER_API_KEY) {
@@ -219,12 +283,13 @@ export const OptionsDeltaHeatmapAPI = {
             oversoldThreshold: 30,
             scale: `|Delta| x100 (deep ITM=high / deep OTM=low), ${side}s (real Tradier greeks)`,
           });
+          const deltaBandPicks = pickDeltaBand(items);
           const swarm = await runSwarm(
             OPTIONS_SWARM_PERSONAS,
-            buildOptionsSwarmContext(heatmap, symbol, side, chain.underlyingPrice, 'tradier'),
+            buildOptionsSwarmContext(heatmap, symbol, side, chain.underlyingPrice, 'tradier', deltaBandPicks),
             { apiKey: ANTHROPIC_API_KEY, model: ANTHROPIC_MODEL },
           );
-          return { tool: 'options_delta_heatmap_full', underlying: symbol, optionType: side, underlyingPrice: chain.underlyingPrice, dataSource: 'tradier', heatmap, swarm };
+          return { tool: 'options_delta_heatmap_full', underlying: symbol, optionType: side, underlyingPrice: chain.underlyingPrice, dataSource: 'tradier', heatmap, deltaBandPicks, swarm };
         }
       } catch {
         // fall through to Polygon below
@@ -261,12 +326,13 @@ export const OptionsDeltaHeatmapAPI = {
       oversoldThreshold: 30,
       scale: `|Delta| x100 (deep ITM=high / deep OTM=low), ${side}s (modeled, Black-Scholes)`,
     });
+    const deltaBandPicks = pickDeltaBand(items);
     const swarm = await runSwarm(
       OPTIONS_SWARM_PERSONAS,
-      buildOptionsSwarmContext(heatmap, symbol, side, chain.underlyingPrice, 'polygon'),
+      buildOptionsSwarmContext(heatmap, symbol, side, chain.underlyingPrice, 'polygon', deltaBandPicks),
       { apiKey: ANTHROPIC_API_KEY, model: ANTHROPIC_MODEL },
     );
 
-    return { tool: 'options_delta_heatmap_full', underlying: symbol, optionType: side, underlyingPrice: chain.underlyingPrice, dataSource: 'polygon', heatmap, swarm };
+    return { tool: 'options_delta_heatmap_full', underlying: symbol, optionType: side, underlyingPrice: chain.underlyingPrice, dataSource: 'polygon', heatmap, deltaBandPicks, swarm };
   },
 };

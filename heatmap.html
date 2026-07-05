@@ -14,7 +14,7 @@
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <title>SML Live Heatmap — Real-Time Equities RSI &amp; Options Delta</title>
-  <meta name="description" content="Institutional-grade live equities RSI(14) and options Delta heatmaps, computed from real Polygon.io market data with a real multi-agent Claude swarm verdict. No demo data, ever.">
+  <meta name="description" content="Institutional-grade live equities RSI(14) and options Delta heatmaps, computed from real Tradier/Polygon.io market data with a real multi-agent Claude swarm verdict. No demo data, ever.">
   <link rel="canonical" href="https://www.scriptmasterlabs.com/heatmap.html">
   <link rel="alternate" type="text/plain" href="/llms.txt" title="LLM context">
 
@@ -334,7 +334,7 @@ footer p { font-size: 0.75rem; color: var(--text-3); font-family: var(--mono); }
   <div class="page-head">
     <div class="eyebrow"><span class="pulse"></span>Live market intelligence · real multi-agent Claude swarm</div>
     <h1>Equities RSI &amp; Options Delta <span class="accent-word">Heatmap</span></h1>
-    <p>Real Polygon.io market data, RSI(14) / Black-Scholes Delta computed live, backed by a real 4-agent Claude swarm verdict on the paid tier. Never demo data — if the server can't compute a value, this page shows the real error instead of a number.</p>
+    <p>Real market data (Tradier preferred, real OPRA Greeks on options; Polygon fallback), RSI(14) / Delta computed live, backed by a real 4-agent Claude swarm verdict on the paid tier. AMC/GME/IWM are always scanned — everything else is real dynamically-discovered top movers, never a hardcoded list. Never demo data — if the server can't compute a value, this page shows the real error instead of a number.</p>
     <div class="status-row">
       <span id="statusDot" class="dot"></span>
       <span id="statusText">Not loaded yet</span>
@@ -365,7 +365,7 @@ footer p { font-size: 0.75rem; color: var(--text-3); font-family: var(--mono); }
 
     <div class="field" id="fieldTickers">
       <label for="tickersInput">Tickers (csv, up to 20)</label>
-      <input type="text" id="tickersInput" placeholder="AAPL,MSFT,NVDA (blank = default watchlist)">
+      <input type="text" id="tickersInput" placeholder="blank = AMC/GME/IWM + real top movers">
     </div>
     <div class="field" id="fieldTimeframe">
       <label for="timeframeSelect">Timeframe</label>
@@ -377,7 +377,7 @@ footer p { font-size: 0.75rem; color: var(--text-3); font-family: var(--mono); }
 
     <div class="field" id="fieldUnderlying" style="display:none;">
       <label for="underlyingInput">Underlying</label>
-      <input type="text" id="underlyingInput" placeholder="SPY">
+      <input type="text" id="underlyingInput" placeholder="AMC">
     </div>
     <div class="field" id="fieldExpiration" style="display:none;">
       <label for="expirationInput">Expiration (YYYY-MM-DD)</label>
@@ -442,9 +442,17 @@ footer p { font-size: 0.75rem; color: var(--text-3); font-family: var(--mono); }
     </div>
   </div>
 
+  <div class="panel" id="deltaBandPanel" style="display:none;">
+    <div class="panel-head">
+      <h2>Delta sweet spot (0.35–0.40)</h2>
+      <span class="meta" id="deltaBandMeta"></span>
+    </div>
+    <div id="deltaBandBody"></div>
+  </div>
+
   <div class="panel swarm" id="swarmPanel" style="display:none;">
     <div class="panel-head">
-      <h2>Claude swarm verdict</h2>
+      <h2 id="swarmTitle">Claude swarm verdict</h2>
       <span class="meta" id="swarmMeta"></span>
     </div>
     <div class="swarm-badge"><span class="pulse"></span>4 independent agents + coordinator · real inference, not a template</div>
@@ -455,7 +463,7 @@ footer p { font-size: 0.75rem; color: var(--text-3); font-family: var(--mono); }
 
 <footer>
   <div class="container" style="padding:0;">
-    <p>Live data via Polygon.io + a real Anthropic Claude swarm on the paid tier. Not financial advice. Endpoint: <span id="apiBaseLabel"></span></p>
+    <p>Live data via Tradier and/or Polygon.io + a real Anthropic Claude swarm on the paid tier. Not financial advice. Endpoint: <span id="apiBaseLabel"></span></p>
   </div>
 </footer>
 
@@ -489,9 +497,13 @@ footer p { font-size: 0.75rem; color: var(--text-3); font-family: var(--mono); }
   const legendLowLabel = el('legendLowLabel');
   const legendHighLabel = el('legendHighLabel');
   const swarmPanel = el('swarmPanel');
+  const swarmTitle = el('swarmTitle');
   const swarmMeta = el('swarmMeta');
   const swarmSynthesis = el('swarmSynthesis');
   const swarmMembers = el('swarmMembers');
+  const deltaBandPanel = el('deltaBandPanel');
+  const deltaBandMeta = el('deltaBandMeta');
+  const deltaBandBody = el('deltaBandBody');
   const tooltip = el('tooltip');
 
   el('operatorKeyInput').value = localStorage.getItem(OPKEY_STORAGE) || '';
@@ -730,9 +742,32 @@ footer p { font-size: 0.75rem; color: var(--text-3); font-family: var(--mono); }
     else renderTable(resultBody, heatmap);
   }
 
-  function renderSwarm(swarm) {
+  function renderDeltaBand(picks) {
+    if (!picks || picks.length === 0) { deltaBandPanel.style.display = 'none'; return; }
+    deltaBandPanel.style.display = 'block';
+    deltaBandMeta.textContent = `${picks.length} contract${picks.length === 1 ? '' : 's'} in band`;
+    const table = document.createElement('table');
+    table.className = 'data-table';
+    table.innerHTML = '<thead><tr><th>Symbol</th><th>Strike</th><th>Expiration</th><th>Delta</th></tr></thead>';
+    const tbody = document.createElement('tbody');
+    for (const p of picks) {
+      const tr = document.createElement('tr');
+      const symTd = document.createElement('td'); symTd.textContent = p.symbol;
+      const strikeTd = document.createElement('td'); strikeTd.className = 'num'; strikeTd.textContent = String(p.strike);
+      const expTd = document.createElement('td'); expTd.textContent = p.expirationDate;
+      const deltaTd = document.createElement('td'); deltaTd.className = 'num'; deltaTd.textContent = p.delta.toFixed(3);
+      tr.append(symTd, strikeTd, expTd, deltaTd);
+      tbody.appendChild(tr);
+    }
+    table.appendChild(tbody);
+    deltaBandBody.innerHTML = '';
+    deltaBandBody.appendChild(table);
+  }
+
+  function renderSwarm(swarm, title) {
     if (!swarm) { swarmPanel.style.display = 'none'; return; }
     swarmPanel.style.display = 'block';
+    swarmTitle.textContent = title || 'Claude swarm verdict';
     swarmMeta.textContent = `${swarm.model} · ${new Date(swarm.generatedAt).toLocaleString()}`;
     swarmSynthesis.textContent = swarm.synthesis;
     swarmMembers.innerHTML = '';
@@ -757,6 +792,7 @@ footer p { font-size: 0.75rem; color: var(--text-3); font-family: var(--mono); }
     setStatus('', 'Loading…');
     resultPanel.classList.add('loading');
     swarmPanel.style.display = 'none';
+    deltaBandPanel.style.display = 'none';
     const path = mode === 'equities' ? '/x402/equities-heatmap/preview' : '/x402/options-delta-heatmap/preview';
     const q = mode === 'options' && el('underlyingInput').value.trim() ? `?underlying=${encodeURIComponent(el('underlyingInput').value.trim())}` : '';
     const { ok, status, body, latencyMs } = await fetchJSON(path + q);
@@ -800,6 +836,7 @@ footer p { font-size: 0.75rem; color: var(--text-3); font-family: var(--mono); }
       statRow.style.display = 'none';
       el('moversRow').style.display = 'none';
       swarmPanel.style.display = 'none';
+      deltaBandPanel.style.display = 'none';
       renderPaymentRequired(resultBody, body);
       return;
     }
@@ -810,6 +847,7 @@ footer p { font-size: 0.75rem; color: var(--text-3); font-family: var(--mono); }
       statRow.style.display = 'none';
       el('moversRow').style.display = 'none';
       swarmPanel.style.display = 'none';
+      deltaBandPanel.style.display = 'none';
       renderMessage(resultBody, 'error', (body && body.message) || `HTTP ${status}`);
       return;
     }
@@ -819,7 +857,14 @@ footer p { font-size: 0.75rem; color: var(--text-3); font-family: var(--mono); }
     const baseMeta = mode === 'options' ? `${data.underlying} @ ${data.underlyingPrice} (${data.optionType})` : `timeframe ${data.timeframe}`;
     resultMeta.textContent = data.dataSource ? `${baseMeta} · source: ${data.dataSource}` : baseMeta;
     renderHeatmap(data.heatmap);
-    renderSwarm(data.swarm);
+    if (mode === 'options') {
+      renderDeltaBand(data.deltaBandPicks);
+      const title = data.deltaBandPicks && data.deltaBandPicks.length > 0 ? 'AI buy/sell recommendation' : 'Claude swarm verdict';
+      renderSwarm(data.swarm, title);
+    } else {
+      deltaBandPanel.style.display = 'none';
+      renderSwarm(data.swarm, 'Claude swarm verdict');
+    }
   }
 
   function switchMode(next) {
@@ -832,6 +877,7 @@ footer p { font-size: 0.75rem; color: var(--text-3); font-family: var(--mono); }
     el('fieldExpiration').style.display = mode === 'options' ? 'flex' : 'none';
     el('fieldOptionType').style.display = mode === 'options' ? 'flex' : 'none';
     swarmPanel.style.display = 'none';
+    deltaBandPanel.style.display = 'none';
     loadPreview();
   }
 

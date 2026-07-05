@@ -43,6 +43,38 @@ export async function fetchEquityCloses(
   return closes.slice(-lookbackBars);
 }
 
+/**
+ * Real, live "most active" discovery — Polygon's day gainers + losers snapshot,
+ * merged and deduped. Used to fill a watchlist dynamically instead of a
+ * hardcoded ticker list. Junk symbols (warrants, units, anything non-alpha)
+ * are filtered out; never returns mock movers.
+ */
+export async function fetchTrendingTickers(apiKey: string, limitEach = 15): Promise<string[]> {
+  if (!apiKey) throw new Error('Polygon API key is required — set POLYGON_API_KEY');
+
+  const fetchSide = async (side: 'gainers' | 'losers'): Promise<string[]> => {
+    const url = `${POLYGON_BASE_URL}/v2/snapshot/locale/us/markets/stocks/${side}?apiKey=${apiKey}`;
+    const res = await fetch(url, { signal: AbortSignal.timeout(15_000) });
+    if (!res.ok) {
+      const text = await res.text().catch(() => '(unreadable body)');
+      throw new Error(`Polygon ${side} snapshot → HTTP ${res.status}: ${text}`);
+    }
+    const data = (await res.json()) as { tickers?: Array<{ ticker?: string }> };
+    return (data.tickers ?? [])
+      .map((t) => t.ticker ?? '')
+      .filter((t) => /^[A-Z]{1,5}$/.test(t))
+      .slice(0, limitEach);
+  };
+
+  const [gainers, losers] = await Promise.all([fetchSide('gainers'), fetchSide('losers')]);
+  const seen = new Set<string>();
+  const merged: string[] = [];
+  for (const t of [...gainers, ...losers]) {
+    if (!seen.has(t)) { seen.add(t); merged.push(t); }
+  }
+  return merged;
+}
+
 // ── Options ─────────────────────────────────────────────────────────────────
 
 export interface OptionContractSnapshot {

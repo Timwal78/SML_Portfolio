@@ -129,7 +129,7 @@ export function registerEquitiesHeatmap(server: McpServer): void {
   server.tool(
     'equities_heatmap_full',
     {
-      tickers: z.array(z.string()).describe('Up to 20 ticker symbols. Defaults to a 16-ticker large-cap watchlist.').optional(),
+      tickers: z.array(z.string()).describe('Up to 20 ticker symbols. Defaults to AMC/GME/IWM plus real dynamically-discovered top movers (day gainers/losers) filling the rest.').optional(),
       timeframe: z.enum(['1h', '1d']).describe('Bar timeframe for RSI computation. Defaults to 1h.').optional(),
       wallet_address: z.string().describe('Agent wallet address for x402 payment.').optional(),
       payment_tx_hash: z.string().describe('On-chain Base tx hash proving USDC payment to the operator (sovereign rail). Omit if using payment_header.').optional(),
@@ -147,7 +147,7 @@ export function registerEquitiesHeatmap(server: McpServer): void {
   server.tool(
     'options_delta_heatmap_preview',
     {
-      underlying: z.string().describe('Underlying ticker symbol. Defaults to SPY.').optional(),
+      underlying: z.string().describe('Underlying ticker symbol. Defaults to AMC.').optional(),
     },
     async (rawArgs) => {
       const { underlying } = Sandbox.validate(OptionsPreviewSchema, rawArgs);
@@ -168,7 +168,7 @@ export function registerEquitiesHeatmap(server: McpServer): void {
   server.tool(
     'options_delta_heatmap_full',
     {
-      underlying: z.string().describe('Underlying ticker symbol. Defaults to SPY.').optional(),
+      underlying: z.string().describe('Underlying ticker symbol. Defaults to AMC.').optional(),
       expiration_date: z.string().describe('Options expiration date (YYYY-MM-DD). Defaults to nearest available.').optional(),
       option_type: z.enum(['call', 'put']).describe('Defaults to call.').optional(),
       wallet_address: z.string().describe('Agent wallet address for x402 payment.').optional(),
