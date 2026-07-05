@@ -15,7 +15,7 @@ import { verifyBaseUsdcPayment, alreadyRedeemed, markRedeemed, releaseRedeem } f
 import { facilitatorChain, decodePaymentHeader, type PaymentRequirements } from './payments/facilitators.js';
 import { X402Stats } from './security/x402-stats.js';
 import { SqueezeOSAPI } from '../lib/sml-api/squeezeos.js';
-import { EquitiesHeatmapAPI, OptionsDeltaHeatmapAPI } from '../lib/sml-api/equities-heatmap.js';
+import { EquitiesHeatmapAPI, OptionsDeltaHeatmapAPI, type DataCredentials } from '../lib/sml-api/equities-heatmap.js';
 
 // Embedded favicon (jet black / neon green SML mark) — served directly, no redirect
 const FAVICON_ICO = Buffer.from(
@@ -1299,9 +1299,19 @@ async function runSSE(): Promise<void> {
   // here as plain REST/JSON so the browser dashboard at scriptmasterlabs.com
   // can call them directly with fetch(), no MCP client required.
 
-  app.get('/x402/equities-heatmap/preview', async (_req, res) => {
+  // BYOK: a caller's own market-data keys, sent as headers, always take
+  // priority over this server's own env-configured keys — the operator never
+  // pays another caller's Tradier/Polygon/Alpaca bill.
+  const byokFromHeaders = (req: Request): DataCredentials => ({
+    tradierApiKey: typeof req.headers['x-tradier-key'] === 'string' ? req.headers['x-tradier-key'] : undefined,
+    polygonApiKey: typeof req.headers['x-polygon-key'] === 'string' ? req.headers['x-polygon-key'] : undefined,
+    alpacaApiKey: typeof req.headers['x-alpaca-key'] === 'string' ? req.headers['x-alpaca-key'] : undefined,
+    alpacaApiSecret: typeof req.headers['x-alpaca-secret'] === 'string' ? req.headers['x-alpaca-secret'] : undefined,
+  });
+
+  app.get('/x402/equities-heatmap/preview', async (req, res) => {
     try {
-      const data = await EquitiesHeatmapAPI.preview();
+      const data = await EquitiesHeatmapAPI.preview(byokFromHeaders(req));
       return res.set('Access-Control-Allow-Origin', '*').json(data);
     } catch (err) {
       return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'api_error', message: String(err) });
@@ -1322,7 +1332,7 @@ async function runSSE(): Promise<void> {
     const pay = await requirePayment(req, res, { resource, priceUnits: EQUITIES_HEATMAP_PRICE_UNITS, description: 'Equities RSI(14) heatmap (up to 20 tickers) with a real 4-agent Claude swarm verdict. Pay 0.10 USDC on Base via X-PAYMENT (standard) or X-PAYMENT-TX (sovereign).', inputSchema, outputSchema });
     if (!pay.ok) return;
     try {
-      const data = await EquitiesHeatmapAPI.full(tickers, timeframe);
+      const data = await EquitiesHeatmapAPI.full(tickers, timeframe, byokFromHeaders(req));
       return res.set('Access-Control-Allow-Origin', '*').json({ data, _paid: pay.payer });
     } catch (err) {
       if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
@@ -1333,7 +1343,7 @@ async function runSSE(): Promise<void> {
   app.get('/x402/options-delta-heatmap/preview', async (req, res) => {
     const underlying = typeof req.query['underlying'] === 'string' ? req.query['underlying'] : undefined;
     try {
-      const data = await OptionsDeltaHeatmapAPI.preview(underlying);
+      const data = await OptionsDeltaHeatmapAPI.preview(underlying, byokFromHeaders(req));
       return res.set('Access-Control-Allow-Origin', '*').json(data);
     } catch (err) {
       return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'api_error', message: String(err) });
@@ -1353,7 +1363,7 @@ async function runSSE(): Promise<void> {
     const pay = await requirePayment(req, res, { resource, priceUnits: OPTIONS_HEATMAP_PRICE_UNITS, description: 'Options Delta heatmap (up to 40 contracts) with a real 4-agent Claude swarm verdict. Pay 0.15 USDC on Base via X-PAYMENT (standard) or X-PAYMENT-TX (sovereign).', inputSchema, outputSchema });
     if (!pay.ok) return;
     try {
-      const data = await OptionsDeltaHeatmapAPI.full(underlying, expirationDate, optionType);
+      const data = await OptionsDeltaHeatmapAPI.full(underlying, expirationDate, optionType, byokFromHeaders(req));
       return res.set('Access-Control-Allow-Origin', '*').json({ data, _paid: pay.payer });
     } catch (err) {
       if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
@@ -1893,8 +1903,12 @@ async function runSSE(): Promise<void> {
       summary: 'Equities RSI(14) heatmap across up to 20 tickers, with a real 4-agent Claude swarm verdict.',
       description: 'Real market data (Tradier preferred, falls back to Polygon.io) — RSI(14) computed for each ticker, grouped into a 4-bucket heatmap, plus a real multi-agent Claude swarm verdict. Keywords: RSI heatmap, equities overbought oversold, momentum screener. Pay 0.10 USDC on Base, then call with X-PAYMENT-TX.',
       parameters: [
-        { name: 'tickers', in: 'query', required: false, schema: { type: 'string' }, description: 'Comma-separated tickers, up to 20. Defaults to a 16-ticker large-cap watchlist.', example: 'AAPL,MSFT,NVDA' },
+        { name: 'tickers', in: 'query', required: false, schema: { type: 'string' }, description: 'Comma-separated tickers, up to 20. Defaults to AMC/GME/IWM plus real dynamically-discovered top movers.', example: 'AAPL,MSFT,NVDA' },
         { name: 'timeframe', in: 'query', required: false, schema: { type: 'string', enum: ['1h', '1d'], default: '1h' } },
+        { name: 'X-Tradier-Key', in: 'header', required: false, schema: { type: 'string' }, description: 'BYOK: your own Tradier API key, takes priority over the server default.' },
+        { name: 'X-Polygon-Key', in: 'header', required: false, schema: { type: 'string' }, description: 'BYOK: your own Polygon.io API key, takes priority over the server default.' },
+        { name: 'X-Alpaca-Key', in: 'header', required: false, schema: { type: 'string' }, description: 'BYOK: your own Alpaca API key ID, paired with X-Alpaca-Secret.' },
+        { name: 'X-Alpaca-Secret', in: 'header', required: false, schema: { type: 'string' }, description: 'BYOK: your own Alpaca API secret, paired with X-Alpaca-Key.' },
       ],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.10', amountUnits: '100000', payTo: X402_PAY_TO, settlement: 'onchain-tx', paymentHeader: 'X-PAYMENT-TX' },
       responses: { '200': { description: 'RSI heatmap + swarm verdict' }, '402': { description: 'Payment required — pay USDC then retry with X-PAYMENT-TX.' } },
@@ -1906,6 +1920,8 @@ async function runSSE(): Promise<void> {
         { name: 'underlying', in: 'query', required: false, schema: { type: 'string' }, description: 'Underlying ticker. Defaults to AMC.', example: 'AMC' },
         { name: 'expiration_date', in: 'query', required: false, schema: { type: 'string' }, description: 'YYYY-MM-DD. Defaults to nearest available.' },
         { name: 'option_type', in: 'query', required: false, schema: { type: 'string', enum: ['call', 'put'], default: 'call' } },
+        { name: 'X-Tradier-Key', in: 'header', required: false, schema: { type: 'string' }, description: 'BYOK: your own Tradier API key, takes priority over the server default.' },
+        { name: 'X-Polygon-Key', in: 'header', required: false, schema: { type: 'string' }, description: 'BYOK: your own Polygon.io API key, takes priority over the server default.' },
       ],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.15', amountUnits: '150000', payTo: X402_PAY_TO, settlement: 'onchain-tx', paymentHeader: 'X-PAYMENT-TX' },
       responses: { '200': { description: 'Options Delta heatmap + swarm verdict' }, '402': { description: 'Payment required — pay USDC then retry with X-PAYMENT-TX.' } },
