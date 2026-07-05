@@ -62,6 +62,14 @@ export class AuditLogger {
       // If log write fails, emit to stderr but don't crash
       process.stderr.write(`[audit-fail] ${JSON.stringify(entry)}\n`);
     }
+
+    // warn/error also go to stdout/stderr — the file above is an ephemeral,
+    // tamper-evident record (Render's disk resets on redeploy and isn't
+    // reachable from the dashboard), but operators diagnosing a live failure
+    // (e.g. why a discovery provider fell through to its fallback) need to
+    // see it in the platform's actual log viewer.
+    if (level === 'warn') process.stderr.write(`[warn] ${event} ${JSON.stringify(safeData)}\n`);
+    if (level === 'error') process.stderr.write(`[error] ${event} ${JSON.stringify(safeData)}\n`);
   }
 
   private redact(data: Record<string, unknown>): Record<string, unknown> {
