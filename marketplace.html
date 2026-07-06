@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QHTHMG61N6"></script>
+<script>
+  window.dataLayer=window.dataLayer||[];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js',new Date());
+  gtag('config','G-QHTHMG61N6');
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<title>Agentic Marketplace — Script Master Labs</title>
+<meta name="description" content="Browse real x402-payable APIs and list your own for AI agents to discover and pay. A one-time 0.05 USDC/RLUSD listing fee — no subscriptions, no gatekeeping.">
+<meta property="og:title" content="Agentic Marketplace — Script Master Labs">
+<meta property="og:description" content="A real, persistent directory of x402-payable APIs. List yours for 0.05 USDC/RLUSD. AI agents and humans browse and pay directly — no middleman.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.scriptmasterlabs.com/marketplace">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Agentic Marketplace — Script Master Labs">
+<meta name="twitter:description" content="Browse real x402-payable APIs. List yours for a one-time 0.05 USDC/RLUSD fee — Base or XRPL settlement, no subscription.">
+<style>
+  :root{
+    --bg:#000000;--panel:#080C08;--panel2:#0D110D;--line:#1A221A;
+    --green:#39FF14;--green2:#00FF7F;--gold:#FFD700;--amber:#FF9500;
+    --blue:#00D4FF;--pink:#FF1493;--purple:#8B5CF6;--red:#FF4D4D;
+    --white:#F5F7F5;--mute:#8A958C;--mute2:#4A554C;
+    --mono:'JetBrains Mono','SF Mono',ui-monospace,Menlo,monospace;
+    --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--white);font-family:var(--sans);line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1100px;margin:0 auto;padding:0 28px}
+
+  nav{border-bottom:1px solid var(--line);padding:18px 0}
+  nav .inner{display:flex;align-items:center;gap:28px}
+  nav .logo{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--green);letter-spacing:1px}
+  nav .links{display:flex;gap:22px;margin-left:auto}
+  nav .links a{font-size:13px;color:var(--mute);transition:color .2s}
+  nav .links a:hover{color:var(--white)}
+  nav .cta{font-family:var(--mono);font-size:11px;padding:8px 18px;border:1px solid var(--green);border-radius:6px;color:var(--green);transition:all .2s}
+  nav .cta:hover{background:var(--green);color:#000}
+
+  .hero{padding:72px 0 44px;border-bottom:1px solid var(--line);position:relative;overflow:hidden}
+  .hero::before{content:'';position:absolute;top:-40%;left:50%;transform:translateX(-50%);width:900px;height:700px;background:radial-gradient(ellipse at center,rgba(57,255,20,.04) 0%,transparent 70%);pointer-events:none}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:3px;color:var(--green);text-transform:uppercase;margin-bottom:20px}
+  h1{font-size:clamp(32px,6vw,58px);font-weight:900;letter-spacing:-2px;line-height:1.05;max-width:900px}
+  h1 .accent-g{color:var(--green)}
+  .hero-sub{margin-top:18px;font-size:clamp(15px,2vw,17px);color:var(--mute);max-width:700px;line-height:1.7}
+  .live-bar{margin-top:28px;display:flex;flex-wrap:wrap;gap:10px}
+  .chip{font-family:var(--mono);font-size:11px;padding:6px 14px;border:1px solid var(--line);border-radius:20px;color:var(--mute);display:flex;align-items:center;gap:7px}
+  .dot{width:7px;height:7px;border-radius:50%}
+  .chip.live .dot{background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+  .chip.gold{border-color:#3a2f08;color:var(--gold)} .chip.gold .dot{background:var(--gold)}
+  .chip.blue{border-color:#0a2030;color:var(--blue)} .chip.blue .dot{background:var(--blue)}
+
+  section{margin:56px 0}
+  .section-head{margin-bottom:24px;display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  .section-head h2{font-size:clamp(22px,3.5vw,32px);font-weight:800;letter-spacing:-.7px}
+  .section-head .sh-sub{margin-top:6px;font-size:14px;color:var(--mute)}
+
+  /* ── BROWSE CONTROLS ── */
+  .browse-controls{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+  .browse-controls input, .browse-controls select{
+    font-family:var(--sans);font-size:13px;padding:10px 14px;border-radius:8px;
+    border:1px solid var(--line);background:var(--panel);color:var(--white);
+  }
+  .browse-controls input{flex:1;min-width:200px}
+  .browse-controls input:focus, .browse-controls select:focus{outline:none;border-color:var(--green)}
+
+  .listing-status{font-family:var(--mono);font-size:12px;color:var(--mute);margin-bottom:16px}
+  .listing-status.error{color:var(--red)}
+
+  .listing-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+  .listing-card{padding:22px;border:1px solid var(--line);border-radius:14px;background:var(--panel);transition:border-color .2s,transform .15s}
+  .listing-card:hover{border-color:rgba(57,255,20,.25);transform:translateY(-2px)}
+  .lc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px}
+  .lc-name{font-size:15px;font-weight:700}
+  .lc-badge{font-family:var(--mono);font-size:9px;padding:3px 9px;border-radius:10px;letter-spacing:.5px;white-space:nowrap}
+  .lc-badge.sml{background:rgba(57,255,20,.1);color:var(--green);border:1px solid rgba(57,255,20,.2)}
+  .lc-badge.third{background:rgba(0,212,255,.08);color:var(--blue);border:1px solid rgba(0,212,255,.2)}
+  .lc-tagline{font-size:12px;color:var(--amber);margin-bottom:10px;font-family:var(--mono)}
+  .lc-desc{font-size:13px;color:var(--mute);line-height:1.55;margin-bottom:14px}
+  .lc-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+  .lc-tag{font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:8px;border:1px solid var(--line);color:var(--mute2)}
+  .lc-bottom{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--line);padding-top:12px}
+  .lc-price{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--green2)}
+  .lc-link{font-family:var(--mono);font-size:11px;color:var(--blue);border-bottom:1px solid rgba(0,212,255,.3)}
+  .lc-link:hover{border-color:var(--blue)}
+
+  /* ── LIST YOUR API FORM ── */
+  .list-panel{border:1px solid rgba(57,255,20,.15);border-radius:16px;background:linear-gradient(135deg,var(--panel),#050805);padding:32px}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+  .form-grid .full{grid-column:1 / -1}
+  .field label{display:block;font-family:var(--mono);font-size:11px;color:var(--mute);margin-bottom:6px;letter-spacing:.4px}
+  .field input, .field select, .field textarea{
+    width:100%;font-family:var(--sans);font-size:13px;padding:10px 12px;border-radius:8px;
+    border:1px solid var(--line);background:var(--panel2);color:var(--white);
+  }
+  .field textarea{resize:vertical;min-height:64px}
+  .field input:focus, .field select:focus, .field textarea:focus{outline:none;border-color:var(--green)}
+  .field .hint{font-size:11px;color:var(--mute2);margin-top:4px}
+
+  .btn{font-family:var(--mono);font-size:12px;padding:12px 28px;border-radius:8px;transition:all .2s;cursor:pointer;letter-spacing:.5px;border:none}
+  .btn.primary{background:var(--green);color:#000;font-weight:700}
+  .btn.primary:hover{background:var(--green2);transform:translateY(-1px)}
+  .btn.primary:disabled{background:var(--mute2);cursor:not-allowed;transform:none}
+  .btn.outline{background:transparent;color:var(--white);border:1px solid var(--line)}
+  .btn.outline:hover{border-color:var(--white)}
+
+  .pay-panel{margin-top:24px;padding-top:24px;border-top:1px solid var(--line);display:none}
+  .pay-panel.visible{display:block}
+  .pay-option{border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:12px;background:var(--panel2)}
+  .pay-option .po-head{font-family:var(--mono);font-size:12px;color:var(--amber);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px}
+  .pay-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-family:var(--mono);font-size:12px}
+  .pay-addr{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:6px 10px;word-break:break-all}
+  .copy-btn{font-family:var(--mono);font-size:10px;padding:5px 10px;border-radius:6px;border:1px solid var(--line);background:transparent;color:var(--mute);cursor:pointer}
+  .copy-btn:hover{color:var(--white);border-color:var(--white)}
+
+  .result-msg{margin-top:16px;padding:14px 16px;border-radius:10px;font-size:13px;line-height:1.5;display:none}
+  .result-msg.visible{display:block}
+  .result-msg.ok{background:rgba(57,255,20,.08);border:1px solid rgba(57,255,20,.25);color:var(--green2)}
+  .result-msg.fail{background:rgba(255,77,77,.08);border:1px solid rgba(255,77,77,.25);color:var(--red)}
+
+  footer{border-top:1px solid var(--line);padding:40px 0;font-size:12px;color:var(--mute2);display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:center}
+  footer .fl{font-family:var(--mono);color:var(--mute2)}
+  footer .links{display:flex;gap:18px}
+  footer .links a:hover{color:var(--mute)}
+
+  @media(max-width:720px){
+    .form-grid{grid-template-columns:1fr}
+    .form-grid .full{grid-column:auto}
+  }
+</style>
+<link rel="canonical" href="https://www.scriptmasterlabs.com/marketplace.html">
+<script src="https://analytics.ahrefs.com/analytics.js" data-key="eO57h84tnrmOGAsKKvyoyw" async></script>
+</head>
+<body>
+
+<nav>
+  <div class="wrap inner">
+    <div class="logo">SML ◈</div>
+    <div class="links">
+      <a href="/stack.html">Stack</a>
+      <a href="/central-bank.html">Central Bank</a>
+      <a href="/marketplace.html" style="color:var(--green)">Marketplace</a>
+      <a href="https://squeezeos-api.onrender.com/docs" target="_blank">API</a>
+    </div>
+    <a href="https://scriptmaster-vending-router.onrender.com/mcp" class="cta" target="_blank">Connect Agent</a>
+  </div>
+</nav>
+
+<main>
+<div class="wrap">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="eyebrow">Script Master Labs</div>
+    <h1>The <span class="accent-g">Agentic</span><br>Marketplace</h1>
+    <p class="hero-sub">
+      A real, persistent directory of x402-payable APIs. ScriptMasterLabs' own products are listed first by
+      default — but every listing here, ours or a third party's, is independently discoverable and payable.
+      Any AI agent or human can skip ours entirely and pay someone else instead.
+    </p>
+    <div class="live-bar">
+      <div class="chip live"><span class="dot"></span><span id="listing-count-chip">Loading live listings…</span></div>
+      <div class="chip gold"><span class="dot" style="background:var(--gold)"></span>0.05 USDC/RLUSD to list</div>
+      <div class="chip blue"><span class="dot" style="background:var(--blue)"></span>Base + XRPL settlement</div>
+    </div>
+  </section>
+
+  <!-- BROWSE -->
+  <section id="browse">
+    <div class="section-head">
+      <div>
+        <h2>Browse Listings</h2>
+        <p class="sh-sub">Live from the ScriptMaster Agentic Vending Router's marketplace API.</p>
+      </div>
+    </div>
+    <div class="browse-controls">
+      <input id="search-input" type="text" placeholder="Search by name, tagline, or tag…">
+      <select id="category-filter">
+        <option value="">All categories</option>
+      </select>
+    </div>
+    <div id="listing-status" class="listing-status">Loading listings…</div>
+    <div id="listing-grid" class="listing-grid"></div>
+  </section>
+
+  <!-- LIST YOUR API -->
+  <section id="list-your-api">
+    <div class="section-head">
+      <div>
+        <h2>List Your API</h2>
+        <p class="sh-sub">One-time 0.05 USDC (Base) or 0.05 RLUSD (XRPL) listing fee. No subscription, no recurring cost.</p>
+      </div>
+    </div>
+    <div class="list-panel">
+      <form id="listing-form">
+        <div class="form-grid">
+          <div class="field">
+            <label for="f-name">API / Product Name *</label>
+            <input id="f-name" required maxlength="120" placeholder="e.g. Weather Oracle API">
+          </div>
+          <div class="field">
+            <label for="f-tagline">Tagline</label>
+            <input id="f-tagline" maxlength="200" placeholder="One line describing it">
+          </div>
+          <div class="field full">
+            <label for="f-description">Description</label>
+            <textarea id="f-description" maxlength="2000" placeholder="What does it do? What does an agent get back?"></textarea>
+          </div>
+          <div class="field">
+            <label for="f-base-url">Base URL *</label>
+            <input id="f-base-url" required placeholder="https://yourapi.com">
+          </div>
+          <div class="field">
+            <label for="f-endpoint">Endpoint Path *</label>
+            <input id="f-endpoint" required placeholder="/v1/quote">
+          </div>
+          <div class="field">
+            <label for="f-method">HTTP Method</label>
+            <select id="f-method">
+              <option value="GET">GET</option>
+              <option value="POST">POST</option>
+              <option value="PUT">PUT</option>
+              <option value="PATCH">PATCH</option>
+              <option value="DELETE">DELETE</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="f-cost">Cost *</label>
+            <input id="f-cost" required placeholder="0.05, or 'free'">
+            <div class="hint">This is what YOUR API costs an agent to call — separate from the listing fee below.</div>
+          </div>
+          <div class="field">
+            <label for="f-currency">Currency</label>
+            <input id="f-currency" placeholder="USDC, RLUSD (leave blank if free)">
+          </div>
+          <div class="field">
+            <label for="f-network">Network</label>
+            <input id="f-network" placeholder="base, xrpl-mainnet">
+          </div>
+          <div class="field">
+            <label for="f-pay-to">Your Receiving Wallet *</label>
+            <input id="f-pay-to" required placeholder="0x... or r... (where YOUR API gets paid)">
+          </div>
+          <div class="field">
+            <label for="f-category">Categories</label>
+            <input id="f-category" placeholder="finance, defi, agent-economy (comma separated)">
+          </div>
+          <div class="field">
+            <label for="f-tags">Tags</label>
+            <input id="f-tags" placeholder="comma separated">
+          </div>
+          <div class="field full">
+            <label for="f-wallet">Your Wallet (for accountability)</label>
+            <input id="f-wallet" placeholder="Wallet you're paying the listing fee from">
+          </div>
+        </div>
+        <button type="submit" class="btn primary" id="get-payment-btn">Get Payment Instructions →</button>
+      </form>
+
+      <div id="pay-panel" class="pay-panel">
+        <div class="pay-option">
+          <div class="po-head">Option A — Base / USDC</div>
+          <div class="pay-row">
+            Pay <strong id="pay-base-amount">—</strong> USDC to
+            <span class="pay-addr" id="pay-base-addr">—</span>
+            <button type="button" class="copy-btn" data-copy-target="pay-base-addr">Copy</button>
+          </div>
+        </div>
+        <div class="pay-option">
+          <div class="po-head">Option B — XRPL / RLUSD</div>
+          <div class="pay-row">
+            Pay <strong id="pay-xrpl-amount">—</strong> RLUSD to
+            <span class="pay-addr" id="pay-xrpl-addr">—</span>
+            <button type="button" class="copy-btn" data-copy-target="pay-xrpl-addr">Copy</button>
+          </div>
+        </div>
+        <div class="field" style="margin-top:16px">
+          <label for="f-txhash">Transaction Hash (after you've paid)</label>
+          <input id="f-txhash" placeholder="Paste your on-chain transaction hash here">
+          <div class="hint">We verify this on-chain — real payment required, no honor system.</div>
+        </div>
+        <button type="button" class="btn primary" id="submit-listing-btn" style="margin-top:14px">Submit Listing →</button>
+      </div>
+
+      <div id="result-msg" class="result-msg"></div>
+    </div>
+  </section>
+
+</div>
+</main>
+
+<div class="wrap">
+  <footer>
+    <span class="fl">© 2026 Script Master Labs LLC</span>
+    <div class="links">
+      <a href="/privacy.html">Privacy</a>
+      <a href="/terms.html">Terms</a>
+      <a href="/stack.html">Stack</a>
+      <a href="/central-bank.html">Central Bank</a>
+    </div>
+  </footer>
+</div>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Agentic Marketplace — Script Master Labs",
+  "description": "A real, persistent directory of x402-payable APIs. List yours for a one-time 0.05 USDC/RLUSD fee.",
+  "url": "https://www.scriptmasterlabs.com/marketplace",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Script Master Labs LLC",
+    "url": "https://www.scriptmasterlabs.com"
+  }
+}
+</script>
+
+<script>
+(function () {
+  "use strict";
+  var API_BASE = "https://scriptmaster-vending-router.onrender.com";
+  var allListings = [];
+
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  function renderListings(listings) {
+    var grid = document.getElementById("listing-grid");
+    if (!listings.length) {
+      grid.innerHTML = "";
+      document.getElementById("listing-status").textContent = "No listings match your filters.";
+      return;
+    }
+    document.getElementById("listing-status").textContent = "";
+    grid.innerHTML = listings.map(function (l) {
+      var badge = l.isScriptMasterLabs
+        ? '<span class="lc-badge sml">ScriptMasterLabs</span>'
+        : '<span class="lc-badge third">Third-Party</span>';
+      var price = l.cost && l.cost.toLowerCase() !== "free"
+        ? esc(l.cost) + " " + esc(l.currency || "")
+        : "Free";
+      var tags = (l.tags || []).slice(0, 6).map(function (t) {
+        return '<span class="lc-tag">' + esc(t) + "</span>";
+      }).join("");
+      var link = esc(l.baseUrl || "") + esc(l.endpoint || "");
+      return (
+        '<div class="listing-card">' +
+          '<div class="lc-top"><div class="lc-name">' + esc(l.name) + "</div>" + badge + "</div>" +
+          (l.tagline ? '<div class="lc-tagline">' + esc(l.tagline) + "</div>" : "") +
+          (l.description ? '<div class="lc-desc">' + esc(l.description) + "</div>" : "") +
+          '<div class="lc-meta">' + tags + "</div>" +
+          '<div class="lc-bottom">' +
+            '<div class="lc-price">' + price + "</div>" +
+            '<a class="lc-link" href="' + link + '" target="_blank" rel="noopener">' + esc(l.method || "GET") + " →</a>" +
+          "</div>" +
+        "</div>"
+      );
+    }).join("");
+  }
+
+  function populateCategoryFilter(listings) {
+    var select = document.getElementById("category-filter");
+    var cats = {};
+    listings.forEach(function (l) {
+      (l.category || []).forEach(function (c) { cats[c] = true; });
+    });
+    Object.keys(cats).sort().forEach(function (c) {
+      var opt = document.createElement("option");
+      opt.value = c;
+      opt.textContent = c;
+      select.appendChild(opt);
+    });
+  }
+
+  function applyFilters() {
+    var q = document.getElementById("search-input").value.trim().toLowerCase();
+    var cat = document.getElementById("category-filter").value;
+    var filtered = allListings.filter(function (l) {
+      var matchesCat = !cat || (l.category || []).indexOf(cat) !== -1;
+      if (!matchesCat) return false;
+      if (!q) return true;
+      var haystack = [l.name, l.tagline, l.description].concat(l.tags || []).join(" ").toLowerCase();
+      return haystack.indexOf(q) !== -1;
+    });
+    renderListings(filtered);
+  }
+
+  function loadListings() {
+    document.getElementById("listing-status").textContent = "Loading listings…";
+    fetch(API_BASE + "/marketplace/listings")
+      .then(function (r) {
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        return r.json();
+      })
+      .then(function (data) {
+        allListings = data.listings || [];
+        document.getElementById("listing-count-chip").textContent = allListings.length + " live listings";
+        populateCategoryFilter(allListings);
+        renderListings(allListings);
+      })
+      .catch(function (err) {
+        document.getElementById("listing-count-chip").textContent = "Listings temporarily unavailable";
+        var status = document.getElementById("listing-status");
+        status.textContent = "Unable to load listings right now (" + err.message + "). Try again shortly.";
+        status.classList.add("error");
+      });
+  }
+
+  document.getElementById("search-input").addEventListener("input", applyFilters);
+  document.getElementById("category-filter").addEventListener("change", applyFilters);
+
+  document.querySelectorAll(".copy-btn").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var target = document.getElementById(btn.getAttribute("data-copy-target"));
+      if (target && target.textContent && target.textContent !== "—") {
+        navigator.clipboard.writeText(target.textContent).then(function () {
+          var original = btn.textContent;
+          btn.textContent = "Copied!";
+          setTimeout(function () { btn.textContent = original; }, 1500);
+        });
+      }
+    });
+  });
+
+  function collectFormBody() {
+    var category = document.getElementById("f-category").value
+      .split(",").map(function (s) { return s.trim(); }).filter(Boolean);
+    var tags = document.getElementById("f-tags").value
+      .split(",").map(function (s) { return s.trim(); }).filter(Boolean);
+    return {
+      name: document.getElementById("f-name").value.trim(),
+      tagline: document.getElementById("f-tagline").value.trim() || undefined,
+      description: document.getElementById("f-description").value.trim() || undefined,
+      base_url: document.getElementById("f-base-url").value.trim(),
+      endpoint: document.getElementById("f-endpoint").value.trim(),
+      method: document.getElementById("f-method").value,
+      cost: document.getElementById("f-cost").value.trim(),
+      currency: document.getElementById("f-currency").value.trim() || undefined,
+      network: document.getElementById("f-network").value.trim() || undefined,
+      pay_to: document.getElementById("f-pay-to").value.trim(),
+      category: category.length ? category : undefined,
+      tags: tags.length ? tags : undefined,
+      submitted_by_wallet: document.getElementById("f-wallet").value.trim() || undefined,
+    };
+  }
+
+  function showResult(ok, message) {
+    var el = document.getElementById("result-msg");
+    el.textContent = message;
+    el.className = "result-msg visible " + (ok ? "ok" : "fail");
+  }
+
+  var lastFormBody = null;
+
+  document.getElementById("listing-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var btn = document.getElementById("get-payment-btn");
+    btn.disabled = true;
+    btn.textContent = "Fetching payment instructions…";
+    lastFormBody = collectFormBody();
+
+    fetch(API_BASE + "/marketplace/list", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(lastFormBody),
+    })
+      .then(function (r) { return r.json().then(function (body) { return { status: r.status, body: body }; }); })
+      .then(function (res) {
+        btn.disabled = false;
+        btn.textContent = "Get Payment Instructions →";
+        if (res.status !== 402 || !res.body.accepts) {
+          showResult(false, "Error: " + (res.body.error || "unexpected_response") +
+            (res.body.reason ? " — " + res.body.reason : "") +
+            (res.body.required ? " (missing: " + res.body.required.join(", ") + ")" : ""));
+          return;
+        }
+        var base = res.body.accepts.find(function (a) { return a.network === "eip155:8453"; });
+        var xrpl = res.body.accepts.find(function (a) { return a.network === "xrpl-mainnet"; });
+        if (base) {
+          document.getElementById("pay-base-amount").textContent = (Number(base.amount) / 1e6).toFixed(2);
+          document.getElementById("pay-base-addr").textContent = base.payTo;
+        }
+        if (xrpl) {
+          document.getElementById("pay-xrpl-amount").textContent = xrpl.amount;
+          document.getElementById("pay-xrpl-addr").textContent = xrpl.payTo;
+        }
+        document.getElementById("pay-panel").classList.add("visible");
+        document.getElementById("pay-panel").scrollIntoView({ behavior: "smooth", block: "nearest" });
+      })
+      .catch(function (err) {
+        btn.disabled = false;
+        btn.textContent = "Get Payment Instructions →";
+        showResult(false, "Network error: " + err.message);
+      });
+  });
+
+  document.getElementById("submit-listing-btn").addEventListener("click", function () {
+    var txHash = document.getElementById("f-txhash").value.trim();
+    if (!txHash) {
+      showResult(false, "Enter your transaction hash first.");
+      return;
+    }
+    var btn = document.getElementById("submit-listing-btn");
+    btn.disabled = true;
+    btn.textContent = "Verifying payment…";
+
+    var proof = btoa(JSON.stringify({ txHash: txHash }));
+
+    fetch(API_BASE + "/marketplace/list", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Payment-Proof": proof },
+      body: JSON.stringify(lastFormBody),
+    })
+      .then(function (r) { return r.json().then(function (body) { return { status: r.status, body: body }; }); })
+      .then(function (res) {
+        btn.disabled = false;
+        btn.textContent = "Submit Listing →";
+        if (res.status !== 200 || !res.body.listing) {
+          showResult(false, "Payment verification failed: " + (res.body.reason || res.body.error || "unknown error") +
+            ". Double check the transaction hash and that the amount/destination match exactly.");
+          return;
+        }
+        showResult(true, "Listed! \"" + res.body.listing.name + "\" is now live in the marketplace below.");
+        document.getElementById("listing-form").reset();
+        document.getElementById("pay-panel").classList.remove("visible");
+        loadListings();
+      })
+      .catch(function (err) {
+        btn.disabled = false;
+        btn.textContent = "Submit Listing →";
+        showResult(false, "Network error: " + err.message);
+      });
+  });
+
+  loadListings();
+})();
+</script>
+</body>
+</html>
