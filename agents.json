@@ -69,6 +69,15 @@
       "url": "https://four02proof.onrender.com/mcp",
       "protocol": "MCP JSON-RPC 2.0",
       "tools": 11
+    },
+    {
+      "name": "ScriptMaster Agentic Vending Router",
+      "description": "5-tool x402 vending stack. ghost_layer_status (free chain status), ghost_layer_notarize (real Xahau URIToken decision receipt, no XRPL wallet needed by the caller), vend_dynamic (payload-size-priced reference tool), marketplace_browse (free directory of x402-payable APIs), marketplace_list (0.05 USDC/RLUSD one-time fee to list your own API alongside ScriptMasterLabs' ~45 endpoints -- open to any seller, not just ScriptMasterLabs). Base/USDC is the primary settlement rail, XRPL/RLUSD secondary.",
+      "url": "https://scriptmaster-vending-router.onrender.com/mcp",
+      "protocol": "MCP JSON-RPC 2.0",
+      "agents_json": "https://scriptmaster-vending-router.onrender.com/.well-known/agents.json",
+      "manifest_json": "https://scriptmaster-vending-router.onrender.com/.well-known/manifest.json",
+      "tools": 5
     }
   ],
   "live_services": [
