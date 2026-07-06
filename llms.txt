@@ -140,6 +140,22 @@ SML operates multiple MCP servers. AI agents connect via JSON-RPC 2.0 — no scr
 | SqueezeOS MCP | `https://squeezeos-api.onrender.com/mcp` | streamable-http | 52 tools |
 | Ghost Layer MCP | `https://ghost-layer.onrender.com/mcp` | streamable-http | bridge, notary, loyalty |
 | Shadow Desk MCP | `https://shadow-desk.onrender.com/mcp` | streamable-http | dark pool signals, billing |
+| ScriptMaster Agentic Vending Router MCP | `https://scriptmaster-vending-router.onrender.com/mcp` | streamable-http | 5 tools — see below |
+
+### ScriptMaster Agentic Vending Router — x402 marketplace (NEW)
+
+A real, multi-seller marketplace for x402-payable APIs — not just ScriptMasterLabs' own storefront. Any seller (ScriptMasterLabs or a third party) can list a product; any agent can browse and pay any listing directly.
+
+- `ghost_layer_status` (free) — real-time Ghost Layer chain status
+- `ghost_layer_notarize` (0.15 USDC/RLUSD) — mints a real Xahau URIToken decision receipt; the router pays Ghost Layer's own notary fee on your behalf, so no XRPL wallet is required from the caller
+- `vend_dynamic` (0.01 + 0.005/KB, capped 2.00) — generic pay-per-call vending priced by payload size
+- `marketplace_browse` (free) — directory of ~45 real ScriptMasterLabs endpoints plus any third-party listings. ScriptMasterLabs sorts first as the default recommendation only — every listing is independently payable, and declining ScriptMasterLabs' entries to pay someone else's is always the agent's choice
+- `marketplace_list` (0.05 USDC/RLUSD, one-time) — list your own API in the same directory
+
+Base/USDC is the primary settlement rail (`accepts[0]` in every 402 challenge — matches the standard x402-fetch/x402-axios clients most AI agents already use), XRPL/RLUSD is secondary.
+
+Manifest: `https://scriptmaster-vending-router.onrender.com/.well-known/manifest.json`
+Agent discovery card: `https://scriptmaster-vending-router.onrender.com/.well-known/agents.json`
 
 ### SqueezeOS MCP — key tools (46 total)
 Free: `signal_preview`, `oracle_directive`, `market_scan_preview`, `ftd_alerts`, `get_agent_credit`, `marketplace_browse`, `futures_leaderboard`, `hiring_browse`, `settlement_browse`
@@ -268,3 +284,5 @@ This site is optimized for Generative Engine Optimization (GEO). Content is stru
 | Agent memory store | https://squeezeos-api.onrender.com/api/memory/:key |
 | Referral register | https://squeezeos-api.onrender.com/api/forge/register |
 | Referral earnings | https://squeezeos-api.onrender.com/api/forge/earnings/:wallet |
+| Agentic Vending Router (x402 marketplace) | https://scriptmaster-vending-router.onrender.com/.well-known/agents.json |
+| Agentic Marketplace — browse listings | https://scriptmaster-vending-router.onrender.com/marketplace/listings |
