@@ -853,6 +853,10 @@ html, body {
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
         Ad Campaigns
       </button>
+      <button class="nav-btn" onclick="switchTab('federal', this)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h1M9 13h1M9 17h1M14 9h1M14 13h1M14 17h1"/></svg>
+        Federal Scout
+      </button>
       <button class="nav-btn" onclick="switchTab('indexer', this)">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
         AI Indexer
@@ -1106,7 +1110,7 @@ html, body {
       <div class="panel-header">
         <div>
           <div class="panel-title">Backlinks — Directory Ranger</div>
-          <div class="panel-sub">24 AI/Dev directories tracked · Ranger runs daily at 08:00 ET</div>
+          <div class="panel-sub">24 AI/Dev directories tracked · Ranger runs every 4 hours</div>
         </div>
         <div class="beastmode-badge"><span class="bm-dot"></span> 24/7 BEASTMODE</div>
       </div>
@@ -1156,16 +1160,12 @@ html, body {
             <span class="stat-label">CHANNELS MONITORED</span>
           </div>
           <div class="stat-block">
-            <span class="stat-val">12</span>
+            <span class="stat-val">17</span>
             <span class="stat-label">SEARCH QUERIES</span>
           </div>
           <div class="stat-block">
-            <span class="stat-val">30</span>
-            <span class="stat-label">SEO KEYWORDS</span>
-          </div>
-          <div class="stat-block">
-            <span class="stat-val">Mon</span>
-            <span class="stat-label">NEXT SCOUT RUN</span>
+            <span class="stat-val">~4h</span>
+            <span class="stat-label">SCOUT RUN INTERVAL</span>
           </div>
         </div>
       </div>
@@ -1180,6 +1180,45 @@ html, body {
       </div>
       <div class="keyword-list" id="keyword-list"></div>
     </div><!-- /tab-campaigns -->
+
+    <!-- ── TAB: FEDERAL SCOUT ── -->
+    <div class="tab-panel" id="tab-federal">
+      <div class="panel-header">
+        <div>
+          <div class="panel-title">Federal Contracts — Federal Scout</div>
+          <div class="panel-sub">SAM UEI G24VZA4RLMK3 · SBIR/NIH/Congress scan via SML's own x402 endpoints · runs every 4 hours</div>
+        </div>
+        <div class="beastmode-badge"><span class="bm-dot"></span> 24/7 BEASTMODE</div>
+      </div>
+
+      <div class="section-pad" style="padding-bottom:0">
+        <div class="live-stats card" style="border-radius:8px">
+          <div class="stat-block">
+            <span class="stat-val" id="fed-stat-scanned">—</span>
+            <span class="stat-label">OPPORTUNITIES SCANNED</span>
+          </div>
+          <div class="stat-block">
+            <span class="stat-val" id="fed-stat-high">—</span>
+            <span class="stat-label">HIGH RELEVANCE</span>
+          </div>
+          <div class="stat-block">
+            <span class="stat-val" id="fed-stat-medium">—</span>
+            <span class="stat-label">MEDIUM RELEVANCE</span>
+          </div>
+        </div>
+        <p style="font-size:.7rem;color:var(--text3);margin-top:6px" id="fed-scan-note">Awaiting first real scan</p>
+      </div>
+
+      <div class="section-pad" style="padding-bottom:4px">
+        <div class="section-title">HIGH-RELEVANCE OPPORTUNITIES</div>
+      </div>
+      <div class="directory-grid" id="federal-high-grid"></div>
+
+      <div class="section-pad" style="padding-bottom:4px; padding-top:4px">
+        <div class="section-title">LEGISLATIVE INTEL</div>
+      </div>
+      <div class="keyword-list" id="federal-legislative-list"></div>
+    </div><!-- /tab-federal -->
 
     <!-- ── TAB: AI INDEXER ── -->
     <div class="tab-panel" id="tab-indexer">
@@ -1434,19 +1473,25 @@ const SUBREDDITS = [
   {name:'HackerNews',             focus:'Show HN + Ask HN threads',       priority:'HIGH'},
 ];
 
+/* Mirrors agent/dept/community_scout.py's real SEARCH_QUERIES exactly — keep in sync when that list changes. */
 const SEARCH_QUERIES = [
-  'MCP server trading signals',
-  'x402 payment protocol API',
-  'autonomous trading agent API',
-  'RLUSD micropayment developer',
+  'MCP server trading',
+  'x402 payment protocol',
+  'autonomous trading agent',
+  'Claude MCP finance',
+  'squeeze momentum indicator',
+  'XRPL autonomous agent',
+  'RLUSD payment',
   'AI agent market data API',
-  'MCP server finance tools',
-  'institutional options flow API',
-  'squeeze signal algorithmic trading',
-  'XRPL developer tools 2025',
-  'AI agent XRPL payments',
-  'pay per API call AI agent',
-  'JSON-RPC trading intelligence',
+  'institutional signals API',
+  'MCP server finance',
+  'pay per call AI API',
+  'agent micropayment',
+  'answer engine optimization AI',
+  'AEO citation tracking',
+  'AI agent credit score',
+  'GEO generative engine optimization',
+  'SEO agent swarm',
 ];
 
 const DISCOVERY_ENDPOINTS = [
@@ -1568,6 +1613,65 @@ async function renderDirectories() {
   }
 }
 
+/* ── RENDER FEDERAL SCOUT — real status only, from the last actual Federal Scout scan ── */
+async function renderFederal() {
+  const highGrid = document.getElementById('federal-high-grid');
+  const legList  = document.getElementById('federal-legislative-list');
+  try {
+    const res = await fetch('https://squeezeos-api.onrender.com/api/marketing/federal', {
+      signal: AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+
+    document.getElementById('fed-stat-scanned').textContent = data.scanned ? data.opportunities_scanned : '—';
+    document.getElementById('fed-stat-high').textContent    = data.scanned ? (data.high_relevance || []).length : '—';
+    document.getElementById('fed-stat-medium').textContent  = data.scanned ? (data.medium_relevance || []).length : '—';
+
+    const note = document.getElementById('fed-scan-note');
+    if (data.scanned && data.scanned_at) {
+      const ago = Math.round((Date.now() / 1000 - data.scanned_at) / 3600);
+      note.textContent = `Last real scan: ${ago < 1 ? 'under an hour' : ago + 'h'} ago`;
+    } else {
+      note.textContent = 'Awaiting first real scan';
+    }
+
+    highGrid.innerHTML = '';
+    const highRelevance = data.high_relevance || [];
+    if (highRelevance.length === 0) {
+      highGrid.innerHTML = `<span class="activity-item">${data.scanned ? 'No high-relevance opportunities in the last scan' : 'Awaiting first real scan'}</span>`;
+    } else {
+      highRelevance.forEach(opp => {
+        const el = document.createElement('div');
+        el.className = 'dir-card';
+        el.innerHTML = `
+          <span class="dir-name">${escapeHtml(opp.title || 'Untitled opportunity')}</span>
+          <span class="dir-url">${escapeHtml(opp.agency || '')}</span>
+          <span class="dir-status listed">SCORE ${escapeHtml(String(opp.score ?? '—'))}</span>
+          <span class="dir-category">${escapeHtml(opp.deadline || 'no deadline listed')}</span>
+        `;
+        highGrid.appendChild(el);
+      });
+    }
+
+    legList.innerHTML = '';
+    const legislative = data.legislative_intel || [];
+    if (legislative.length === 0) {
+      legList.innerHTML = `<span class="activity-item">${data.scanned ? 'No legislative signals in the last scan' : 'Awaiting first real scan'}</span>`;
+    } else {
+      legislative.forEach(item => {
+        const el = document.createElement('span');
+        el.className = 'kw-chip';
+        el.textContent = item;
+        legList.appendChild(el);
+      });
+    }
+  } catch (e) {
+    document.getElementById('fed-scan-note').textContent = 'Scan data unavailable — awaiting connection';
+    highGrid.innerHTML = '<span class="activity-item">Scan data unavailable — awaiting connection</span>';
+  }
+}
+
 /* ── RENDER CAMPAIGNS ── */
 function renderCampaigns() {
   const grid = document.getElementById('subreddit-grid');
@@ -1682,7 +1786,7 @@ async function loadActivity() {
     const entries = data.entries || [];
 
     if (entries.length === 0) {
-      scroll.innerHTML = '<span class="activity-item">No agent activity yet — CEO (Campaign Director) runs daily at 08:00 ET</span>';
+      scroll.innerHTML = '<span class="activity-item">No agent activity yet — CEO (Campaign Director) runs every 4 hours</span>';
       return;
     }
 
@@ -2060,7 +2164,9 @@ function updateSIS(networkUp) {
 renderEndpoints();   // draw hardcoded 44 immediately
 loadLiveEndpoints(); // async: overwrite with live spec if CORS allows
 renderDirectories();
-setInterval(renderDirectories, 300000); // real audit runs once a day — 5-min poll is plenty
+setInterval(renderDirectories, 300000); // real audit runs every 4h — 5-min poll is plenty
+renderFederal();
+setInterval(renderFederal, 300000); // real scan runs every 4h — 5-min poll is plenty
 renderCampaigns();
 renderIndexer();
 loadActivity();
