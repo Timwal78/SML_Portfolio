@@ -1,3 +1,4 @@
+76141
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -915,7 +916,6 @@ html, body {
         </div>
         <div class="sis-grade-text" id="sis-grade" style="color:var(--text3)">INITIALIZING…</div>
         <div class="sis-mini-bars" id="sis-mini-bars">
-          <div class="sis-mini-row"><span>Domain</span><div class="sis-mini-track"><div id="sm-domain" style="width:0%;background:var(--cyan)"></div></div></div>
           <div class="sis-mini-row"><span>Coverage</span><div class="sis-mini-track"><div id="sm-coverage" style="width:0%;background:var(--violet2)"></div></div></div>
           <div class="sis-mini-row"><span>Reach</span><div class="sis-mini-track"><div id="sm-reach" style="width:0%;background:var(--amber)"></div></div></div>
           <div class="sis-mini-row"><span>Uptime</span><div class="sis-mini-track"><div id="sm-uptime" style="width:0%;background:var(--green)"></div></div></div>
@@ -1043,11 +1043,6 @@ html, body {
               </div>
               <div class="sis-dims">
                 <div class="sis-dim">
-                  <span class="sis-dim-label" style="color:var(--cyan)">DOMAIN</span>
-                  <div class="sis-dim-bar"><div class="sis-dim-fill" id="sis-bar-domain" style="width:0%;background:var(--cyan)"></div></div>
-                  <span class="sis-dim-val" id="sis-val-domain">—</span>
-                </div>
-                <div class="sis-dim">
                   <span class="sis-dim-label" style="color:var(--violet2)">COVERAGE</span>
                   <div class="sis-dim-bar"><div class="sis-dim-fill" id="sis-bar-coverage" style="width:0%;background:var(--violet2)"></div></div>
                   <span class="sis-dim-val" id="sis-val-coverage">—</span>
@@ -1063,7 +1058,7 @@ html, body {
                   <span class="sis-dim-val" id="sis-val-uptime">—</span>
                 </div>
               </div>
-              <div class="sis-footnote">Proprietary SML composite metric &mdash; Domain Authority (25pt) &times; API Coverage (25pt) &times; Discovery Reach (25pt) &times; Network Uptime (25pt)</div>
+              <div class="sis-footnote">Proprietary SML composite metric &mdash; API Coverage (34pt, live vs. catalog) + Discovery Reach (33pt, real directory audit) + Network Uptime (33pt, live health check). No component is hardcoded or simulated &mdash; each is 0 until its real data source responds.</div>
             </div>
           </div>
         </div>
@@ -1342,6 +1337,14 @@ ENDPOINTS.forEach(ep => {
   EP_META[ep.path] = { cat: ep.cat, free: ep.free, cost: ep.cost || null, desc: ep.desc };
 });
 
+/* Real endpoint catalog size, captured before ENDPOINTS gets overwritten by
+   the live fetch below. Used as the SIS coverage denominator — this is a
+   project constant (how many endpoints exist to find), not a live claim. */
+const ENDPOINTS_CATALOG_SIZE = ENDPOINTS.length;
+/* null until loadLiveEndpoints() actually succeeds — SIS coverage stays at 0
+   until then, it never guesses. */
+let liveEndpointCount = null;
+
 async function loadLiveEndpoints() {
   try {
     const res = await fetch('https://mcp-x402.onrender.com/.well-known/openapi.json', {
@@ -1376,9 +1379,12 @@ async function loadLiveEndpoints() {
       document.querySelectorAll('[data-live-count]').forEach(el => {
         el.textContent = liveCount;
       });
+      liveEndpointCount = liveCount;
+      updateSIS(isOnline === true); // recompute SIS coverage now that it's real
     }
   } catch (_) {
-    // CORS or network error — hardcoded fallback already rendered
+    // CORS or network error — hardcoded fallback already rendered.
+    // liveEndpointCount stays null, so SIS coverage stays 0 (not faked).
   }
 }
 
@@ -1523,6 +1529,10 @@ function renderDirectoryCards(listedSet, unlistedSet, audited) {
   });
 }
 
+/* Real directory audit state — SIS reach reads this, never a hardcoded
+   fraction. audited stays false (reach=0) until the real audit responds. */
+let dirAudit = { listedCount: null, total: DIRECTORIES.length, audited: false };
+
 async function renderDirectories() {
   try {
     const res = await fetch('https://squeezeos-api.onrender.com/api/marketing/directories', {
@@ -1547,9 +1557,14 @@ async function renderDirectories() {
     } else {
       note.textContent = 'Awaiting first real audit';
     }
+
+    dirAudit = { listedCount, total: DIRECTORIES.length, audited: !!data.audited };
+    updateSIS(isOnline === true); // recompute SIS reach now that it's real
   } catch (e) {
     renderDirectoryCards(new Set(), new Set(), false);
     document.getElementById('dir-audit-note').textContent = 'Audit data unavailable — awaiting connection';
+    dirAudit = { listedCount: null, total: DIRECTORIES.length, audited: false };
+    updateSIS(isOnline === true); // reach falls back to 0, not a guess
   }
 }
 
@@ -1614,10 +1629,39 @@ function renderIndexer() {
     row.className = 'config-row';
     row.innerHTML = `
       <span class="config-val" style="font-size:11px">/.well-known/${w.file}</span>
-      <span class="ep-cost-free" style="font-size:10px">● LIVE</span>
+      <span class="ep-cost-free" style="font-size:10px" id="wk-status-${w.file}">CHECKING…</span>
     `;
     wkEl.appendChild(row);
   });
+  verifyWellknown(); // never assume LIVE — actually check each file
+}
+
+/* Verifies each /.well-known file actually responds on this domain.
+   No status is ever assumed — CHECKING… until a real fetch resolves. */
+async function verifyWellknown() {
+  for (const w of WELLKNOWN) {
+    const el = document.getElementById('wk-status-' + w.file);
+    if (!el) continue;
+    try {
+      const res = await fetch('/.well-known/' + w.file, {
+        method: 'HEAD',
+        signal: AbortSignal.timeout ? AbortSignal.timeout(6000) : undefined
+      });
+      if (res.ok) {
+        el.textContent = '● LIVE';
+        el.className = 'ep-cost-free';
+        el.style.color = '';
+      } else {
+        el.textContent = '○ DOWN (' + res.status + ')';
+        el.className = '';
+        el.style.color = 'var(--red)';
+      }
+    } catch (_) {
+      el.textContent = '○ UNVERIFIED';
+      el.className = '';
+      el.style.color = 'var(--text3)';
+    }
+  }
 }
 
 /* ── ACTIVITY TICKER — real agent runs only, no fallback fabrication ── */
@@ -1853,20 +1897,33 @@ function startHeartbeatCounter() {
 }
 
 /* ── SIS™ — SWARM INTELLIGENCE SCORE ────────────────────── */
-const SIS_MAX = { domain: 25, coverage: 25, reach: 25, uptime: 25 };
-let sisState  = { domain: 0, coverage: 0, reach: 0, uptime: 0 };
+/* Every component below is either 0 or computed from a real fetched value.
+   Nothing here is a hardcoded fraction — if the real data hasn't loaded yet,
+   the component stays at 0 rather than showing a guessed number. */
+const SIS_MAX = { coverage: 34, reach: 33, uptime: 33 };
+let sisState  = { coverage: 0, reach: 0, uptime: 0 };
 let sisAnimCurrent = 0;
 
 function computeSIS(networkUp) {
-  const domain   = Math.round((72 / 100)  * SIS_MAX.domain);    // 18 — from AgentSwarm AI Domain Score
-  const coverage = Math.round((52 / 58)   * SIS_MAX.coverage);  // 22 — 52 live / 58 theoretical endpoints (inc. 8 AEO suite)
-  const reach    = Math.round((33 / 40)   * SIS_MAX.reach);     // 21 — 28 directories + 5 AI discovery files + 3 new AEO manifests
+  // Real live endpoint count (from loadLiveEndpoints' fetch of openapi.json)
+  // vs. the actual size of our endpoint catalog. 0 until the fetch succeeds.
+  const coverage = (liveEndpointCount != null && ENDPOINTS_CATALOG_SIZE > 0)
+    ? Math.round((liveEndpointCount / ENDPOINTS_CATALOG_SIZE) * SIS_MAX.coverage)
+    : 0;
+
+  // Real directory audit result (from renderDirectories' fetch) vs. the
+  // total directories we track. 0 until a real audit has actually run.
+  const reach = (dirAudit.audited && dirAudit.listedCount != null && dirAudit.total > 0)
+    ? Math.round((dirAudit.listedCount / dirAudit.total) * SIS_MAX.reach)
+    : 0;
+
   // Reflects the real-time health check result — full points while the API is
   // actually responding, zero while it isn't. Not a session-local counter, so
   // it can't drift between tabs or reset on reload.
-  const uptime   = networkUp ? SIS_MAX.uptime : 0;
-  sisState = { ...sisState, domain, coverage, reach, uptime };
-  return domain + coverage + reach + uptime;
+  const uptime = networkUp ? SIS_MAX.uptime : 0;
+
+  sisState = { coverage, reach, uptime };
+  return coverage + reach + uptime;
 }
 
 function getSISGrade(score) {
@@ -1980,7 +2037,6 @@ function updateSIS(networkUp) {
     if (bar)   bar.style.width = (val / max * 100) + '%';
     if (valEl) valEl.textContent = val;
   }
-  setDimBar('domain',   sisState.domain,   SIS_MAX.domain);
   setDimBar('coverage', sisState.coverage, SIS_MAX.coverage);
   setDimBar('reach',    sisState.reach,    SIS_MAX.reach);
   setDimBar('uptime',   sisState.uptime,   SIS_MAX.uptime);
@@ -1995,7 +2051,6 @@ function updateSIS(networkUp) {
     const el = document.getElementById(id);
     if (el) el.style.width = (val / max * 100) + '%';
   };
-  setMini('sm-domain',   sisState.domain,   SIS_MAX.domain);
   setMini('sm-coverage', sisState.coverage, SIS_MAX.coverage);
   setMini('sm-reach',    sisState.reach,    SIS_MAX.reach);
   setMini('sm-uptime',   sisState.uptime,   SIS_MAX.uptime);
@@ -2022,3 +2077,4 @@ setInterval(loadAgentStats, 60000);
 </script>
 </body>
 </html>
+
