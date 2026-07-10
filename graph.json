@@ -59,6 +59,15 @@
       "provider": { "@id": "https://www.scriptmasterlabs.com/#org" }
     },
     {
+      "@type": "WebAPI",
+      "@id": "https://scriptmaster-vending-router.onrender.com/#api",
+      "name": "ScriptMaster Agentic Vending Router",
+      "url": "https://scriptmaster-vending-router.onrender.com/",
+      "description": "A real, persistent x402 marketplace and MCP gateway where AI agents discover, browse, and pay for third-party and ScriptMasterLabs APIs directly. One-time 0.05 USDC (Base) or 0.05 RLUSD (XRPL) listing fee, no subscription. Agent discovery via /.well-known/agents.json and /mcp (streamable-http, 5 tools).",
+      "termsOfService": "https://www.scriptmasterlabs.com/marketplace.html",
+      "provider": { "@id": "https://www.scriptmasterlabs.com/#org" }
+    },
+    {
       "@type": "SoftwareApplication",
       "@id": "https://www.nexus-402.com/#app",
       "name": "Nexus-402",
