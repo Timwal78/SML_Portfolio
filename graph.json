@@ -8,13 +8,14 @@
       "alternateName": "ScriptMasterLabs",
       "url": "https://www.scriptmasterlabs.com/",
       "email": "scriptmasterlabs@gmail.com",
-      "founder": { "@type": "Person", "name": "Timothy Walton" },
+      "founder": { "@type": "Person", "name": "Timothy Walton", "sameAs": ["https://www.wikidata.org/wiki/Q140478697"] },
       "address": { "@type": "PostalAddress", "addressLocality": "Kinston", "addressRegion": "NC", "addressCountry": "US" },
       "description": "x402/HTTP-402 micropayment infrastructure for autonomous AI agents (USDC on Base), payment rails on XRPL and Xahau via Xahau Hooks, MCP server monetization middleware, and institutional-grade AI market intelligence. Service-Disabled Veteran-Owned Small Business.",
       "sameAs": [
         "https://github.com/Timwal78",
         "https://www.nexus-402.com/",
-        "https://www.neuralosagent.com/"
+        "https://www.neuralosagent.com/",
+        "https://www.wikidata.org/wiki/Q140478532"
       ],
       "knowsAbout": ["x402 protocol", "HTTP 402", "agentic payments", "USDC on Base", "XRPL", "Xahau Hooks", "RLUSD", "MCP servers", "Generative Engine Optimization", "Pine Script v6", "short squeeze detection"]
     },
