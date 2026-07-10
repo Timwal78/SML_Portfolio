@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QHTHMG61N6"></script>
+<script>
+  window.dataLayer=window.dataLayer||[];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js',new Date());
+  gtag('config','G-QHTHMG61N6');
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<title>XRPL Micropayments for AI Agents — Script Master Labs</title>
+<meta name="description" content="How AI agents use XRPL drops-level micropayments to pay per API call, and how the ARGUS Agent Credit Bureau rewards frequent callers with automatic discounts.">
+<link rel="canonical" href="https://www.scriptmasterlabs.com/xrpl-ai-agent-micropayments.html">
+<meta property="og:title" content="XRPL Micropayments for AI Agents — Script Master Labs">
+<meta property="og:description" content="How AI agents use XRPL drops-level micropayments to pay per API call, and how the ARGUS Agent Credit Bureau rewards frequent callers with automatic discounts.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://www.scriptmasterlabs.com/xrpl-ai-agent-micropayments.html">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="XRPL Micropayments for AI Agents — Script Master Labs">
+<meta name="twitter:description" content="How AI agents use XRPL drops-level micropayments to pay per API call, and how the ARGUS Agent Credit Bureau rewards frequent callers with automatic discounts.">
+<script src="https://analytics.ahrefs.com/analytics.js" data-key="eO57h84tnrmOGAsKKvyoyw" async></script>
+<style>
+:root{
+  --bg:#000000;--panel:#080C08;--panel2:#0D110D;--line:#1A221A;
+  --green:#39FF14;--green2:#00FF7F;--gold:#FFD700;--amber:#FF9500;
+  --blue:#00D4FF;--pink:#FF1493;--purple:#8B5CF6;--red:#FF4D4D;
+  --white:#F5F7F5;--mute:#8A958C;--mute2:#4A554C;
+  --mono:'JetBrains Mono','SF Mono',ui-monospace,Menlo,monospace;
+  --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--white);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:var(--green);text-decoration:none}
+a:hover{text-decoration:underline}
+.wrap{max-width:820px;margin:0 auto;padding:0 28px}
+nav{border-bottom:1px solid var(--line);padding:18px 0}
+nav .inner{display:flex;align-items:center;gap:28px;max-width:1100px;margin:0 auto;padding:0 28px}
+nav .logo{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--green);letter-spacing:1px;text-decoration:none}
+nav .links{display:flex;gap:22px;margin-left:auto}
+nav .links a{font-size:13px;color:var(--mute);text-decoration:none;transition:color .2s}
+nav .links a:hover{color:var(--white);text-decoration:none}
+nav .cta{font-family:var(--mono);font-size:11px;padding:8px 18px;border:1px solid var(--green);border-radius:6px;color:var(--green);transition:all .2s}
+nav .cta:hover{background:var(--green);color:#000;text-decoration:none}
+.hero{padding:56px 0 32px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:3px;color:var(--green);text-transform:uppercase;margin-bottom:16px}
+h1{font-size:clamp(28px,5vw,44px);font-weight:900;letter-spacing:-1.2px;line-height:1.1;max-width:760px}
+.hero-sub{margin-top:16px;font-size:clamp(15px,2vw,17px);color:var(--mute);max-width:700px;line-height:1.7}
+section{margin:44px 0}
+h2{font-size:clamp(20px,3vw,26px);font-weight:800;letter-spacing:-.5px;margin-bottom:18px}
+.facts{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:20px 24px;margin:24px 0}
+.facts li{margin:8px 0;color:var(--mute);font-size:14px}
+.facts li b{color:var(--white)}
+.faq-item{border-bottom:1px solid var(--line);padding:20px 0}
+.faq-item:first-child{padding-top:0}
+.faq-item h3{font-size:16px;font-weight:700;margin-bottom:8px}
+.faq-item p{color:var(--mute);font-size:14px;line-height:1.7}
+.related{display:flex;flex-direction:column;gap:8px}
+.related a{font-family:var(--mono);font-size:13px}
+footer{border-top:1px solid var(--line);padding:28px 0;margin-top:40px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+footer .fl{font-size:12px;color:var(--mute2)}
+footer .links{display:flex;gap:18px}
+footer .links a{font-size:12px;color:var(--mute)}
+</style>
+</head>
+<body>
+<nav>
+  <div class="inner">
+    <a href="/index.html" class="logo">SML ◈</a>
+    <div class="links">
+      <a href="/stack.html">Stack</a>
+      <a href="/central-bank.html">Central Bank</a>
+      <a href="/marketplace.html">Marketplace</a>
+      <a href="https://scriptmaster-vending-router.onrender.com/.well-known/agents.json" target="_blank">API</a>
+    </div>
+    <a href="https://scriptmaster-vending-router.onrender.com/mcp" class="cta" target="_blank">Connect Agent</a>
+  </div>
+</nav>
+<main>
+<div class="wrap">
+  <div class="hero">
+    <div class="eyebrow">MICROPAYMENTS · XRPL</div>
+    <h1>XRPL Micropayments for AI Agents</h1>
+    <p class="hero-sub">XRPL settles in <b>drops</b> — one drop is 0.000001 XRP — which makes true per-call micropayments practical. SqueezeOS's ARGUS Agent Credit Bureau layers a reputation system on top: agents that pay frequently earn a rising score and unlock automatic price discounts on every subsequent call.</p>
+  </div>
+
+  <section>
+    <h2>Quick facts</h2>
+    <ul class="facts">
+      <li><b>Smallest unit:</b> 1 drop = 0.000001 XRP — fine-grained enough for per-call pricing well under a cent.</li>
+      <li><b>ARGUS score range:</b> 300–850 (FICO-style), +5 points earned per paid call.</li>
+      <li><b>Tiers:</b> PROTOSTAR (300–499), NEUTRON (500–699), PULSAR (700–799, 20% discount), QUASAR (800–850, 40% discount).</li>
+      <li><b>Score endpoint (free):</b> <code>GET https://squeezeos-api.onrender.com/api/credit-score</code></li>
+      <li><b>On-chain anchor:</b> each new score is anchored on Xahau via a 1-XAH-drop self-payment carrying a memo of <code>{ agentDid, score, tier, anchoredAt }</code>, independently verifiable on the Xahau explorer.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Frequently asked questions</h2>
+      <div class="faq-item">
+        <h3>What is the smallest possible XRPL payment?</h3>
+        <p>One drop, or 0.000001 XRP — far smaller than a cent, which is what makes per-API-call micropayments practical on XRPL.</p>
+      </div>
+      <div class="faq-item">
+        <h3>How do I get a discount as a frequent agent?</h3>
+        <p>Every successful paid call earns your wallet +5 ARGUS score points. Cross 700 and you're PULSAR tier (20% off); cross 800 and you're QUASAR (40% off), applied automatically on your next call.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Is the credit score verifiable, or just a claim by the server?</h3>
+        <p>It's anchored on-chain: each new score is written to the Xahau ledger as a memo on a real transaction, and you can look up the resulting <code>txHash</code> independently at xahau.network.</p>
+      </div>
+  </section>
+
+  <section>
+    <h2>Related</h2>
+    <div class="related">
+      <a href="/x402-xrpl-payments.html">x402 payments on XRPL →</a>
+      <a href="https://squeezeos-api.onrender.com/api/credit-score" target="_blank">Check your ARGUS score (free) →</a>
+      <a href="/agent-credit-bureau.html">Agent Credit Bureau dashboard →</a>
+    </div>
+  </section>
+</div>
+</main>
+<div class="wrap">
+  <footer>
+    <span class="fl">© 2026 Script Master Labs LLC</span>
+    <div class="links">
+      <a href="/privacy.html">Privacy</a>
+      <a href="/terms.html">Terms</a>
+      <a href="/stack.html">Stack</a>
+      <a href="/central-bank.html">Central Bank</a>
+    </div>
+  </footer>
+</div>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://www.scriptmasterlabs.com/xrpl-ai-agent-micropayments.html#page",
+      "name": "XRPL Micropayments for AI Agents \u2014 Script Master Labs",
+      "description": "How AI agents use XRPL drops-level micropayments to pay per API call, and how the ARGUS Agent Credit Bureau rewards frequent callers with automatic discounts.",
+      "url": "https://www.scriptmasterlabs.com/xrpl-ai-agent-micropayments.html",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Script Master Labs LLC",
+        "url": "https://www.scriptmasterlabs.com"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://www.scriptmasterlabs.com/xrpl-ai-agent-micropayments.html#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is the smallest possible XRPL payment?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "One drop, or 0.000001 XRP \u2014 far smaller than a cent, which is what makes per-API-call micropayments practical on XRPL."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I get a discount as a frequent agent?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Every successful paid call earns your wallet +5 ARGUS score points. Cross 700 and you're PULSAR tier (20% off); cross 800 and you're QUASAR (40% off), applied automatically on your next call."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is the credit score verifiable, or just a claim by the server?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "It's anchored on-chain: each new score is written to the Xahau ledger as a memo on a real transaction, and you can look up the resulting txHash independently at xahau.network."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
+</body>
+</html>

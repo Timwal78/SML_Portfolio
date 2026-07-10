@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QHTHMG61N6"></script>
+<script>
+  window.dataLayer=window.dataLayer||[];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js',new Date());
+  gtag('config','G-QHTHMG61N6');
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<title>Xahau URITokenMint Hooks — Script Master Labs</title>
+<meta name="description" content="How Ghost Layer anchors AI agent credit scores on the Xahau ledger using real URITokenMint transactions, independently verifiable on-chain.">
+<link rel="canonical" href="https://www.scriptmasterlabs.com/xahau-uritokenmint-hooks.html">
+<meta property="og:title" content="Xahau URITokenMint Hooks — Script Master Labs">
+<meta property="og:description" content="How Ghost Layer anchors AI agent credit scores on the Xahau ledger using real URITokenMint transactions, independently verifiable on-chain.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://www.scriptmasterlabs.com/xahau-uritokenmint-hooks.html">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Xahau URITokenMint Hooks — Script Master Labs">
+<meta name="twitter:description" content="How Ghost Layer anchors AI agent credit scores on the Xahau ledger using real URITokenMint transactions, independently verifiable on-chain.">
+<script src="https://analytics.ahrefs.com/analytics.js" data-key="eO57h84tnrmOGAsKKvyoyw" async></script>
+<style>
+:root{
+  --bg:#000000;--panel:#080C08;--panel2:#0D110D;--line:#1A221A;
+  --green:#39FF14;--green2:#00FF7F;--gold:#FFD700;--amber:#FF9500;
+  --blue:#00D4FF;--pink:#FF1493;--purple:#8B5CF6;--red:#FF4D4D;
+  --white:#F5F7F5;--mute:#8A958C;--mute2:#4A554C;
+  --mono:'JetBrains Mono','SF Mono',ui-monospace,Menlo,monospace;
+  --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--white);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:var(--green);text-decoration:none}
+a:hover{text-decoration:underline}
+.wrap{max-width:820px;margin:0 auto;padding:0 28px}
+nav{border-bottom:1px solid var(--line);padding:18px 0}
+nav .inner{display:flex;align-items:center;gap:28px;max-width:1100px;margin:0 auto;padding:0 28px}
+nav .logo{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--green);letter-spacing:1px;text-decoration:none}
+nav .links{display:flex;gap:22px;margin-left:auto}
+nav .links a{font-size:13px;color:var(--mute);text-decoration:none;transition:color .2s}
+nav .links a:hover{color:var(--white);text-decoration:none}
+nav .cta{font-family:var(--mono);font-size:11px;padding:8px 18px;border:1px solid var(--green);border-radius:6px;color:var(--green);transition:all .2s}
+nav .cta:hover{background:var(--green);color:#000;text-decoration:none}
+.hero{padding:56px 0 32px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:3px;color:var(--green);text-transform:uppercase;margin-bottom:16px}
+h1{font-size:clamp(28px,5vw,44px);font-weight:900;letter-spacing:-1.2px;line-height:1.1;max-width:760px}
+.hero-sub{margin-top:16px;font-size:clamp(15px,2vw,17px);color:var(--mute);max-width:700px;line-height:1.7}
+section{margin:44px 0}
+h2{font-size:clamp(20px,3vw,26px);font-weight:800;letter-spacing:-.5px;margin-bottom:18px}
+.facts{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:20px 24px;margin:24px 0}
+.facts li{margin:8px 0;color:var(--mute);font-size:14px}
+.facts li b{color:var(--white)}
+.faq-item{border-bottom:1px solid var(--line);padding:20px 0}
+.faq-item:first-child{padding-top:0}
+.faq-item h3{font-size:16px;font-weight:700;margin-bottom:8px}
+.faq-item p{color:var(--mute);font-size:14px;line-height:1.7}
+.related{display:flex;flex-direction:column;gap:8px}
+.related a{font-family:var(--mono);font-size:13px}
+footer{border-top:1px solid var(--line);padding:28px 0;margin-top:40px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+footer .fl{font-size:12px;color:var(--mute2)}
+footer .links{display:flex;gap:18px}
+footer .links a{font-size:12px;color:var(--mute)}
+</style>
+</head>
+<body>
+<nav>
+  <div class="inner">
+    <a href="/index.html" class="logo">SML ◈</a>
+    <div class="links">
+      <a href="/stack.html">Stack</a>
+      <a href="/central-bank.html">Central Bank</a>
+      <a href="/marketplace.html">Marketplace</a>
+      <a href="https://scriptmaster-vending-router.onrender.com/.well-known/agents.json" target="_blank">API</a>
+    </div>
+    <a href="https://scriptmaster-vending-router.onrender.com/mcp" class="cta" target="_blank">Connect Agent</a>
+  </div>
+</nav>
+<main>
+<div class="wrap">
+  <div class="hero">
+    <div class="eyebrow">XAHAU · ON-CHAIN ANCHORING</div>
+    <h1>Xahau URITokenMint Hooks — On-Chain Score Anchoring</h1>
+    <p class="hero-sub">Ghost Layer, ScriptMasterLabs' Go routing backend, submits real <code>URITokenMint</code> transactions to the Xahau ledger to anchor data on-chain. SqueezeOS uses this to anchor each agent's ARGUS credit score after every paid call — a self-payment of 1 XAH drop carrying a memo with the score, tier, and timestamp, independently verifiable by anyone.</p>
+  </div>
+
+  <section>
+    <h2>Quick facts</h2>
+    <ul class="facts">
+      <li><b>Transaction type:</b> <code>URITokenMint</code> (Xahau transaction type 45), submitted by Ghost Layer's <code>xahau.go</code>.</li>
+      <li><b>What gets anchored:</b> a memo JSON containing <code>{ agentDid, score, tier, anchoredAt }</code>.</li>
+      <li><b>Cost:</b> a 1-XAH-drop self-payment per anchor.</li>
+      <li><b>Verification:</b> anyone can independently confirm an anchor at <code>https://xahau.network/tx/&lt;txHash&gt;</code>.</li>
+      <li><b>Lookup endpoint:</b> <code>GET https://squeezeos-api.onrender.com/api/credit-score/anchor/:wallet</code></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Frequently asked questions</h2>
+      <div class="faq-item">
+        <h3>What is a URITokenMint transaction used for here?</h3>
+        <p>It's the on-ledger vehicle Ghost Layer uses to write a small, verifiable piece of data (an agent's updated credit score) to the Xahau chain — URITokenMint lets a memo carry that payload alongside a minimal self-payment.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Can I verify an anchor myself, or do I have to trust SqueezeOS&#x27;s word?</h3>
+        <p>You can verify independently — every anchor has a real Xahau transaction hash, viewable at <code>xahau.network/tx/&lt;txHash&gt;</code>, showing the exact memo that was written.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Does this require the XAHAU_SEED to be configured?</h3>
+        <p>Yes — anchoring only runs when the server has a Xahau signing seed configured; otherwise the score still updates off-chain but isn't anchored.</p>
+      </div>
+  </section>
+
+  <section>
+    <h2>Related</h2>
+    <div class="related">
+      <a href="/xrpl-ai-agent-micropayments.html">XRPL micropayments for AI agents →</a>
+      <a href="https://squeezeos-api.onrender.com/api/credit-score/anchor/" target="_blank">Check anchor proof for a wallet →</a>
+      <a href="/agent-credit-bureau.html">Agent Credit Bureau dashboard →</a>
+    </div>
+  </section>
+</div>
+</main>
+<div class="wrap">
+  <footer>
+    <span class="fl">© 2026 Script Master Labs LLC</span>
+    <div class="links">
+      <a href="/privacy.html">Privacy</a>
+      <a href="/terms.html">Terms</a>
+      <a href="/stack.html">Stack</a>
+      <a href="/central-bank.html">Central Bank</a>
+    </div>
+  </footer>
+</div>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://www.scriptmasterlabs.com/xahau-uritokenmint-hooks.html#page",
+      "name": "Xahau URITokenMint Hooks \u2014 Script Master Labs",
+      "description": "How Ghost Layer anchors AI agent credit scores on the Xahau ledger using real URITokenMint transactions, independently verifiable on-chain.",
+      "url": "https://www.scriptmasterlabs.com/xahau-uritokenmint-hooks.html",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Script Master Labs LLC",
+        "url": "https://www.scriptmasterlabs.com"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://www.scriptmasterlabs.com/xahau-uritokenmint-hooks.html#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is a URITokenMint transaction used for here?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "It's the on-ledger vehicle Ghost Layer uses to write a small, verifiable piece of data (an agent's updated credit score) to the Xahau chain \u2014 URITokenMint lets a memo carry that payload alongside a minimal self-payment."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I verify an anchor myself, or do I have to trust SqueezeOS's word?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "You can verify independently \u2014 every anchor has a real Xahau transaction hash, viewable at xahau.network/tx/&lt;txHash&gt;, showing the exact memo that was written."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does this require the XAHAU_SEED to be configured?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes \u2014 anchoring only runs when the server has a Xahau signing seed configured; otherwise the score still updates off-chain but isn't anchored."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
+</body>
+</html>
