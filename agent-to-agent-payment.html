@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QHTHMG61N6"></script>
+<script>
+  window.dataLayer=window.dataLayer||[];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js',new Date());
+  gtag('config','G-QHTHMG61N6');
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<title>Agent-to-Agent (A2A) Payment Protocol Headers — Script Master Labs</title>
+<meta name="description" content="How SqueezeOS&#x27;s MCP server signals x402 payment requirements to A2A-compatible agent frameworks via response headers and its AgentCard.">
+<link rel="canonical" href="https://www.scriptmasterlabs.com/agent-to-agent-payment.html">
+<meta property="og:title" content="Agent-to-Agent (A2A) Payment Protocol Headers — Script Master Labs">
+<meta property="og:description" content="How SqueezeOS&#x27;s MCP server signals x402 payment requirements to A2A-compatible agent frameworks via response headers and its AgentCard.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://www.scriptmasterlabs.com/agent-to-agent-payment.html">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Agent-to-Agent (A2A) Payment Protocol Headers — Script Master Labs">
+<meta name="twitter:description" content="How SqueezeOS&#x27;s MCP server signals x402 payment requirements to A2A-compatible agent frameworks via response headers and its AgentCard.">
+<script src="https://analytics.ahrefs.com/analytics.js" data-key="eO57h84tnrmOGAsKKvyoyw" async></script>
+<style>
+:root{
+  --bg:#000000;--panel:#080C08;--panel2:#0D110D;--line:#1A221A;
+  --green:#39FF14;--green2:#00FF7F;--gold:#FFD700;--amber:#FF9500;
+  --blue:#00D4FF;--pink:#FF1493;--purple:#8B5CF6;--red:#FF4D4D;
+  --white:#F5F7F5;--mute:#8A958C;--mute2:#4A554C;
+  --mono:'JetBrains Mono','SF Mono',ui-monospace,Menlo,monospace;
+  --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--white);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:var(--green);text-decoration:none}
+a:hover{text-decoration:underline}
+.wrap{max-width:820px;margin:0 auto;padding:0 28px}
+nav{border-bottom:1px solid var(--line);padding:18px 0}
+nav .inner{display:flex;align-items:center;gap:28px;max-width:1100px;margin:0 auto;padding:0 28px}
+nav .logo{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--green);letter-spacing:1px;text-decoration:none}
+nav .links{display:flex;gap:22px;margin-left:auto}
+nav .links a{font-size:13px;color:var(--mute);text-decoration:none;transition:color .2s}
+nav .links a:hover{color:var(--white);text-decoration:none}
+nav .cta{font-family:var(--mono);font-size:11px;padding:8px 18px;border:1px solid var(--green);border-radius:6px;color:var(--green);transition:all .2s}
+nav .cta:hover{background:var(--green);color:#000;text-decoration:none}
+.hero{padding:56px 0 32px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:3px;color:var(--green);text-transform:uppercase;margin-bottom:16px}
+h1{font-size:clamp(28px,5vw,44px);font-weight:900;letter-spacing:-1.2px;line-height:1.1;max-width:760px}
+.hero-sub{margin-top:16px;font-size:clamp(15px,2vw,17px);color:var(--mute);max-width:700px;line-height:1.7}
+section{margin:44px 0}
+h2{font-size:clamp(20px,3vw,26px);font-weight:800;letter-spacing:-.5px;margin-bottom:18px}
+.facts{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:20px 24px;margin:24px 0}
+.facts li{margin:8px 0;color:var(--mute);font-size:14px}
+.facts li b{color:var(--white)}
+.faq-item{border-bottom:1px solid var(--line);padding:20px 0}
+.faq-item:first-child{padding-top:0}
+.faq-item h3{font-size:16px;font-weight:700;margin-bottom:8px}
+.faq-item p{color:var(--mute);font-size:14px;line-height:1.7}
+.related{display:flex;flex-direction:column;gap:8px}
+.related a{font-family:var(--mono);font-size:13px}
+footer{border-top:1px solid var(--line);padding:28px 0;margin-top:40px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+footer .fl{font-size:12px;color:var(--mute2)}
+footer .links{display:flex;gap:18px}
+footer .links a{font-size:12px;color:var(--mute)}
+</style>
+</head>
+<body>
+<nav>
+  <div class="inner">
+    <a href="/index.html" class="logo">SML ◈</a>
+    <div class="links">
+      <a href="/stack.html">Stack</a>
+      <a href="/central-bank.html">Central Bank</a>
+      <a href="/marketplace.html">Marketplace</a>
+      <a href="https://scriptmaster-vending-router.onrender.com/.well-known/agents.json" target="_blank">API</a>
+    </div>
+    <a href="https://scriptmaster-vending-router.onrender.com/mcp" class="cta" target="_blank">Connect Agent</a>
+  </div>
+</nav>
+<main>
+<div class="wrap">
+  <div class="hero">
+    <div class="eyebrow">A2A · AGENT-TO-AGENT</div>
+    <h1>Agent-to-Agent (A2A) Payment Protocol Headers</h1>
+    <p class="hero-sub">Google's Agent-to-Agent (A2A) protocol lets agent frameworks discover how to pay each other automatically. SqueezeOS's MCP server adds two response headers to every HTTP 402/403 payment-verification response so A2A-compatible frameworks can resolve payment requirements without parsing a response body, plus a full AgentCard at <code>/.well-known/agent.json</code>.</p>
+  </div>
+
+  <section>
+    <h2>Quick facts</h2>
+    <ul class="facts">
+      <li><b>Protocol header:</b> <code>X-A2A-Payment-Protocol: x402/1.0</code></li>
+      <li><b>Destination header:</b> <code>X-A2A-Receiving-Address: &lt;XRPL address&gt;</code></li>
+      <li><b>AgentCard:</b> <code>https://squeezeos-api.onrender.com/.well-known/agent.json</code> (live) and a static mirror at <code>https://www.scriptmasterlabs.com/.well-known/agent.json</code>, schema <code>agent-card/v1</code>.</li>
+      <li><b>Card contents:</b> x402 payment config, ARGUS tier table, skills with pricing, quickstart commands, provider metadata.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Frequently asked questions</h2>
+      <div class="faq-item">
+        <h3>What does the X-A2A-Payment-Protocol header do?</h3>
+        <p>It tells an A2A-compatible framework which payment scheme is in play (“x402/1.0”) purely from response headers, without needing to parse the JSON body.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Where do I send the payment?</h3>
+        <p>The <code>X-A2A-Receiving-Address</code> header carries the destination XRPL address directly — no lookup required.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Is there a machine-readable summary of everything an agent needs?</h3>
+        <p>Yes — the AgentCard at <code>/.well-known/agent.json</code> bundles payment config, pricing, and quickstart calls in one document, returned with <code>Access-Control-Allow-Origin: *</code>.</p>
+      </div>
+  </section>
+
+  <section>
+    <h2>Related</h2>
+    <div class="related">
+      <a href="https://squeezeos-api.onrender.com/.well-known/agent.json" target="_blank">SqueezeOS AgentCard →</a>
+      <a href="/x402-protocol-guide.html">What is the x402 protocol? →</a>
+      <a href="/autonomous-agent-payments.html">How AI agents pay for APIs →</a>
+    </div>
+  </section>
+</div>
+</main>
+<div class="wrap">
+  <footer>
+    <span class="fl">© 2026 Script Master Labs LLC</span>
+    <div class="links">
+      <a href="/privacy.html">Privacy</a>
+      <a href="/terms.html">Terms</a>
+      <a href="/stack.html">Stack</a>
+      <a href="/central-bank.html">Central Bank</a>
+    </div>
+  </footer>
+</div>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://www.scriptmasterlabs.com/agent-to-agent-payment.html#page",
+      "name": "Agent-to-Agent (A2A) Payment Protocol Headers \u2014 Script Master Labs",
+      "description": "How SqueezeOS's MCP server signals x402 payment requirements to A2A-compatible agent frameworks via response headers and its AgentCard.",
+      "url": "https://www.scriptmasterlabs.com/agent-to-agent-payment.html",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Script Master Labs LLC",
+        "url": "https://www.scriptmasterlabs.com"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://www.scriptmasterlabs.com/agent-to-agent-payment.html#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What does the X-A2A-Payment-Protocol header do?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "It tells an A2A-compatible framework which payment scheme is in play (\u201cx402/1.0\u201d) purely from response headers, without needing to parse the JSON body."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Where do I send the payment?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The X-A2A-Receiving-Address header carries the destination XRPL address directly \u2014 no lookup required."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is there a machine-readable summary of everything an agent needs?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes \u2014 the AgentCard at /.well-known/agent.json bundles payment config, pricing, and quickstart calls in one document, returned with Access-Control-Allow-Origin: *."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
+</body>
+</html>

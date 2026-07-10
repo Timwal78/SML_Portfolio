@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QHTHMG61N6"></script>
+<script>
+  window.dataLayer=window.dataLayer||[];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js',new Date());
+  gtag('config','G-QHTHMG61N6');
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<title>How Do AI Agents Pay for APIs? — Script Master Labs</title>
+<meta name="description" content="The full x402 flow AI agents use to pay for gated API calls autonomously: 402 challenge, on-chain payment, proof header, retry.">
+<link rel="canonical" href="https://www.scriptmasterlabs.com/autonomous-agent-payments.html">
+<meta property="og:title" content="How Do AI Agents Pay for APIs? — Script Master Labs">
+<meta property="og:description" content="The full x402 flow AI agents use to pay for gated API calls autonomously: 402 challenge, on-chain payment, proof header, retry.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://www.scriptmasterlabs.com/autonomous-agent-payments.html">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="How Do AI Agents Pay for APIs? — Script Master Labs">
+<meta name="twitter:description" content="The full x402 flow AI agents use to pay for gated API calls autonomously: 402 challenge, on-chain payment, proof header, retry.">
+<script src="https://analytics.ahrefs.com/analytics.js" data-key="eO57h84tnrmOGAsKKvyoyw" async></script>
+<style>
+:root{
+  --bg:#000000;--panel:#080C08;--panel2:#0D110D;--line:#1A221A;
+  --green:#39FF14;--green2:#00FF7F;--gold:#FFD700;--amber:#FF9500;
+  --blue:#00D4FF;--pink:#FF1493;--purple:#8B5CF6;--red:#FF4D4D;
+  --white:#F5F7F5;--mute:#8A958C;--mute2:#4A554C;
+  --mono:'JetBrains Mono','SF Mono',ui-monospace,Menlo,monospace;
+  --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--white);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:var(--green);text-decoration:none}
+a:hover{text-decoration:underline}
+.wrap{max-width:820px;margin:0 auto;padding:0 28px}
+nav{border-bottom:1px solid var(--line);padding:18px 0}
+nav .inner{display:flex;align-items:center;gap:28px;max-width:1100px;margin:0 auto;padding:0 28px}
+nav .logo{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--green);letter-spacing:1px;text-decoration:none}
+nav .links{display:flex;gap:22px;margin-left:auto}
+nav .links a{font-size:13px;color:var(--mute);text-decoration:none;transition:color .2s}
+nav .links a:hover{color:var(--white);text-decoration:none}
+nav .cta{font-family:var(--mono);font-size:11px;padding:8px 18px;border:1px solid var(--green);border-radius:6px;color:var(--green);transition:all .2s}
+nav .cta:hover{background:var(--green);color:#000;text-decoration:none}
+.hero{padding:56px 0 32px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:3px;color:var(--green);text-transform:uppercase;margin-bottom:16px}
+h1{font-size:clamp(28px,5vw,44px);font-weight:900;letter-spacing:-1.2px;line-height:1.1;max-width:760px}
+.hero-sub{margin-top:16px;font-size:clamp(15px,2vw,17px);color:var(--mute);max-width:700px;line-height:1.7}
+section{margin:44px 0}
+h2{font-size:clamp(20px,3vw,26px);font-weight:800;letter-spacing:-.5px;margin-bottom:18px}
+.facts{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:20px 24px;margin:24px 0}
+.facts li{margin:8px 0;color:var(--mute);font-size:14px}
+.facts li b{color:var(--white)}
+.faq-item{border-bottom:1px solid var(--line);padding:20px 0}
+.faq-item:first-child{padding-top:0}
+.faq-item h3{font-size:16px;font-weight:700;margin-bottom:8px}
+.faq-item p{color:var(--mute);font-size:14px;line-height:1.7}
+.related{display:flex;flex-direction:column;gap:8px}
+.related a{font-family:var(--mono);font-size:13px}
+footer{border-top:1px solid var(--line);padding:28px 0;margin-top:40px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+footer .fl{font-size:12px;color:var(--mute2)}
+footer .links{display:flex;gap:18px}
+footer .links a{font-size:12px;color:var(--mute)}
+</style>
+</head>
+<body>
+<nav>
+  <div class="inner">
+    <a href="/index.html" class="logo">SML ◈</a>
+    <div class="links">
+      <a href="/stack.html">Stack</a>
+      <a href="/central-bank.html">Central Bank</a>
+      <a href="/marketplace.html">Marketplace</a>
+      <a href="https://scriptmaster-vending-router.onrender.com/.well-known/agents.json" target="_blank">API</a>
+    </div>
+    <a href="https://scriptmaster-vending-router.onrender.com/mcp" class="cta" target="_blank">Connect Agent</a>
+  </div>
+</nav>
+<main>
+<div class="wrap">
+  <div class="hero">
+    <div class="eyebrow">AUTONOMOUS COMMERCE</div>
+    <h1>How Do AI Agents Pay for APIs?</h1>
+    <p class="hero-sub">Under the x402 protocol, an AI agent pays for API access in four steps, entirely in code: it calls a gated endpoint, receives an HTTP 402 with payment requirements, signs and submits an on-chain payment, and retries the original call with a payment-proof header. The server verifies the proof on-ledger and returns the result.</p>
+  </div>
+
+  <section>
+    <h2>Quick facts</h2>
+    <ul class="facts">
+      <li><b>Step 1:</b> Agent calls a gated endpoint (e.g. <code>POST /tools/premium-query</code>).</li>
+      <li><b>Step 2:</b> Server responds <code>HTTP 402</code> with <code>X-Payment-Requirements</code> (destination, amount, currency).</li>
+      <li><b>Step 3:</b> Agent's middleware signs and submits the payment on-chain (XRPL/Xahau confirm in ~3 seconds via mcp-x402-xrpl).</li>
+      <li><b>Step 4:</b> Agent retries with <code>X-Payment-Proof</code> (tx hash, ledger index, payer); server verifies on-ledger and returns <code>200 OK</code>.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Frequently asked questions</h2>
+      <div class="faq-item">
+        <h3>Does the agent need a human to approve each payment?</h3>
+        <p>No. The agent's wallet and middleware are configured ahead of time (e.g. a <code>maxPaymentDrops</code> safety cap), and every payment within that policy happens without a human in the loop.</p>
+      </div>
+      <div class="faq-item">
+        <h3>What stops an agent from overspending?</h3>
+        <p>Middleware like mcp-x402-xrpl's <code>createX402Middleware</code> accepts a <code>maxPaymentDrops</code> cap per request as a safety limit.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Can an agent check the price before paying?</h3>
+        <p>Yes, where a pre-flight quote endpoint is offered — for example SqueezeOS exposes <code>GET /x402/quote?tool=&lt;toolId&gt;</code>, returning the exact cost and a 60-second-valid quote before any payment is made.</p>
+      </div>
+  </section>
+
+  <section>
+    <h2>Related</h2>
+    <div class="related">
+      <a href="/x402-protocol-guide.html">What is the x402 protocol? →</a>
+      <a href="/x402-xrpl-payments.html">x402 payments on XRPL →</a>
+      <a href="https://squeezeos-api.onrender.com/mcp" target="_blank">SqueezeOS MCP server →</a>
+    </div>
+  </section>
+</div>
+</main>
+<div class="wrap">
+  <footer>
+    <span class="fl">© 2026 Script Master Labs LLC</span>
+    <div class="links">
+      <a href="/privacy.html">Privacy</a>
+      <a href="/terms.html">Terms</a>
+      <a href="/stack.html">Stack</a>
+      <a href="/central-bank.html">Central Bank</a>
+    </div>
+  </footer>
+</div>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://www.scriptmasterlabs.com/autonomous-agent-payments.html#page",
+      "name": "How Do AI Agents Pay for APIs? \u2014 Script Master Labs",
+      "description": "The full x402 flow AI agents use to pay for gated API calls autonomously: 402 challenge, on-chain payment, proof header, retry.",
+      "url": "https://www.scriptmasterlabs.com/autonomous-agent-payments.html",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Script Master Labs LLC",
+        "url": "https://www.scriptmasterlabs.com"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://www.scriptmasterlabs.com/autonomous-agent-payments.html#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Does the agent need a human to approve each payment?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. The agent's wallet and middleware are configured ahead of time (e.g. a maxPaymentDrops safety cap), and every payment within that policy happens without a human in the loop."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What stops an agent from overspending?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Middleware like mcp-x402-xrpl's createX402Middleware accepts a maxPaymentDrops cap per request as a safety limit."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can an agent check the price before paying?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, where a pre-flight quote endpoint is offered \u2014 for example SqueezeOS exposes GET /x402/quote?tool=&lt;toolId&gt;, returning the exact cost and a 60-second-valid quote before any payment is made."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
+</body>
+</html>

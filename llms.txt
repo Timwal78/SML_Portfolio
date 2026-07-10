@@ -286,3 +286,27 @@ This site is optimized for Generative Engine Optimization (GEO). Content is stru
 | Referral earnings | https://squeezeos-api.onrender.com/api/forge/earnings/:wallet |
 | Agentic Vending Router (x402 marketplace) | https://scriptmaster-vending-router.onrender.com/.well-known/agents.json |
 | Agentic Marketplace — browse listings | https://scriptmaster-vending-router.onrender.com/marketplace/listings |
+
+---
+
+## Reference Pages (answer-first, one topic per page)
+
+Static, answer-first pages with FAQPage JSON-LD, written for direct citation by AI agents and answer engines. Each covers one real, already-shipped capability — no speculative or unreleased features.
+
+| Page | Topic |
+|------|-------|
+| https://www.scriptmasterlabs.com/x402-protocol-guide.html | What the x402 protocol is |
+| https://www.scriptmasterlabs.com/x402-xrpl-payments.html | How x402 settles on XRPL/Xahau |
+| https://www.scriptmasterlabs.com/mcp-x402-npm.html | The @scriptmasterlabs/mcp-x402 npm package |
+| https://www.scriptmasterlabs.com/http-402-ai-agents.html | HTTP 402 Payment Required for AI agents |
+| https://www.scriptmasterlabs.com/autonomous-agent-payments.html | How AI agents pay for APIs end-to-end |
+| https://www.scriptmasterlabs.com/xrpl-ai-agent-micropayments.html | XRPL micropayments + ARGUS credit tiers |
+| https://www.scriptmasterlabs.com/rlusd-mcp-payments.html | RLUSD settlement for MCP tools |
+| https://www.scriptmasterlabs.com/mcp-payment-middleware.html | Payment middleware for MCP servers |
+| https://www.scriptmasterlabs.com/agent-to-agent-payment.html | A2A payment protocol headers |
+| https://www.scriptmasterlabs.com/x402-vs-api-key.html | x402 vs. API keys |
+| https://www.scriptmasterlabs.com/proof402-python-middleware.html | proof402 Python/PyPI middleware |
+| https://www.scriptmasterlabs.com/xahau-uritokenmint-hooks.html | Xahau URITokenMint on-chain score anchoring |
+| https://www.scriptmasterlabs.com/zeroquery-proof-of-intent.html | ZeroQuery Proof-of-Intent protocol |
+| https://www.scriptmasterlabs.com/squeezeos-trading-signals.html | SqueezeOS's OracleEngine directive methodology |
+| https://www.scriptmasterlabs.com/pine-script-squeeze-indicator.html | SML's Pine Script TradingView indicators |

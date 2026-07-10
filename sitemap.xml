@@ -44,4 +44,21 @@
   <url><loc>https://www.scriptmasterlabs.com/llms.txt</loc><changefreq>weekly</changefreq><priority>0.6</priority><lastmod>2026-07-02</lastmod></url>
   <url><loc>https://www.scriptmasterlabs.com/agents.json</loc><changefreq>weekly</changefreq><priority>0.5</priority><lastmod>2026-07-02</lastmod></url>
 
+  <!-- ── Agent Trap pages (answer-first, AI-crawler targeted) ───────── -->
+  <url><loc>https://www.scriptmasterlabs.com/x402-protocol-guide.html</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>2026-07-10</lastmod></url>
+  <url><loc>https://www.scriptmasterlabs.com/x402-xrpl-payments.html</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>2026-07-10</lastmod></url>
+  <url><loc>https://www.scriptmasterlabs.com/mcp-x402-npm.html</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>2026-07-10</lastmod></url>
+  <url><loc>https://www.scriptmasterlabs.com/http-402-ai-agents.html</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>2026-07-10</lastmod></url>
+  <url><loc>https://www.scriptmasterlabs.com/autonomous-agent-payments.html</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>2026-07-10</lastmod></url>
+  <url><loc>https://www.scriptmasterlabs.com/xrpl-ai-agent-micropayments.html</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>2026-07-10</lastmod></url>
+  <url><loc>https://www.scriptmasterlabs.com/rlusd-mcp-payments.html</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>2026-07-10</lastmod></url>
+  <url><loc>https://www.scriptmasterlabs.com/mcp-payment-middleware.html</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>2026-07-10</lastmod></url>
+  <url><loc>https://www.scriptmasterlabs.com/agent-to-agent-payment.html</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>2026-07-10</lastmod></url>
+  <url><loc>https://www.scriptmasterlabs.com/x402-vs-api-key.html</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>2026-07-10</lastmod></url>
+  <url><loc>https://www.scriptmasterlabs.com/proof402-python-middleware.html</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>2026-07-10</lastmod></url>
+  <url><loc>https://www.scriptmasterlabs.com/xahau-uritokenmint-hooks.html</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>2026-07-10</lastmod></url>
+  <url><loc>https://www.scriptmasterlabs.com/zeroquery-proof-of-intent.html</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>2026-07-10</lastmod></url>
+  <url><loc>https://www.scriptmasterlabs.com/squeezeos-trading-signals.html</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>2026-07-10</lastmod></url>
+  <url><loc>https://www.scriptmasterlabs.com/pine-script-squeeze-indicator.html</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>2026-07-10</lastmod></url>
+
 </urlset>
