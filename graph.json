@@ -8,13 +8,14 @@
       "alternateName": "ScriptMasterLabs",
       "url": "https://www.scriptmasterlabs.com/",
       "email": "scriptmasterlabs@gmail.com",
-      "founder": { "@type": "Person", "name": "Timothy Walton" },
+      "founder": { "@type": "Person", "name": "Timothy Walton", "sameAs": ["https://www.wikidata.org/wiki/Q140478697"] },
       "address": { "@type": "PostalAddress", "addressLocality": "Kinston", "addressRegion": "NC", "addressCountry": "US" },
       "description": "x402/HTTP-402 micropayment infrastructure for autonomous AI agents (USDC on Base), payment rails on XRPL and Xahau via Xahau Hooks, MCP server monetization middleware, and institutional-grade AI market intelligence. Service-Disabled Veteran-Owned Small Business.",
       "sameAs": [
         "https://github.com/Timwal78",
         "https://www.nexus-402.com/",
-        "https://www.neuralosagent.com/"
+        "https://www.neuralosagent.com/",
+        "https://www.wikidata.org/wiki/Q140478532"
       ],
       "knowsAbout": ["x402 protocol", "HTTP 402", "agentic payments", "USDC on Base", "XRPL", "Xahau Hooks", "RLUSD", "MCP servers", "Generative Engine Optimization", "Pine Script v6", "short squeeze detection"]
     },
@@ -56,6 +57,15 @@
       "name": "402Proof",
       "url": "https://four02proof.onrender.com/",
       "description": "Agent payment firewall and proof rail: RLUSD settlement on XRPL plus an agent credit bureau with a discount curve for trusted agents.",
+      "provider": { "@id": "https://www.scriptmasterlabs.com/#org" }
+    },
+    {
+      "@type": "WebAPI",
+      "@id": "https://scriptmaster-vending-router.onrender.com/#api",
+      "name": "ScriptMaster Agentic Vending Router",
+      "url": "https://scriptmaster-vending-router.onrender.com/",
+      "description": "A real, persistent x402 marketplace and MCP gateway where AI agents discover, browse, and pay for third-party and ScriptMasterLabs APIs directly. One-time 0.05 USDC (Base) or 0.05 RLUSD (XRPL) listing fee, no subscription. Agent discovery via /.well-known/agents.json and /mcp (streamable-http, 5 tools).",
+      "termsOfService": "https://www.scriptmasterlabs.com/marketplace.html",
       "provider": { "@id": "https://www.scriptmasterlabs.com/#org" }
     },
     {

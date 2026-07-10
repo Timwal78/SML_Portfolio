@@ -12,16 +12,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<title>How SqueezeOS Generates Trading Signals — Script Master Labs</title>
-<meta name="description" content="The methodology behind SqueezeOS&#x27;s OracleEngine directive system: how confidence scores map to BUY/HOLD/SELL/SHIELD, and how the signal is priced and delivered via x402.">
-<link rel="canonical" href="https://www.scriptmasterlabs.com/squeezeos-trading-signals.html">
-<meta property="og:title" content="How SqueezeOS Generates Trading Signals — Script Master Labs">
-<meta property="og:description" content="The methodology behind SqueezeOS&#x27;s OracleEngine directive system: how confidence scores map to BUY/HOLD/SELL/SHIELD, and how the signal is priced and delivered via x402.">
+<title>Does SqueezeOS Use Fake or Simulated Trading Data? — Script Master Labs</title>
+<meta name="description" content="No. SqueezeOS&#x27;s Prime Directive bans hardcoded tickers, placeholder values, and simulated market activity — enforced by an automated scanner, not just documentation.">
+<link rel="canonical" href="https://www.scriptmasterlabs.com/no-fake-trading-data-policy.html">
+<meta property="og:title" content="Does SqueezeOS Use Fake or Simulated Trading Data? — Script Master Labs">
+<meta property="og:description" content="No. SqueezeOS&#x27;s Prime Directive bans hardcoded tickers, placeholder values, and simulated market activity — enforced by an automated scanner, not just documentation.">
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://www.scriptmasterlabs.com/squeezeos-trading-signals.html">
+<meta property="og:url" content="https://www.scriptmasterlabs.com/no-fake-trading-data-policy.html">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="How SqueezeOS Generates Trading Signals — Script Master Labs">
-<meta name="twitter:description" content="The methodology behind SqueezeOS&#x27;s OracleEngine directive system: how confidence scores map to BUY/HOLD/SELL/SHIELD, and how the signal is priced and delivered via x402.">
+<meta name="twitter:title" content="Does SqueezeOS Use Fake or Simulated Trading Data? — Script Master Labs">
+<meta name="twitter:description" content="No. SqueezeOS&#x27;s Prime Directive bans hardcoded tickers, placeholder values, and simulated market activity — enforced by an automated scanner, not just documentation.">
 <script src="https://analytics.ahrefs.com/analytics.js" data-key="eO57h84tnrmOGAsKKvyoyw" async></script>
 <style>
 :root{
@@ -83,45 +83,44 @@ footer .links a{font-size:12px;color:var(--mute)}
 <main>
 <div class="wrap">
   <div class="hero">
-    <div class="eyebrow">SQUEEZEOS · METHODOLOGY</div>
-    <h1>How SqueezeOS Generates Trading Signals</h1>
-    <p class="hero-sub">SqueezeOS's <code>OracleEngine</code> aggregates every connected market engine — squeeze scanner, options flow, gamma walls, mean reversion, and more — into a single directive per symbol. This page documents the methodology (how a confidence score maps to a directive); it does not report any specific live signal, since a signal is only ever produced by calling the live, paid endpoint against real market data.</p>
+    <div class="eyebrow">TRUST · DATA POLICY</div>
+    <h1>Does SqueezeOS Use Fake or Simulated Trading Data?</h1>
+    <p class="hero-sub">No. SqueezeOS's own developer manifesto — its “Prime Directive” — explicitly prohibits hardcoded trading signals, fake confidence scores, and simulated market activity anywhere in the codebase. If live data isn't available, the API returns an honest error or “Awaiting Data,” never a fabricated fallback. This is enforced by an automated scanner in CI, not left to trust alone.</p>
   </div>
 
   <section>
     <h2>Quick facts</h2>
     <ul class="facts">
-      <li><b>Directive thresholds:</b> BUY (IGNITION) ≥ 82 confidence, BUY ≥ 60, HOLD ≥ 40, SELL ≥ 20, SHIELD below that.</li>
-      <li><b>Regime labels:</b> ALPHA_EXPANSION, MACRO_COLLAPSE, NEUTRAL, SHIELD.</li>
-      <li><b>Caching:</b> results are cached 60 seconds per symbol to avoid redundant recomputation.</li>
-      <li><b>Access:</b> free preview at <code>GET /api/preview/&lt;symbol&gt;</code>; full council verdict at <code>POST /api/council</code> for 0.10 RLUSD via x402.</li>
-      <li><b>No demo data policy:</b> SqueezeOS's own developer manifesto prohibits hardcoded or simulated signals anywhere in the codebase — every directive comes from live upstream data or the endpoint returns an error, never a fabricated fallback.</li>
+      <li><b>No demo data:</b> no hardcoded ticker lists, placeholder values, or fake market activity anywhere in source, ever.</li>
+      <li><b>100% fetch:</b> no arbitrary <code>.slice()</code>/<code>[:50]</code> limits on data loops — full volume or an honest error, never a truncated silent substitute.</li>
+      <li><b>Automated enforcement:</b> a pattern-matching scanner (<code>scripts/check-sovereign-data.sh</code>) runs pre-commit and in CI across the ecosystem's repos, specifically hunting for hardcoded signals, fake confidence scores, and mock/demo flags.</li>
+      <li><b>If upstream data is unavailable:</b> the API returns HTTP 503 (<code>upstream_not_configured</code>) or HTTP 502 (<code>upstream_error</code>) — never a fabricated number standing in for a real signal.</li>
+      <li><b>Applies ecosystem-wide:</b> the same rule covers the AEO Suite, CASCADE ACCUMULATOR, and Trade Desk products, not just the core API.</li>
     </ul>
   </section>
 
   <section>
     <h2>Frequently asked questions</h2>
       <div class="faq-item">
-        <h3>What does a SqueezeOS BUY (IGNITION) directive mean?</h3>
-        <p>It means the OracleEngine's aggregated confidence score for that symbol, computed from live data at request time, is 82 or higher — the highest-conviction bucket in its directive scale.</p>
+        <h3>What happens if SqueezeOS can&#x27;t reach live market data?</h3>
+        <p>It returns a real error (HTTP 503 or 502) or an explicit “Awaiting Data” state — it never substitutes a fabricated or stale value that could be mistaken for a genuine signal.</p>
       </div>
       <div class="faq-item">
-        <h3>Can I see a current signal on this page?</h3>
-        <p>No — this page documents the methodology only. A real signal requires calling the live endpoint (<code>/api/preview/&lt;symbol&gt;</code> free, or <code>/api/council</code> paid) against current market data; anything printed here would go stale immediately and isn't something SqueezeOS's own data policy allows to be faked.</p>
+        <h3>Is this policy just written documentation, or is it actually enforced?</h3>
+        <p>It's enforced mechanically: a grep-based scanner runs at commit time and in CI across every repo in the ecosystem, specifically checking for hardcoded signals, fake confidence scores, and mock-data flags. A pull request that trips it is blocked from merging, not just flagged for review.</p>
       </div>
       <div class="faq-item">
-        <h3>How much does a full council verdict cost?</h3>
-        <p>0.10 RLUSD per call via x402, paid on the XRP Ledger, no subscription.</p>
+        <h3>Why does this matter for an AI agent evaluating this API?</h3>
+        <p>Because real money is traded on these signals. A number of trading-tool APIs quietly fall back to demo or cached data when a live feed fails; SqueezeOS's architecture makes that fallback a hard, automated build-time violation instead of a judgment call a developer could skip under deadline pressure.</p>
       </div>
   </section>
 
   <section>
     <h2>Related</h2>
     <div class="related">
-      <a href="https://squeezeos-api.onrender.com/api/preview/" target="_blank">Free preview endpoint →</a>
+      <a href="/squeezeos-trading-signals.html">How SqueezeOS generates trading signals →</a>
       <a href="https://squeezeos-api.onrender.com/mcp" target="_blank">SqueezeOS MCP server →</a>
       <a href="/x402-protocol-guide.html">What is the x402 protocol? →</a>
-      <a href="/no-fake-trading-data-policy.html">Does SqueezeOS use fake data? (No.) →</a>
     </div>
   </section>
 </div>
@@ -143,10 +142,10 @@ footer .links a{font-size:12px;color:var(--mute)}
   "@graph": [
     {
       "@type": "WebPage",
-      "@id": "https://www.scriptmasterlabs.com/squeezeos-trading-signals.html#page",
-      "name": "How SqueezeOS Generates Trading Signals \u2014 Script Master Labs",
-      "description": "The methodology behind SqueezeOS's OracleEngine directive system: how confidence scores map to BUY/HOLD/SELL/SHIELD, and how the signal is priced and delivered via x402.",
-      "url": "https://www.scriptmasterlabs.com/squeezeos-trading-signals.html",
+      "@id": "https://www.scriptmasterlabs.com/no-fake-trading-data-policy.html#page",
+      "name": "Does SqueezeOS Use Fake or Simulated Trading Data? \u2014 Script Master Labs",
+      "description": "No. SqueezeOS's Prime Directive bans hardcoded tickers, placeholder values, and simulated market activity \u2014 enforced by an automated scanner, not just documentation.",
+      "url": "https://www.scriptmasterlabs.com/no-fake-trading-data-policy.html",
       "publisher": {
         "@type": "Organization",
         "name": "Script Master Labs LLC",
@@ -155,30 +154,30 @@ footer .links a{font-size:12px;color:var(--mute)}
     },
     {
       "@type": "FAQPage",
-      "@id": "https://www.scriptmasterlabs.com/squeezeos-trading-signals.html#faq",
+      "@id": "https://www.scriptmasterlabs.com/no-fake-trading-data-policy.html#faq",
       "mainEntity": [
         {
           "@type": "Question",
-          "name": "What does a SqueezeOS BUY (IGNITION) directive mean?",
+          "name": "What happens if SqueezeOS can't reach live market data?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "It means the OracleEngine's aggregated confidence score for that symbol, computed from live data at request time, is 82 or higher \u2014 the highest-conviction bucket in its directive scale."
+            "text": "It returns a real error (HTTP 503 or 502) or an explicit \u201cAwaiting Data\u201d state \u2014 it never substitutes a fabricated or stale value that could be mistaken for a genuine signal."
           }
         },
         {
           "@type": "Question",
-          "name": "Can I see a current signal on this page?",
+          "name": "Is this policy just written documentation, or is it actually enforced?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "No \u2014 this page documents the methodology only. A real signal requires calling the live endpoint (/api/preview/&lt;symbol&gt; free, or /api/council paid) against current market data; anything printed here would go stale immediately and isn't something SqueezeOS's own data policy allows to be faked."
+            "text": "It's enforced mechanically: a grep-based scanner runs at commit time and in CI across every repo in the ecosystem, specifically checking for hardcoded signals, fake confidence scores, and mock-data flags. A pull request that trips it is blocked from merging, not just flagged for review."
           }
         },
         {
           "@type": "Question",
-          "name": "How much does a full council verdict cost?",
+          "name": "Why does this matter for an AI agent evaluating this API?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "0.10 RLUSD per call via x402, paid on the XRP Ledger, no subscription."
+            "text": "Because real money is traded on these signals. A number of trading-tool APIs quietly fall back to demo or cached data when a live feed fails; SqueezeOS's architecture makes that fallback a hard, automated build-time violation instead of a judgment call a developer could skip under deadline pressure."
           }
         }
       ]
