@@ -30,7 +30,15 @@ import { type Request, type Response, type NextFunction } from 'express';
 // servers POST here right after a customer subscribes, carrying no RapidAPI
 // secret and no way to add one. resolveAwsMarketplaceCustomer() validates the
 // registration token against AWS itself, which is the real access control.
-const PUBLIC_PREFIXES = ['/health', '/api/stats', '/api/checkout/', '/aws/marketplace/', '/.well-known/', '/openapi.json', '/llms.txt', '/agents.json', '/favicon.ico', '/x402/', '/mcp', '/sse', '/messages'];
+//
+// /api/stripe/webhook is Stripe's own servers calling us, same no-secret-
+// possible situation — the Stripe-Signature HMAC (verified in the handler,
+// checked BEFORE this guard even runs since the route is registered ahead of
+// rapidApiGuard for raw-body access) is the real access control.
+// /api/marketing/community is free public read data (real HN search-hit
+// counts for the agentswarm-seo.html dashboard) — same tier as /api/stats,
+// no payment or secret involved either way.
+const PUBLIC_PREFIXES = ['/health', '/api/stats', '/api/marketing/community', '/api/checkout/', '/api/stripe/webhook', '/aws/marketplace/', '/.well-known/', '/openapi.json', '/llms.txt', '/agents.json', '/favicon.ico', '/x402/', '/mcp', '/sse', '/messages'];
 
 export function rapidApiGuard(req: Request, res: Response, next: NextFunction): void {
   const secret = process.env['RAPIDAPI_PROXY_SECRET'];

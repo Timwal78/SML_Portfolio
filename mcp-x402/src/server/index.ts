@@ -8,6 +8,8 @@ import { randomUUID } from 'crypto';
 import cors from 'cors';
 import Stripe from 'stripe';
 import { resolveAwsMarketplaceCustomer, isEntitledAwsMarketplaceKey } from './aws/marketplace.js';
+import { handleStripeWebhookEvent, getApiKeyForCheckoutSession, isEntitledStripeKey } from './stripe/entitlement.js';
+import { runCommunityScan } from './marketing/community.js';
 import { registerTools } from './tools/index.js';
 import { AuditLogger } from './security/audit.js';
 import { RateLimiter } from './security/rate-limit.js';
@@ -62,6 +64,38 @@ async function runSSE(): Promise<void> {
   const port = parseInt(process.env['MCP_SSE_PORT'] ?? '3402', 10);
 
   app.use(cors({ origin: process.env['CORS_ORIGIN'] ?? '*' }));
+
+  // Stripe webhook signature verification needs the RAW request bytes, not
+  // the parsed JSON body — must be registered before express.json() below,
+  // which would otherwise consume the stream first and leave nothing to
+  // verify the signature against.
+  app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async (req: Request, res: Response) => {
+    const webhookSecret = process.env['STRIPE_WEBHOOK_SECRET'];
+    const stripeSecret = process.env['STRIPE_SECRET_KEY'];
+    const signature = req.headers['stripe-signature'];
+    if (!webhookSecret || !stripeSecret || typeof signature !== 'string') {
+      res.status(503).json({ error: 'stripe_webhook_not_configured' });
+      return;
+    }
+    let event: Stripe.Event;
+    try {
+      const stripe = new Stripe(stripeSecret);
+      event = stripe.webhooks.constructEvent(req.body as Buffer, signature, webhookSecret);
+    } catch (err) {
+      AuditLogger.getInstance().error('stripe_webhook_signature_invalid', { error: String(err) });
+      res.status(400).json({ error: 'invalid_signature' });
+      return;
+    }
+    try {
+      await handleStripeWebhookEvent(event);
+      res.status(200).json({ received: true });
+    } catch (err) {
+      AuditLogger.getInstance().error('stripe_webhook_handler_failed', { type: event.type, error: String(err) });
+      // 500 so Stripe retries — the event was valid, something on our side failed.
+      res.status(500).json({ error: 'webhook_handler_failed' });
+    }
+  });
+
   app.use(express.json({ limit: '1mb' }));
   // AWS Marketplace redirects a buyer's browser to the fulfillment URL as a
   // POST with Content-Type: application/x-www-form-urlencoded — express.json()
@@ -127,6 +161,28 @@ async function runSSE(): Promise<void> {
     });
   });
 
+  // Community Scout — real HackerNews search-hit counts for
+  // agentswarm-seo.html's "Ad Campaigns" tab, replacing what used to be a
+  // static hardcoded list with no backend call at all. Reddit is honestly
+  // reported as pending credentials rather than faked — see marketing/community.ts.
+  const COMMUNITY_SEARCH_QUERIES = [
+    'MCP server trading', 'x402 payment protocol', 'autonomous trading agent',
+    'Claude MCP finance', 'squeeze momentum indicator', 'XRPL autonomous agent',
+    'RLUSD payment', 'AI agent market data API', 'institutional signals API',
+    'MCP server finance', 'pay per call AI API', 'agent micropayment',
+    'answer engine optimization AI', 'AEO citation tracking', 'AI agent credit score',
+    'GEO generative engine optimization', 'SEO agent swarm',
+  ];
+  app.get('/api/marketing/community', async (_req, res) => {
+    try {
+      const result = await runCommunityScan(COMMUNITY_SEARCH_QUERIES);
+      res.set('Access-Control-Allow-Origin', '*').json(result);
+    } catch (err) {
+      AuditLogger.getInstance().error('community_scan_failed', { error: String(err) });
+      res.status(502).set('Access-Control-Allow-Origin', '*').json({ scanned: false, error: 'scan_failed' });
+    }
+  });
+
   // ── Stripe subscription checkout (Starter/Elite) ────────────────────────────
   // Every /x402/* route above is pay-per-call for autonomous agents. This is the
   // flat-rate human-subscription rail surfaced as two buttons on
@@ -156,7 +212,11 @@ async function runSSE(): Promise<void> {
         payment_method_types: ['card'],
         line_items: [{ price: priceId, quantity: 1 }],
         mode: 'subscription',
-        success_url: 'https://www.scriptmasterlabs.com/agentswarm-seo.html?payment=success',
+        // {CHECKOUT_SESSION_ID} lets the success page fetch its own API key via
+        // GET /api/checkout/session/:id below — the webhook is what actually
+        // provisions the key server-side; this is just how the buyer's browser
+        // learns about it.
+        success_url: 'https://www.scriptmasterlabs.com/agentswarm-seo.html?payment=success&session_id={CHECKOUT_SESSION_ID}',
         cancel_url: 'https://www.scriptmasterlabs.com/agentswarm-seo.html?payment=cancelled',
         metadata: { tier, source: 'agentswarm-seo' },
       });
@@ -165,6 +225,20 @@ async function runSSE(): Promise<void> {
       AuditLogger.getInstance().error('stripe_checkout_error', { error: String(err) });
       res.status(500).set('Access-Control-Allow-Origin', '*').json({ error: 'stripe_error', message: String(err) });
     }
+  });
+
+  // Success-page key retrieval. Deliberately reads our own table, not Stripe
+  // again — the webhook already did the provisioning; a buyer landing here
+  // right after the webhook fires (or before it, on a slow network) sees
+  // 'processing' and the frontend can retry rather than a bare failure.
+  app.get('/api/checkout/session/:sessionId', async (req: Request, res: Response) => {
+    const sessionIdParam = req.params['sessionId'];
+    const result = await getApiKeyForCheckoutSession(typeof sessionIdParam === 'string' ? sessionIdParam : '');
+    if (!result) {
+      res.status(202).set('Access-Control-Allow-Origin', '*').json({ status: 'processing', detail: 'Payment received, provisioning your key — this can take a few seconds. Retry shortly.' });
+      return;
+    }
+    res.set('Access-Control-Allow-Origin', '*').json({ status: 'ready', apiKey: result.apiKey, tier: result.tier });
   });
 
   // ── AWS Marketplace fulfillment ──────────────────────────────────────────
@@ -383,6 +457,15 @@ async function runSSE(): Promise<void> {
     const awsMpKey = typeof req.headers['x-aws-mp-key'] === 'string' ? req.headers['x-aws-mp-key'] : '';
     if (awsMpKey && await isEntitledAwsMarketplaceKey(awsMpKey)) {
       return { ok: true, payer: { rail: 'aws-marketplace', from: `aws:${awsMpKey.slice(0, 16)}…`, tx: '' } };
+    }
+
+    // Stripe subscription bypass — customer already paying a flat monthly fee
+    // via the Starter/Elite checkout (agentswarm-seo.html); their key (issued
+    // by the checkout.session.completed webhook) skips the per-call x402
+    // charge entirely, same mechanism as the AWS Marketplace bypass above.
+    const stripeKey = typeof req.headers['x-stripe-key'] === 'string' ? req.headers['x-stripe-key'] : '';
+    if (stripeKey && await isEntitledStripeKey(stripeKey)) {
+      return { ok: true, payer: { rail: 'stripe', from: `stripe:${stripeKey.slice(0, 16)}…`, tx: '' } };
     }
 
     // Rail A — standard EIP-3009 via hybrid facilitator chain
@@ -2145,8 +2228,35 @@ async function runSSE(): Promise<void> {
     res.set('Access-Control-Allow-Origin', '*').json(X402Stats.getInstance().snapshot());
   });
 
-  // Root handler — service discovery for agents hitting / directly
-  app.get('/', (_req, res) => {
+  // Root handler — service discovery for agents hitting / directly, PLUS the
+  // AWS Marketplace fulfillment landing page. This product's "AI Agents &
+  // Tools" listing type only accepts a bare domain for its Fulfillment URL
+  // (rejects any path — confirmed live against the console), so a subscribing
+  // customer's browser lands here, not at /aws/marketplace/resolve. Handles
+  // both possibilities defensively since AWS's own docs are inconsistent
+  // about whether this listing type still POSTs x-amzn-marketplace-token the
+  // way classic SaaS Contract does: checks for the token in a POST body, a
+  // GET query string (AWS's own fallback for "test modes"), and otherwise
+  // serves agents JSON / browsers a real page instead of a raw JSON dump.
+  const rootWelcomePage = (): string => `<!doctype html><html><head><meta charset="utf-8"><title>Script Master Labs — mcp-x402</title>
+    <style>body{background:#050508;color:#e2e8f0;font-family:'Courier New',monospace;max-width:640px;margin:4rem auto;padding:0 1.5rem;line-height:1.6}
+    h1{color:#a78bfa}p{color:#94a3b8}code{background:#0d0d14;border:1px solid #1e1e2e;border-radius:4px;padding:.1rem .4rem;color:#10ff80}a{color:#a78bfa}</style></head>
+    <body><h1>Subscription received</h1>
+    <p>If you just subscribed via AWS Marketplace, your API key is being provisioned — this can take a minute. Check your email, or if you have your AWS Marketplace order details handy, contact <a href="mailto:timothy.walton45@gmail.com">support</a> and reference your Customer ID.</p>
+    <p>MCP endpoint: <code>https://mcp-x402.onrender.com/mcp</code></p>
+    <p>Full docs: <a href="/llms.txt">llms.txt</a></p></body></html>`;
+  app.get('/', async (req: Request, res: Response) => {
+    const tokenFromQuery = typeof req.query['x-amzn-marketplace-token'] === 'string' ? (req.query['x-amzn-marketplace-token'] as string) : '';
+    if (tokenFromQuery) {
+      const result = await resolveAwsMarketplaceCustomer(tokenFromQuery);
+      res.send(awsFulfillmentPage(result.ok ? { ok: true, apiKey: result.apiKey } : { ok: false, error: result.error }));
+      return;
+    }
+    const acceptsHtml = typeof req.headers['accept'] === 'string' && req.headers['accept'].includes('text/html');
+    if (acceptsHtml) {
+      res.send(rootWelcomePage());
+      return;
+    }
     res.json({
       name: 'mcp-x402',
       version: VERSION,
@@ -2166,6 +2276,15 @@ async function runSSE(): Promise<void> {
         homepage: 'https://scriptmasterlabs.com',
       },
     });
+  });
+  app.post('/', async (req: Request, res: Response) => {
+    const token = typeof req.body?.['x-amzn-marketplace-token'] === 'string' ? req.body['x-amzn-marketplace-token'] : '';
+    if (!token) {
+      res.status(400).send(awsFulfillmentPage({ ok: false, error: 'missing_registration_token' }));
+      return;
+    }
+    const result = await resolveAwsMarketplaceCustomer(token);
+    res.send(awsFulfillmentPage(result.ok ? { ok: true, apiKey: result.apiKey } : { ok: false, error: result.error }));
   });
 
   // --- MONETIZATION FLYWHEEL (Credit Bureau & Paid Endpoints) ---

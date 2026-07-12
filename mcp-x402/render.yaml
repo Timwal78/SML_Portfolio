@@ -88,6 +88,13 @@ services:
         value: "price_1TdcN6QL50L4TFzsynvRdAID"
       - key: STRIPE_PRICE_ELITE
         value: "price_1Tgy87QL50L4TFzs4O9tNh01"
+      # Webhook signing secret from the Stripe Dashboard (Developers > Webhooks
+      # > add endpoint https://mcp-x402.onrender.com/api/stripe/webhook,
+      # events: checkout.session.completed, customer.subscription.deleted,
+      # customer.subscription.paused, invoice.payment_failed). Without this,
+      # checkout still takes payment but never provisions an entitled key.
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
       # AWS Marketplace fulfillment (/aws/marketplace/resolve) for
       # prod-lop2m2yjjcs76 "Script Master Labs Federal, Medical & Finance MCP
       # (x402)". IAM user needs ONLY aws-marketplace:ResolveCustomer — no
