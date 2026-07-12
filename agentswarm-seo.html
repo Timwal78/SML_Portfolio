@@ -1181,7 +1181,7 @@ html, body {
       <div class="panel-header">
         <div>
           <h2 class="panel-title">Ad Campaigns — Community Scout</h2>
-          <div class="panel-sub">12 subreddits + HackerNews · Developer conversation targeting</div>
+          <div class="panel-sub">HackerNews scanned live via Algolia search API · Reddit pending credentials</div>
         </div>
         <div class="beastmode-badge"><span class="bm-dot"></span> 24/7 BEASTMODE</div>
       </div>
@@ -1189,18 +1189,19 @@ html, body {
       <div class="section-pad" style="padding-bottom:0">
         <div class="live-stats card" style="border-radius:8px">
           <div class="stat-block">
-            <span class="stat-val">13</span>
-            <span class="stat-label">CHANNELS MONITORED</span>
+            <span class="stat-val" id="comm-stat-hn-hits">—</span>
+            <span class="stat-label">HN MENTIONS FOUND</span>
           </div>
           <div class="stat-block">
             <span class="stat-val">17</span>
             <span class="stat-label">SEARCH QUERIES</span>
           </div>
           <div class="stat-block">
-            <span class="stat-val">~4h</span>
-            <span class="stat-label">SCOUT RUN INTERVAL</span>
+            <span class="stat-val" id="comm-stat-reddit">PENDING</span>
+            <span class="stat-label">REDDIT STATUS</span>
           </div>
         </div>
+        <p style="font-size:.7rem;color:var(--text3);margin-top:6px" id="comm-scan-note">Awaiting first real scan</p>
       </div>
 
       <div class="section-pad" style="padding-bottom:4px">
@@ -1209,7 +1210,7 @@ html, body {
       <div class="subreddit-grid" id="subreddit-grid"></div>
 
       <div class="section-pad" style="padding-bottom:4px; padding-top:4px">
-        <div class="section-title">SEARCH QUERY TARGETING</div>
+        <div class="section-title">SEARCH QUERY TARGETING — REAL HN HIT COUNTS</div>
       </div>
       <div class="keyword-list" id="keyword-list"></div>
     </div><!-- /tab-campaigns -->
@@ -1706,26 +1707,63 @@ async function renderFederal() {
 }
 
 /* ── RENDER CAMPAIGNS ── */
+/* Target list is real config (these ARE the channels we intend to scan), not
+   a claim about current activity — actual scan results come from
+   renderCommunityScan() below, which is what used to be entirely faked. */
 function renderCampaigns() {
   const grid = document.getElementById('subreddit-grid');
   SUBREDDITS.forEach(s => {
     const el = document.createElement('div');
     el.className = 'sub-card';
+    const isHN = s.name === 'HackerNews';
     el.innerHTML = `
-      <span class="sub-name">${s.name}</span>
-      <span class="sub-focus">${s.focus}</span>
-      <span class="sub-priority">${s.priority}</span>
+      <span class="sub-name">${escapeHtml(s.name)}</span>
+      <span class="sub-focus">${escapeHtml(s.focus)}</span>
+      <span class="sub-priority">${isHN ? 'LIVE SCAN' : 'PENDING CREDENTIALS'}</span>
     `;
     grid.appendChild(el);
   });
+}
 
+/* ── RENDER COMMUNITY SCAN — real HN hit counts, honest about Reddit ── */
+async function renderCommunityScan() {
   const kwList = document.getElementById('keyword-list');
-  SEARCH_QUERIES.forEach(q => {
-    const el = document.createElement('span');
-    el.className = 'kw-chip';
-    el.textContent = q;
-    kwList.appendChild(el);
-  });
+  try {
+    const res = await fetch('https://mcp-x402.onrender.com/api/marketing/community', {
+      signal: AbortSignal.timeout ? AbortSignal.timeout(15000) : undefined
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+
+    document.getElementById('comm-stat-hn-hits').textContent = data.scanned ? data.hn_total_hits.toLocaleString() : '—';
+    document.getElementById('comm-stat-reddit').textContent = 'PENDING';
+
+    const note = document.getElementById('comm-scan-note');
+    if (data.scanned && data.scanned_at) {
+      const ago = Math.round((Date.now() / 1000 - data.scanned_at));
+      note.textContent = `Last real HN scan: ${ago < 60 ? 'just now' : Math.round(ago / 60) + 'm ago'} · ${data.reddit_note || ''}`;
+    } else {
+      note.textContent = 'Awaiting first real scan';
+    }
+
+    kwList.innerHTML = '';
+    (data.hn_queries || []).forEach(q => {
+      const el = document.createElement('span');
+      el.className = 'kw-chip';
+      el.title = (q.hn_recent_titles || []).join(' · ');
+      el.textContent = `${q.query} (${q.hn_hits})`;
+      kwList.appendChild(el);
+    });
+  } catch (e) {
+    document.getElementById('comm-scan-note').textContent = 'Scan data unavailable — awaiting connection';
+    kwList.innerHTML = '';
+    SEARCH_QUERIES.forEach(q => {
+      const el = document.createElement('span');
+      el.className = 'kw-chip';
+      el.textContent = q;
+      kwList.appendChild(el);
+    });
+  }
 }
 
 /* ── RENDER AI INDEXER ── */
@@ -2201,6 +2239,8 @@ setInterval(renderDirectories, 300000); // real audit runs every 4h — 5-min po
 renderFederal();
 setInterval(renderFederal, 300000); // real scan runs every 4h — 5-min poll is plenty
 renderCampaigns();
+renderCommunityScan();
+setInterval(renderCommunityScan, 300000); // live HN query on each poll — no server-side cache to go stale
 renderIndexer();
 loadActivity();
 setInterval(loadActivity, 60000);
