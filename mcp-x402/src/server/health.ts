@@ -6,6 +6,7 @@ export interface HealthStatus {
   status: 'ok' | 'degraded';
   version: string;
   transport: string;
+  commit: string;
   uptime_seconds: number;
   uptime_human: string;
   timestamp: string;
@@ -36,6 +37,10 @@ export function healthHandler(_req: Request, res: Response): void {
     status: memOk ? 'ok' : 'degraded',
     version: process.env['npm_package_version'] ?? '1.0.0',
     transport: process.env['MCP_TRANSPORT'] ?? 'stdio',
+    // RENDER_GIT_COMMIT is injected automatically by Render on every deploy —
+    // lets us confirm which commit is actually live via HTTP instead of
+    // guessing from uptime/restart timing.
+    commit: process.env['RENDER_GIT_COMMIT'] ?? 'unknown',
     uptime_seconds: Math.floor(uptimeMs / 1000),
     uptime_human: formatUptime(uptimeMs),
     timestamp: new Date().toISOString(),
