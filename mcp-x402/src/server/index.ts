@@ -1,4 +1,13 @@
 #!/usr/bin/env node
+import { setDefaultResultOrder } from 'dns';
+// Stripe checkout was failing in production with a generic connection error
+// while other outbound HTTPS calls from the same container worked fine —
+// the signature of Node's IPv6-first DNS resolution (default since Node 17)
+// hitting a bad path to that one host. Forcing this in code instead of via
+// a NODE_OPTIONS env var: a dashboard env var is something I can't verify
+// got set correctly, this always applies regardless.
+setDefaultResultOrder('ipv4first');
+
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js';
