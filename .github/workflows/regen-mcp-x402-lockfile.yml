@@ -12,6 +12,9 @@ jobs:
       run:
         working-directory: mcp-x402
     steps:
+      - name: Install git (node:22-alpine has none by default; actions/checkout needs it)
+        run: apk add --no-cache git
+
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: npm version in this exact build environment
@@ -27,7 +30,7 @@ jobs:
           rm -rf node_modules
           npm ci --ignore-scripts
 
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa9 # v4
+      - uses: actions/upload-artifact@v4
         with:
           name: mcp-x402-package-lock
           path: mcp-x402/package-lock.json
