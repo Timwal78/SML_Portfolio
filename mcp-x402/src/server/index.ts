@@ -70,12 +70,40 @@ async function runSSE(): Promise<void> {
   app.use(rapidApiGuard);
 
   // ── In-memory AI agent traffic counter ──────────────────────────────────────
+  // Previously matched any UA containing the bare substrings "agent" or "llm" —
+  // that's wide enough to catch uptime monitors and generic bots (confirmed
+  // live: a plain curl with UA "Uptime-Agent/1.0" hitting /health incremented
+  // this), while somehow still MISSING real crawlers: "gpt-4" as a literal
+  // substring never matches OpenAI's actual crawler UA "GPTBot", and
+  // google-extended/ccbot/bytespider/meta-externalagent weren't listed at all.
+  // Replaced with an explicit allowlist of real, documented AI crawler/agent
+  // UA tokens instead of a loose "sounds AI-ish" regex.
   const _statsStartMs = Date.now();
   const _agentCounts = { today: 0, allTime: 0 };
   let _agentCountDay = new Date().toDateString();
-  const _isAiAgent = (ua: string): boolean =>
-    /claude|anthropic|openai|chatgpt|gpt-4|gemini|grok|mistral|cohere|llm|mcp-client|agent|langchain|llamaindex|perplexity/i.test(ua);
+  const AI_AGENT_UA_TOKENS = [
+    'gptbot', 'oai-searchbot', 'chatgpt-user',                 // OpenAI
+    'claudebot', 'claude-web', 'anthropic-ai', 'claude-user',  // Anthropic
+    'perplexitybot', 'perplexity-user',                        // Perplexity
+    'google-extended',                                          // Google AI training
+    'ccbot',                                                    // Common Crawl (widely used for AI training sets)
+    'bytespider',                                               // ByteDance
+    'cohere-ai',                                                // Cohere
+    'meta-externalagent', 'meta-externalfetcher',               // Meta
+    'diffbot',
+    'mcp-client',                                               // self-identifying MCP clients
+    'langchain', 'llamaindex', 'crewai', 'autogpt',             // known agent frameworks
+  ];
+  const _isAiAgent = (ua: string): boolean => {
+    const lower = ua.toLowerCase();
+    return AI_AGENT_UA_TOKENS.some((token) => lower.includes(token));
+  };
+  // /health is hit every 30s by Docker's healthcheck + a keepalive cron — that's
+  // infrastructure noise, not a visitor, and was the single largest source of
+  // false counts under the old regex.
+  const AGENT_COUNT_EXEMPT_PATHS = new Set(['/health']);
   app.use((req, _res, next) => {
+    if (AGENT_COUNT_EXEMPT_PATHS.has(req.path)) { next(); return; }
     const today = new Date().toDateString();
     if (today !== _agentCountDay) { _agentCounts.today = 0; _agentCountDay = today; }
     if (_isAiAgent(String(req.headers['user-agent'] ?? ''))) { _agentCounts.today++; _agentCounts.allTime++; }
