@@ -1,0 +1,33 @@
+name: One-off — regenerate mcp-x402 lockfile on node:22-alpine
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  regen:
+    runs-on: ubuntu-latest
+    container:
+      image: node:22-alpine
+    defaults:
+      run:
+        working-directory: mcp-x402
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: npm version in this exact build environment
+        run: npm --version && node --version
+
+      - name: Regenerate lockfile from scratch, on the real target platform
+        run: |
+          rm -rf node_modules package-lock.json
+          npm install --no-audit --no-fund
+
+      - name: Verify with the EXACT command the Dockerfile runs
+        run: |
+          rm -rf node_modules
+          npm ci --ignore-scripts
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa9 # v4
+        with:
+          name: mcp-x402-package-lock
+          path: mcp-x402/package-lock.json
