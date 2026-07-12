@@ -1,4 +1,5 @@
 import { MarketplaceMeteringClient, ResolveCustomerCommand } from '@aws-sdk/client-marketplace-metering';
+import { MarketplaceEntitlementServiceClient, GetEntitlementsCommand } from '@aws-sdk/client-marketplace-entitlement-service';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { randomUUID } from 'crypto';
 import { AuditLogger } from '../security/audit.js';
@@ -102,4 +103,58 @@ export async function isEntitledAwsMarketplaceKey(key: string): Promise<boolean>
   if (!db) return false;
   const { data } = await db.from('aws_marketplace_customers').select('status').eq('api_key', key).maybeSingle();
   return data?.status === 'entitled';
+}
+
+// ── GetEntitlements audit self-check ────────────────────────────────────────
+// AWS's automated listing audit requires a contract-pricing SaaS product to
+// successfully call the Entitlements Service (GetEntitlements) at least
+// once, verified via CloudTrail, before "Update product visibility" can be
+// approved — undocumented in AWS's public guides, but confirmed against the
+// real implementation already live for a different product in this same
+// account (core/api/aws_marketplace_bp.py, squeezeos-api). Both prior
+// visibility requests for THIS listing failed before any code anywhere
+// called GetEntitlements. This runs once at startup so the first deploy
+// after AWS_ACCESS_KEY_ID/AWS_SECRET_ACCESS_KEY are set produces a real,
+// CloudTrail-visible call without waiting for an actual customer to subscribe.
+export interface EntitlementsSelfCheckResult {
+  ran: boolean;
+  ok: boolean | null;
+  ts: number;
+  error: string | null;
+  entitlementCount: number | null;
+}
+let lastEntitlementsSelfCheck: EntitlementsSelfCheckResult = {
+  ran: false, ok: null, ts: Date.now() / 1000, error: null, entitlementCount: null,
+};
+export function getEntitlementsSelfCheckStatus(): EntitlementsSelfCheckResult {
+  return lastEntitlementsSelfCheck;
+}
+export async function runEntitlementsSelfCheck(): Promise<void> {
+  const accessKeyId = process.env['AWS_ACCESS_KEY_ID'];
+  const secretAccessKey = process.env['AWS_SECRET_ACCESS_KEY'];
+  if (!accessKeyId || !secretAccessKey) {
+    lastEntitlementsSelfCheck = {
+      ran: false, ok: null, ts: Date.now() / 1000,
+      error: 'AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY not set', entitlementCount: null,
+    };
+    AuditLogger.getInstance().warn('aws_mp_entitlements_selfcheck_skipped', {
+      detail: 'Set AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY on Render to clear the AWS Marketplace AUDIT_ERROR.',
+    });
+    return;
+  }
+  const region = process.env['AWS_REGION'] ?? 'us-east-1';
+  try {
+    const client = new MarketplaceEntitlementServiceClient({ region });
+    const resp = await client.send(new GetEntitlementsCommand({ ProductCode: EXPECTED_PRODUCT_CODE }));
+    lastEntitlementsSelfCheck = {
+      ran: true, ok: true, ts: Date.now() / 1000, error: null,
+      entitlementCount: resp.Entitlements?.length ?? 0,
+    };
+    AuditLogger.getInstance().info('aws_mp_entitlements_selfcheck_ok', {
+      count: lastEntitlementsSelfCheck.entitlementCount, productCode: EXPECTED_PRODUCT_CODE,
+    });
+  } catch (err) {
+    lastEntitlementsSelfCheck = { ran: true, ok: false, ts: Date.now() / 1000, error: String(err), entitlementCount: null };
+    AuditLogger.getInstance().error('aws_mp_entitlements_selfcheck_failed', { error: String(err) });
+  }
 }

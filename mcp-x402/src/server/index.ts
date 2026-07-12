@@ -7,7 +7,7 @@ import express, { type Request, type Response } from 'express';
 import { randomUUID } from 'crypto';
 import cors from 'cors';
 import Stripe from 'stripe';
-import { resolveAwsMarketplaceCustomer, isEntitledAwsMarketplaceKey } from './aws/marketplace.js';
+import { resolveAwsMarketplaceCustomer, isEntitledAwsMarketplaceKey, runEntitlementsSelfCheck, getEntitlementsSelfCheckStatus } from './aws/marketplace.js';
 import { handleStripeWebhookEvent, getApiKeyForCheckoutSession, isEntitledStripeKey } from './stripe/entitlement.js';
 import { runCommunityScan } from './marketing/community.js';
 import { registerTools } from './tools/index.js';
@@ -222,7 +222,16 @@ async function runSSE(): Promise<void> {
       });
       res.set('Access-Control-Allow-Origin', '*').json({ checkout_url: session.url });
     } catch (err) {
-      AuditLogger.getInstance().error('stripe_checkout_error', { error: String(err) });
+      // Stripe.errors.StripeConnectionError wraps the real network failure in
+      // `.detail`/`.cause` — String(err) alone was only ever showing the generic
+      // "connection error, retried 2 times" wrapper, not what actually failed
+      // underneath (DNS, TLS, ECONNRESET, etc.). Capturing everything available.
+      const e = err as { type?: string; code?: string; detail?: unknown; cause?: unknown; message?: string };
+      AuditLogger.getInstance().error('stripe_checkout_error', {
+        error: String(err), type: e.type, code: e.code,
+        detail: e.detail ? String(e.detail) : undefined,
+        cause: e.cause ? String(e.cause) : undefined,
+      });
       res.status(500).set('Access-Control-Allow-Origin', '*').json({ error: 'stripe_error', message: String(err) });
     }
   });
@@ -239,6 +248,17 @@ async function runSSE(): Promise<void> {
       return;
     }
     res.set('Access-Control-Allow-Origin', '*').json({ status: 'ready', apiKey: result.apiKey, tier: result.tier });
+  });
+
+  // Config + last GetEntitlements self-check result — check this before
+  // resubmitting the "Update product visibility" request to confirm the
+  // audit-satisfying call actually ran and succeeded.
+  app.get('/aws/marketplace/status', (_req, res) => {
+    res.set('Access-Control-Allow-Origin', '*').json({
+      configured: Boolean(process.env['AWS_ACCESS_KEY_ID'] && process.env['AWS_SECRET_ACCESS_KEY']),
+      product_code: 'c6g8c5zsvgof5a4rpp6eqlzn',
+      last_entitlements_self_check: getEntitlementsSelfCheckStatus(),
+    });
   });
 
   // ── AWS Marketplace fulfillment ──────────────────────────────────────────
@@ -2539,6 +2559,13 @@ async function runSSE(): Promise<void> {
   } else {
     console.warn('[LEVIATHAN] Skipped — ACP_WALLET_ID or ACP_SIGNER_PRIVATE_KEY not set');
   }
+
+  // Fire-and-forget: real, CloudTrail-visible GetEntitlements call so the
+  // first deploy after AWS credentials are set satisfies AWS's listing audit
+  // without waiting on an actual customer subscription. See marketplace.ts.
+  runEntitlementsSelfCheck().catch((err: unknown) => {
+    AuditLogger.getInstance().error('aws_mp_entitlements_selfcheck_unhandled', { error: String(err) });
+  });
 
   const shutdown = async () => {
     AuditLogger.getInstance().info('server_stop', { transport: 'sse' });
