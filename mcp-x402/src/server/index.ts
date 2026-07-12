@@ -7,6 +7,7 @@ import express, { type Request, type Response } from 'express';
 import { randomUUID } from 'crypto';
 import cors from 'cors';
 import Stripe from 'stripe';
+import { resolveAwsMarketplaceCustomer, isEntitledAwsMarketplaceKey } from './aws/marketplace.js';
 import { registerTools } from './tools/index.js';
 import { AuditLogger } from './security/audit.js';
 import { RateLimiter } from './security/rate-limit.js';
@@ -62,6 +63,10 @@ async function runSSE(): Promise<void> {
 
   app.use(cors({ origin: process.env['CORS_ORIGIN'] ?? '*' }));
   app.use(express.json({ limit: '1mb' }));
+  // AWS Marketplace redirects a buyer's browser to the fulfillment URL as a
+  // POST with Content-Type: application/x-www-form-urlencoded — express.json()
+  // above ignores that content type, so it needs its own parser.
+  app.use(express.urlencoded({ extended: true }));
   app.use(rapidApiGuard);
 
   // ── In-memory AI agent traffic counter ──────────────────────────────────────
@@ -132,6 +137,43 @@ async function runSSE(): Promise<void> {
       AuditLogger.getInstance().error('stripe_checkout_error', { error: String(err) });
       res.status(500).set('Access-Control-Allow-Origin', '*').json({ error: 'stripe_error', message: String(err) });
     }
+  });
+
+  // ── AWS Marketplace fulfillment ──────────────────────────────────────────
+  // AWS redirects a buyer's browser here as a POST (x-www-form-urlencoded)
+  // right after they subscribe to "Script Master Labs Federal, Medical &
+  // Finance MCP (x402)" (prod-lop2m2yjjcs76). This is the third checkout rail
+  // alongside Stripe (direct card) and x402 (autonomous agents) — same
+  // product, same MCP endpoint, different buyer.
+  const awsFulfillmentPage = (body: { ok: boolean; apiKey?: string; error?: string }): string => {
+    const inner = body.ok
+      ? `<h1>You're in.</h1>
+         <p>Your AWS Marketplace subscription is active. Use the key below with the MCP endpoint to skip per-call x402 payment for the life of your subscription.</p>
+         <p class="label">MCP Endpoint</p><code>https://mcp-x402.onrender.com/mcp</code>
+         <p class="label">Your API Key</p><code>${body.apiKey}</code>
+         <p class="label">Header</p><code>X-AWS-MP-Key: ${body.apiKey}</code>
+         <p class="hint">Save this key now — it will not be shown again on this page. Full usage docs: <a href="https://mcp-x402.onrender.com/llms.txt">llms.txt</a></p>`
+      : `<h1>Something went wrong</h1>
+         <p>We couldn't complete provisioning (${body.error ?? 'unknown_error'}). Nothing was charged beyond what AWS Marketplace already processed. Contact support and reference this error code.</p>`;
+    return `<!doctype html><html><head><meta charset="utf-8"><title>Script Master Labs — AWS Marketplace</title>
+      <style>body{background:#050508;color:#e2e8f0;font-family:'Courier New',monospace;max-width:640px;margin:4rem auto;padding:0 1.5rem;line-height:1.6}
+      h1{color:#a78bfa}.label{color:#64748b;font-size:.75rem;text-transform:uppercase;margin-top:1.2rem;margin-bottom:.2rem}
+      code{display:block;background:#0d0d14;border:1px solid #1e1e2e;border-radius:6px;padding:.6rem .8rem;color:#10b981;word-break:break-all}
+      .hint{color:#64748b;font-size:.8rem;margin-top:1rem}a{color:#a78bfa}</style></head>
+      <body>${inner}</body></html>`;
+  };
+  app.post('/aws/marketplace/resolve', async (req: Request, res: Response) => {
+    const token = typeof req.body?.['x-amzn-marketplace-token'] === 'string' ? req.body['x-amzn-marketplace-token'] : '';
+    if (!token) {
+      res.status(400).send(awsFulfillmentPage({ ok: false, error: 'missing_registration_token' }));
+      return;
+    }
+    const result = await resolveAwsMarketplaceCustomer(token);
+    if (!result.ok) {
+      res.status(502).send(awsFulfillmentPage({ ok: false, error: result.error }));
+      return;
+    }
+    res.send(awsFulfillmentPage({ ok: true, apiKey: result.apiKey }));
   });
 
   // Wallet info — shows the server's derived wallet address (safe to expose, no private key)
@@ -305,6 +347,14 @@ async function runSSE(): Promise<void> {
     // only one operator secret to manage instead of two.
     if (SML_API_KEY && req.headers['x-operator-key'] === SML_API_KEY) {
       return { ok: true, payer: { rail: 'operator', from: 'did:sml:operator', tx: '' } };
+    }
+
+    // AWS Marketplace bypass — customer already paying AWS a flat monthly fee
+    // via the SaaS Contract product (prod-lop2m2yjjcs76); their key (issued at
+    // /aws/marketplace/resolve) skips the per-call x402 charge entirely.
+    const awsMpKey = typeof req.headers['x-aws-mp-key'] === 'string' ? req.headers['x-aws-mp-key'] : '';
+    if (awsMpKey && await isEntitledAwsMarketplaceKey(awsMpKey)) {
+      return { ok: true, payer: { rail: 'aws-marketplace', from: `aws:${awsMpKey.slice(0, 16)}…`, tx: '' } };
     }
 
     // Rail A — standard EIP-3009 via hybrid facilitator chain

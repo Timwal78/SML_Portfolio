@@ -25,7 +25,12 @@ import { type Request, type Response, type NextFunction } from 'express';
 // it's how a payment gets *started*. Stripe itself is the access control once
 // the session is created; gating the create-session call here would just 403
 // every legitimate customer before they ever reach checkout.
-const PUBLIC_PREFIXES = ['/health', '/api/stats', '/api/checkout/', '/.well-known/', '/openapi.json', '/llms.txt', '/agents.json', '/favicon.ico', '/x402/', '/mcp', '/sse', '/messages'];
+//
+// /aws/marketplace/ is the AWS Marketplace fulfillment redirect — AWS's own
+// servers POST here right after a customer subscribes, carrying no RapidAPI
+// secret and no way to add one. resolveAwsMarketplaceCustomer() validates the
+// registration token against AWS itself, which is the real access control.
+const PUBLIC_PREFIXES = ['/health', '/api/stats', '/api/checkout/', '/aws/marketplace/', '/.well-known/', '/openapi.json', '/llms.txt', '/agents.json', '/favicon.ico', '/x402/', '/mcp', '/sse', '/messages'];
 
 export function rapidApiGuard(req: Request, res: Response, next: NextFunction): void {
   const secret = process.env['RAPIDAPI_PROXY_SECRET'];

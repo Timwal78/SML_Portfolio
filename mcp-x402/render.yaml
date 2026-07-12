@@ -88,6 +88,21 @@ services:
         value: "price_1TdcN6QL50L4TFzsynvRdAID"
       - key: STRIPE_PRICE_ELITE
         value: "price_1Tgy87QL50L4TFzs4O9tNh01"
+      # AWS Marketplace fulfillment (/aws/marketplace/resolve) for
+      # prod-lop2m2yjjcs76 "Script Master Labs Federal, Medical & Finance MCP
+      # (x402)". IAM user needs ONLY aws-marketplace:ResolveCustomer — no
+      # broader AWS access. Reuses the same Supabase project as SUPABASE_URL/
+      # SUPABASE_SERVICE_ROLE_KEY below (table: aws_marketplace_customers).
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+      - key: AWS_REGION
+        value: "us-east-1"
+      - key: SUPABASE_URL
+        value: "https://gqzkwwchahmzenacwmhj.supabase.co"
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
     autoDeploy: true
     # Render restarts the service automatically on crash
     # healthCheckPath triggers restart if /health returns non-2xx
