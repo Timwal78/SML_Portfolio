@@ -1039,6 +1039,31 @@ html, body {
         </div>
       </div>
 
+      <!-- Subscription checkout -->
+      <div class="section-pad" style="padding-bottom:0">
+        <div class="section-title">UNLOCK FULL ACCESS</div>
+        <div class="card">
+          <div class="card-body" style="padding:16px">
+            <div style="color:var(--text3,#94a3b8);font-size:13px;margin-bottom:14px">
+              Flat-rate subscription for unlimited dashboard access. Prefer pay-per-call instead? Every endpoint above already supports x402 — no subscription required.
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <button class="tier-btn" data-tier="starter" style="flex:1;min-width:180px;padding:12px 16px;border-radius:6px;border:1px solid rgba(124,58,237,.35);background:rgba(124,58,237,.12);color:var(--violet2);font-family:var(--mono);font-size:13px;font-weight:600;cursor:pointer">
+                STARTER — $500/mo
+              </button>
+              <button class="tier-btn" data-tier="elite" style="flex:1;min-width:180px;padding:12px 16px;border-radius:6px;border:1px solid rgba(16,255,128,.35);background:rgba(16,255,128,.1);color:var(--green);font-family:var(--mono);font-size:13px;font-weight:600;cursor:pointer">
+                ELITE — $2,000/mo
+              </button>
+            </div>
+            <div id="checkout-status" style="margin-top:10px;font-size:12px;color:var(--text3,#94a3b8);font-family:var(--mono)"></div>
+            <div style="margin-top:14px;padding:12px;border-radius:6px;background:rgba(16,255,128,.06);border:1px solid rgba(16,255,128,.2);font-size:12px;color:var(--text3,#94a3b8)">
+              <strong style="color:var(--green)">x402 Autonomous Agent Payment (USDC / Base)</strong><br/>
+              AI agents skip Stripe entirely — pay per call directly against any endpoint above. Same receiving wallet: <code style="color:var(--green)">0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700</code>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- SIS™ Card -->
       <div class="section-pad" style="padding-bottom:0">
         <div class="section-title">SIS™ — SWARM INTELLIGENCE SCORE</div>
@@ -2188,6 +2213,43 @@ setInterval(checkStatus, 30000);
 startHeartbeatCounter();
 loadAgentStats();
 setInterval(loadAgentStats, 60000);
+
+async function startCheckout(tier) {
+  const statusEl = document.getElementById('checkout-status');
+  const buttons = document.querySelectorAll('.tier-btn');
+  buttons.forEach(b => b.disabled = true);
+  if (statusEl) statusEl.textContent = 'Contacting Stripe…';
+  try {
+    const res = await fetch('https://mcp-x402.onrender.com/api/checkout/create-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tier }),
+      signal: AbortSignal.timeout ? AbortSignal.timeout(15000) : undefined
+    });
+    const data = await res.json();
+    if (!res.ok || !data.checkout_url) {
+      if (statusEl) statusEl.textContent = 'Checkout unavailable: ' + (data.detail || data.error || ('HTTP ' + res.status));
+      buttons.forEach(b => b.disabled = false);
+      return;
+    }
+    window.location.href = data.checkout_url;
+  } catch (err) {
+    if (statusEl) statusEl.textContent = 'Failed to reach checkout backend. Please try again.';
+    buttons.forEach(b => b.disabled = false);
+  }
+}
+document.querySelectorAll('.tier-btn').forEach(btn => {
+  btn.addEventListener('click', () => startCheckout(btn.dataset.tier));
+});
+
+const params = new URLSearchParams(window.location.search);
+if (params.get('payment') === 'success') {
+  const statusEl = document.getElementById('checkout-status');
+  if (statusEl) { statusEl.textContent = 'Payment confirmed — welcome aboard.'; statusEl.style.color = 'var(--green)'; }
+} else if (params.get('payment') === 'cancelled') {
+  const statusEl = document.getElementById('checkout-status');
+  if (statusEl) statusEl.textContent = 'Checkout cancelled.';
+}
 </script>
 
 <script type="application/ld+json">
