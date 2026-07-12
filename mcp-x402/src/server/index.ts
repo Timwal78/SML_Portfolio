@@ -8,6 +8,7 @@ import { randomUUID } from 'crypto';
 import cors from 'cors';
 import Stripe from 'stripe';
 import { resolveAwsMarketplaceCustomer, isEntitledAwsMarketplaceKey, runEntitlementsSelfCheck, getEntitlementsSelfCheckStatus } from './aws/marketplace.js';
+import { handleSnsMessage } from './aws/sns-entitlement.js';
 import { handleStripeWebhookEvent, getApiKeyForCheckoutSession, isEntitledStripeKey } from './stripe/entitlement.js';
 import { runCommunityScan } from './marketing/community.js';
 import { registerTools } from './tools/index.js';
@@ -93,6 +94,28 @@ async function runSSE(): Promise<void> {
       AuditLogger.getInstance().error('stripe_webhook_handler_failed', { type: event.type, error: String(err) });
       // 500 so Stripe retries — the event was valid, something on our side failed.
       res.status(500).json({ error: 'webhook_handler_failed' });
+    }
+  });
+
+  // AWS SNS delivers to HTTPS endpoints with Content-Type: text/plain even
+  // though the body is real JSON — express.json() below only parses
+  // application/json, so this route needs `type: '*/*'` to force-parse
+  // regardless of the declared content-type. Registered ahead of the global
+  // parser for the same reason the Stripe webhook is.
+  app.post('/aws/marketplace/sns', express.json({ type: '*/*', limit: '256kb' }), async (req: Request, res: Response) => {
+    try {
+      const result = await handleSnsMessage(req.body);
+      // 200 for most ok:false cases — SNS retries aggressively on non-2xx and
+      // there's no reason to retry a genuinely malformed/forged message.
+      if (!result.ok && result.error === 'invalid_signature') {
+        res.status(400).json(result);
+        return;
+      }
+      res.status(200).json(result);
+    } catch (err) {
+      // Something worth AWS retrying (Supabase down, etc.) — 500, not 200.
+      AuditLogger.getInstance().error('sns_handler_unhandled', { error: String(err) });
+      res.status(500).json({ ok: false, error: 'handler_exception' });
     }
   });
 
