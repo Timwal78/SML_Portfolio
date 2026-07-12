@@ -20,7 +20,12 @@ import { type Request, type Response, type NextFunction } from 'express';
 // payment check IS the access control here, exactly like /x402/*. There is no
 // active RapidAPI relationship using this gate, so blocking these would only
 // ever turn away the autonomous agents the server exists to serve.
-const PUBLIC_PREFIXES = ['/health', '/api/stats', '/.well-known/', '/openapi.json', '/llms.txt', '/agents.json', '/favicon.ico', '/x402/', '/mcp', '/sse', '/messages'];
+// /api/checkout/ is the Stripe subscription entry point (Starter/Elite buttons
+// on agentswarm-seo.html) — it must stay public for the same reason /x402/ does:
+// it's how a payment gets *started*. Stripe itself is the access control once
+// the session is created; gating the create-session call here would just 403
+// every legitimate customer before they ever reach checkout.
+const PUBLIC_PREFIXES = ['/health', '/api/stats', '/api/checkout/', '/.well-known/', '/openapi.json', '/llms.txt', '/agents.json', '/favicon.ico', '/x402/', '/mcp', '/sse', '/messages'];
 
 export function rapidApiGuard(req: Request, res: Response, next: NextFunction): void {
   const secret = process.env['RAPIDAPI_PROXY_SECRET'];
