@@ -6,6 +6,7 @@ import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/
 import express, { type Request, type Response } from 'express';
 import { randomUUID } from 'crypto';
 import cors from 'cors';
+import Stripe from 'stripe';
 import { registerTools } from './tools/index.js';
 import { AuditLogger } from './security/audit.js';
 import { RateLimiter } from './security/rate-limit.js';
@@ -91,6 +92,46 @@ async function runSSE(): Promise<void> {
       endpoint_count: 44,
       version: VERSION,
     });
+  });
+
+  // ── Stripe subscription checkout (Starter/Elite) ────────────────────────────
+  // Every /x402/* route above is pay-per-call for autonomous agents. This is the
+  // flat-rate human-subscription rail surfaced as two buttons on
+  // agentswarm-seo.html, for buyers who want unlimited dashboard access instead
+  // of metering every call. Same receiving wallet (SML_PAYMENT_RECEIVER), same
+  // brand, one checkout — deliberately consolidated here instead of on a
+  // separate throwaway backend so there's exactly one place this can break.
+  const STRIPE_PRICE_BY_TIER: Record<string, string | undefined> = {
+    starter: process.env['STRIPE_PRICE_STARTER'],
+    elite: process.env['STRIPE_PRICE_ELITE'],
+  };
+  app.post('/api/checkout/create-session', async (req: Request, res: Response) => {
+    const stripeSecret = process.env['STRIPE_SECRET_KEY'];
+    if (!stripeSecret) {
+      res.status(503).set('Access-Control-Allow-Origin', '*').json({ error: 'stripe_not_configured', detail: 'Operator must set STRIPE_SECRET_KEY.' });
+      return;
+    }
+    const tier = typeof req.body?.['tier'] === 'string' && req.body['tier'].toLowerCase() === 'starter' ? 'starter' : 'elite';
+    const priceId = STRIPE_PRICE_BY_TIER[tier];
+    if (!priceId) {
+      res.status(503).set('Access-Control-Allow-Origin', '*').json({ error: 'price_not_configured', detail: `Operator must set STRIPE_PRICE_${tier.toUpperCase()}.` });
+      return;
+    }
+    try {
+      const stripe = new Stripe(stripeSecret);
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: [{ price: priceId, quantity: 1 }],
+        mode: 'subscription',
+        success_url: 'https://www.scriptmasterlabs.com/agentswarm-seo.html?payment=success',
+        cancel_url: 'https://www.scriptmasterlabs.com/agentswarm-seo.html?payment=cancelled',
+        metadata: { tier, source: 'agentswarm-seo' },
+      });
+      res.set('Access-Control-Allow-Origin', '*').json({ checkout_url: session.url });
+    } catch (err) {
+      AuditLogger.getInstance().error('stripe_checkout_error', { error: String(err) });
+      res.status(500).set('Access-Control-Allow-Origin', '*').json({ error: 'stripe_error', message: String(err) });
+    }
   });
 
   // Wallet info — shows the server's derived wallet address (safe to expose, no private key)

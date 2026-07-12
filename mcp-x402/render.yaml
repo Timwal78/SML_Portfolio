@@ -78,6 +78,16 @@ services:
         sync: false
       - key: ANTHROPIC_MODEL
         value: "claude-sonnet-4-5"
+      # Stripe subscription checkout (Starter/Elite buttons on agentswarm-seo.html).
+      # Secret key must be set in the Render dashboard, never in git. Price IDs are
+      # not secret (Stripe scopes them to a specific product/amount), so the known
+      # live IDs are declared here directly like SML_PAYMENT_RECEIVER above.
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_PRICE_STARTER
+        value: "price_1TdcN6QL50L4TFzsynvRdAID"
+      - key: STRIPE_PRICE_ELITE
+        value: "price_1Tgy87QL50L4TFzs4O9tNh01"
     autoDeploy: true
     # Render restarts the service automatically on crash
     # healthCheckPath triggers restart if /health returns non-2xx
