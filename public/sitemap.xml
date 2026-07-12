@@ -19,10 +19,34 @@
     <loc>https://www.scriptmasterlabs.com/agent-to-agent-payment</loc>
   </url>
   <url>
+    <loc>https://www.scriptmasterlabs.com/agentcard/app/controllers/api/v1</loc>
+  </url>
+  <url>
+    <loc>https://www.scriptmasterlabs.com/agentcard/app/controllers/api/v1/agents_controller.rb</loc>
+  </url>
+  <url>
+    <loc>https://www.scriptmasterlabs.com/agentcard/app/controllers/api/v1/discover_controller.rb</loc>
+  </url>
+  <url>
+    <loc>https://www.scriptmasterlabs.com/agentcard/app/controllers/api/v1/leaderboard_controller.rb</loc>
+  </url>
+  <url>
+    <loc>https://www.scriptmasterlabs.com/agentcard/spec/requests/api/v1</loc>
+  </url>
+  <url>
+    <loc>https://www.scriptmasterlabs.com/agentcard/spec/requests/api/v1/agents_spec.rb</loc>
+  </url>
+  <url>
+    <loc>https://www.scriptmasterlabs.com/agentcard/spec/requests/api/v1/discover_spec.rb</loc>
+  </url>
+  <url>
     <loc>https://www.scriptmasterlabs.com/agentswarm-seo</loc>
   </url>
   <url>
     <loc>https://www.scriptmasterlabs.com/ai-seo-agent-os</loc>
+  </url>
+  <url>
+    <loc>https://www.scriptmasterlabs.com/api/agents</loc>
   </url>
   <url>
     <loc>https://www.scriptmasterlabs.com/autonomous-agent-payments</loc>
@@ -71,6 +95,60 @@
   </url>
   <url>
     <loc>https://www.scriptmasterlabs.com/mcp-x402-npm</loc>
+  </url>
+  <url>
+    <loc>https://www.scriptmasterlabs.com/mcp-x402/src/lib/sml-api/agentcard</loc>
+  </url>
+  <url>
+    <loc>https://www.scriptmasterlabs.com/mcp-x402/src/lib/sml-api/backtest</loc>
+  </url>
+  <url>
+    <loc>https://www.scriptmasterlabs.com/mcp-x402/src/lib/sml-api/brokers</loc>
+  </url>
+  <url>
+    <loc>https://www.scriptmasterlabs.com/mcp-x402/src/lib/sml-api/copytrader</loc>
+  </url>
+  <url>
+    <loc>https://www.scriptmasterlabs.com/mcp-x402/src/lib/sml-api/crawl</loc>
+  </url>
+  <url>
+    <loc>https://www.scriptmasterlabs.com/mcp-x402/src/lib/sml-api/equities-heatmap</loc>
+  </url>
+  <url>
+    <loc>https://www.scriptmasterlabs.com/mcp-x402/src/lib/sml-api/forge</loc>
+  </url>
+  <url>
+    <loc>https://www.scriptmasterlabs.com/mcp-x402/src/lib/sml-api/ftd</loc>
+  </url>
+  <url>
+    <loc>https://www.scriptmasterlabs.com/mcp-x402/src/lib/sml-api/ghost</loc>
+  </url>
+  <url>
+    <loc>https://www.scriptmasterlabs.com/mcp-x402/src/lib/sml-api/launchpad</loc>
+  </url>
+  <url>
+    <loc>https://www.scriptmasterlabs.com/mcp-x402/src/lib/sml-api/leviathan</loc>
+  </url>
+  <url>
+    <loc>https://www.scriptmasterlabs.com/mcp-x402/src/lib/sml-api/nexus</loc>
+  </url>
+  <url>
+    <loc>https://www.scriptmasterlabs.com/mcp-x402/src/lib/sml-api/proof402</loc>
+  </url>
+  <url>
+    <loc>https://www.scriptmasterlabs.com/mcp-x402/src/lib/sml-api/rails</loc>
+  </url>
+  <url>
+    <loc>https://www.scriptmasterlabs.com/mcp-x402/src/lib/sml-api/shadow</loc>
+  </url>
+  <url>
+    <loc>https://www.scriptmasterlabs.com/mcp-x402/src/lib/sml-api/squeezeos</loc>
+  </url>
+  <url>
+    <loc>https://www.scriptmasterlabs.com/mcp-x402/src/lib/sml-api/xdeo</loc>
+  </url>
+  <url>
+    <loc>https://www.scriptmasterlabs.com/mcp-x402/src/lib/sml-api/xmit</loc>
   </url>
   <url>
     <loc>https://www.scriptmasterlabs.com/no-fake-trading-data-policy</loc>
