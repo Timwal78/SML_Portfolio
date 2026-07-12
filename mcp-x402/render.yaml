@@ -11,6 +11,18 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+      # Stripe checkout was failing in production with a generic
+      # "StripeConnectionError, retried 2 times" — confirmed the SDK and
+      # network path are fine from outside Render (a fake key gets a proper
+      # auth error, not a connection error), and other outbound HTTPS calls
+      # from this same container work fine (Community Scout hits HN's
+      # Algolia API successfully). That pattern — works everywhere except one
+      # specific host, from a container — is the signature of Node's IPv6-
+      # first DNS resolution (default since Node 17+) hitting a bad IPv6 path
+      # to that one host specifically. Forcing IPv4 is the standard,
+      # low-risk fix; safe to leave on even if this isn't the actual cause.
+      - key: NODE_OPTIONS
+        value: "--dns-result-order=ipv4first"
       - key: MCP_TRANSPORT
         value: sse
       - key: MCP_SSE_PORT
