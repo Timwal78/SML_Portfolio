@@ -1,11 +1,11 @@
 # mcp-x402 — ScriptMasterLabs Autonomous Payment MCP Server
-# The x402 Amazon: 62 tools, pay-per-call, no API keys
+# The x402 Amazon: 63 tools, pay-per-call, no API keys
 
 > The first MCP server that pays for itself.
 
 ## What this is
 
-mcp-x402 is the front door to ScriptMasterLabs financial intelligence products. AI agents (Claude, Cursor, GPT, etc.) connect once and get access to 62 tools covering market intelligence, SEC data, XRPL payments, copy-trading, web scraping, and more. Agents pay with stablecoins autonomously — no human billing, no API keys.
+mcp-x402 is the front door to ScriptMasterLabs financial intelligence products. AI agents (Claude, Cursor, GPT, etc.) connect once and get access to 63 tools covering market intelligence, SEC data, XRPL payments, copy-trading, web scraping, and more. Agents pay with stablecoins autonomously — no human billing, no API keys.
 
 ## Quick Start (30 seconds)
 

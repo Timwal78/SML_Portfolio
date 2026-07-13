@@ -12,6 +12,7 @@ import { registerEquitiesHeatmap } from './equities-heatmap.js';
 import { registerFederal } from './federal.js';
 import { registerForge } from './forge.js';
 import { registerFtd } from './ftd.js';
+import { registerFxRates } from './fx-rates.js';
 import { registerGhost } from './ghost.js';
 import { registerLaunchpad } from './launchpad.js';
 import { registerLeviathan } from './leviathan.js';
@@ -39,6 +40,7 @@ export async function registerTools(server: McpServer): Promise<void> {
   registerFederal(server);
   registerForge(server);
   registerFtd(server);
+  registerFxRates(server);
   registerGhost(server);
   registerLaunchpad(server);
   await registerLeviathan(server);

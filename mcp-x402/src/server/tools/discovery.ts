@@ -51,6 +51,14 @@ const CATALOG = {
       ],
     },
     {
+      product: 'FX Rates',
+      description: 'Daily exchange rates from 84 central banks, 201 currencies back to 1948 — latest or historical, pairs naturally with crypto_token_price for cross-currency conversion',
+      backend: 'https://api.frankfurter.dev',
+      tools: [
+        { name: 'fx_exchange_rate', type: 'PAID', price_usdc: '0.01', description: 'Latest or historical exchange rate for a base currency against one or more target currencies' },
+      ],
+    },
+    {
       product: 'SqueezeOS',
       description: 'Institutional-grade equity intelligence — squeeze scanner, options flow, multi-engine AI council verdicts',
       backend: 'https://squeezeos-api.onrender.com',
