@@ -18,6 +18,7 @@ import { registerNexus } from './nexus.js';
 import { registerProof402 } from './proof402.js';
 import { registerRails } from './rails.js';
 import { registerRestrictedParty } from './restricted-party.js';
+import { registerTradeLeads } from './trade-leads.js';
 import { registerShadow } from './shadow.js';
 import { registerSqueezeOS } from './squeezeos.js';
 import { registerXdeo } from './xdeo.js';
@@ -45,6 +46,7 @@ export async function registerTools(server: McpServer): Promise<void> {
   registerRestrictedParty(server);
   registerShadow(server);
   registerSqueezeOS(server);
+  registerTradeLeads(server);
   registerXdeo(server);
   await registerXmit(server);
 }
