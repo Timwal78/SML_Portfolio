@@ -17,6 +17,7 @@ import { registerLeviathan } from './leviathan.js';
 import { registerNexus } from './nexus.js';
 import { registerProof402 } from './proof402.js';
 import { registerRails } from './rails.js';
+import { registerRestrictedParty } from './restricted-party.js';
 import { registerShadow } from './shadow.js';
 import { registerSqueezeOS } from './squeezeos.js';
 import { registerXdeo } from './xdeo.js';
@@ -41,6 +42,7 @@ export async function registerTools(server: McpServer): Promise<void> {
   registerNexus(server);
   registerProof402(server);
   registerRails(server);
+  registerRestrictedParty(server);
   registerShadow(server);
   registerSqueezeOS(server);
   registerXdeo(server);
