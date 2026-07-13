@@ -6,6 +6,7 @@ import { registerBacktest } from './backtest.js';
 import { registerBrokers } from './brokers.js';
 import { registerCopyTrader } from './copytrader.js';
 import { registerCrawl } from './crawl.js';
+import { registerCryptoMarket } from './crypto-market.js';
 import { registerDiscovery } from './discovery.js';
 import { registerEquitiesHeatmap } from './equities-heatmap.js';
 import { registerFederal } from './federal.js';
@@ -33,6 +34,7 @@ export async function registerTools(server: McpServer): Promise<void> {
   registerBrokers(server);
   registerCopyTrader(server);
   registerCrawl(server);
+  registerCryptoMarket(server);
   registerEquitiesHeatmap(server);
   registerFederal(server);
   registerForge(server);

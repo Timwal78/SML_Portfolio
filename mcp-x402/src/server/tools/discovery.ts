@@ -43,6 +43,14 @@ const CATALOG = {
       ],
     },
     {
+      product: 'Crypto Market Data',
+      description: 'Real-time token price, market cap, and 24h volume/change — the same category CoinGecko itself runs on x402 at $0.01/call',
+      backend: 'https://api.coingecko.com',
+      tools: [
+        { name: 'crypto_token_price', type: 'PAID', price_usdc: '0.01', description: 'Real-time price, market cap, and 24h volume/change for one or more tokens against one or more currencies' },
+      ],
+    },
+    {
       product: 'SqueezeOS',
       description: 'Institutional-grade equity intelligence — squeeze scanner, options flow, multi-engine AI council verdicts',
       backend: 'https://squeezeos-api.onrender.com',

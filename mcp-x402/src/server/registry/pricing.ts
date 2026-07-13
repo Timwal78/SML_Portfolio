@@ -77,6 +77,8 @@ const BASE_PRICES: Record<string, string> = {
   screen_restricted_party: '0.03',
   // Export opportunities (Trade.gov Trade Leads)
   search_trade_leads: '0.03',
+  // Crypto market data (CoinGecko)
+  crypto_token_price: '0.01',
 };
 
 interface CachedPrice {
