@@ -12,18 +12,3 @@ jobs:
       - name: Ping mcp-x402
         run: |
           curl -sf https://mcp-x402.onrender.com/health || echo "mcp-x402 health check failed"
-
-      - name: DIAGNOSTIC — real current state of agentswarm-seo.html checkout (temporary, remove after use)
-        continue-on-error: true
-        run: |
-          echo "── Live page: does it still have Starter/Elite buttons, and what price text? ──"
-          curl -s --max-time 20 https://www.scriptmasterlabs.com/agentswarm-seo.html -o /tmp/live-page.html
-          grep -o 'STARTER[^<]*\|ELITE[^<]*\|\$[0-9,]*/mo' /tmp/live-page.html || echo "(no STARTER/ELITE/price text found on live page)"
-          echo
-          echo "── POST /api/checkout/create-session tier=starter — real backend response ──"
-          curl -s --max-time 20 -X POST https://mcp-x402.onrender.com/api/checkout/create-session \
-            -H "Content-Type: application/json" -d '{"tier":"starter"}' -w "\nHTTP %{http_code}\n"
-          echo
-          echo "── POST /api/checkout/create-session tier=elite — real backend response ──"
-          curl -s --max-time 20 -X POST https://mcp-x402.onrender.com/api/checkout/create-session \
-            -H "Content-Type: application/json" -d '{"tier":"elite"}' -w "\nHTTP %{http_code}\n"
