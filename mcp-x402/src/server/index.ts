@@ -264,7 +264,17 @@ async function runSSE(): Promise<void> {
         detail: e.detail ? String(e.detail) : undefined,
         cause: e.cause ? String(e.cause) : undefined,
       });
-      res.status(500).set('Access-Control-Allow-Origin', '*').json({ error: 'stripe_error', message: String(err) });
+      // TEMPORARY: exposing diagnostic fields in the response body itself,
+      // not just server logs — no Render API key available to pull logs
+      // directly, this lets the real cause be read via a plain curl instead
+      // of another round-trip asking for a dashboard log line. Revert to a
+      // generic message once this is actually diagnosed.
+      res.status(500).set('Access-Control-Allow-Origin', '*').json({
+        error: 'stripe_error', message: String(err),
+        debug_type: e.type, debug_code: e.code,
+        debug_detail: e.detail ? String(e.detail) : undefined,
+        debug_cause: e.cause ? String(e.cause) : undefined,
+      });
     }
   });
 
