@@ -79,6 +79,7 @@ const BASE_PRICES: Record<string, string> = {
   search_trade_leads: '0.03',
   // Crypto market data (CoinGecko)
   crypto_token_price: '0.01',
+  crypto_trending: '0.01',
   // FX rates (Frankfurter / ECB)
   fx_exchange_rate: '0.01',
 };
