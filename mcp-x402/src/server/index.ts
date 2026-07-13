@@ -173,12 +173,26 @@ async function runSSE(): Promise<void> {
   // infrastructure noise, not a visitor, and was the single largest source of
   // false counts under the old regex.
   const AGENT_COUNT_EXEMPT_PATHS = new Set(['/health']);
+  // Ring buffer of the last 20 counted hits (path + matched token + full UA)
+  // — the counter alone can't be sanity-checked against real traffic without
+  // seeing WHAT actually matched. Exposed via /api/stats/recent-agents.
+  const _recentAgentHits: Array<{ ts: string; path: string; matchedToken: string; userAgent: string }> = [];
   app.use((req, _res, next) => {
     if (AGENT_COUNT_EXEMPT_PATHS.has(req.path)) { next(); return; }
     const today = new Date().toDateString();
     if (today !== _agentCountDay) { _agentCounts.today = 0; _agentCountDay = today; }
-    if (_isAiAgent(String(req.headers['user-agent'] ?? ''))) { _agentCounts.today++; _agentCounts.allTime++; }
+    const ua = String(req.headers['user-agent'] ?? '');
+    const lowerUa = ua.toLowerCase();
+    const matchedToken = AI_AGENT_UA_TOKENS.find((token) => lowerUa.includes(token));
+    if (matchedToken) {
+      _agentCounts.today++; _agentCounts.allTime++;
+      _recentAgentHits.unshift({ ts: new Date().toISOString(), path: req.path, matchedToken, userAgent: ua });
+      if (_recentAgentHits.length > 20) _recentAgentHits.length = 20;
+    }
     next();
+  });
+  app.get('/api/stats/recent-agents', (_req, res) => {
+    res.set('Access-Control-Allow-Origin', '*').json({ recent: _recentAgentHits });
   });
 
   const LEVIATHAN_BYPASS_SECRET = process.env['LEVIATHAN_BYPASS_SECRET'] ?? '';
