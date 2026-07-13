@@ -27,6 +27,14 @@ const CATALOG = {
       ],
     },
     {
+      product: 'Export Compliance',
+      description: 'Restricted-party screening against all 11 US export-control and sanctions lists in one search — BIS Denied Persons/Entity/Unverified Lists, State ITAR Debarred + Nonproliferation Sanctions, Treasury OFAC SDN and 5 more',
+      backend: 'https://data.trade.gov',
+      tools: [
+        { name: 'screen_restricted_party', type: 'PAID', price_usdc: '0.03', description: 'Screen an individual or entity name against the Consolidated Screening List — fuzzy name matching, filterable by source list or country' },
+      ],
+    },
+    {
       product: 'SqueezeOS',
       description: 'Institutional-grade equity intelligence — squeeze scanner, options flow, multi-engine AI council verdicts',
       backend: 'https://squeezeos-api.onrender.com',
