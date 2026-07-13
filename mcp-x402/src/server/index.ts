@@ -1905,6 +1905,128 @@ async function runSSE(): Promise<void> {
     } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'upstream_error', message: String(err) }); }
   });
 
+  // ── /x402/restricted-party-screen — Consolidated Screening List, keyless, $0.03 ─
+  app.get('/x402/restricted-party-screen', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/restricted-party-screen`;
+    const name = cleanTerm(typeof req.query['name'] === 'string' ? req.query['name'] : '');
+    const fuzzy_name = req.query['fuzzy_name'] === 'true';
+    const sources = typeof req.query['sources'] === 'string' ? req.query['sources'] : undefined;
+    const countries = typeof req.query['countries'] === 'string' ? req.query['countries'] : undefined;
+    const size = typeof req.query['size'] === 'string' && /^\d+$/.test(req.query['size']) ? Math.min(50, parseInt(req.query['size'], 10)) : 20;
+    const inputSchema = { type: 'object', properties: { name: { type: 'string' }, fuzzy_name: { type: 'boolean' }, sources: { type: 'string' }, countries: { type: 'string' }, size: { type: 'integer' } }, required: ['name'] };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { name: { type: 'string', required: true } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 30000n, description: 'Screen a name against all 11 US export-control/sanctions lists (BIS Denied Persons/Entity/Unverified, State ITAR Debarred + Nonproliferation, Treasury OFAC SDN + 5 more) in one search. Pay 0.03 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    if (!name) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_name', detail: 'Payment verified. Add ?name= and retry with the same payment.' }); }
+    try {
+      const p = new URLSearchParams({ name, size: String(size) });
+      if (fuzzy_name) p.set('fuzzy_name', 'true');
+      if (sources) p.set('sources', sources);
+      if (countries) p.set('countries', countries);
+      const r = await fetch(`https://data.trade.gov/consolidated_screening_list/v1/search?${p.toString()}`, { headers: { Accept: 'application/json' } });
+      if (!r.ok) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'csl_api_error', status: r.status }); }
+      const j = await r.json() as { total?: number; results?: Array<Record<string, unknown>> };
+      const matches = (j.results ?? []).map((m) => ({ name: m['name'], alt_names: m['alt_names'] ?? [], source: m['source'], source_list_url: m['source_list_url'], type: m['type'], programs: m['programs'] ?? [], start_date: m['start_date'], end_date: m['end_date'], addresses: m['addresses'] ?? [] }));
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'trade.gov/consolidated_screening_list', total: j.total ?? matches.length, match_count: matches.length, matches, _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'csl_fetch_failed', message: String(err) }); }
+  });
+
+  // ── /x402/trade-leads — Overseas trade leads for US exporters, keyless, $0.03 ─
+  app.get('/x402/trade-leads', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/trade-leads`;
+    const q = typeof req.query['q'] === 'string' ? cleanTerm(req.query['q']) : undefined;
+    const country_codes = typeof req.query['country_codes'] === 'string' ? req.query['country_codes'] : undefined;
+    const tenderFrom = typeof req.query['tender_start_from'] === 'string' ? req.query['tender_start_from'] : undefined;
+    const tenderTo = typeof req.query['tender_start_to'] === 'string' ? req.query['tender_start_to'] : undefined;
+    const contractFrom = typeof req.query['contract_start_from'] === 'string' ? req.query['contract_start_from'] : undefined;
+    const contractTo = typeof req.query['contract_start_to'] === 'string' ? req.query['contract_start_to'] : undefined;
+    const size = typeof req.query['size'] === 'string' && /^\d+$/.test(req.query['size']) ? Math.min(50, parseInt(req.query['size'], 10)) : 20;
+    const inputSchema = { type: 'object', properties: { q: { type: 'string' }, country_codes: { type: 'string' }, tender_start_from: { type: 'string' }, tender_start_to: { type: 'string' }, contract_start_from: { type: 'string' }, contract_start_to: { type: 'string' }, size: { type: 'integer' } }, required: [] };
+    const outputSchema = { input: { type: 'http', method: 'GET' }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 30000n, description: 'Real overseas contract/tender opportunities for US exporters -- foreign government tenders and private-sector RFPs. Pay 0.03 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    try {
+      const p = new URLSearchParams({ size: String(size) });
+      if (q) p.set('q', q);
+      if (country_codes) p.set('country_codes', country_codes);
+      if (tenderFrom) p.set('tender_start_date_range[from]', tenderFrom);
+      if (tenderTo) p.set('tender_start_date_range[to]', tenderTo);
+      if (contractFrom) p.set('contract_start_date_range[from]', contractFrom);
+      if (contractTo) p.set('contract_start_date_range[to]', contractTo);
+      const r = await fetch(`https://data.trade.gov/trade_leads/v1/search?${p.toString()}`, { headers: { Accept: 'application/json' } });
+      if (!r.ok) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'trade_leads_api_error', status: r.status }); }
+      const j = await r.json() as { total?: number; results?: Array<Record<string, unknown>> };
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'trade.gov/trade_leads', total: j.total ?? (j.results ?? []).length, results: j.results ?? [], _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'trade_leads_fetch_failed', message: String(err) }); }
+  });
+
+  // ── /x402/crypto-price — CoinGecko real-time token price, $0.01 ──────────────
+  app.get('/x402/crypto-price', async (req, res) => {
+    const cgKey = byokKey(req, 'x-coingecko-key', 'COINGECKO_API_KEY');
+    if (!cgKey) return res.status(503).set('Access-Control-Allow-Origin', '*').json({ error: 'service_unconfigured', detail: 'COINGECKO_API_KEY required. No payment taken.' });
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/crypto-price`;
+    const ids = cleanTerm(typeof req.query['ids'] === 'string' ? req.query['ids'] : '');
+    const vs_currencies = typeof req.query['vs_currencies'] === 'string' ? req.query['vs_currencies'] : 'usd';
+    const include_market_cap = req.query['include_market_cap'] === 'true';
+    const include_24hr_vol = req.query['include_24hr_vol'] === 'true';
+    const include_24hr_change = req.query['include_24hr_change'] === 'true';
+    const inputSchema = { type: 'object', properties: { ids: { type: 'string' }, vs_currencies: { type: 'string' }, include_market_cap: { type: 'boolean' }, include_24hr_vol: { type: 'boolean' }, include_24hr_change: { type: 'boolean' } }, required: ['ids'] };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { ids: { type: 'string', required: true } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 10000n, description: 'Real-time price, market cap, and 24h volume/change for one or more tokens against one or more currencies (CoinGecko). Pay 0.01 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    if (!ids) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_ids', detail: 'Payment verified. Add ?ids= and retry with the same payment.' }); }
+    try {
+      const p = new URLSearchParams({ ids, vs_currencies, include_market_cap: String(include_market_cap), include_24hr_vol: String(include_24hr_vol), include_24hr_change: String(include_24hr_change) });
+      const r = await fetch(`https://api.coingecko.com/api/v3/simple/price?${p.toString()}`, { headers: { Accept: 'application/json', 'x-cg-demo-api-key': cgKey } });
+      if (!r.ok) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'coingecko_api_error', status: r.status }); }
+      const j = await r.json();
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'coingecko.com/api/v3/simple/price', data: j, _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'coingecko_fetch_failed', message: String(err) }); }
+  });
+
+  // ── /x402/crypto-trending — CoinGecko trending coins/NFTs/categories, $0.01 ──
+  app.get('/x402/crypto-trending', async (req, res) => {
+    const cgKey = byokKey(req, 'x-coingecko-key', 'COINGECKO_API_KEY');
+    if (!cgKey) return res.status(503).set('Access-Control-Allow-Origin', '*').json({ error: 'service_unconfigured', detail: 'COINGECKO_API_KEY required. No payment taken.' });
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/crypto-trending`;
+    const inputSchema = { type: 'object', properties: {}, required: [] };
+    const outputSchema = { input: { type: 'http', method: 'GET' }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 10000n, description: 'Top 15 trending coins, 7 trending NFTs, and 6 trending categories by user search activity in the last 24h (CoinGecko). Pay 0.01 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    try {
+      const r = await fetch('https://api.coingecko.com/api/v3/search/trending', { headers: { Accept: 'application/json', 'x-cg-demo-api-key': cgKey } });
+      if (!r.ok) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'coingecko_api_error', status: r.status }); }
+      const j = await r.json();
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'coingecko.com/api/v3/search/trending', data: j, _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'coingecko_fetch_failed', message: String(err) }); }
+  });
+
+  // ── /x402/fx-rate — Frankfurter daily exchange rates, keyless, $0.01 ─────────
+  app.get('/x402/fx-rate', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/fx-rate`;
+    const base = (typeof req.query['base'] === 'string' ? req.query['base'] : 'USD').toUpperCase().slice(0, 3);
+    const quotes = typeof req.query['quotes'] === 'string' ? req.query['quotes'].toUpperCase() : undefined;
+    const date = typeof req.query['date'] === 'string' ? req.query['date'] : undefined;
+    const inputSchema = { type: 'object', properties: { base: { type: 'string' }, quotes: { type: 'string' }, date: { type: 'string' } }, required: [] };
+    const outputSchema = { input: { type: 'http', method: 'GET' }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: 10000n, description: 'Latest or historical exchange rate for a base currency against one or more target currencies -- 84 central banks, 201 currencies back to 1948 (Frankfurter/ECB). Pay 0.01 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    try {
+      const p = new URLSearchParams({ base });
+      if (quotes) p.set('quotes', quotes);
+      if (date) p.set('date', date);
+      const r = await fetch(`https://api.frankfurter.dev/v2/rates?${p.toString()}`, { headers: { Accept: 'application/json' } });
+      if (!r.ok) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'fx_api_error', status: r.status }); }
+      const j = await r.json();
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'frankfurter.dev/v2/rates', data: j, _paid: pay.payer });
+    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'fx_fetch_failed', message: String(err) }); }
+  });
+
   // ── x402 discovery document (OpenAPI 3.1 + x-service-info / x-payment-info) ─
   // x402scan's canonical signal; served at /.well-known/x402 and /openapi.json.
   const OPENAPI_DOC = {
@@ -2259,10 +2381,45 @@ async function runSSE(): Promise<void> {
       ],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.15', amountUnits: '150000', payTo: X402_PAY_TO, settlement: 'onchain-tx', paymentHeader: 'X-PAYMENT-TX' },
       responses: { '200': { description: 'Options Delta heatmap + swarm verdict' }, '402': { description: 'Payment required — pay USDC then retry with X-PAYMENT-TX.' } },
-    } } },
-    '/.well-known/x402': { get: { operationId: 'openApiDiscovery', summary: 'OpenAPI/x402 discovery document (free).', security: [], responses: { '200': { description: 'OpenAPI spec.' } } } },
+    } },
+    '/x402/restricted-party-screen': { get: {
+      operationId: 'screenRestrictedParty',
+      summary: 'Screen a name against all 11 US export-control and sanctions lists.',
+      description: 'Consolidated Screening List: BIS Denied Persons/Entity/Unverified Lists, State ITAR Debarred + Nonproliferation Sanctions, Treasury OFAC SDN and 5 more, in one search. Pay 0.03 USDC on Base.',
+      parameters: [{ name: 'name', in: 'query', required: true, schema: { type: 'string' }, example: 'Acme Exports LLC' }, { name: 'fuzzy_name', in: 'query', required: false, schema: { type: 'boolean' } }, { name: 'sources', in: 'query', required: false, schema: { type: 'string' }, description: 'Comma-separated source list abbreviations (DPL, EL, MEU, UVL, ISN, DTC, SDN, CAP, CMIC, FSE, MBS, PLC). Omit for all.' }, { name: 'countries', in: 'query', required: false, schema: { type: 'string' }, description: 'Comma-separated ISO alpha-2 country codes.' }, { name: 'size', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 50, default: 20 } }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.03', amountUnits: '30000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'Screening matches' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/trade-leads': { get: {
+      operationId: 'searchTradeLeads',
+      summary: 'Search live overseas trade leads for US exporters.',
+      description: 'Real foreign government tenders and private-sector RFPs sourced by ITA\'s global commercial network. Pay 0.03 USDC on Base.',
+      parameters: [{ name: 'q', in: 'query', required: false, schema: { type: 'string' }, example: 'solar panels' }, { name: 'country_codes', in: 'query', required: false, schema: { type: 'string' }, description: 'Comma-separated ISO alpha-2 country codes.' }, { name: 'tender_start_from', in: 'query', required: false, schema: { type: 'string' }, description: 'YYYY-MM-DD' }, { name: 'tender_start_to', in: 'query', required: false, schema: { type: 'string' } }, { name: 'contract_start_from', in: 'query', required: false, schema: { type: 'string' } }, { name: 'contract_start_to', in: 'query', required: false, schema: { type: 'string' } }, { name: 'size', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 50, default: 20 } }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.03', amountUnits: '30000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'Trade leads' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/crypto-price': { get: {
+      operationId: 'cryptoTokenPrice',
+      summary: 'Real-time token price, market cap, and 24h volume/change.',
+      description: 'CoinGecko simple price. Pay 0.01 USDC on Base.',
+      parameters: [{ name: 'ids', in: 'query', required: true, schema: { type: 'string' }, description: 'Comma-separated CoinGecko coin IDs, e.g. "bitcoin,ethereum,ripple".', example: 'bitcoin,ethereum' }, { name: 'vs_currencies', in: 'query', required: false, schema: { type: 'string', default: 'usd' } }, { name: 'include_market_cap', in: 'query', required: false, schema: { type: 'boolean' } }, { name: 'include_24hr_vol', in: 'query', required: false, schema: { type: 'boolean' } }, { name: 'include_24hr_change', in: 'query', required: false, schema: { type: 'boolean' } }, { name: 'X-Coingecko-Key', in: 'header', required: false, schema: { type: 'string' }, description: 'BYOK: your own CoinGecko Demo API key, takes priority over the server default.' }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.01', amountUnits: '10000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'Token price data' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/crypto-trending': { get: {
+      operationId: 'cryptoTrending',
+      summary: 'Top trending coins, NFTs, and categories in the last 24h.',
+      description: 'CoinGecko trending search. Top 15 coins, 7 NFTs, 6 categories by user search activity. Pay 0.01 USDC on Base.',
+      parameters: [{ name: 'X-Coingecko-Key', in: 'header', required: false, schema: { type: 'string' }, description: 'BYOK: your own CoinGecko Demo API key, takes priority over the server default.' }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.01', amountUnits: '10000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'Trending coins/NFTs/categories' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/fx-rate': { get: {
+      operationId: 'fxExchangeRate',
+      summary: 'Latest or historical exchange rate for a base currency.',
+      description: 'Frankfurter API -- 84 central banks, 201 currencies back to 1948. Pay 0.01 USDC on Base.',
+      parameters: [{ name: 'base', in: 'query', required: false, schema: { type: 'string', default: 'USD' }, example: 'USD' }, { name: 'quotes', in: 'query', required: false, schema: { type: 'string' }, description: 'Comma-separated 3-letter target currency codes.', example: 'EUR,GBP,JPY' }, { name: 'date', in: 'query', required: false, schema: { type: 'string' }, description: 'YYYY-MM-DD for a historical rate. Omit for latest.' }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.01', amountUnits: '10000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'Exchange rate data' }, '402': { description: 'Payment required.' } },
+    } }, '/.well-known/x402': { get: { operationId: 'openApiDiscovery', summary: 'OpenAPI/x402 discovery document (free).', security: [], responses: { '200': { description: 'OpenAPI spec.' } } } },
     '/openapi.json': { get: { operationId: 'openApiJson', summary: 'OpenAPI spec (free).', security: [], responses: { '200': { description: 'OpenAPI spec.' } } } },
-  };
+  } };
   // x402scan/Bazaar discovery validation (per their docs/DISCOVERY.md) requires
   // every paid operation's x-payment-info to carry a `protocols` array and a
   // nested `price` object. Our existing flat fields (method/amount/etc.) stay
