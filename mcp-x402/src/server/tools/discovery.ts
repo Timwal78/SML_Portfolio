@@ -43,6 +43,22 @@ const CATALOG = {
       ],
     },
     {
+      product: 'Crypto Market Data',
+      description: 'Real-time token price, market cap, and 24h volume/change — the same category CoinGecko itself runs on x402 at $0.01/call',
+      backend: 'https://api.coingecko.com',
+      tools: [
+        { name: 'crypto_token_price', type: 'PAID', price_usdc: '0.01', description: 'Real-time price, market cap, and 24h volume/change for one or more tokens against one or more currencies' },
+      ],
+    },
+    {
+      product: 'FX Rates',
+      description: 'Daily exchange rates from 84 central banks, 201 currencies back to 1948 — latest or historical, pairs naturally with crypto_token_price for cross-currency conversion',
+      backend: 'https://api.frankfurter.dev',
+      tools: [
+        { name: 'fx_exchange_rate', type: 'PAID', price_usdc: '0.01', description: 'Latest or historical exchange rate for a base currency against one or more target currencies' },
+      ],
+    },
+    {
       product: 'SqueezeOS',
       description: 'Institutional-grade equity intelligence — squeeze scanner, options flow, multi-engine AI council verdicts',
       backend: 'https://squeezeos-api.onrender.com',
