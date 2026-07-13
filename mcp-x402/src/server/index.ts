@@ -79,31 +79,6 @@ async function runSSE(): Promise<void> {
   // the parsed JSON body — must be registered before express.json() below,
   // which would otherwise consume the stream first and leave nothing to
   // verify the signature against.
-  // TEMPORARY — end-to-end fulfillment test, no UI access to Stripe's
-  // "send test webhook" button was available. Bypasses signature
-  // verification entirely (that's already covered by Stripe's own SDK,
-  // stripe.webhooks.constructEvent, well-trusted code) to test ONLY the
-  // provisioning logic — does a checkout.session.completed actually create
-  // a row and an API key. Gated behind a one-time random token so it's not
-  // wide open even for the few minutes it's live. REMOVE after use — this
-  // would otherwise let anyone mint a free entitled key with no payment.
-  app.post('/api/stripe/webhook/__test_e2e_7f3a91', async (req: Request, res: Response) => {
-    if (req.headers['x-test-token'] !== 'temp-e2e-check-9f2b7c1a') {
-      res.status(404).json({ error: 'not_found' });
-      return;
-    }
-    const fakeEvent = {
-      type: 'checkout.session.completed',
-      data: { object: { id: 'cs_test_e2e_' + Date.now(), customer: 'cus_test_e2e', subscription: 'sub_test_e2e', metadata: { tier: 'starter' } } },
-    } as unknown as Stripe.Event;
-    try {
-      await handleStripeWebhookEvent(fakeEvent);
-      res.json({ ok: true, session_id: (fakeEvent.data.object as { id: string }).id });
-    } catch (err) {
-      res.status(500).json({ ok: false, error: String(err) });
-    }
-  });
-
   app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async (req: Request, res: Response) => {
     // .trim() on every secret below: root cause of the checkout connection
     // failures was a stray trailing newline in a copy-pasted Render env var
