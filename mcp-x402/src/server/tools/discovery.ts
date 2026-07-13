@@ -48,6 +48,7 @@ const CATALOG = {
       backend: 'https://api.coingecko.com',
       tools: [
         { name: 'crypto_token_price', type: 'PAID', price_usdc: '0.01', description: 'Real-time price, market cap, and 24h volume/change for one or more tokens against one or more currencies' },
+        { name: 'crypto_trending',    type: 'PAID', price_usdc: '0.01', description: 'Top 15 trending coins, 7 trending NFTs, and 6 trending categories by user search activity in the last 24h' },
       ],
     },
     {
