@@ -14,8 +14,8 @@ const EXPECTED_PRODUCT_CODE = 'c6g8c5zsvgof5a4rpp6eqlzn';
 let supabase: SupabaseClient | null = null;
 function getSupabase(): SupabaseClient | null {
   if (supabase) return supabase;
-  const url = process.env['SUPABASE_URL'];
-  const key = process.env['SUPABASE_SERVICE_ROLE_KEY'];
+  const url = process.env['SUPABASE_URL']?.trim();
+  const key = process.env['SUPABASE_SERVICE_ROLE_KEY']?.trim();
   if (!url || !key) return null;
   supabase = createClient(url, key);
   return supabase;
@@ -130,8 +130,8 @@ export function getEntitlementsSelfCheckStatus(): EntitlementsSelfCheckResult {
   return lastEntitlementsSelfCheck;
 }
 export async function runEntitlementsSelfCheck(): Promise<void> {
-  const accessKeyId = process.env['AWS_ACCESS_KEY_ID'];
-  const secretAccessKey = process.env['AWS_SECRET_ACCESS_KEY'];
+  const accessKeyId = process.env['AWS_ACCESS_KEY_ID']?.trim();
+  const secretAccessKey = process.env['AWS_SECRET_ACCESS_KEY']?.trim();
   if (!accessKeyId || !secretAccessKey) {
     lastEntitlementsSelfCheck = {
       ran: false, ok: null, ts: Date.now() / 1000,

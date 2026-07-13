@@ -80,8 +80,13 @@ async function runSSE(): Promise<void> {
   // which would otherwise consume the stream first and leave nothing to
   // verify the signature against.
   app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async (req: Request, res: Response) => {
-    const webhookSecret = process.env['STRIPE_WEBHOOK_SECRET'];
-    const stripeSecret = process.env['STRIPE_SECRET_KEY'];
+    // .trim() on every secret below: root cause of the checkout connection
+    // failures was a stray trailing newline in a copy-pasted Render env var
+    // producing "Invalid character in header content [Authorization]" —
+    // trimming here means it self-heals regardless of what's actually
+    // pasted into the dashboard.
+    const webhookSecret = process.env['STRIPE_WEBHOOK_SECRET']?.trim();
+    const stripeSecret = process.env['STRIPE_SECRET_KEY']?.trim();
     const signature = req.headers['stripe-signature'];
     if (!webhookSecret || !stripeSecret || typeof signature !== 'string') {
       res.status(503).json({ error: 'stripe_webhook_not_configured' });
@@ -227,7 +232,7 @@ async function runSSE(): Promise<void> {
     elite: process.env['STRIPE_PRICE_ELITE'],
   };
   app.post('/api/checkout/create-session', async (req: Request, res: Response) => {
-    const stripeSecret = process.env['STRIPE_SECRET_KEY'];
+    const stripeSecret = process.env['STRIPE_SECRET_KEY']?.trim();
     if (!stripeSecret) {
       res.status(503).set('Access-Control-Allow-Origin', '*').json({ error: 'stripe_not_configured', detail: 'Operator must set STRIPE_SECRET_KEY.' });
       return;
@@ -264,17 +269,7 @@ async function runSSE(): Promise<void> {
         detail: e.detail ? String(e.detail) : undefined,
         cause: e.cause ? String(e.cause) : undefined,
       });
-      // TEMPORARY: exposing diagnostic fields in the response body itself,
-      // not just server logs — no Render API key available to pull logs
-      // directly, this lets the real cause be read via a plain curl instead
-      // of another round-trip asking for a dashboard log line. Revert to a
-      // generic message once this is actually diagnosed.
-      res.status(500).set('Access-Control-Allow-Origin', '*').json({
-        error: 'stripe_error', message: String(err),
-        debug_type: e.type, debug_code: e.code,
-        debug_detail: e.detail ? String(e.detail) : undefined,
-        debug_cause: e.cause ? String(e.cause) : undefined,
-      });
+      res.status(500).set('Access-Control-Allow-Origin', '*').json({ error: 'stripe_error', message: String(err) });
     }
   });
 

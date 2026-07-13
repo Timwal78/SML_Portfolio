@@ -19,8 +19,8 @@ const EXPECTED_PRODUCT_CODE = 'c6g8c5zsvgof5a4rpp6eqlzn';
 let supabase: SupabaseClient | null = null;
 function getSupabase(): SupabaseClient | null {
   if (supabase) return supabase;
-  const url = process.env['SUPABASE_URL'];
-  const key = process.env['SUPABASE_SERVICE_ROLE_KEY'];
+  const url = process.env['SUPABASE_URL']?.trim();
+  const key = process.env['SUPABASE_SERVICE_ROLE_KEY']?.trim();
   if (!url || !key) return null;
   supabase = createClient(url, key);
   return supabase;
