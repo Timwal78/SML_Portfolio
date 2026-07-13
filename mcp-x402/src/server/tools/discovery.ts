@@ -35,6 +35,14 @@ const CATALOG = {
       ],
     },
     {
+      product: 'Trade Leads',
+      description: 'Real overseas contract/tender opportunities for US exporters — foreign government tenders and private-sector RFPs sourced by ITA\'s global commercial network',
+      backend: 'https://data.trade.gov',
+      tools: [
+        { name: 'search_trade_leads', type: 'PAID', price_usdc: '0.03', description: 'Search live overseas trade leads — keyword, country, tender/contract date range' },
+      ],
+    },
+    {
       product: 'SqueezeOS',
       description: 'Institutional-grade equity intelligence — squeeze scanner, options flow, multi-engine AI council verdicts',
       backend: 'https://squeezeos-api.onrender.com',

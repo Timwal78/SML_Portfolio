@@ -75,6 +75,8 @@ const BASE_PRICES: Record<string, string> = {
   lookup_entity: '0.02',
   // Export compliance (Trade.gov Consolidated Screening List)
   screen_restricted_party: '0.03',
+  // Export opportunities (Trade.gov Trade Leads)
+  search_trade_leads: '0.03',
 };
 
 interface CachedPrice {
