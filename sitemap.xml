@@ -3,9 +3,9 @@
 
   <!-- ── Core ─────────────────────────────────────────────────────────── -->
   <url><loc>https://www.scriptmasterlabs.com/</loc><changefreq>daily</changefreq><priority>1.0</priority><lastmod>2026-06-24</lastmod></url>
-  <url><loc>https://www.scriptmasterlabs.com/stack</loc><changefreq>weekly</changefreq><priority>0.9</priority><lastmod>2026-06-24</lastmod></url>
+  <url><loc>https://www.scriptmasterlabs.com/stack.html</loc><changefreq>weekly</changefreq><priority>0.9</priority><lastmod>2026-07-12</lastmod></url>
   <url><loc>https://www.scriptmasterlabs.com/marketplace.html</loc><changefreq>daily</changefreq><priority>0.95</priority><lastmod>2026-07-06</lastmod></url>
-  <url><loc>https://www.scriptmasterlabs.com/affiliate</loc><changefreq>monthly</changefreq><priority>0.8</priority><lastmod>2026-06-24</lastmod></url>
+  <url><loc>https://www.scriptmasterlabs.com/affiliate.html</loc><changefreq>monthly</changefreq><priority>0.8</priority><lastmod>2026-06-24</lastmod></url>
 
   <!-- ── AEO/GEO Intelligence Suite (revenue) ──────────────────────── -->
   <url><loc>https://www.scriptmasterlabs.com/aeo.html</loc><changefreq>weekly</changefreq><priority>0.95</priority><lastmod>2026-07-03</lastmod></url>
@@ -24,8 +24,7 @@
   <url><loc>https://www.scriptmasterlabs.com/builds/xah-pay/</loc><changefreq>weekly</changefreq><priority>0.9</priority><lastmod>2026-06-24</lastmod></url>
 
   <!-- ── Sovereign stack (MCP / AI agents / Ghost Layer / ZeroQuery) ── -->
-  <url><loc>https://www.scriptmasterlabs.com/stack/ghost</loc><changefreq>weekly</changefreq><priority>0.9</priority><lastmod>2026-06-24</lastmod></url>
-  <url><loc>https://www.scriptmasterlabs.com/stack/zeroquery</loc><changefreq>weekly</changefreq><priority>0.9</priority><lastmod>2026-06-24</lastmod></url>
+  <!-- /stack/ghost and /stack/zeroquery both redirect to stack.html (already listed above) — removed as duplicates -->
   <url><loc>https://www.scriptmasterlabs.com/crawltoll.html</loc><changefreq>weekly</changefreq><priority>0.8</priority><lastmod>2026-06-24</lastmod></url>
 
   <!-- ── AI products (SML Sheets AI / indicators / ebooks) ─────────── -->
@@ -43,6 +42,17 @@
   <!-- ── AI / agent discovery endpoints ───────────────────────────── -->
   <url><loc>https://www.scriptmasterlabs.com/llms.txt</loc><changefreq>weekly</changefreq><priority>0.6</priority><lastmod>2026-07-02</lastmod></url>
   <url><loc>https://www.scriptmasterlabs.com/agents.json</loc><changefreq>weekly</changefreq><priority>0.5</priority><lastmod>2026-07-02</lastmod></url>
+
+  <!-- ── Previously indexable pages missing from sitemap (found via Ahrefs audit) ── -->
+  <url><loc>https://www.scriptmasterlabs.com/about.html</loc><changefreq>monthly</changefreq><priority>0.6</priority><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://www.scriptmasterlabs.com/central-bank.html</loc><changefreq>weekly</changefreq><priority>0.85</priority><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://www.scriptmasterlabs.com/ghost-cube.html</loc><changefreq>weekly</changefreq><priority>0.6</priority><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://www.scriptmasterlabs.com/heatmap.html</loc><changefreq>weekly</changefreq><priority>0.6</priority><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://www.scriptmasterlabs.com/pipeline.html</loc><changefreq>weekly</changefreq><priority>0.6</priority><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://www.scriptmasterlabs.com/trustverify-competitive-faq.html</loc><changefreq>monthly</changefreq><priority>0.5</priority><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://www.scriptmasterlabs.com/trustverify-integrations.html</loc><changefreq>monthly</changefreq><priority>0.5</priority><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://www.scriptmasterlabs.com/trustverify-scoring-guide.html</loc><changefreq>monthly</changefreq><priority>0.5</priority><lastmod>2026-07-12</lastmod></url>
+  <url><loc>https://www.scriptmasterlabs.com/trustverify-security.html</loc><changefreq>monthly</changefreq><priority>0.5</priority><lastmod>2026-07-12</lastmod></url>
 
   <!-- ── Agent Trap pages (answer-first, AI-crawler targeted) ───────── -->
   <url><loc>https://www.scriptmasterlabs.com/x402-protocol-guide.html</loc><changefreq>monthly</changefreq><priority>0.7</priority><lastmod>2026-07-10</lastmod></url>
