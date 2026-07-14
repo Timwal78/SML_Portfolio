@@ -777,7 +777,7 @@ async function runSSE(): Promise<void> {
     const specialty = cleanTerm(typeof req.query['specialty'] === 'string' ? req.query['specialty'] : '');
     const limit = Math.min(Math.max(parseInt(String(req.query['limit'] ?? '10'), 10) || 10, 1), 20);
     const inputSchema = { type: 'object', properties: { last_name: { type: 'string' }, first_name: { type: 'string' }, organization_name: { type: 'string' }, state: { type: 'string', description: '2-letter state code.' }, specialty: { type: 'string', description: 'Taxonomy description, e.g. Cardiology.' }, limit: { type: 'integer', minimum: 1, maximum: 20, default: 10 } }, required: [] };
-    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { last_name: { type: 'string', required: false }, organization_name: { type: 'string', required: false }, specialty: { type: 'string', required: false }, state: { type: 'string', required: false } } }, output: null };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { last_name: { type: 'string', required: false }, first_name: { type: 'string', required: false }, organization_name: { type: 'string', required: false }, specialty: { type: 'string', required: false }, state: { type: 'string', required: false } } }, output: null };
     const pay = await requirePayment(req, res, { resource, priceUnits: 50000n, description: 'NPPES provider (NPI) lookup: NPI number, name, specialty, location, phone. Provide last_name, organization_name, or specialty. Pay 0.05 USDC on Base via X-PAYMENT (standard) or X-PAYMENT-TX (sovereign).', inputSchema, outputSchema });
     if (!pay.ok) return;
     if (!last && !org && !specialty) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_query', detail: 'Payment verified. Provide last_name, organization_name, or specialty and retry with the same payment.' }); }
@@ -2073,105 +2073,105 @@ async function runSSE(): Promise<void> {
       description: 'Indications, dosage, warnings, interactions for a drug. Pay 0.05 USDC on Base.',
       parameters: [{ name: 'drug', in: 'query', required: true, schema: { type: 'string' }, description: 'Brand or generic drug name.', example: 'aspirin' }, { name: 'X-Openfda-Key', in: 'header', required: false, schema: { type: 'string' }, description: 'BYOK: your own openFDA API key, takes priority over the server default.' }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.05', amountUnits: '50000', payTo: X402_PAY_TO },
-      responses: { '200': { description: 'Drug label' }, '402': { description: 'Payment required.' } },
+      responses: { '200': { description: 'Drug label', content: { 'application/json': { schema: { type: 'object' } } } }, '402': { description: 'Payment required.' } },
     } }, '/x402/drug-recall': { get: {
       operationId: 'drugRecall',
       summary: 'FDA drug recall/enforcement search (openFDA).',
       description: 'Recall reason, classification, status, recalling firm. Pay 0.08 USDC on Base.',
       parameters: [{ name: 'drug', in: 'query', required: true, schema: { type: 'string' }, example: 'metformin' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 20, default: 5 } }, { name: 'X-Openfda-Key', in: 'header', required: false, schema: { type: 'string' }, description: 'BYOK: your own openFDA API key, takes priority over the server default.' }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.08', amountUnits: '80000', payTo: X402_PAY_TO },
-      responses: { '200': { description: 'Recalls' }, '402': { description: 'Payment required.' } },
+      responses: { '200': { description: 'Recalls', content: { 'application/json': { schema: { type: 'object' } } } }, '402': { description: 'Payment required.' } },
     } }, '/x402/npi': { get: {
       operationId: 'npiLookup',
       summary: 'NPPES provider (NPI) lookup.',
       description: 'NPI, name, specialty, location, phone. Provide last_name, organization_name, or specialty. Pay 0.05 USDC on Base.',
-      parameters: [{ name: 'last_name', in: 'query', required: false, schema: { type: 'string' }, example: 'Smith' }, { name: 'organization_name', in: 'query', required: false, schema: { type: 'string' } }, { name: 'specialty', in: 'query', required: false, schema: { type: 'string' }, example: 'Cardiology' }, { name: 'state', in: 'query', required: false, schema: { type: 'string' } }],
+      parameters: [{ name: 'last_name', in: 'query', required: false, schema: { type: 'string' }, example: 'Smith' }, { name: 'first_name', in: 'query', required: false, schema: { type: 'string' } }, { name: 'organization_name', in: 'query', required: false, schema: { type: 'string' } }, { name: 'specialty', in: 'query', required: false, schema: { type: 'string' }, example: 'Cardiology' }, { name: 'state', in: 'query', required: false, schema: { type: 'string' } }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.05', amountUnits: '50000', payTo: X402_PAY_TO },
-      responses: { '200': { description: 'Providers' }, '402': { description: 'Payment required.' } },
+      responses: { '200': { description: 'Providers', content: { 'application/json': { schema: { type: 'object' } } } }, '402': { description: 'Payment required.' } },
     } }, '/x402/clinical-trials': { get: {
       operationId: 'clinicalTrials',
       summary: 'Clinical trial search (ClinicalTrials.gov APIv2).',
       description: 'NCT ID, title, status, phase, enrollment, sponsor, conditions. Pay 0.08 USDC on Base.',
       parameters: [{ name: 'term', in: 'query', required: false, schema: { type: 'string' }, description: 'Drug, sponsor, or keyword.', example: 'diabetes' }, { name: 'condition', in: 'query', required: false, schema: { type: 'string' } }, { name: 'status', in: 'query', required: false, schema: { type: 'string', enum: ['RECRUITING', 'ACTIVE', 'COMPLETED', 'ALL'], default: 'RECRUITING' } }, { name: 'rows', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 25, default: 10 } }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.08', amountUnits: '80000', payTo: X402_PAY_TO },
-      responses: { '200': { description: 'Clinical trials' }, '402': { description: 'Payment required.' } },
+      responses: { '200': { description: 'Clinical trials', content: { 'application/json': { schema: { type: 'object' } } } }, '402': { description: 'Payment required.' } },
     } }, '/x402/insider-trades': { get: {
       operationId: 'insiderTrades',
       summary: 'SEC EDGAR Form 4 insider trades by ticker.',
       description: 'Executive buy/sell filings from SEC EDGAR. Returns filing URLs with full Form 4 detail. Pay 0.20 USDC on Base.',
       parameters: [{ name: 'ticker', in: 'query', required: true, schema: { type: 'string' }, description: 'Stock ticker (e.g. TSLA, AMC, GME).', example: 'NVDA' }, { name: 'days', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 90, default: 30 } }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 25, default: 10 } }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.20', amountUnits: '200000', payTo: X402_PAY_TO },
-      responses: { '200': { description: 'Insider trades' }, '402': { description: 'Payment required.' } },
+      responses: { '200': { description: 'Insider trades', content: { 'application/json': { schema: { type: 'object' } } } }, '402': { description: 'Payment required.' } },
     } }, '/x402/drug-adverse-events': { get: {
       operationId: 'drugAdverseEvents',
       summary: 'FDA adverse event reports (openFDA FAERS).',
       description: 'Reactions, seriousness, outcomes for a drug from FDA safety reports. Pay 0.08 USDC on Base.',
       parameters: [{ name: 'drug', in: 'query', required: true, schema: { type: 'string' }, example: 'ibuprofen' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 25, default: 10 } }, { name: 'X-Openfda-Key', in: 'header', required: false, schema: { type: 'string' }, description: 'BYOK: your own openFDA API key, takes priority over the server default.' }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.08', amountUnits: '80000', payTo: X402_PAY_TO },
-      responses: { '200': { description: 'Adverse events' }, '402': { description: 'Payment required.' } },
+      responses: { '200': { description: 'Adverse events', content: { 'application/json': { schema: { type: 'object' } } } }, '402': { description: 'Payment required.' } },
     } }, '/x402/sec-8k': { get: {
       operationId: 'sec8k',
       summary: 'SEC EDGAR 8-K material event filings by ticker.',
       description: 'Earnings, CEO changes, M&A, and other material events. Pay 0.25 USDC on Base.',
       parameters: [{ name: 'ticker', in: 'query', required: true, schema: { type: 'string' }, example: 'AAPL' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 20, default: 5 } }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.25', amountUnits: '250000', payTo: X402_PAY_TO },
-      responses: { '200': { description: '8-K filings' }, '402': { description: 'Payment required.' } },
+      responses: { '200': { description: '8-K filings', content: { 'application/json': { schema: { type: 'object' } } } }, '402': { description: 'Payment required.' } },
     } }, '/x402/treasury-yields': { get: {
       operationId: 'treasuryYields',
       summary: 'Daily US Treasury yield curve rates (1M–30Y).',
       description: 'Official daily yield curve from Treasury.gov. Pay 0.05 USDC on Base.',
       parameters: [{ name: 'month', in: 'query', required: false, schema: { type: 'string' }, description: 'YYYYMM format (defaults to current month).', example: '202606' }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.05', amountUnits: '50000', payTo: X402_PAY_TO },
-      responses: { '200': { description: 'Yield curve' }, '402': { description: 'Payment required.' } },
+      responses: { '200': { description: 'Yield curve', content: { 'application/json': { schema: { type: 'object' } } } }, '402': { description: 'Payment required.' } },
     } }, '/x402/entity-compliance': { get: {
       operationId: 'entityCompliance',
       summary: 'SAM entity compliance bundle: registration + exclusion + set-asides + NAICS.',
       description: 'Full compliance check by UEI or CAGE: active status, expiry, exclusion flag, set-aside certifications, size standard. Pay 0.35 USDC on Base.',
       parameters: [{ name: 'uei', in: 'query', required: false, schema: { type: 'string' }, description: 'SAM UEI (preferred).', example: 'JF19MPF74LN7' }, { name: 'cage', in: 'query', required: false, schema: { type: 'string' }, description: 'CAGE code (alternative).' }, { name: 'X-Sam-Key', in: 'header', required: false, schema: { type: 'string' }, description: 'BYOK: your own SAM.gov API key, takes priority over the server default.' }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.35', amountUnits: '350000', payTo: X402_PAY_TO },
-      responses: { '200': { description: 'Compliance report' }, '402': { description: 'Payment required.' } },
+      responses: { '200': { description: 'Compliance report', content: { 'application/json': { schema: { type: 'object' } } } }, '402': { description: 'Payment required.' } },
     } }, '/x402/agent-score': { get: {
       operationId: 'agentScore',
       summary: 'AI agent FICO-style reputation score (300–850).',
       description: 'Submit behavioral signals (tasks, errors, payments) or retrieve score for an agent. Pay 0.20 USDC on Base.',
       parameters: [{ name: 'agent_id', in: 'query', required: true, schema: { type: 'string' }, example: 'agent-001' }, { name: 'action', in: 'query', required: false, schema: { type: 'string', enum: ['get', 'report'], default: 'get' } }, { name: 'tasks', in: 'query', required: false, schema: { type: 'integer' } }, { name: 'successes', in: 'query', required: false, schema: { type: 'integer' } }, { name: 'errors', in: 'query', required: false, schema: { type: 'integer' } }, { name: 'payments', in: 'query', required: false, schema: { type: 'integer' } }, { name: 'uptime', in: 'query', required: false, schema: { type: 'number' } }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.20', amountUnits: '200000', payTo: X402_PAY_TO },
-      responses: { '200': { description: 'Agent score' }, '402': { description: 'Payment required.' } },
+      responses: { '200': { description: 'Agent score', content: { 'application/json': { schema: { type: 'object' } } } }, '402': { description: 'Payment required.' } },
     } }, '/x402/fact-check': { get: {
       operationId: 'factCheck',
       summary: 'Grounding oracle: fact-checks a claim against live government/FDA/SEC/Treasury data.',
       description: 'Submit any claim; auto-routes to the relevant primary source. Pay 0.15 USDC on Base.',
       parameters: [{ name: 'claim', in: 'query', required: true, schema: { type: 'string' }, example: 'The 10-year Treasury yield is above 4%' }, { name: 'domain', in: 'query', required: false, schema: { type: 'string', enum: ['grants', 'contracts', 'drug', 'provider', 'insider', 'yields', 'clinical', 'general'] } }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.15', amountUnits: '150000', payTo: X402_PAY_TO },
-      responses: { '200': { description: 'Fact-check result' }, '402': { description: 'Payment required.' } },
+      responses: { '200': { description: 'Fact-check result', content: { 'application/json': { schema: { type: 'object' } } } }, '402': { description: 'Payment required.' } },
     } }, '/x402/sec-13f': { get: {
       operationId: 'sec13f',
       summary: 'SEC EDGAR 13F institutional holdings — hedge fund quarterly positions.',
       description: 'Returns the most recent 13F-HR filings for a fund or institution by CIK or name. Each result includes the filing URL linking to the full XML holdings table. Pay 0.25 USDC on Base.',
       parameters: [{ name: 'cik', in: 'query', required: false, schema: { type: 'string' }, description: '10-digit SEC CIK number (preferred).', example: '0001067983' }, { name: 'name', in: 'query', required: false, schema: { type: 'string' }, description: 'Institution or fund name (e.g. "Berkshire Hathaway").' }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.25', amountUnits: '250000', payTo: X402_PAY_TO },
-      responses: { '200': { description: '13F filing list with URLs' }, '402': { description: 'Payment required.' } },
+      responses: { '200': { description: '13F filing list with URLs', content: { 'application/json': { schema: { type: 'object' } } } }, '402': { description: 'Payment required.' } },
     } }, '/x402/lobbying': { get: {
       operationId: 'lobbyingDisclosures',
       summary: 'Senate LDA lobbying disclosure filings — client, registrant, issues, and amounts.',
       description: 'Search the Senate Lobbying Disclosure Act database by client name, registrant (lobbying firm), or issue code. Returns recent filings with activity detail. Pay 0.15 USDC on Base.',
       parameters: [{ name: 'client', in: 'query', required: false, schema: { type: 'string' }, description: 'The company or organization being lobbied for.', example: 'Google' }, { name: 'registrant', in: 'query', required: false, schema: { type: 'string' }, description: 'The lobbying firm or individual registrant.' }, { name: 'issue', in: 'query', required: false, schema: { type: 'string' }, description: 'LDA issue area code (e.g. TAX, HCR, DEF, ENV, TRD).' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 25, default: 10 } }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.15', amountUnits: '150000', payTo: X402_PAY_TO },
-      responses: { '200': { description: 'Lobbying filings' }, '402': { description: 'Payment required.' } },
+      responses: { '200': { description: 'Lobbying filings', content: { 'application/json': { schema: { type: 'object' } } } }, '402': { description: 'Payment required.' } },
     } }, '/x402/patents': { get: {
       operationId: 'patentSearch',
       summary: 'USPTO PatentsView patent search — title, abstract, assignee, CPC class, grant date.',
       description: 'Search granted U.S. patents by keyword title or assignee (company). Returns patent ID, title, abstract snippet, CPC classification, and grant date. Pay 0.10 USDC on Base.',
       parameters: [{ name: 'query', in: 'query', required: false, schema: { type: 'string' }, description: 'Keyword or phrase to search in patent titles.', example: 'machine learning' }, { name: 'assignee', in: 'query', required: false, schema: { type: 'string' }, description: 'Assignee organization name (e.g. "Apple Inc").', example: 'Apple Inc' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 25, default: 10 } }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.10', amountUnits: '100000', payTo: X402_PAY_TO },
-      responses: { '200': { description: 'Patent results' }, '402': { description: 'Payment required.' } },
+      responses: { '200': { description: 'Patent results', content: { 'application/json': { schema: { type: 'object' } } } }, '402': { description: 'Payment required.' } },
     } }, '/x402/fred': { get: {
       operationId: 'fredSeries',
       summary: 'FRED economic indicator series (Federal Reserve Bank of St. Louis).',
       description: 'Retrieve observations for any FRED series: GDP, CPI, UNRATE, FEDFUNDS, T10Y2Y, and 800k+ others. Returns series metadata and latest observations in reverse chronological order. Pay 0.08 USDC on Base.',
       parameters: [{ name: 'series_id', in: 'query', required: true, schema: { type: 'string' }, description: 'FRED series ID (e.g. GDP, CPIAUCSL, UNRATE, FEDFUNDS, T10Y2Y, MORTGAGE30US).', example: 'GDP' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 50, default: 20 } }, { name: 'X-Fred-Key', in: 'header', required: false, schema: { type: 'string' }, description: 'BYOK: your own FRED API key, takes priority over the server default.' }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.08', amountUnits: '80000', payTo: X402_PAY_TO },
-      responses: { '200': { description: 'FRED series observations' }, '402': { description: 'Payment required.' } },
+      responses: { '200': { description: 'FRED series observations', content: { 'application/json': { schema: { type: 'object' } } } }, '402': { description: 'Payment required.' } },
     } }, '/x402/osha': { get: {
       operationId: 'oshaInspections',
       summary: 'OSHA workplace inspection and violation records (DOL enforcement data).',
@@ -2346,7 +2346,7 @@ async function runSSE(): Promise<void> {
       description: 'BULL or BEAR only when three independent engines (macro price stretch, dark-pool volume kinetics, ribbon harmonics) all agree; otherwise NO_TRIPLE_LOCK with the blocking engine named. Keywords: max conviction signal, rare squeeze signal, triple lock verdict, three engine consensus. Pay 0.25 USDC on Base.',
       requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', properties: { symbol: { type: 'string' } }, required: ['symbol'] } } } },
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.25', amountUnits: '250000', payTo: X402_PAY_TO },
-      responses: { '200': { description: 'Max-conviction verdict' }, '402': { description: 'Payment required.' } },
+      responses: { '200': { description: 'Max-conviction verdict', content: { 'application/json': { schema: { type: 'object' } } } }, '402': { description: 'Payment required.' } },
     } }, '/x402/content-trust-score': { post: {
       operationId: 'contentTrustScore',
       summary: 'Content misinformation trust scoring plus on-chain wallet trust ledger.',
@@ -2419,6 +2419,8 @@ async function runSSE(): Promise<void> {
       responses: { '200': { description: 'Exchange rate data' }, '402': { description: 'Payment required.' } },
     } }, '/.well-known/x402': { get: { operationId: 'openApiDiscovery', summary: 'OpenAPI/x402 discovery document (free).', security: [], responses: { '200': { description: 'OpenAPI spec.' } } } },
     '/openapi.json': { get: { operationId: 'openApiJson', summary: 'OpenAPI spec (free).', security: [], responses: { '200': { description: 'OpenAPI spec.' } } } },
+    '/x402/.well-known/x402': { get: { operationId: 'openApiDiscoveryAlias', summary: 'OpenAPI/x402 discovery document (free).', security: [], responses: { '200': { description: 'OpenAPI spec.' } } } },
+    '/x402/openapi.json': { get: { operationId: 'openApiJsonAlias', summary: 'OpenAPI spec (free).', security: [], responses: { '200': { description: 'OpenAPI spec.' } } } },
   } };
   // x402scan/Bazaar discovery validation (per their docs/DISCOVERY.md) requires
   // every paid operation's x-payment-info to carry a `protocols` array and a
@@ -2436,6 +2438,8 @@ async function runSSE(): Promise<void> {
   }
   app.get('/.well-known/x402', (_req, res) => { res.set('Access-Control-Allow-Origin', '*').json(OPENAPI_DOC); });
   app.get('/openapi.json', (_req, res) => { res.set('Access-Control-Allow-Origin', '*').json(OPENAPI_DOC); });
+  app.get('/x402/.well-known/x402', (_req, res) => { res.set('Access-Control-Allow-Origin', '*').json(OPENAPI_DOC); });
+  app.get('/x402/openapi.json', (_req, res) => { res.set('Access-Control-Allow-Origin', '*').json(OPENAPI_DOC); });
   app.get('/favicon.ico', (_req, res) => {
     res.set('Content-Type', 'image/x-icon').set('Cache-Control', 'public, max-age=86400').send(FAVICON_ICO);
   });
