@@ -197,6 +197,7 @@ async function runSSE(): Promise<void> {
 
   const LEVIATHAN_BYPASS_SECRET = process.env['LEVIATHAN_BYPASS_SECRET'] ?? '';
   const SML_API_KEY = process.env['SML_API_KEY'] ?? '';
+  const API_MARKET_PROXY_SECRET = process.env['API_MARKET_PROXY_SECRET'] ?? '';
 
   // Health endpoint — hit every 30s by Docker healthcheck + keepalive cron
   app.get('/health', healthHandler);
@@ -512,6 +513,13 @@ async function runSSE(): Promise<void> {
     // LEVIATHAN bypass — Virtuals Protocol USDC already settled on-chain
     if (LEVIATHAN_BYPASS_SECRET && req.headers['x-leviathan-key'] === LEVIATHAN_BYPASS_SECRET) {
       return { ok: true, payer: { rail: 'leviathan', from: 'did:leviathan:acp:scriptmasterlabs', tx: '' } };
+    }
+
+    // api.market bypass — requests proxied through api.market carry a custom
+    // header (X-Api-Market-Key) that we configure in the api.market seller
+    // dashboard. api.market handles subscriber billing; we trust their gateway.
+    if (API_MARKET_PROXY_SECRET && req.headers['x-api-market-key'] === API_MARKET_PROXY_SECRET) {
+      return { ok: true, payer: { rail: 'api-market', from: 'proxy:api.market', tx: '' } };
     }
 
     // Operator bypass — the operator's own private tools (e.g. the trading
