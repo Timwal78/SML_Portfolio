@@ -1,4 +1,5 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { registerFederal } from './federal.js';
 import { registerAgentCard } from './agentcard.js';
 import { registerApm } from './apm.js';
 import { registerApmExecute } from './apm-execute.js';
@@ -53,4 +54,5 @@ export async function registerTools(server: McpServer): Promise<void> {
   registerTradeLeads(server);
   registerXdeo(server);
   await registerXmit(server);
+  registerFederal(server);
 }
