@@ -12,7 +12,7 @@
 FROM node:22-alpine AS builder
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci --ignore-scripts --omit=optional
+RUN npm install --ignore-scripts --omit=optional
 COPY tsconfig.json ./
 COPY src/ ./src/
 RUN npm run build
@@ -21,7 +21,7 @@ FROM node:22-alpine AS runner
 WORKDIR /app
 RUN apk add --no-cache dbus libsecret
 COPY package*.json ./
-RUN npm ci --omit=dev --omit=optional --ignore-scripts
+RUN npm install --omit=dev --omit=optional --ignore-scripts
 COPY --from=builder /app/dist ./dist
 COPY agents.json llms.txt .well-known/ ./
 EXPOSE 3402
