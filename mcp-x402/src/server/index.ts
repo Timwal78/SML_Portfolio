@@ -202,6 +202,49 @@ async function runSSE(): Promise<void> {
   // Health endpoint — hit every 30s by Docker healthcheck + keepalive cron
   app.get('/health', healthHandler);
 
+  // FREE public status endpoint — no payment or auth required.
+  // Listed as the free-tier offering on api.market so reviewers and
+  // subscribers can immediately verify the service is live.
+  app.get('/x402/status', (_req, res) => {
+    const now = new Date();
+    const dayOfWeek = now.getUTCDay(); // 0=Sun, 6=Sat
+    const hourUTC = now.getUTCHours();
+    // NYSE hours: Mon-Fri 13:30–20:00 UTC
+    const marketOpen =
+      dayOfWeek >= 1 && dayOfWeek <= 5 &&
+      (hourUTC > 13 || (hourUTC === 13 && now.getUTCMinutes() >= 30)) &&
+      hourUTC < 20;
+    res.set('Access-Control-Allow-Origin', '*').json({
+      service: 'Script Master Labs x402 Data API',
+      status: 'operational',
+      version: '1.0.0',
+      provider: {
+        name: 'Script Master Labs, LLC',
+        sdvosb: true,
+        samGovRegistered: true,
+        description: '54 pay-per-call U.S. federal, financial, and compliance data endpoints settled in USDC on Base via x402.',
+      },
+      market: {
+        nyse: marketOpen ? 'open' : 'closed',
+        timestamp: now.toISOString(),
+      },
+      endpoints: {
+        total: 53,
+        categories: [
+          'SEC Filings (10-K, 10-Q, 8-K, 13F, 13D/G)',
+          'FDA (drug labels, recalls, adverse events, 510k, warnings)',
+          'Health (NPI lookup, CMS providers, NIH grants, clinical trials)',
+          'Compliance (EPA violations, OSHA, FINRA BrokerCheck, entity check)',
+          'Finance (FRED, treasury yields, FEC, insider trades, options flow, FTD)',
+          'Government (Congress bills, lobbying, SAM.gov grants, SBIR, patents)',
+          'AI Signals (SqueezeOS trading signals, AI fact-check, cascade signal)',
+        ],
+        pricing: 'From $0.03 to $0.35 USD per call, settled in USDC on Base.',
+        docs: 'https://mcp-x402.onrender.com/openapi.json',
+      },
+    });
+  });
+
   // Agent traffic stats — polled by dashboard every 60s
   app.get('/api/stats', (_req, res) => {
     res.set('Access-Control-Allow-Origin', '*').json({
