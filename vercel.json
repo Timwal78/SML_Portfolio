@@ -10,7 +10,7 @@
     {
       "source": "/aeo",
       "destination": "/aeo.html",
-      "permanent": false
+      "permanent": true
     },
     {
       "source": "/:path*",
@@ -26,37 +26,37 @@
     {
       "source": "/agentswarm-seo",
       "destination": "/agentswarm-seo.html",
-      "permanent": false
+      "permanent": true
     },
     {
       "source": "/slack",
       "destination": "/slack.html",
-      "permanent": false
+      "permanent": true
     },
     {
       "source": "/privacy",
       "destination": "/privacy.html",
-      "permanent": false
+      "permanent": true
     },
     {
       "source": "/terms",
       "destination": "/terms.html",
-      "permanent": false
+      "permanent": true
     },
     {
       "source": "/trustverify",
       "destination": "/trustverify.html",
-      "permanent": false
+      "permanent": true
     },
     {
       "source": "/stack",
       "destination": "/stack.html",
-      "permanent": false
+      "permanent": true
     },
     {
       "source": "/affiliate",
       "destination": "/affiliate.html",
-      "permanent": false
+      "permanent": true
     },
     {
       "source": "/stack/nexus-402",
