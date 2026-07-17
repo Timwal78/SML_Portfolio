@@ -2,6 +2,19 @@
  * LEVIATHAN — Virtuals Protocol ACP Seller Agent
  * ScriptMasterLabs | mcp-x402
  *
+ * This is the LIVE, deployed LEVIATHAN agent (Render service `mcp-x402`,
+ * ACP_WALLET_ADDRESS 0x0f035c36c4ce65a6f1bf4370f779bac722d59004). The
+ * duplicate at mcp-x402-xrpl/src/acp/leviathan.ts is stale/orphaned — see
+ * SqueezeOS/CLAUDE.md, "LEVIATHAN / Virtuals ACP Marketplace" section.
+ *
+ * MARKETPLACE VISIBILITY: this agent does not appear in ACP marketplace
+ * search because its Virtuals agent NFT has never been minted/"graduated"
+ * (erc8004AgentId is null). No method in @virtuals-protocol/acp-node-v2
+ * can mint/graduate an agent or edit its profile — confirmed by inspecting
+ * the SDK's full type surface. Fixing this requires a manual step at
+ * app.virtuals.io (graduate virtualAgentId 106978, then fill in the profile
+ * description) — it cannot be done from this codebase.
+ *
  * 54 institutional-grade offerings backed by live routes in this server.
  * Buyers pay USDC on Base via Virtuals Protocol ACP v2.
  * Calls are forwarded to the appropriate backend with X-Leviathan-Key bypass
