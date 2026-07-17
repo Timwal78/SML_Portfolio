@@ -18,6 +18,7 @@
     "test:integration": "vitest run tests/integration",
     "test:coverage": "vitest run --coverage",
     "pay-standard": "node scripts/pay-standard.mjs",
+    "acp-self-test-buyer": "tsx scripts/acp-self-test-buyer.ts",
     "lint": "eslint src tests",
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "npm run build && npm run typecheck"
