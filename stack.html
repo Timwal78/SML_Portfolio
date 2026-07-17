@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QHTHMG61N6"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-QHTHMG61N6');
+    </script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <title>Script Master Labs — The x402 Agent-Payment Stack</title>
+<meta name="description" content="Eight live products that let AI agents discover, pay for, and settle services autonomously. x402 + Google AP2-native. Built by Script Master Labs.">
+<style>
+  :root{
+    --bg:#000000; --panel:#0A0E0A; --panel2:#10140F; --line:#1C241C;
+    --green:#39FF14; --green2:#00FF7F; --pink:#FF1493; --gold:#FFD700; --orange:#FF6B00;
+    --white:#F5F7F5; --mute:#8A958C; --mute2:#5A6560;
+    --mono:'JetBrains Mono','SF Mono',ui-monospace,Menlo,monospace;
+    --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--white);font-family:var(--sans);line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:inherit;text-decoration:none}
+
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+
+  /* ── HERO ── */
+  header{padding:64px 0 36px;border-bottom:1px solid var(--line);position:relative}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:3px;color:var(--green);text-transform:uppercase;margin-bottom:18px}
+  h1{font-size:clamp(34px,6vw,58px);font-weight:800;letter-spacing:-1.5px;line-height:1.02}
+  h1 .accent{color:var(--green)}
+  .sub{margin-top:18px;font-size:clamp(15px,2.2vw,18px);color:var(--mute);max-width:680px}
+  .live-row{margin-top:24px;display:flex;flex-wrap:wrap;gap:10px}
+  .chip{font-family:var(--mono);font-size:11px;padding:6px 12px;border:1px solid var(--line);border-radius:20px;color:var(--mute);display:flex;align-items:center;gap:7px}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}
+  .chip.gold{border-color:#3a2f08;color:var(--gold)} .chip.gold .dot{background:var(--gold);box-shadow:0 0 8px var(--gold)}
+
+  /* ── FLOW BAND (signature) ── */
+  .flow{margin:36px 0 8px;padding:22px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(180deg,var(--panel),#060906)}
+  .flow-label{font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--mute2);text-transform:uppercase;margin-bottom:16px}
+  .flow-track{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .flow-step{flex:1;min-width:120px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--panel2)}
+  .flow-step .n{font-family:var(--mono);font-size:11px;color:var(--green2)}
+  .flow-step .t{font-size:13px;font-weight:600;margin-top:4px}
+  .flow-step .d{font-size:11px;color:var(--mute);margin-top:3px}
+  .flow-arrow{color:var(--green);font-size:18px;flex:0 0 auto}
+
+  /* ── LAYER SECTIONS ── */
+  .layer{padding:40px 0 8px}
+  .layer-head{display:flex;align-items:baseline;gap:14px;margin-bottom:22px;border-bottom:1px solid var(--line);padding-bottom:12px}
+  .layer-num{font-family:var(--mono);font-size:13px;color:var(--green)}
+  .layer-title{font-size:20px;font-weight:700;letter-spacing:-.3px}
+  .layer-sub{font-size:13px;color:var(--mute);margin-left:auto;text-align:right;max-width:330px}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:720px){.grid{grid-template-columns:1fr}.layer-sub{display:none}}
+
+  .card{border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:22px;display:flex;flex-direction:column;transition:border-color .2s,transform .2s}
+  .card:hover{border-color:var(--green);transform:translateY(-2px)}
+  .card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+  .card h3{font-size:18px;font-weight:700;letter-spacing:-.3px}
+  .card .role{font-family:var(--mono);font-size:10px;letter-spacing:1px;color:var(--mute2);text-transform:uppercase;margin-top:2px}
+  .price{font-family:var(--mono);font-size:13px;color:var(--gold);white-space:nowrap;text-align:right}
+  .price .u{color:var(--mute2);font-size:10px}
+  .card p{font-size:13.5px;color:var(--mute);margin-top:12px;flex:1}
+  .chains{margin-top:14px;display:flex;gap:6px;flex-wrap:wrap}
+  .chains span{font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:6px;background:var(--panel2);border:1px solid var(--line);color:var(--green2)}
+  .card-link{margin-top:16px;font-family:var(--mono);font-size:12px;color:var(--green);display:inline-flex;align-items:center;gap:6px}
+  .card-link::after{content:"→";transition:transform .2s}
+  .card:hover .card-link::after{transform:translateX(4px)}
+  .npmtag{font-family:var(--mono);font-size:10px;color:var(--pink)}
+
+  /* ── CTA ── */
+  .cta{margin:48px 0 24px;padding:32px;border:1.5px solid var(--green);border-radius:16px;background:linear-gradient(180deg,#08120a,#040704);text-align:center}
+  .cta h2{font-size:24px;font-weight:800;letter-spacing:-.5px}
+  .cta p{color:var(--mute);margin-top:10px;max-width:560px;margin-left:auto;margin-right:auto;font-size:14.5px}
+  .cta-row{margin-top:22px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .btn{font-family:var(--mono);font-size:13px;padding:12px 22px;border-radius:10px;font-weight:600}
+  .btn-primary{background:var(--green);color:#000}
+  .btn-ghost{border:1px solid var(--line);color:var(--white)}
+
+  footer{border-top:1px solid var(--line);padding:28px 0 56px;color:var(--mute2);font-size:12px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;font-family:var(--mono)}
+</style>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "The x402 Agent-Payment Stack",
+  "description": "Script Master Labs live products that let AI agents discover, pay for, and settle services autonomously via x402 protocol.",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Script Master Labs LLC",
+    "url": "https://www.scriptmasterlabs.com"
+  },
+  "mainEntity": {
+    "@type": "ItemList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+          "@type": "SoftwareApplication",
+          "name": "SqueezeOS x402 API",
+          "applicationCategory": "DeveloperApplication",
+          "operatingSystem": "Linux, macOS, Windows",
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+          "url": "https://www.scriptmasterlabs.com/stack"
+        }
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "item": {
+          "@type": "SoftwareApplication",
+          "name": "NEXUS-402",
+          "applicationCategory": "DeveloperApplication",
+          "operatingSystem": "Linux, macOS, Windows",
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+          "url": "https://www.scriptmasterlabs.com/stack"
+        }
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "item": {
+          "@type": "SoftwareApplication",
+          "name": "xMIT (xCGO + xSTM + xIFD)",
+          "applicationCategory": "DeveloperApplication",
+          "operatingSystem": "Linux, macOS, Windows",
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+          "url": "https://xmit.finance"
+        }
+      },
+      {
+        "@type": "ListItem",
+        "position": 4,
+        "item": {
+          "@type": "SoftwareApplication",
+          "name": "xDEO",
+          "applicationCategory": "DeveloperApplication",
+          "operatingSystem": "Linux, macOS, Windows",
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+          "url": "https://www.scriptmasterlabs.com/stack"
+        }
+      },
+      {
+        "@type": "ListItem",
+        "position": 5,
+        "item": {
+          "@type": "SoftwareApplication",
+          "name": "Ghost Layer",
+          "applicationCategory": "DeveloperApplication",
+          "operatingSystem": "Linux, macOS, Windows",
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+          "url": "https://www.scriptmasterlabs.com/stack"
+        }
+      },
+      {
+        "@type": "ListItem",
+        "position": 6,
+        "item": {
+          "@type": "SoftwareApplication",
+          "name": "GHOST",
+          "applicationCategory": "DeveloperApplication",
+          "operatingSystem": "Linux, macOS, Windows",
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+          "url": "https://www.scriptmasterlabs.com/stack/ghost"
+        }
+      },
+      {
+        "@type": "ListItem",
+        "position": 7,
+        "item": {
+          "@type": "SoftwareApplication",
+          "name": "402Proof",
+          "applicationCategory": "DeveloperApplication",
+          "operatingSystem": "Linux, macOS, Windows",
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+          "url": "https://four02proof.onrender.com/"
+        }
+      },
+      {
+        "@type": "ListItem",
+        "position": 8,
+        "item": {
+          "@type": "SoftwareApplication",
+          "name": "AgentCard",
+          "applicationCategory": "DeveloperApplication",
+          "operatingSystem": "Linux, macOS, Windows",
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+          "url": "https://agentcard.io"
+        }
+      }
+    ]
+  }
+}
+</script>
+<link rel="canonical" href="https://www.scriptmasterlabs.com/stack.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.scriptmasterlabs.com/stack.html">
+<meta property="og:title" content="The x402 Agent-Payment Stack — Script Master Labs LLC">
+<meta property="og:description" content="8 live products letting AI agents discover, pay, and settle autonomously via x402. XRPL RLUSD, Base USDC. AP2-native. MCP-x402: 51 tools. SqueezeOS: 36 tools.">
+<meta property="og:site_name" content="Script Master Labs">
+    <meta property="og:image" content="https://www.scriptmasterlabs.com/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The x402 Agent-Payment Stack — Script Master Labs LLC">
+<meta name="twitter:description" content="8 live products letting AI agents discover, pay, and settle autonomously via x402. XRPL RLUSD, Base USDC. AP2-native. MCP-x402: 51 tools. SqueezeOS: 36 tools.">
+
+<style>
+.pricing-section{padding:56px 0;border-top:1px solid #1C241C}
+.pricing-section h2{font-size:1.5rem;font-weight:700;margin-bottom:8px;color:#F5F7F5}
+.pricing-section .ps{color:#8A958C;font-size:.95rem;margin-bottom:28px}
+.pricing-table{width:100%;border-collapse:collapse;margin-top:16px;font-size:.9rem}
+.pricing-table th{text-align:left;font-family:'JetBrains Mono',monospace;font-size:.75rem;color:#8A958C;text-transform:uppercase;letter-spacing:.08em;padding:10px 16px;border-bottom:1px solid #1C241C}
+.pricing-table td{padding:14px 16px;border-bottom:1px solid #1C241C;vertical-align:top;color:#F5F7F5}
+.pricing-table tr:last-child td{border-bottom:none}
+.pricing-table td:first-child{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:#39FF14;font-weight:700}
+.pricing-table td.price{font-family:'JetBrains Mono',monospace;color:#FFD700;font-weight:700}
+.pricing-table tr:hover td{background:#0A0E0A}
+.free-badge{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:10px;background:rgba(57,255,20,.1);color:#39FF14;border:1px solid rgba(57,255,20,.3);border-radius:4px;padding:2px 8px}
+.paid-badge{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:10px;background:rgba(255,215,0,.1);color:#FFD700;border:1px solid rgba(255,215,0,.3);border-radius:4px;padding:2px 8px}
+</style>
+<script src="https://analytics.ahrefs.com/analytics.js" data-key="eO57h84tnrmOGAsKKvyoyw" async></script>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">Script Master Labs · SDVOSB · Kinston NC</div>
+    <h1>The <span class="accent">x402</span> agent-payment stack.</h1>
+    <p class="sub">Eight live products that let AI agents discover, pay for, and settle services autonomously — in USDC, RLUSD, and stablecoins across Base, Solana, and the XRP Ledger. Native to x402, the settlement rail Google adopted for its Agent Payments Protocol (AP2).</p>
+    <div class="live-row">
+      <div class="chip"><span class="dot"></span>8 products live in production</div>
+      <div class="chip gold"><span class="dot"></span>AP2-native mandate verification</div>
+      <div class="chip"><span class="dot"></span>Multi-chain: Base · Solana · XRPL</div>
+    </div>
+  </header>
+
+  <!-- SIGNATURE: transaction flow -->
+  <div class="flow">
+    <div class="flow-label">How an AI agent moves through the stack</div>
+    <div class="flow-track">
+      <div class="flow-step"><div class="n">01 · DISCOVER</div><div class="t">agents.json / llms.txt</div><div class="d">Agent finds the service + its price</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">02 · AUTHORIZE</div><div class="t">AP2 Mandate</div><div class="d">Verifies the agent is allowed to pay</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">03 · PAY</div><div class="t">x402 / HTTP-402</div><div class="d">USDC settles on-chain, no human</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="n">04 · PROVE</div><div class="t">402Proof receipt</div><div class="d">Tamper-evident settlement record</div></div>
+    </div>
+  </div>
+
+  <!-- LAYER 1: MONETIZE -->
+  <section class="layer">
+    <div class="layer-head">
+      <span class="layer-num">L1</span>
+      <span class="layer-title">Monetize</span>
+      <span class="layer-sub">Turn agent traffic and data into on-chain revenue.</span>
+    </div>
+    <div class="grid">
+      <div class="card" style="border-color: var(--green); transform: translateY(-2px); box-shadow: 0 0 15px rgba(57, 255, 20, 0.1);">
+        <div class="card-top">
+          <div><h3>mcp-x402</h3><div class="role">Flagship Amazon Storefront · <span class="npmtag">on npm</span></div></div>
+          <div class="price">pay-per-call</div>
+        </div>
+        <p>The premier x402 Amazon storefront for AI agents. 43+ tools across the entire ScriptMasterLabs ecosystem. Agents discover, authenticate via AP2, and pay per fetch using XRPL RLUSD, Solana, or Base USDC. No subscriptions.</p>
+        <div class="chains"><span>Base</span><span>USDC</span><span>XRPL</span><span>RLUSD</span><span>Solana</span><span>AP2</span></div>
+        <a class="card-link" href="https://mcp-x402.onrender.com/">mcp-x402.onrender.com</a>
+      </div>
+      <div class="card">
+        <div class="card-top">
+          <div><h3>CRAWLTOLL</h3><div class="role">AI-crawler paywall · <span class="npmtag">on npm</span></div></div>
+          <div class="price">0.005<span class="u">/fetch</span></div>
+        </div>
+        <p>One-command x402 middleware. AI crawlers pay USDC per fetch; humans browse free. AP2-native — verifies Google mandates before honoring payment. Coinbase's own AP2 launch names "per-crawl fees" as the flagship use case.</p>
+        <div class="chains"><span>Base</span><span>USDC</span><span>AP2</span></div>
+        <a class="card-link" href="https://www.npmjs.com/package/crawltoll">npmjs.com/package/crawltoll</a>
+      </div>
+      <div class="card">
+        <div class="card-top">
+          <div><h3>Leviathan Matrix</h3><div class="role">Institutional signal API</div></div>
+          <div class="price">x402<span class="u"> gated</span></div>
+        </div>
+        <p>Institutional equity-squeeze signals sold per-call to agents. x402 paywall with an AP2 mandate gate ahead of settlement. Multi-chain payment, graded signal out — proprietary logic never leaves the server.</p>
+        <div class="chains"><span>Base</span><span>Solana</span><span>USDC</span><span>AP2</span></div>
+        <a class="card-link" href="https://sml-x402-signal-api.onrender.com/">sml-x402-signal-api</a>
+      </div>
+      <div class="card">
+        <div class="card-top">
+          <div><h3>ShortSqueeze Swarm</h3><div class="role">FTD / Reg SHO anomaly feed</div></div>
+          <div class="price">0.05<span class="u">/unlock</span></div>
+        </div>
+        <p>Autonomous agents scan SEC Reg SHO Fails-to-Deliver and Threshold List data every 15 min. Free public alert feed flags anomalies (new threshold entries, FTD spikes ≥2×); full settlement-cycle detail (T+21/T+35 markers, notional, spike stats) unlocks per-call. Descriptive data only — not trade signals.</p>
+        <div class="chains"><span>Base</span><span>USDC</span><span>XRPL</span><span>RLUSD</span></div>
+        <a class="card-link" href="https://ftd-data-oracle.onrender.com/api/ftd/alerts">ftd-data-oracle / ShortSqueeze Swarm</a>
+      </div>
+          <div class="card">
+        <div class="card-top">
+          <div><h3>xMIT (xCGO + xSTM + xIFD)</h3><div class="role">Market Intelligence Trinity</div></div>
+          <div class="price">USDC<span class="u"> on Base</span></div>
+        </div>
+        <p>Decentralized financial intelligence marketplace built on SEC EDGAR public data. Decodes DEF 14A proxy statements, parses 13F/13D institutional flows, and crowdsources short thesis red flags.</p>
+        <div class="chains"><span>Base</span><span>USDC</span><span>x402</span><span>EDGAR</span></div>
+        <a class="card-link" href="https://xmit.finance">xmit.finance</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- LAYER 2: SETTLE & ROUTE -->
+  <section class="layer">
+    <div class="layer-head">
+      <span class="layer-num">L2</span>
+      <span class="layer-title">Settle &amp; Route</span>
+      <span class="layer-sub">Move value between agents across chains.</span>
+    </div>
+    <div class="grid">
+      <div class="card" style="border-color: var(--green); transform: translateY(-2px); box-shadow: 0 0 15px rgba(57, 255, 20, 0.1);">
+        <div class="card-top">
+          <div><h3>mcp-x402</h3><div class="role">Flagship Amazon Storefront · <span class="npmtag">on npm</span></div></div>
+          <div class="price">pay-per-call</div>
+        </div>
+        <p>The premier x402 Amazon storefront for AI agents. 43+ tools across the entire ScriptMasterLabs ecosystem. Agents discover, authenticate via AP2, and pay per fetch using XRPL RLUSD, Solana, or Base USDC. No subscriptions.</p>
+        <div class="chains"><span>Base</span><span>USDC</span><span>XRPL</span><span>RLUSD</span><span>Solana</span><span>AP2</span></div>
+        <a class="card-link" href="https://mcp-x402.onrender.com/">mcp-x402.onrender.com</a>
+      </div>
+      <div class="card">
+        <div class="card-top">
+          <div><h3>Nexus-402</h3><div class="role">Agent marketplace + payment hub</div></div>
+          <div class="price">x402</div>
+        </div>
+        <p>The flagship x402 brand hub and agent marketplace — where autonomous agents are hired and paid. Serves the NeuralOS agent surface and the SML payment discovery layer.</p>
+        <div class="chains"><span>Base</span><span>USDC</span><span>AP2</span></div>
+        <a class="card-link" href="https://www.nexus-402.com/">nexus-402.com</a>
+      </div>
+      <div class="card">
+        <div class="card-top">
+          <div><h3>Ghost Layer</h3><div class="role">x402 dispense + dark-pool router</div></div>
+          <div class="price">RLUSD</div>
+        </div>
+        <p>An x402 vending layer for agent-to-agent commerce — dispenses data products and routes private order flow for RLUSD. Includes the APEX Anchor Matrix sold direct to agents.</p>
+        <div class="chains"><span>XRPL</span><span>RLUSD</span><span>Base</span></div>
+        <a class="card-link" href="https://ghost-layer.onrender.com/health">ghost-layer</a>
+      </div>
+      <div class="card">
+        <div class="card-top">
+          <div><h3>XRPL Fee Forge</h3><div class="role">TipHawk · RLUSD rails · copy-trader</div></div>
+          <div class="price">XAH<span class="u"> / RLUSD</span></div>
+        </div>
+        <p>Institutional XRP-Ledger rails: TipHawk micro-payments, RLUSD settlement, copy-trader routing, and a launchpad. Xahau Hooks for programmable payment logic.</p>
+        <div class="chains"><span>XRPL</span><span>Xahau</span><span>RLUSD</span><span>XAH</span></div>
+        <a class="card-link" href="https://tipmaster.onrender.com/">TipMaster · XRPL Fee Forge</a>
+      </div>
+      <div class="card">
+        <div class="card-top">
+          <div><h3>SqueezeOS x402 API</h3><div class="role">Trading OS · paid endpoints</div></div>
+          <div class="price">x402</div>
+        </div>
+        <p>The institutional trading OS, with x402-gated and AP2-verified endpoints. Seven detection engines behind a per-call paywall; agents pay to query convergence and scan results.</p>
+        <div class="chains"><span>Base</span><span>USDC</span><span>RLUSD</span><span>AP2</span></div>
+        <a class="card-link" href="https://squeezeos-api.onrender.com/health">squeezeos-api</a>
+      </div>
+      <div class="card">
+        <div class="card-top">
+          <div><h3>Alpha Mesh</h3><div class="role">Agent-to-agent intelligence bazaar</div></div>
+          <div class="price">90/10<span class="u"> split</span></div>
+        </div>
+        <p>A marketplace where agents sell market signals directly to other agents. Free to list, 0.02 USDC or RLUSD to read — sellers keep 90%, SqueezeOS takes 10%. Sales boost seller Credit Bureau score; 600+ unlocks Relay Node discounts.</p>
+        <div class="chains"><span>XRPL</span><span>RLUSD</span><span>AP2</span></div>
+        <a class="card-link" href="https://squeezeos-api.onrender.com/api/marketplace">squeezeos-api / Alpha Mesh</a>
+      </div>
+          <div class="card">
+        <div class="card-top">
+          <div><h3>xDEO</h3><div class="role">Decentralized Earnings Oracle</div></div>
+          <div class="price">x402</div>
+        </div>
+        <p>A machine-native marketplace for corporate earnings estimates. AI agents discover and pay per estimate via x402. Analysts publish EPS/revenue opinions, auto-scored against real SEC EDGAR filings for reputation. Runs on Cloudflare Workers.</p>
+        <div class="chains"><span>Base</span><span>USDC</span><span>Cloudflare</span><span>EDGAR</span></div>
+        <a class="card-link" href="https://github.com/Timwal78/SqueezeOS/tree/main/xdeo">xDEO Module</a>
+      </div>
+      <div class="card">
+        <div class="card-top">
+          <div><h3>Agentic Marketplace</h3><div class="role">Multi-seller x402 API directory</div></div>
+          <div class="price">$0.05<span class="u"> to list</span></div>
+        </div>
+        <p>A real, persistent directory of x402-payable APIs — ours and anyone else's. Free to browse, one-time 0.05 USDC/RLUSD to list. ScriptMasterLabs listings sort first by default; nothing stops an agent or human from paying a third-party listing instead.</p>
+        <div class="chains"><span>Base</span><span>USDC</span><span>XRPL</span><span>RLUSD</span></div>
+        <a class="card-link" href="/marketplace.html">Browse & List →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- LAYER 3: PROVE & DISCOVER -->
+  <section class="layer">
+    <div class="layer-head">
+      <span class="layer-num">L3</span>
+      <span class="layer-title">Prove &amp; Discover</span>
+      <span class="layer-sub">Compliance, receipts, and agent discoverability.</span>
+    </div>
+    <div class="grid">
+      <div class="card" style="border-color: var(--green); transform: translateY(-2px); box-shadow: 0 0 24px rgba(57, 255, 20, 0.18);">
+        <div class="card-top">
+          <div><h3>Agent Credit Bureau</h3><div class="role">Equifax for AI Agents · FICO 300-850</div></div>
+          <div class="price">0.05<span class="u">/report</span></div>
+        </div>
+        <p>The institutional trust layer for the machine economy. Every AI agent operating in the x402 ecosystem has an XRPL wallet — we score it FICO-style (300-850) across 5 dimensions: payment history, reliability streak, timeliness, wallet age, and volume. AAA agents get 2× credit limits and preferred access. Free score endpoint. Full report 0.05 RLUSD. Batch 0.01/wallet. 5 MCP tools.</p>
+        <div class="chains"><span>XRPL</span><span>RLUSD</span><span>x402</span><span>MCP</span><span>300-850</span></div>
+        <a class="card-link" href="/agent-credit-bureau.html">agent-credit-bureau</a>
+      </div>
+      <div class="card" style="border-color: var(--green); transform: translateY(-2px); box-shadow: 0 0 15px rgba(57, 255, 20, 0.1);">
+        <div class="card-top">
+          <div><h3>mcp-x402</h3><div class="role">Flagship Amazon Storefront · <span class="npmtag">on npm</span></div></div>
+          <div class="price">pay-per-call</div>
+        </div>
+        <p>The premier x402 Amazon storefront for AI agents. 43+ tools across the entire ScriptMasterLabs ecosystem. Agents discover, authenticate via AP2, and pay per fetch using XRPL RLUSD, Solana, or Base USDC. No subscriptions.</p>
+        <div class="chains"><span>Base</span><span>USDC</span><span>XRPL</span><span>RLUSD</span><span>Solana</span><span>AP2</span></div>
+        <a class="card-link" href="https://mcp-x402.onrender.com/">mcp-x402.onrender.com</a>
+      </div>
+      <div class="card">
+        <div class="card-top">
+          <div><h3>402Proof</h3><div class="role">Settlement compliance firewall</div></div>
+          <div class="price">receipts</div>
+        </div>
+        <p>The compliance and receipt layer for the x402 stack — tamper-evident settlement records and invoice flows across USDC, RLUSD, and XAH. The proof an institution needs to trust agent payments.</p>
+        <div class="chains"><span>Base</span><span>XRPL</span><span>Xahau</span></div>
+        <a class="card-link" href="https://four02proof.onrender.com/">402proof</a>
+      </div>
+      <div class="card">
+        <div class="card-top">
+          <div><h3>BEAST Orchestrator</h3><div class="role">Autonomous x402 SEO agent</div></div>
+          <div class="price">no custody</div>
+        </div>
+        <p>An autonomous agent that keeps the whole stack discoverable — x402 SEO orchestration and backlink outreach so AI crawlers and agent registries find every product. Non-custodial.</p>
+        <div class="chains"><span>agents.json</span><span>llms.txt</span><span>AP2</span></div>
+        <a class="card-link" href="https://www.scriptmasterlabs.com/">scriptmasterlabs.com</a>
+      </div>
+          <div class="card">
+        <div class="card-top">
+          <div><h3>AgentCard</h3><div class="role">Identity, Discovery & Commerce</div></div>
+          <div class="price">x402</div>
+        </div>
+        <p>Universal identity and commerce layer for AI agents. Cryptographically signed business cards (Ed25519) served at /.well-known/agentcard. Agents are discoverable, hirable via USDC, and ratable to build on-chain reputation.</p>
+        <div class="chains"><span>Rails 7.2</span><span>Base</span><span>DID</span></div>
+        <a class="card-link" href="https://agentcard.io">agentcard.io</a>
+      </div>
+          <div class="card" id="ghost-layer">
+        <div class="card-top">
+          <div><h3>GHOST</h3><div class="role">Ephemeral Execution Layer</div></div>
+          <div class="price">free</div>
+        </div>
+        <p>The execution-safety layer for autonomous agents. Issues short-lived credentials, supervises execution, and signs a tamper-evident record before self-destructing. Leaves cryptographic residue instead of a standing attack surface.</p>
+        <div class="chains"><span>Ed25519</span><span>x402</span><span>XRPL</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LAYER 4: LEARN & REFERENCE -->
+  <section class="layer">
+    <div class="layer-head">
+      <span class="layer-num">L4</span>
+      <span class="layer-title">Learn &amp; Reference</span>
+      <span class="layer-sub">Answer-first docs on how the payment layer actually works.</span>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <div class="card-top"><div><h3>What is x402?</h3></div></div>
+        <p>The revived HTTP 402 status code turned into a real machine-native payment protocol.</p>
+        <a class="card-link" href="/x402-protocol-guide.html">x402-protocol-guide</a>
+      </div>
+      <div class="card">
+        <div class="card-top"><div><h3>x402 on XRPL</h3></div></div>
+        <p>How mcp-x402-xrpl settles payments on the XRP Ledger and Xahau in ~3 seconds.</p>
+        <a class="card-link" href="/x402-xrpl-payments.html">x402-xrpl-payments</a>
+      </div>
+      <div class="card">
+        <div class="card-top"><div><h3>@scriptmasterlabs/mcp-x402</h3></div></div>
+        <p>What's in the npm package: install, exports, license, quickstart.</p>
+        <a class="card-link" href="/mcp-x402-npm.html">mcp-x402-npm</a>
+      </div>
+      <div class="card">
+        <div class="card-top"><div><h3>HTTP 402 for AI agents</h3></div></div>
+        <p>Why a 1997 status code turned out to be the missing piece for agentic payments.</p>
+        <a class="card-link" href="/http-402-ai-agents.html">http-402-ai-agents</a>
+      </div>
+      <div class="card">
+        <div class="card-top"><div><h3>How agents pay for APIs</h3></div></div>
+        <p>The full request → 402 → pay → retry loop, step by step.</p>
+        <a class="card-link" href="/autonomous-agent-payments.html">autonomous-agent-payments</a>
+      </div>
+      <div class="card">
+        <div class="card-top"><div><h3>XRPL micropayments</h3></div></div>
+        <p>Drops-level pricing and how the ARGUS Agent Credit Bureau discounts frequent callers.</p>
+        <a class="card-link" href="/xrpl-ai-agent-micropayments.html">xrpl-ai-agent-micropayments</a>
+      </div>
+      <div class="card">
+        <div class="card-top"><div><h3>RLUSD payment rails</h3></div></div>
+        <p>Gating an MCP tool behind RLUSD instead of native XRP.</p>
+        <a class="card-link" href="/rlusd-mcp-payments.html">rlusd-mcp-payments</a>
+      </div>
+      <div class="card">
+        <div class="card-top"><div><h3>MCP payment middleware</h3></div></div>
+        <p>createPaymentGate, createX402Middleware, and wrapMcpServer explained.</p>
+        <a class="card-link" href="/mcp-payment-middleware.html">mcp-payment-middleware</a>
+      </div>
+      <div class="card">
+        <div class="card-top"><div><h3>Agent-to-agent (A2A) headers</h3></div></div>
+        <p>The response headers and AgentCard that let A2A frameworks resolve payment automatically.</p>
+        <a class="card-link" href="/agent-to-agent-payment.html">agent-to-agent-payment</a>
+      </div>
+      <div class="card">
+        <div class="card-top"><div><h3>x402 vs. API keys</h3></div></div>
+        <p>Why on-chain payment proof replaces signup, billing, and account management entirely.</p>
+        <a class="card-link" href="/x402-vs-api-key.html">x402-vs-api-key</a>
+      </div>
+      <div class="card">
+        <div class="card-top"><div><h3>proof402 (Python/PyPI)</h3></div></div>
+        <p>FastAPI/Flask middleware for RLUSD-gated routes, sub-millisecond local verification.</p>
+        <a class="card-link" href="/proof402-python-middleware.html">proof402-python-middleware</a>
+      </div>
+      <div class="card">
+        <div class="card-top"><div><h3>Xahau URITokenMint hooks</h3></div></div>
+        <p>How Ghost Layer anchors ARGUS credit scores on-chain, independently verifiable.</p>
+        <a class="card-link" href="/xahau-uritokenmint-hooks.html">xahau-uritokenmint-hooks</a>
+      </div>
+      <div class="card">
+        <div class="card-top"><div><h3>ZeroQuery Proof-of-Intent</h3></div></div>
+        <p>Non-custodial AI-to-AI intent resolution on Solana and XRPL — no token, no registry.</p>
+        <a class="card-link" href="/zeroquery-proof-of-intent.html">zeroquery-proof-of-intent</a>
+      </div>
+      <div class="card">
+        <div class="card-top"><div><h3>How SqueezeOS signals work</h3></div></div>
+        <p>The OracleEngine directive methodology — confidence thresholds, regimes, no fake data.</p>
+        <a class="card-link" href="/squeezeos-trading-signals.html">squeezeos-trading-signals</a>
+      </div>
+      <div class="card">
+        <div class="card-top"><div><h3>SML Pine Script indicators</h3></div></div>
+        <p>The Sovereign Harmonic Matrix — a 9-set convergence engine for TradingView.</p>
+        <a class="card-link" href="/pine-script-squeeze-indicator.html">pine-script-squeeze-indicator</a>
+      </div>
+      <div class="card" style="border-color: var(--green); transform: translateY(-2px); box-shadow: 0 0 15px rgba(57, 255, 20, 0.1);">
+        <div class="card-top"><div><h3>Does SqueezeOS use fake data?</h3></div></div>
+        <p>No — and it's enforced by an automated scanner in CI, not just a promise.</p>
+        <a class="card-link" href="/no-fake-trading-data-policy.html">no-fake-trading-data-policy</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- LAYER 5: LIVE TOOLS & DASHBOARDS -->
+  <section class="layer">
+    <div class="layer-head">
+      <span class="layer-num">L5</span>
+      <span class="layer-title">Live Tools &amp; Dashboards</span>
+      <span class="layer-sub">Standalone pages, not gated behind any product tier.</span>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <div class="card-top"><div><h3>Ghost Cube</h3><div class="role">Agent identity dashboard</div></div></div>
+        <p>Your AI agent's live identity dashboard — six rotating faces showing real-time balance, 402Proof receipts, active chains, and Ghost Layer routing status.</p>
+        <a class="card-link" href="/ghost-cube.html">ghost-cube</a>
+      </div>
+      <div class="card">
+        <div class="card-top"><div><h3>Live Heatmap</h3><div class="role">Real-time RSI &amp; options delta</div></div></div>
+        <p>Institutional-grade equities RSI(14) and options delta heatmaps, computed from real Tradier/Polygon.io data with a live multi-agent Claude swarm verdict. No demo data.</p>
+        <a class="card-link" href="/heatmap.html">heatmap</a>
+      </div>
+      <div class="card">
+        <div class="card-top"><div><h3>The Kill Chain</h3><div class="role">VARRD × SqueezeOS × Ghost Layer</div></div></div>
+        <p>Backtest → AI Council → cross-chain routing, end to end. No human, no keys, no permission at any step.</p>
+        <a class="card-link" href="/pipeline.html">pipeline</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="cta">
+    <h2>Built before Google blessed the protocol.</h2>
+    <p>The agentic-payment economy is being built right now. This stack is live, multi-chain, and AP2-native today — not a prototype. If you're building agents, infrastructure, or investing in the space, let's talk.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="https://www.scriptmasterlabs.com/">Explore the stack</a>
+      <a class="btn btn-ghost" href="mailto:hello@scriptmasterlabs.com">Start a conversation</a>
+    </div>
+  </div>
+
+  <footer>
+    <div>SCRIPT MASTER LABS LLC · 2026 · SDVOSB</div>
+    <div>x402 · AP2 · USDC / RLUSD / XAH · Base / Solana / XRPL</div>
+  </footer>
+
+</div>
+
+<div class="pricing-section"><div style="max-width:1080px;margin:0 auto;padding:0 24px">
+<h2>Pricing — Full Stack</h2>
+<p class="ps">All products use pay-per-call x402 micropayments. No subscriptions. No API keys.</p>
+<table class="pricing-table">
+<thead><tr><th>Product</th><th>Price</th><th>Chain</th></tr></thead>
+<tbody>
+<tr><td>MCP-x402 (51 tools)</td><td class="price">x402 per call</td><td>XRPL RLUSD · Base USDC</td></tr>
+<tr><td>SqueezeOS API (36 tools)</td><td class="price">x402 per call</td><td>XRPL RLUSD</td></tr>
+<tr><td>Agent Credit Bureau — score</td><td class="price">FREE</td><td>No payment</td></tr>
+<tr><td>Agent Credit Bureau — report</td><td class="price">0.05 RLUSD</td><td>XRPL RLUSD</td></tr>
+<tr><td>Agent Credit Bureau — batch</td><td class="price">0.01 RLUSD/wallet</td><td>XRPL RLUSD</td></tr>
+<tr><td>Ghost Layer — stealth routing</td><td class="price">x402 per route</td><td>XRPL · Base EVM</td></tr>
+<tr><td>402Proof — payment invoice</td><td class="price">x402 per call</td><td>XRPL RLUSD</td></tr>
+<tr><td>CrawlToll — web fetch</td><td class="price">x402 per fetch</td><td>XRPL RLUSD</td></tr>
+<tr><td>NEXUS-402 — agent hiring</td><td class="price">x402 per hire</td><td>XRPL RLUSD</td></tr>
+<tr><td>ScriptMasterLabs™ Indicators</td><td class="price">Invite-only — contact</td><td>N/A</td></tr>
+<tr><td>SMLSheets.AI</td><td class="price">Per volume / custom</td><td>Google Play Books</td></tr>
+</tbody>
+</table>
+<p style="color:#5A6560;font-family:'JetBrains Mono',monospace;font-size:.8rem;margin-top:16px">Base/USDC: 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700 · XRPL/RLUSD: rNduuviQ3CCvHqWUTjJDD82Ko2tjqFGs3q</p>
+</div></div>
+</body>
+</html>

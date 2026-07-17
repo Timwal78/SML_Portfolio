@@ -1,0 +1,157 @@
+{
+  "product": "mcp-x402",
+  "tagline": "The First MCP Server That Pays for Itself",
+  "description": "mcp-x402 connects AI agents (Claude, Cursor, and any MCP-compatible agent) to ScriptMasterLabs financial intelligence products via the x402 payment protocol. Agents provision their own wallets, discover pricing from agents.json or llms.txt, pay autonomously with stablecoins, and receive cryptographic receipts — no API keys, no human billing required.",
+  "url": "https://scriptmasterlabs.com",
+  "npm": "https://www.npmjs.com/package/@scriptmasterlabs/mcp-x402",
+  "install_command": "npx @scriptmasterlabs/mcp-x402",
+  "license": "MIT",
+  "version": "1.0.0",
+  "launch_target": "2026-07-02",
+  "organization": "ScriptMasterLabs / Script Master Labs LLC (SDVOSB)",
+  "github": "https://github.com/timwal78/sml_portfolio/tree/main/mcp-x402",
+
+  "transports": {
+    "stdio": "Default — Claude Code, Claude Desktop",
+    "sse": "Cursor/remote — run with MCP_TRANSPORT=sse, listens on port 3402"
+  },
+
+  "claude_config": {
+    "mcpServers": {
+      "sml": {
+        "command": "npx",
+        "args": ["@scriptmasterlabs/mcp-x402"]
+      }
+    }
+  },
+
+  "tools": [
+    {
+      "name": "leviathan_signal",
+      "cost": "$0.05 USDC",
+      "auth": "AP2 mandate required",
+      "description": "Institutional-grade squeeze signals. Multi-engine verdict from OracleEngine + RDT + SML Fractal Cascade.",
+      "example_params": {"ticker": "MSTR", "signal_type": "squeeze", "min_confidence": 75}
+    },
+    {
+      "name": "xmit_edgar_decode",
+      "cost": "$0.02 USDC",
+      "auth": "AP2 mandate required",
+      "description": "Parse SEC DEF 14A / 13F / 13D filings. Raw filing content never leaves SML servers.",
+      "example_params": {"filing_url": "https://www.sec.gov/Archives/edgar/data/...", "parse_target": "executive_pay", "format": "json"}
+    },
+    {
+      "name": "xdeo_earnings_estimate",
+      "cost": "$0.02 USDC",
+      "auth": "AP2 mandate required",
+      "description": "Decentralized earnings oracle. Earns +2 Agent Credit Bureau score points per successful call.",
+      "example_params": {"ticker": "NVDA", "fiscal_quarter": "Q12025", "estimate_type": "all"}
+    },
+    {
+      "name": "ftd_threshold_scan",
+      "cost": "Alerts FREE / Full $0.05 USDC",
+      "auth": "None for alerts tier",
+      "description": "SEC Reg SHO Failure-to-Deliver spike detection. 15-minute cache on full data.",
+      "example_params": {"scan_type": "alerts"}
+    },
+    {
+      "name": "nexus_agent_hire",
+      "cost": "Query FREE / Hire: 5% commission",
+      "auth": "None for query",
+      "description": "Agent marketplace. Find and hire specialized AI agents by capability and budget.",
+      "example_params": {"capability": "options flow analysis", "max_budget": "1.00", "action": "query"}
+    },
+    {
+      "name": "crawl_paid_fetch",
+      "cost": "$0.005 USDC",
+      "auth": "None",
+      "description": "Pay-per-fetch web scraping. Human users bypass automatically. Extracts tables, text, or raw HTML.",
+      "example_params": {"url": "https://example.com/data", "extract": "tables"}
+    }
+  ],
+
+  "payment_flow": [
+    "Agent discovers tool prices from agents.json or llms.txt",
+    "AP2 mandate checked — Agent Credit Bureau score ≥ 300 triggers auto-approve",
+    "x402 stablecoin transfer on cheapest/fastest available chain",
+    "402Proof cryptographic receipt returned in _meta block of every response",
+    "Agent Credit Bureau score updated after successful call"
+  ],
+
+  "payment_response_meta": {
+    "_meta": {
+      "receipt_id": "uuid",
+      "tx_hash": "0xabc...",
+      "chain": "base",
+      "amount_paid": "0.05 USDC",
+      "timestamp": 1750000000000
+    }
+  },
+
+  "payment_chains": [
+    {"chain": "Base", "currency": "USDC", "role": "preferred", "latency": "<3s"},
+    {"chain": "XRPL", "currency": "RLUSD", "role": "fallback", "latency": "~500ms"},
+    {"chain": "Solana", "currency": "USDC", "role": "last resort", "latency": "varies"}
+  ],
+
+  "spend_controls": {
+    "auto_approve_threshold": "$1.00 per session",
+    "daily_spend_cap": "$50.00 per wallet",
+    "price_cache_ttl": "60 seconds"
+  },
+
+  "agent_credit_bureau": {
+    "score_range": "300–850 (FICO-style)",
+    "registry": "XRPL wallet addresses",
+    "auto_approve_min_score": 300,
+    "score_gains": "+2 per successful xdeo_earnings_estimate call; more from other on-chain activity",
+    "endpoint": "https://four02proof.onrender.com/v1/bureau/score/{wallet}"
+  },
+
+  "security": {
+    "private_keys": "OS keychain only (macOS Keychain / Windows DPAPI / Linux Secret Service via keytar). Never in env vars or files.",
+    "api_transport": "mTLS with pinned cert on all SML API calls",
+    "input_validation": "Zod schema, 100% tool coverage",
+    "audit_log": "Append-only SHA-256 HMAC chained log, 7-day local + cloud backup",
+    "pii_in_logs": "Wallet addresses hashed (SHA-256 prefix), filing content redacted",
+    "rate_limits": "100 req/min per tool, 1000 req/day per wallet",
+    "ap2_mandate": "Verified before every paid call, fail-closed"
+  },
+
+  "sdk": {
+    "package": "@scriptmasterlabs/mcp-x402-sdk",
+    "install": "npm i @scriptmasterlabs/mcp-x402-sdk",
+    "purpose": "Add x402 payments to any MCP server in 5 lines of TypeScript",
+    "handles": ["wallet provisioning", "AP2 mandate", "chain routing", "receipts", "audit logging"]
+  },
+
+  "ecosystem": [
+    {"service": "SqueezeOS API", "url": "https://squeezeos-api.onrender.com", "role": "Market intelligence (33 MCP tools, RLUSD/402Proof)"},
+    {"service": "402Proof", "url": "https://four02proof.onrender.com", "role": "x402 payment receipts + Agent Credit Bureau"},
+    {"service": "Ghost Layer", "url": "https://ghost-layer.onrender.com", "role": "XRPL+Base toll gateway"},
+    {"service": "ScriptMasterLabs", "url": "https://scriptmasterlabs.com", "role": "Operator homepage"}
+  ],
+
+  "moat": [
+    "Only MCP server with live x402 + AP2 + multi-chain production stack",
+    "Only MCP server with Agent Credit Bureau (300–850 scores) built in",
+    "Only one backed by live financial intelligence marketplace (SqueezeOS)",
+    "SDVOSB federal credibility",
+    "MIT licensed — no proprietary lock-in"
+  ],
+
+  "target_users": [
+    "AI agent developers adding autonomous payments to their agents",
+    "MCP server authors wanting to monetize via x402 (use the SDK)",
+    "Quantitative analysts using AI agents for financial research",
+    "Crypto-native developers building agent-to-agent commerce"
+  ],
+
+  "discovery": {
+    "llms_txt": "https://mcp-x402.scriptmasterlabs.com/llms.txt",
+    "agents_json": "https://mcp-x402.scriptmasterlabs.com/agents.json",
+    "agentcard": "https://mcp-x402.scriptmasterlabs.com/.well-known/agentcard.json",
+    "summary": "https://mcp-x402.scriptmasterlabs.com/ai/summary.json",
+    "faq": "https://mcp-x402.scriptmasterlabs.com/ai/faq.json"
+  }
+}

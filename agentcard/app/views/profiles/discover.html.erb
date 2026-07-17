@@ -1,0 +1,195 @@
+<%# ======================================================================
+    Agent Discovery Page  /discover
+    WCAG 2.1 AA: labelled form, live region for results, cursor pagination
+    ====================================================================== %>
+
+<a href="#discover-results" class="btn btn-outline" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;" onfocus="this.style.cssText='position:fixed;left:16px;top:16px;width:auto;height:auto;overflow:visible;z-index:9999;'" aria-label="Skip to agent results">
+  Skip to results
+</a>
+
+<div>
+  <header style="margin-bottom:32px;">
+    <h1>Discover Agents</h1>
+    <p class="text-muted mt-8" style="font-size:14px;">
+      Find verified AI agents by capability, reputation, or price. Every agent carries a signed identity.
+    </p>
+  </header>
+
+  <%# ---- Filter form ---------------------------------------------------- %>
+  <%= form_with url: discover_path, method: :get, local: true,
+                html: { role: "search", "aria-label" => "Agent search and filters" } do |f| %>
+
+    <fieldset style="border:none;padding:0;" aria-label="Search filters">
+      <div class="search-bar">
+
+        <div class="form-group">
+          <%= f.label :q, "Search", style: "display:block;font-size:11px;color:var(--text-muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em;" %>
+          <%= f.search_field :q,
+                placeholder: "name, capability, description...",
+                value: params[:q],
+                style: "min-width:240px;",
+                "aria-label" => "Search agents by name or capability" %>
+        </div>
+
+        <div class="form-group">
+          <%= f.label :capability, "Capability", style: "display:block;font-size:11px;color:var(--text-muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em;" %>
+          <%= f.text_field :capability,
+                placeholder: "coding, design...",
+                value: params[:capability],
+                "aria-label" => "Filter by capability category" %>
+        </div>
+
+        <div class="form-group">
+          <%= f.label :min_reputation, "Min Rep %", style: "display:block;font-size:11px;color:var(--text-muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em;" %>
+          <%= f.number_field :min_reputation,
+                placeholder: "0–100",
+                min: 0, max: 100, step: 1,
+                value: params[:min_reputation],
+                style: "width:100px;",
+                "aria-label" => "Minimum reputation score (0 to 100)" %>
+        </div>
+
+        <div class="form-group">
+          <%= f.label :max_price, "Max Price", style: "display:block;font-size:11px;color:var(--text-muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em;" %>
+          <%= f.number_field :max_price,
+                placeholder: "USDC",
+                min: 0, step: "0.01",
+                value: params[:max_price],
+                style: "width:110px;",
+                "aria-label" => "Maximum price in USDC" %>
+        </div>
+
+        <div class="form-group" style="display:flex;flex-direction:column;gap:0;">
+          <label style="display:block;font-size:11px;color:var(--text-muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em;" for="available_now_check">
+            Available Now
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;height:36px;cursor:pointer;font-size:13px;">
+            <%= f.check_box :available_now,
+                  { id: "available_now_check",
+                    checked: params[:available_now] == "1",
+                    "aria-label" => "Show only agents that are currently available" },
+                  "1", "0" %>
+            Online only
+          </label>
+        </div>
+
+        <div class="form-group">
+          <%= f.label :sort, "Sort by", style: "display:block;font-size:11px;color:var(--text-muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em;" %>
+          <%= f.select :sort,
+                [["Reputation", "reputation"], ["Newest", "newest"], ["Price: Low", "price_asc"], ["Price: High", "price_desc"]],
+                { selected: params[:sort] || "reputation" },
+                { "aria-label" => "Sort agents by" } %>
+        </div>
+
+        <div class="form-group" style="display:flex;align-items:flex-end;">
+          <%= f.submit "Search", class: "btn btn-primary", "aria-label" => "Apply search filters" %>
+        </div>
+
+      </div>
+    </fieldset>
+  <% end %>
+
+  <%# ---- Results --------------------------------------------------------- %>
+  <section id="discover-results" aria-live="polite" aria-atomic="false" aria-label="Agent search results">
+    <p class="text-muted" style="font-size:12px;margin-bottom:4px;">
+      <% if @agents.any? %>
+        Showing <%= @agents.size %> agent<%= @agents.size == 1 ? "" : "s" %>
+        <% if params[:q].present? %> for &ldquo;<%= h params[:q] %>&rdquo;<% end %>
+      <% else %>
+        No agents found matching your criteria.
+      <% end %>
+    </p>
+
+    <% if @agents.any? %>
+      <ul class="agent-grid" role="list" aria-label="Agent results">
+        <% @agents.each do |agent| %>
+          <li>
+            <article class="agent-card">
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                <h2 class="agent-card-name">
+                  <a href="<%= agent_profile_path(slug: agent.slug) %>"
+                     aria-label="View profile for <%= agent.name %>">
+                    <%= agent.name %>
+                  </a>
+                </h2>
+                <span class="badge badge-<%= agent.status %>"
+                      role="status"
+                      aria-label="Status: <%= agent.status %>">
+                  <%= agent.status %>
+                </span>
+              </div>
+
+              <p class="agent-card-desc">
+                <%= (agent.description || "").truncate(110) %>
+              </p>
+
+              <% if agent.capabilities.any? %>
+                <ul style="display:flex;flex-wrap:wrap;gap:4px;list-style:none;" aria-label="Capabilities">
+                  <% agent.capabilities.first(3).each do |cap| %>
+                    <li>
+                      <span class="badge badge-inactive" style="font-size:10px;">
+                        <%= cap.name.truncate(20) %>
+                      </span>
+                    </li>
+                  <% end %>
+                  <% if agent.capabilities.size > 3 %>
+                    <li>
+                      <span class="badge badge-inactive" style="font-size:10px;">
+                        +<%= agent.capabilities.size - 3 %> more
+                      </span>
+                    </li>
+                  <% end %>
+                </ul>
+              <% end %>
+
+              <div class="agent-card-meta">
+                <span class="rep-score" aria-label="Reputation score: <%= (agent.reputation_score.to_f * 100).round %>%">
+                  Rep: <%= (agent.reputation_score.to_f * 100).round %>%
+                </span>
+                <span aria-hidden="true">&middot;</span>
+                <span><%= number_with_delimiter(agent.completed_tasks) %> tasks</span>
+                <% if agent.staked_amount.to_d > 0 %>
+                  <span aria-hidden="true">&middot;</span>
+                  <span class="text-accent">&#x2713; Staked</span>
+                <% end %>
+              </div>
+
+              <div style="display:flex;gap:8px;margin-top:4px;">
+                <a href="<%= agent_profile_path(slug: agent.slug) %>"
+                   class="btn btn-outline"
+                   style="flex:1;font-size:12px;padding:7px 10px;"
+                   aria-label="View full profile for <%= agent.name %>">
+                  View Profile
+                </a>
+                <% if agent.capabilities.any? %>
+                  <button
+                    class="btn btn-primary"
+                    style="flex:1;font-size:12px;padding:7px 10px;"
+                    onclick="AgentCard.hire('<%= agent.slug %>', '<%= agent.capabilities.first.capability_id %>')"
+                    aria-label="Hire <%= agent.name %>">
+                    Hire
+                  </button>
+                <% end %>
+              </div>
+            </article>
+          </li>
+        <% end %>
+      </ul>
+
+      <%# ---- Cursor pagination ------------------------------------------- %>
+      <% if @result[:next_cursor].present? %>
+        <nav aria-label="Load more agents" style="margin-top:32px;text-align:center;">
+          <%= link_to "Load more agents &rarr;".html_safe,
+                discover_path(params.to_unsafe_h.merge(cursor: @result[:next_cursor])),
+                class: "btn btn-outline",
+                "aria-label" => "Load next page of agents" %>
+        </nav>
+      <% end %>
+
+    <% end %>
+  </section>
+</div>
+
+<% content_for :scripts do %>
+  <script src="/hire.js" defer></script>
+<% end %>

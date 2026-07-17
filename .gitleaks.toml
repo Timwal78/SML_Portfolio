@@ -1,0 +1,9 @@
+title = "SML Portfolio Gitleaks Config"
+
+[allowlist]
+description = "Allowlisted patterns that are not real secrets"
+regexes = [
+  # W3C DID key identifiers — high-entropy base58 strings used as public identifiers,
+  # not secrets. Format: did:key:z6Mk... (Ed25519 multicodec prefix 0xed01)
+  '''did:key:z[a-km-zA-HJ-NP-Z1-9]+''',
+]

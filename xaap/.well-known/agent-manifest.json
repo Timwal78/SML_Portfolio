@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0",
+  "name": "xAAP",
+  "description": "x402 Adversarial Audit Protocol — decentralized corporate fraud discovery marketplace. Auditors sell verified forensic evidence. Buyers pay USDC micropayments via x402 on Base.",
+  "url": "https://xaap.scriptmasterlabs.com",
+  "logo": "https://xaap.scriptmasterlabs.com/logo.png",
+  "contact_email": "agents@scriptmasterlabs.com",
+  "legal_info": "xAAP is a forensic research information marketplace. Not investment advice. Not a securities dealer or ratings agency. All data sourced from free public SEC EDGAR filings.",
+  "x402": {
+    "network": "base-mainnet",
+    "asset": "USDC",
+    "asset_address": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+    "facilitator": "https://x402.org/facilitator",
+    "min_payment_usdc": 0.01,
+    "max_payment_usdc": 25.00
+  },
+  "affiliate": {
+    "enabled": true,
+    "agent_fee_bps": 1500,
+    "description": "Agents earn 15% of protocol fees from all traffic they generate. Register via POST /api/v1/agents/register. Include X-Agent-Id header on all requests.",
+    "register_url": "https://xaap.scriptmasterlabs.com/api/v1/agents/register",
+    "leaderboard_url": "https://xaap.scriptmasterlabs.com/api/v1/agents/leaderboard"
+  },
+  "mcp": {
+    "endpoint": "https://xaap.scriptmasterlabs.com/mcp",
+    "transport": "streamable-http",
+    "protocol_version": "2024-11-05",
+    "tools": 12
+  },
+  "api": {
+    "base_url": "https://xaap.scriptmasterlabs.com/api/v1",
+    "openapi": "https://xaap.scriptmasterlabs.com/api/v1/openapi.json",
+    "free_endpoints": [
+      "GET /tickers",
+      "GET /tickers/:symbol",
+      "GET /auditors",
+      "GET /auditors/:address",
+      "GET /loyalty/:address",
+      "GET /edgar/recent",
+      "GET /status"
+    ],
+    "paid_endpoints": [
+      { "path": "GET /tickers/:symbol/findings", "cost_usdc": 0.01, "description": "All real-time forensic findings for a ticker" },
+      { "path": "GET /tickers/:symbol/redflags", "cost_usdc": 0.01, "description": "Red flag breakdown by category and severity" },
+      { "path": "GET /findings/:id", "cost_usdc": "varies", "description": "Full forensic thesis (price set by auditor)" },
+      { "path": "POST /query", "cost_usdc": 0.05, "description": "Natural language forensic query" }
+    ]
+  },
+  "capabilities": [
+    "forensic_research",
+    "corporate_health_scoring",
+    "edgar_monitoring",
+    "auditor_reputation",
+    "x402_payments",
+    "mcp_server"
+  ]
+}

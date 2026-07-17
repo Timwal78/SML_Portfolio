@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vapl.scriptmasterlabs.com/v1/schemas/accuracy-vc.json",
+  "title": "AccuracyCredential",
+  "type": "object",
+  "required": ["@context", "id", "type", "issuer", "validFrom", "credentialSubject", "proof"],
+  "properties": {
+    "credentialSubject": {
+      "type": "object",
+      "required": ["id", "accuracy"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^did:key:z" },
+        "accuracy": {
+          "type": "object",
+          "required": ["predictionId", "predictionTimestamp", "predictionValue",
+                       "verificationTimestamp", "verificationSource", "actualValue",
+                       "accuracyScore", "methodology", "nonce"],
+          "properties": {
+            "predictionId": { "type": "string" },
+            "predictionTimestamp": { "type": "string", "format": "date-time" },
+            "predictionValue": { "type": "string" },
+            "verificationTimestamp": { "type": "string", "format": "date-time" },
+            "verificationSource": { "type": "string" },
+            "actualValue": { "type": "string" },
+            "accuracyScore": { "type": "number", "minimum": 0, "maximum": 1 },
+            "methodology": { "type": "string" },
+            "nonce": { "type": "string", "minLength": 8 }
+          }
+        }
+      }
+    }
+  }
+}

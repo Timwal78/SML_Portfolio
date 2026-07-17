@@ -1,0 +1,2331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgentSwarm SEO — Script Master Labs Command Center</title>
+<meta name="description" content="Live command center for Script Master Labs' AI marketing swarm — Directory Ranger, Community Scout, and Federal Scout — plus the x402 pay-per-call data API (44 live endpoints, 52 MCP tools) settled in USDC on Base.">
+<link rel="canonical" href="https://www.scriptmasterlabs.com/agentswarm-seo.html">
+<meta property="og:title" content="AgentSwarm SEO — Script Master Labs Command Center">
+<meta property="og:description" content="Live dashboard for the AI marketing swarm (Directory Ranger, Community Scout, Federal Scout) and the x402 pay-per-call data API — 44 live endpoints, 52 MCP tools, settled in USDC on Base.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.scriptmasterlabs.com/agentswarm-seo.html">
+    <meta property="og:image" content="https://www.scriptmasterlabs.com/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AgentSwarm SEO — Script Master Labs Command Center">
+<meta name="twitter:description" content="Live dashboard for the AI marketing swarm and the x402 pay-per-call data API — 44 live endpoints, 52 MCP tools, settled in USDC on Base.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --void:     #030308;
+  --surface:  #0a0a18;
+  --panel:    #0f0f22;
+  --border:   #1e1e3a;
+  --border2:  #2a2a4a;
+  --violet:   #7c3aed;
+  --violet2:  #9f5cff;
+  --cyan:     #06b6d4;
+  --cyan2:    #22d3ee;
+  --green:    #10ff80;
+  --green2:   #00cc66;
+  --amber:    #f59e0b;
+  --red:      #ef4444;
+  --text1:    #e2e8f0;
+  --text2:    #94a3b8;
+  --text3:    #4a5568;
+  --mono:     'JetBrains Mono', monospace;
+  --sans:     'Space Grotesk', system-ui, sans-serif;
+}
+
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+
+html, body {
+  height: 100%;
+  background: var(--void);
+  color: var(--text1);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.5;
+  overflow: hidden;
+}
+
+/* ── TOPBAR ──────────────────────────────────────────────── */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 52px;
+  padding: 0 20px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+}
+
+.logo {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 180px;
+}
+.logo-title {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text1);
+}
+.logo-sub {
+  font-size: 10px;
+  color: var(--text3);
+  letter-spacing: 0.04em;
+}
+
+.url-bar {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0 12px;
+  height: 32px;
+  max-width: 480px;
+}
+.url-bar svg { color: var(--cyan); flex-shrink: 0; }
+.url-bar span {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.model-badge {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--violet2);
+  background: rgba(124,58,237,.15);
+  border: 1px solid rgba(124,58,237,.3);
+  border-radius: 4px;
+  padding: 3px 8px;
+  white-space: nowrap;
+}
+
+#swarm-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid;
+  cursor: default;
+  transition: all 0.4s;
+  white-space: nowrap;
+}
+#swarm-pill.checking { color: var(--amber); border-color: rgba(245,158,11,.3); background: rgba(245,158,11,.08); }
+#swarm-pill.online   { color: var(--green); border-color: rgba(16,255,128,.3); background: rgba(16,255,128,.08); }
+#swarm-pill.offline  { color: var(--red);   border-color: rgba(239,68,68,.3);  background: rgba(239,68,68,.08);  }
+#swarm-pill .dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+#swarm-pill.online .dot { animation: pulse-dot 1.4s ease-in-out infinite; }
+@keyframes pulse-dot {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.4; transform: scale(1.4); }
+}
+
+/* ── LAYOUT ──────────────────────────────────────────────── */
+.layout {
+  display: flex;
+  height: 100vh;
+  padding-top: 52px;
+}
+
+/* ── SIDEBAR ─────────────────────────────────────────────── */
+.sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.nav {
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--text2);
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: left;
+  width: 100%;
+}
+.nav-btn:hover { background: var(--panel); color: var(--text1); }
+.nav-btn.active { background: rgba(124,58,237,.15); color: var(--violet2); }
+.nav-btn svg { flex-shrink: 0; }
+
+.sidebar-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 16px;
+}
+
+/* Radar section */
+.radar-section {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.radar-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--text3);
+  text-align: center;
+}
+.radar-wrap {
+  position: relative;
+  width: 180px;
+  height: 180px;
+}
+#radar-canvas {
+  width: 180px;
+  height: 180px;
+  display: block;
+}
+.radar-center-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+#status-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  transition: color 0.4s;
+}
+#status-label.online  { color: var(--green); }
+#status-label.offline { color: var(--red); }
+#status-label.checking { color: var(--amber); }
+#ping-display {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text3);
+  margin-top: 2px;
+}
+
+/* Sidebar metrics */
+.sidebar-metrics {
+  padding: 0 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.metric-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.metric-label { font-size: 11px; color: var(--text3); }
+.metric-value { font-family: var(--mono); font-size: 11px; color: var(--text2); }
+.metric-value.live { color: var(--green); }
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+}
+.domain-score-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.domain-score-label {
+  font-size: 10px;
+  color: var(--text3);
+  letter-spacing: 0.08em;
+}
+.score-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.score-num {
+  font-family: var(--mono);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--cyan);
+}
+.score-track {
+  flex: 1;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.score-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--violet), var(--cyan));
+  border-radius: 2px;
+  width: 72%;
+  transition: width 1s ease;
+}
+
+/* ── MAIN CONTENT ────────────────────────────────────────── */
+.main {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.tab-panel { display: none; flex: 1; }
+.tab-panel.active { display: flex; flex-direction: column; }
+
+/* ── SWARM CENTER TAB ────────────────────────────────────── */
+.panel-header {
+  padding: 20px 24px 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.panel-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text1);
+}
+.panel-sub {
+  font-size: 12px;
+  color: var(--text3);
+  margin-top: 2px;
+}
+
+.beastmode-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--red);
+  background: rgba(239,68,68,.1);
+  border: 1px solid rgba(239,68,68,.25);
+  border-radius: 4px;
+  padding: 4px 10px;
+  flex-shrink: 0;
+  animation: bm-pulse 2s ease-in-out infinite;
+}
+.beastmode-badge .bm-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--red);
+  animation: pulse-dot 1s ease-in-out infinite;
+}
+@keyframes bm-pulse {
+  0%,100% { border-color: rgba(239,68,68,.25); }
+  50%      { border-color: rgba(239,68,68,.55); }
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding: 16px 24px;
+}
+.content-grid.full { grid-template-columns: 1fr; }
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.card-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.card-title {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--text2);
+}
+.card-body { padding: 16px; }
+
+/* config rows */
+.config-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+.config-row:last-child { border-bottom: none; }
+.config-key { font-size: 12px; color: var(--text3); min-width: 120px; }
+.config-val { font-family: var(--mono); font-size: 12px; color: var(--cyan); }
+.config-val.violet { color: var(--violet2); }
+.config-val.green  { color: var(--green); }
+
+/* live stats row */
+.live-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border);
+}
+.stat-block {
+  background: var(--panel);
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.stat-val {
+  font-family: var(--mono);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--cyan);
+  font-variant-numeric: tabular-nums;
+}
+.stat-label { font-size: 10px; color: var(--text3); letter-spacing: 0.06em; }
+
+/* endpoint table */
+.ep-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.ep-search {
+  flex: 1;
+  min-width: 160px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-family: var(--sans);
+  font-size: 12px;
+  color: var(--text1);
+  outline: none;
+}
+.ep-search::placeholder { color: var(--text3); }
+.ep-search:focus { border-color: var(--violet); }
+
+.filter-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  border: 1px solid var(--border2);
+  background: transparent;
+  color: var(--text3);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: var(--sans);
+}
+.chip:hover { border-color: var(--border2); color: var(--text2); }
+.chip.active { background: rgba(124,58,237,.15); border-color: var(--violet); color: var(--violet2); }
+
+.ep-table-wrap { overflow-x: auto; }
+.ep-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.ep-table th {
+  text-align: left;
+  padding: 8px 12px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--text3);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.ep-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.ep-table tr:last-child td { border-bottom: none; }
+.ep-table tr:hover td { background: rgba(255,255,255,.02); }
+
+.method-badge {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 3px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+.method-GET    { background: rgba(6,182,212,.15); color: var(--cyan); border: 1px solid rgba(6,182,212,.3); }
+.method-POST   { background: rgba(124,58,237,.15); color: var(--violet2); border: 1px solid rgba(124,58,237,.3); }
+.method-SSE    { background: rgba(16,255,128,.1); color: var(--green); border: 1px solid rgba(16,255,128,.25); }
+
+.ep-path { font-family: var(--mono); font-size: 12px; color: var(--text1); }
+.ep-desc { color: var(--text2); font-size: 12px; }
+.ep-cost-free  { color: var(--green); font-family: var(--mono); font-size: 11px; }
+.ep-cost-paid  { color: var(--amber); font-family: var(--mono); font-size: 11px; }
+.cat-pill {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid var(--border2);
+  color: var(--text3);
+  white-space: nowrap;
+}
+
+/* ── BACKLINKS TAB ───────────────────────────────────────── */
+.directory-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+  padding: 16px 24px;
+}
+.dir-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.dir-name { font-size: 13px; font-weight: 600; color: var(--text1); }
+.dir-url  { font-size: 11px; color: var(--text3); font-family: var(--mono); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dir-status {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 2px 6px;
+  border-radius: 3px;
+  align-self: flex-start;
+}
+.dir-status.listed   { background: rgba(16,255,128,.1); color: var(--green); border: 1px solid rgba(16,255,128,.25); }
+.dir-status.pending  { background: rgba(245,158,11,.1); color: var(--amber); border: 1px solid rgba(245,158,11,.25); }
+.dir-status.unlisted { background: rgba(239,68,68,.1); color: var(--red); border: 1px solid rgba(239,68,68,.25); }
+.dir-category { font-size: 10px; color: var(--text3); }
+
+/* ── AD CAMPAIGNS TAB ────────────────────────────────────── */
+.subreddit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 8px;
+  padding: 0 24px 16px;
+}
+.sub-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.sub-name { font-size: 13px; font-weight: 600; color: var(--violet2); }
+.sub-focus { font-size: 11px; color: var(--text3); }
+.sub-priority {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--amber);
+  margin-top: 2px;
+}
+
+.checkout-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: var(--sans);
+  border: 1px solid var(--border2);
+  background: var(--surface);
+  color: var(--text1);
+}
+.checkout-btn:hover { border-color: var(--violet); }
+.checkout-btn.elite:hover { border-color: var(--cyan); }
+.checkout-btn:disabled { opacity: .5; cursor: not-allowed; }
+.checkout-tier { font-size: 11px; font-weight: 700; letter-spacing: .08em; color: var(--violet2); }
+.checkout-btn.elite .checkout-tier { color: var(--cyan2); }
+.checkout-price { font-family: var(--mono); font-size: 16px; font-weight: 700; }
+
+.keyword-list { padding: 0 24px 24px; display: flex; flex-wrap: wrap; gap: 8px; }
+.kw-chip {
+  background: rgba(6,182,212,.08);
+  border: 1px solid rgba(6,182,212,.2);
+  border-radius: 4px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-family: var(--mono);
+  color: var(--cyan);
+}
+
+/* ── AI INDEXER TAB ──────────────────────────────────────── */
+.indexer-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding: 16px 24px;
+}
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: var(--panel);
+  border: 1px solid rgba(16,255,128,.2);
+  border-radius: 8px;
+  margin: 0 24px 16px;
+}
+.toggle-info { display: flex; flex-direction: column; gap: 3px; }
+.toggle-title { font-size: 14px; font-weight: 600; color: var(--text1); }
+.toggle-desc { font-size: 12px; color: var(--text3); }
+.toggle-on {
+  background: var(--green);
+  color: var(--void);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.code-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 14px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text2);
+  overflow-x: auto;
+  line-height: 1.7;
+  white-space: pre;
+}
+.code-block .key   { color: var(--cyan); }
+.code-block .str   { color: var(--green2); }
+.code-block .punc  { color: var(--text3); }
+
+/* ── ACTIVITY BAR ────────────────────────────────────────── */
+.activity-bar {
+  position: fixed;
+  bottom: 0; left: 220px; right: 0;
+  height: 32px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  overflow: hidden;
+}
+.activity-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--text3);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.activity-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse-dot 1.4s infinite; flex-shrink: 0; }
+.activity-scroll-wrap { flex: 1; overflow: hidden; position: relative; }
+.activity-scroll {
+  display: flex;
+  gap: 0;
+  white-space: nowrap;
+  animation: scroll-left 40s linear infinite;
+}
+.activity-item {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text3);
+  padding-right: 80px;
+}
+.activity-item .agent { color: var(--cyan); font-weight: 500; }
+.activity-item .action { color: var(--text2); }
+@keyframes scroll-left {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ── SCROLLBAR ───────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+/* ── SECTION SPACING ─────────────────────────────────────── */
+.section-pad { padding: 16px 24px; }
+.section-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--text3);
+  margin-bottom: 12px;
+}
+
+/* hidden row */
+.ep-row-hidden { display: none; }
+
+/* ── SIS™ GAUGE ──────────────────────────────────────────── */
+.sis-sidebar {
+  padding: 14px 16px 16px;
+}
+.sis-sidebar-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--text3);
+  margin-bottom: 8px;
+}
+.sis-big {
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+  margin-bottom: 2px;
+}
+.sis-big-num {
+  font-family: var(--mono);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--cyan);
+  text-shadow: 0 0 14px rgba(6,182,212,0.55);
+}
+.sis-big-denom {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--text3);
+}
+.sis-grade-text {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+}
+.sis-mini-bars { display: flex; flex-direction: column; gap: 4px; }
+.sis-mini-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 9px;
+  color: var(--text3);
+}
+.sis-mini-row span { width: 44px; flex-shrink: 0; }
+.sis-mini-track {
+  flex: 1;
+  height: 3px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.sis-mini-track div { height: 100%; border-radius: 2px; transition: width 1.2s ease; }
+
+/* SIS card */
+.sis-card-body {
+  padding: 20px 24px;
+  display: flex;
+  gap: 28px;
+  align-items: center;
+}
+#sis-canvas { flex-shrink: 0; }
+.sis-detail { flex: 1; min-width: 0; }
+.sis-headline {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.sis-headline-num {
+  font-family: var(--mono);
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--cyan);
+  text-shadow: 0 0 20px rgba(6,182,212,0.4);
+}
+.sis-headline-meta { display: flex; flex-direction: column; gap: 4px; }
+.sis-grade-badge {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+.sis-desc { font-size: 12px; color: var(--text3); max-width: 280px; }
+.sis-dims { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+.sis-dim {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sis-dim-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  width: 64px;
+  flex-shrink: 0;
+}
+.sis-dim-bar {
+  flex: 1;
+  height: 5px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.sis-dim-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.sis-dim-val {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text2);
+  width: 24px;
+  text-align: right;
+}
+.sis-footnote {
+  font-size: 10px;
+  color: var(--text3);
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+  line-height: 1.6;
+}
+</style>
+<script src="https://analytics.ahrefs.com/analytics.js" data-key="eO57h84tnrmOGAsKKvyoyw" async></script>
+</head>
+<body>
+
+<!-- ── TOPBAR ── -->
+<header class="topbar">
+  <div class="logo">
+    <span class="logo-title">AGENTSWARM SEO</span>
+    <span class="logo-sub">Script Master Labs — Command Center</span>
+  </div>
+
+  <div class="url-bar">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+    <span>mcp-x402.onrender.com · scriptmasterlabs.com</span>
+  </div>
+
+  <div class="topbar-right">
+    <span class="model-badge">claude-sonnet-5</span>
+    <div id="swarm-pill" class="swarm-pill checking">
+      <span class="dot"></span>
+      <span id="pill-text">CHECKING…</span>
+    </div>
+  </div>
+</header>
+
+<!-- ── LAYOUT ── -->
+<div class="layout">
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar">
+    <nav class="nav">
+      <button class="nav-btn active" onclick="switchTab('swarm', this)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+        Swarm Center
+      </button>
+      <button class="nav-btn" onclick="switchTab('backlinks', this)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        Backlinks
+      </button>
+      <button class="nav-btn" onclick="switchTab('campaigns', this)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        Ad Campaigns
+      </button>
+      <button class="nav-btn" onclick="switchTab('federal', this)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h1M9 13h1M9 17h1M14 9h1M14 13h1M14 17h1"/></svg>
+        Federal Scout
+      </button>
+      <button class="nav-btn" onclick="switchTab('indexer', this)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        AI Indexer
+      </button>
+    </nav>
+
+    <div class="sidebar-divider"></div>
+
+    <!-- Radar -->
+    <div class="radar-section">
+      <div class="radar-label">SWARM INTELLIGENCE</div>
+      <div class="radar-wrap">
+        <canvas id="radar-canvas" width="180" height="180"></canvas>
+        <div class="radar-center-text">
+          <span id="status-label" class="status-label checking">CHECKING</span>
+          <span id="ping-display"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <!-- Metrics -->
+    <div class="sidebar-metrics">
+      <div class="metric-row">
+        <span class="metric-label">Chain</span>
+        <span class="metric-value live">Base (USDC)</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">API endpoints</span>
+        <span class="metric-value" data-live-count>44</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">MCP tools</span>
+        <span class="metric-value">52</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Last heartbeat</span>
+        <span class="metric-value" id="metric-heartbeat">—</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">AI agents today</span>
+        <span class="metric-value live" id="metric-agents-today">—</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Agent hits total</span>
+        <span class="metric-value" id="metric-agents-total">—</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Payment protocol</span>
+        <span class="metric-value">x402 / USDC</span>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="sis-sidebar">
+        <div class="sis-sidebar-label">SIS™ COMPOSITE</div>
+        <div class="sis-big">
+          <span class="sis-big-num" id="sis-num">—</span>
+          <span class="sis-big-denom">/100</span>
+        </div>
+        <div class="sis-grade-text" id="sis-grade" style="color:var(--text3)">INITIALIZING…</div>
+        <div class="sis-mini-bars" id="sis-mini-bars">
+          <div class="sis-mini-row"><span>Coverage</span><div class="sis-mini-track"><div id="sm-coverage" style="width:0%;background:var(--violet2)"></div></div></div>
+          <div class="sis-mini-row"><span>Reach</span><div class="sis-mini-track"><div id="sm-reach" style="width:0%;background:var(--amber)"></div></div></div>
+          <div class="sis-mini-row"><span>Uptime</span><div class="sis-mini-track"><div id="sm-uptime" style="width:0%;background:var(--green)"></div></div></div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── MAIN ── -->
+  <main class="main" style="padding-bottom:32px">
+
+    <!-- ── TAB: SWARM CENTER ── -->
+    <div class="tab-panel active" id="tab-swarm">
+
+      <div class="panel-header">
+        <div>
+          <h1 class="panel-title">Swarm Center</h1>
+          <div class="panel-sub">Script Master Labs — x402 Data API · Pay-per-call U.S. federal data, settled in USDC on Base via x402 · 44 Live Endpoints</div>
+        </div>
+        <div class="beastmode-badge"><span class="bm-dot"></span> BEASTMODE ACTIVE</div>
+      </div>
+
+      <!-- Live stats -->
+      <div class="section-pad" style="padding-bottom:0">
+        <div class="live-stats card" style="border-radius:8px">
+          <div class="stat-block">
+            <span class="stat-val">Base</span>
+            <span class="stat-label">CHAIN</span>
+          </div>
+          <div class="stat-block">
+            <span class="stat-val" data-live-count>44</span>
+            <span class="stat-label">API ENDPOINTS</span>
+          </div>
+          <div class="stat-block">
+            <span class="stat-val" id="stat-ping">—</span>
+            <span class="stat-label">PING (ms)</span>
+          </div>
+          <div class="stat-block">
+            <span class="stat-val" id="stat-agents-today">—</span>
+            <span class="stat-label">AI AGENTS TODAY</span>
+          </div>
+          <div class="stat-block">
+            <span class="stat-val" id="stat-status">—</span>
+            <span class="stat-label">API STATUS</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Config card -->
+      <div class="content-grid" style="padding-bottom:0">
+        <div class="card">
+          <div class="card-header"><span class="card-title">SWARM TARGET CONFIGURATION</span></div>
+          <div class="card-body">
+            <div class="config-row">
+              <span class="config-key">Domain URL</span>
+              <span class="config-val">scriptmasterlabs.com</span>
+            </div>
+            <div class="config-row">
+              <span class="config-key">API Base</span>
+              <span class="config-val">mcp-x402.onrender.com</span>
+            </div>
+            <div class="config-row">
+              <span class="config-key">Brand</span>
+              <span class="config-val">Script Master Labs LLC</span>
+            </div>
+            <div class="config-row">
+              <span class="config-key">SAM UEI</span>
+              <span class="config-val">G24VZA4RLMK3</span>
+            </div>
+            <div class="config-row">
+              <span class="config-key">CAGE Code</span>
+              <span class="config-val">21U51</span>
+            </div>
+            <div class="config-row">
+              <span class="config-key">Swarm Profile</span>
+              <span class="config-val green">Full Swarm</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><span class="card-title">LLM ENGINE</span></div>
+          <div class="card-body">
+            <div class="config-row">
+              <span class="config-key">Model</span>
+              <span class="config-val violet">claude-sonnet-5</span>
+            </div>
+            <div class="config-row">
+              <span class="config-key">MCP endpoint</span>
+              <span class="config-val">/mcp</span>
+            </div>
+            <div class="config-row">
+              <span class="config-key">Payment</span>
+              <span class="config-val">x402 / USDC (Base)</span>
+            </div>
+            <div class="config-row">
+              <span class="config-key">Protocol</span>
+              <span class="config-val">JSON-RPC 2.0</span>
+            </div>
+            <div class="config-row">
+              <span class="config-key">MCP Tools</span>
+              <span class="config-val green">52 registered</span>
+            </div>
+            <div class="config-row">
+              <span class="config-key">AI Indexer</span>
+              <span class="config-val green">ENABLED</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Access -->
+      <div class="section-pad" style="padding-bottom:0">
+        <div class="section-title">API ACCESS</div>
+        <div class="card">
+          <div class="card-body" style="padding:16px">
+            <div style="color:var(--text3,#94a3b8);font-size:13px;margin-bottom:14px">
+              Every endpoint above is pay-per-call via the x402 protocol (USDC on Base) — no signup needed. Prefer flat-rate unlimited access instead?
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+              <button class="checkout-btn starter" onclick="startCheckout('starter', this)">
+                <span class="checkout-tier">STARTER</span>
+                <span class="checkout-price">$29/mo</span>
+              </button>
+              <button class="checkout-btn elite" onclick="startCheckout('elite', this)">
+                <span class="checkout-tier">ELITE</span>
+                <span class="checkout-price">$97/mo</span>
+              </button>
+            </div>
+            <div id="checkout-status" style="font-size:11px;min-height:14px;margin-bottom:14px"></div>
+            <div style="padding:12px;border-radius:6px;background:rgba(16,255,128,.06);border:1px solid rgba(16,255,128,.2);font-size:12px;color:var(--text3,#94a3b8)">
+              <strong style="color:var(--green)">x402 Autonomous Agent Payment (USDC / Base)</strong><br/>
+              AI agents pay per call directly against any endpoint above. Receiving wallet: <code style="color:var(--green)">0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700</code>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SIS™ Card -->
+      <div class="section-pad" style="padding-bottom:0">
+        <div class="section-title">SIS™ — SWARM INTELLIGENCE SCORE</div>
+        <div class="card">
+          <div class="sis-card-body">
+            <canvas id="sis-canvas" width="160" height="160"></canvas>
+            <div class="sis-detail">
+              <div class="sis-headline">
+                <span class="sis-headline-num" id="sis-card-num">—</span>
+                <div class="sis-headline-meta">
+                  <span class="sis-grade-badge" id="sis-grade-badge" style="color:var(--text3)">INITIALIZING</span>
+                  <span class="sis-desc" id="sis-desc">Establishing swarm vector baseline…</span>
+                </div>
+              </div>
+              <div class="sis-dims">
+                <div class="sis-dim">
+                  <span class="sis-dim-label" style="color:var(--violet2)">COVERAGE</span>
+                  <div class="sis-dim-bar"><div class="sis-dim-fill" id="sis-bar-coverage" style="width:0%;background:var(--violet2)"></div></div>
+                  <span class="sis-dim-val" id="sis-val-coverage">—</span>
+                </div>
+                <div class="sis-dim">
+                  <span class="sis-dim-label" style="color:var(--amber)">REACH</span>
+                  <div class="sis-dim-bar"><div class="sis-dim-fill" id="sis-bar-reach" style="width:0%;background:var(--amber)"></div></div>
+                  <span class="sis-dim-val" id="sis-val-reach">—</span>
+                </div>
+                <div class="sis-dim">
+                  <span class="sis-dim-label" style="color:var(--green)">UPTIME</span>
+                  <div class="sis-dim-bar"><div class="sis-dim-fill" id="sis-bar-uptime" style="width:0%;background:var(--green)"></div></div>
+                  <span class="sis-dim-val" id="sis-val-uptime">—</span>
+                </div>
+              </div>
+              <div class="sis-footnote">Proprietary SML composite metric &mdash; API Coverage (34pt, live vs. catalog) + Discovery Reach (33pt, real directory audit) + Network Uptime (33pt, live health check). No component is hardcoded or simulated &mdash; each is 0 until its real data source responds.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Endpoint table -->
+      <div class="section-pad">
+        <div class="section-title">ALL 44 API ENDPOINTS</div>
+        <div class="card">
+          <div class="ep-controls">
+            <input class="ep-search" type="text" id="ep-search" placeholder="Search endpoints…" oninput="filterEndpoints()">
+            <div class="filter-chips">
+              <button class="chip active" onclick="filterCat('all', this)">All</button>
+              <button class="chip" onclick="filterCat('Federal', this)">Federal</button>
+              <button class="chip" onclick="filterCat('Healthcare', this)">Healthcare</button>
+              <button class="chip" onclick="filterCat('SEC', this)">SEC</button>
+              <button class="chip" onclick="filterCat('FTD', this)">FTD</button>
+              <button class="chip" onclick="filterCat('Compliance', this)">Compliance</button>
+              <button class="chip" onclick="filterCat('Signals', this)">Signals</button>
+              <button class="chip" onclick="filterCat('Economic', this)">Economic</button>
+              <button class="chip" onclick="filterCat('Marketplace', this)">Marketplace</button>
+              <button class="chip" onclick="filterCat('Discovery', this)">Discovery</button>
+            </div>
+          </div>
+          <div class="ep-table-wrap">
+            <table class="ep-table" id="ep-table">
+              <thead>
+                <tr>
+                  <th>METHOD</th>
+                  <th>PATH</th>
+                  <th>DESCRIPTION</th>
+                  <th>COST</th>
+                  <th>CAT</th>
+                </tr>
+              </thead>
+              <tbody id="ep-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div><!-- /tab-swarm -->
+
+    <!-- ── TAB: BACKLINKS ── -->
+    <div class="tab-panel" id="tab-backlinks">
+      <div class="panel-header">
+        <div>
+          <h2 class="panel-title">Backlinks — Directory Ranger</h2>
+          <div class="panel-sub">24 AI/Dev directories tracked · Ranger runs every 4 hours</div>
+        </div>
+        <div class="beastmode-badge"><span class="bm-dot"></span> 24/7 BEASTMODE</div>
+      </div>
+
+      <div class="section-pad" style="padding-bottom:0">
+        <div class="live-stats card" style="border-radius:8px">
+          <div class="stat-block">
+            <span class="stat-val" id="dir-stat-listed">—</span>
+            <span class="stat-label">CONFIRMED LISTED</span>
+          </div>
+          <div class="stat-block">
+            <span class="stat-val" id="dir-stat-pending">—</span>
+            <span class="stat-label">NOT YET LISTED</span>
+          </div>
+          <div class="stat-block">
+            <span class="stat-val">24</span>
+            <span class="stat-label">DIRECTORIES TRACKED</span>
+          </div>
+          <div class="stat-block">
+            <span class="stat-val" id="dir-stat-coverage">—</span>
+            <span class="stat-label">COVERAGE</span>
+          </div>
+        </div>
+        <p style="font-size:.7rem;color:var(--text3);margin-top:6px" id="dir-audit-note">Awaiting first real audit</p>
+      </div>
+
+      <div class="section-pad" style="padding-bottom:4px">
+        <div class="section-title">DIRECTORY TARGETS</div>
+      </div>
+      <div class="directory-grid" id="directory-grid"></div>
+    </div><!-- /tab-backlinks -->
+
+    <!-- ── TAB: AD CAMPAIGNS ── -->
+    <div class="tab-panel" id="tab-campaigns">
+      <div class="panel-header">
+        <div>
+          <h2 class="panel-title">Ad Campaigns — Community Scout</h2>
+          <div class="panel-sub">HackerNews scanned live via Algolia search API · Reddit pending credentials</div>
+        </div>
+        <div class="beastmode-badge"><span class="bm-dot"></span> 24/7 BEASTMODE</div>
+      </div>
+
+      <div class="section-pad" style="padding-bottom:0">
+        <div class="live-stats card" style="border-radius:8px">
+          <div class="stat-block">
+            <span class="stat-val" id="comm-stat-hn-hits">—</span>
+            <span class="stat-label">HN MENTIONS FOUND</span>
+          </div>
+          <div class="stat-block">
+            <span class="stat-val">17</span>
+            <span class="stat-label">SEARCH QUERIES</span>
+          </div>
+          <div class="stat-block">
+            <span class="stat-val" id="comm-stat-reddit">PENDING</span>
+            <span class="stat-label">REDDIT STATUS</span>
+          </div>
+        </div>
+        <p style="font-size:.7rem;color:var(--text3);margin-top:6px" id="comm-scan-note">Awaiting first real scan</p>
+      </div>
+
+      <div class="section-pad" style="padding-bottom:4px">
+        <div class="section-title">COMMUNITY TARGETS</div>
+      </div>
+      <div class="subreddit-grid" id="subreddit-grid"></div>
+
+      <div class="section-pad" style="padding-bottom:4px; padding-top:4px">
+        <div class="section-title">SEARCH QUERY TARGETING — REAL HN HIT COUNTS</div>
+      </div>
+      <div class="keyword-list" id="keyword-list"></div>
+    </div><!-- /tab-campaigns -->
+
+    <!-- ── TAB: FEDERAL SCOUT ── -->
+    <div class="tab-panel" id="tab-federal">
+      <div class="panel-header">
+        <div>
+          <h2 class="panel-title">Federal Contracts — Federal Scout</h2>
+          <div class="panel-sub">SAM UEI G24VZA4RLMK3 · SBIR/NIH/Congress scan via SML's own x402 endpoints · runs every 4 hours</div>
+        </div>
+        <div class="beastmode-badge"><span class="bm-dot"></span> 24/7 BEASTMODE</div>
+      </div>
+
+      <div class="section-pad" style="padding-bottom:0">
+        <div class="live-stats card" style="border-radius:8px">
+          <div class="stat-block">
+            <span class="stat-val" id="fed-stat-scanned">—</span>
+            <span class="stat-label">OPPORTUNITIES SCANNED</span>
+          </div>
+          <div class="stat-block">
+            <span class="stat-val" id="fed-stat-high">—</span>
+            <span class="stat-label">HIGH RELEVANCE</span>
+          </div>
+          <div class="stat-block">
+            <span class="stat-val" id="fed-stat-medium">—</span>
+            <span class="stat-label">MEDIUM RELEVANCE</span>
+          </div>
+        </div>
+        <p style="font-size:.7rem;color:var(--text3);margin-top:6px" id="fed-scan-note">Awaiting first real scan</p>
+      </div>
+
+      <div class="section-pad" style="padding-bottom:4px">
+        <div class="section-title">HIGH-RELEVANCE OPPORTUNITIES</div>
+      </div>
+      <div class="directory-grid" id="federal-high-grid"></div>
+
+      <div class="section-pad" style="padding-bottom:4px; padding-top:4px">
+        <div class="section-title">LEGISLATIVE INTEL</div>
+      </div>
+      <div class="keyword-list" id="federal-legislative-list"></div>
+    </div><!-- /tab-federal -->
+
+    <!-- ── TAB: AI INDEXER ── -->
+    <div class="tab-panel" id="tab-indexer">
+      <div class="panel-header">
+        <div>
+          <h2 class="panel-title">AI Indexer</h2>
+          <div class="panel-sub">AI agent discoverability · Plugin descriptors · OpenAPI · Discovery files</div>
+        </div>
+        <div class="beastmode-badge"><span class="bm-dot"></span> INDEXER ACTIVE</div>
+      </div>
+
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <span class="toggle-title">AI Agent Discoverability Core</span>
+          <span class="toggle-desc">Maximize crawlability and tool invocation by Autonomous Agents</span>
+        </div>
+        <span class="toggle-on">ENABLED</span>
+      </div>
+
+      <div class="indexer-grid">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">ChatGPT / LLM AI Plugin Descriptor</span>
+          </div>
+          <div class="card-body" style="padding:0">
+            <div class="code-block" id="plugin-json"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><span class="card-title">DISCOVERY ENDPOINTS</span></div>
+          <div class="card-body">
+            <div style="display:flex;flex-direction:column;gap:8px" id="discovery-endpoints"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><span class="card-title">API PLUGIN ENDPOINTS</span></div>
+          <div class="card-body">
+            <div class="config-row">
+              <span class="config-key">Custom endpoints</span>
+              <span class="config-val green">44 registered</span>
+            </div>
+            <div class="config-row">
+              <span class="config-key">MCP tools</span>
+              <span class="config-val green">52 registered</span>
+            </div>
+            <div class="config-row">
+              <span class="config-key">Auth required</span>
+              <span class="config-val">x402 (premium only)</span>
+            </div>
+            <div class="config-row">
+              <span class="config-key">Schema version</span>
+              <span class="config-val">OpenAPI 3.1.0</span>
+            </div>
+            <div class="config-row">
+              <span class="config-key">MCP protocol</span>
+              <span class="config-val">2024-11-05</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><span class="card-title">WELL-KNOWN FILES</span></div>
+          <div class="card-body">
+            <div style="display:flex;flex-direction:column;gap:6px" id="wellknown-list"></div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /tab-indexer -->
+
+  </main>
+</div><!-- /layout -->
+
+<!-- ── ACTIVITY BAR ── -->
+<div class="activity-bar">
+  <div class="activity-dot"></div>
+  <span class="activity-label">AGENT_SWARM_STREAM</span>
+  <div class="activity-scroll-wrap">
+    <div class="activity-scroll" id="activity-scroll"></div>
+  </div>
+</div>
+
+<script>
+/* ── DATA ── */
+const ENDPOINTS = [
+  // ── Federal ───────────────────────────────────────────────
+  {method:'GET',path:'/x402/grants',              desc:'Live federal grants data from USASpending.gov',                      cat:'Federal',    free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/sbir-grants',         desc:'SBIR/STTR federal research & technology grants',                    cat:'Federal',    free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/nih-grants',          desc:'NIH research grants via NIH Reporter',                               cat:'Federal',    free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/congress-bills',      desc:'Congress.gov live bill tracker and legislative status',              cat:'Federal',    free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/lobbying',            desc:'Federal lobbying disclosure reports (Senate LDA)',                   cat:'Federal',    free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/fec-finance',         desc:'FEC campaign finance filings and donor data',                       cat:'Federal',    free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/patents',             desc:'USPTO patent search and IP intelligence',                            cat:'Federal',    free:false, cost:'0.05 USDC'},
+  // ── Healthcare / FDA ──────────────────────────────────────
+  {method:'GET',path:'/x402/drug-label',          desc:'FDA drug label information via OpenFDA',                             cat:'Healthcare', free:false, cost:'0.03 USDC'},
+  {method:'GET',path:'/x402/drug-recall',         desc:'FDA drug recall enforcement reports via OpenFDA',                   cat:'Healthcare', free:false, cost:'0.03 USDC'},
+  {method:'GET',path:'/x402/npi',                 desc:'National Provider Identifier (NPI) registry lookup',                cat:'Healthcare', free:false, cost:'0.03 USDC'},
+  {method:'GET',path:'/x402/clinical-trials',     desc:'ClinicalTrials.gov study search by condition or sponsor',           cat:'Healthcare', free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/drug-adverse-events', desc:'FDA FAERS adverse event reports for any drug',                      cat:'Healthcare', free:false, cost:'0.03 USDC'},
+  {method:'GET',path:'/x402/fda-510k',            desc:'FDA 510(k) medical device clearance database',                      cat:'Healthcare', free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/fda-warnings',        desc:'FDA warning letters issued to manufacturers',                       cat:'Healthcare', free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/cms-providers',       desc:'CMS Medicare/Medicaid provider enrollment and data',                cat:'Healthcare', free:false, cost:'0.05 USDC'},
+  // ── SEC / FINRA ───────────────────────────────────────────
+  {method:'GET',path:'/x402/sec-8k',              desc:'Real-time SEC 8-K material event filings for any ticker',           cat:'SEC',        free:false, cost:'0.10 USDC'},
+  {method:'GET',path:'/x402/sec-13f',             desc:'SEC 13F institutional holdings — quarterly snapshots',              cat:'SEC',        free:false, cost:'0.10 USDC'},
+  {method:'GET',path:'/x402/sec-10k',             desc:'SEC 10-K annual report filings via EDGAR',                          cat:'SEC',        free:false, cost:'0.10 USDC'},
+  {method:'GET',path:'/x402/sec-10q',             desc:'SEC 10-Q quarterly report filings via EDGAR',                       cat:'SEC',        free:false, cost:'0.10 USDC'},
+  {method:'GET',path:'/x402/sec-13dg',            desc:'SEC 13D/13G activist investor and large position filings',          cat:'SEC',        free:false, cost:'0.10 USDC'},
+  {method:'GET',path:'/x402/insider-trades',      desc:'SEC Form 4 insider trading activity for any ticker',                cat:'SEC',        free:false, cost:'0.10 USDC'},
+  {method:'GET',path:'/x402/finra-broker',        desc:'FINRA BrokerCheck registration and disciplinary records',           cat:'SEC',        free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/firms',               desc:'SEC EDGAR corporate filings search',                                cat:'SEC',        free:false, cost:'0.05 USDC'},
+  // ── Economic ──────────────────────────────────────────────
+  {method:'GET',path:'/x402/treasury-yields',     desc:'Current US Treasury yield curve (1M through 30Y)',                  cat:'Economic',   free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/fred',                desc:'St. Louis Fed FRED economic time-series data',                      cat:'Economic',   free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/market',              desc:'Real-time market intelligence data feed',                            cat:'Economic',   free:false, cost:'0.05 USDC'},
+  // ── FTD Intelligence ──────────────────────────────────────
+  {method:'GET',path:'/x402/ftd-threshold-list',  desc:'SEC Regulation SHO threshold securities list',                     cat:'FTD',        free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/ftd-time-series',     desc:'Failure-to-deliver time-series history by ticker',                  cat:'FTD',        free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/ftd-ratio',           desc:'FTD ratio relative to float and daily volume',                     cat:'FTD',        free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/ftd-etf-basket',      desc:'ETF component FTD basket — constituent-level data',               cat:'FTD',        free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/ftd-settlement-cycle',desc:'T+1 settlement cycle FTD tracking and projections',                cat:'FTD',        free:false, cost:'0.05 USDC'},
+  // ── Compliance ────────────────────────────────────────────
+  {method:'GET',path:'/x402/entity-compliance',   desc:'OFAC sanctions and entity compliance screening',                   cat:'Compliance', free:false, cost:'0.08 USDC'},
+  {method:'GET',path:'/x402/epa-violations',      desc:'EPA enforcement actions and environmental violations',              cat:'Compliance', free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/osha',                desc:'OSHA workplace safety violations and citations',                    cat:'Compliance', free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/compliance-anomaly',  desc:'AI-detected compliance anomaly signals across entities',            cat:'Compliance', free:false, cost:'0.08 USDC'},
+  {method:'GET',path:'/x402/compliance-audit',    desc:'Structured compliance audit trail for any entity',                 cat:'Compliance', free:false, cost:'0.08 USDC'},
+  {method:'GET',path:'/x402/compliance-regulator-query', desc:'Regulatory body query interface — SEC, FINRA, CFTC, FDA',  cat:'Compliance', free:false, cost:'0.08 USDC'},
+  // ── Intelligence / Signals ────────────────────────────────
+  {method:'GET',path:'/x402/options-flow',        desc:'Institutional options flow — unusual activity and sweeps',         cat:'Signals',    free:false, cost:'0.10 USDC'},
+  {method:'GET',path:'/x402/cascade-signal',      desc:'SML Cascade Accumulator directional signal',                       cat:'Signals',    free:false, cost:'0.10 USDC'},
+  {method:'GET',path:'/x402/max-conviction-signal',desc:'Maximum conviction composite trading signal',                    cat:'Signals',    free:false, cost:'0.10 USDC'},
+  {method:'GET',path:'/x402/iam-model',           desc:'IAM institutional accumulation model output',                      cat:'Signals',    free:false, cost:'0.10 USDC'},
+  {method:'GET',path:'/x402/agent-score',         desc:'ARGUS agent credit score (300–850) and tier',                     cat:'Signals',    free:false, cost:'0.01 USDC'},
+  {method:'GET',path:'/x402/fact-check',          desc:'AI-powered fact verification against live sources',                cat:'Signals',    free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/content-trust-score', desc:'Content authenticity and trust scoring',                           cat:'Signals',    free:false, cost:'0.05 USDC'},
+  // ── AEO / GEO Intelligence Suite (SqueezeOS) ─────────────────
+  {method:'GET',path:'/api/citation-score/',        desc:'AgentRank™ — citation authority scores for SML APIs on Reddit/HN', cat:'AEO',         free:true,  cost:null},
+  {method:'POST',path:'/api/citation-score/probe',  desc:'Trigger on-demand AgentRank citation probe (async)',               cat:'AEO',         free:true,  cost:null},
+  {method:'GET',path:'/api/scriptmaster/narrative', desc:'P04 API Narrative Optimizer — AI discoverability copy audit',      cat:'AEO',         free:true,  cost:null},
+  {method:'GET',path:'/x402/provider-score/',       desc:'ARGUS AgentPageRank™ — provider quality score 0–850 from live AI agent traffic', cat:'AEO', free:true, cost:null},
+  {method:'GET',path:'/api/graph/gaps/',            desc:'Semantic Gap Detector™ — unmet API demand leaderboard from forums','cat':'AEO',       free:true,  cost:null},
+  {method:'POST',path:'/api/graph/gaps/scan',       desc:'Trigger semantic gap scan (async)',                                 cat:'AEO',         free:true,  cost:null},
+  {method:'GET',path:'/x402/agent-economy/',        desc:'AEIN™ — AI agent commerce summary: which AI systems call us and why', cat:'AEO',      free:true,  cost:null},
+  {method:'GET',path:'/x402/agent-economy/report',  desc:'AEIN™ full report — heatmap, wallet analytics, anomaly flags',     cat:'AEO',         free:false, cost:'0.25 RLUSD'},
+];
+
+/* ── LIVE ENDPOINT PRELOAD ──────────────────────────────────
+   Fetches openapi.json from mcp-x402.onrender.com at load time
+   and merges live paths with local cost/category metadata.
+   Falls back to the hardcoded 44 above if CORS blocks the fetch. */
+const EP_META = {};
+ENDPOINTS.forEach(ep => {
+  EP_META[ep.path] = { cat: ep.cat, free: ep.free, cost: ep.cost || null, desc: ep.desc };
+});
+
+/* Real endpoint catalog size, captured before ENDPOINTS gets overwritten by
+   the live fetch below. Used as the SIS coverage denominator — this is a
+   project constant (how many endpoints exist to find), not a live claim. */
+const ENDPOINTS_CATALOG_SIZE = ENDPOINTS.length;
+/* null until loadLiveEndpoints() actually succeeds — SIS coverage stays at 0
+   until then, it never guesses. */
+let liveEndpointCount = null;
+
+async function loadLiveEndpoints() {
+  try {
+    const res = await fetch('https://mcp-x402.onrender.com/.well-known/openapi.json', {
+      signal: AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const spec = await res.json();
+    const paths = spec.paths || {};
+
+    const live = [];
+    for (const [path, methods] of Object.entries(paths)) {
+      for (const [method, opObj] of Object.entries(methods)) {
+        if (!['get','post','put','delete','patch'].includes(method)) continue;
+        const meta = EP_META[path] || {};
+        live.push({
+          method: method.toUpperCase(),
+          path,
+          desc:  opObj.summary || opObj.description || meta.desc || '',
+          cat:   meta.cat  || 'Other',
+          free:  meta.free !== undefined ? meta.free : true,
+          cost:  meta.cost || null
+        });
+      }
+    }
+
+    if (live.length > 0) {
+      ENDPOINTS.length = 0;
+      live.forEach(ep => ENDPOINTS.push(ep));
+      renderEndpoints();
+      // Sync the count chips to the live number
+      const liveCount = live.length;
+      document.querySelectorAll('[data-live-count]').forEach(el => {
+        el.textContent = liveCount;
+      });
+      liveEndpointCount = liveCount;
+      updateSIS(isOnline === true); // recompute SIS coverage now that it's real
+    }
+  } catch (_) {
+    // CORS or network error — hardcoded fallback already rendered.
+    // liveEndpointCount stays null, so SIS coverage stays 0 (not faked).
+  }
+}
+
+/* rangerName must match agent/dept/directory_ranger.py's DIRECTORIES list
+   exactly — that's the real agent that actually checks these, so its name
+   is the join key for real status. name is just the display label. */
+const DIRECTORIES = [
+  {name:'Smithery.ai',          rangerName:'Smithery.ai',          url:'smithery.ai',               cat:'MCP Registry'},
+  {name:'Glama.ai',             rangerName:'Glama.ai MCP',         url:'glama.ai',                  cat:'MCP Registry'},
+  {name:'mcp.run',              rangerName:'mcp.run',              url:'mcp.run',                   cat:'MCP Registry'},
+  {name:'mcp.so',               rangerName:'mcp.so (MCP Hub)',     url:'mcp.so',                    cat:'MCP Registry'},
+  {name:'PulseMCP',             rangerName:'PulseMCP',             url:'pulsemcp.com',              cat:'MCP Registry'},
+  {name:'There\'s An AI For That',rangerName:'There\'s An AI',     url:'theresanaiforthat.com',     cat:'AI Directory'},
+  {name:'Futurepedia',          rangerName:'Futurepedia',          url:'futurepedia.io',            cat:'AI Directory'},
+  {name:'Toolify.ai',           rangerName:'Toolify.ai',           url:'toolify.ai',                cat:'AI Directory'},
+  {name:'AI Top Tools',         rangerName:'AI Top Tools',         url:'aitoptools.com',            cat:'AI Directory'},
+  {name:'OpenTools.ai',         rangerName:'OpenTools.ai',         url:'opentools.ai',              cat:'AI Directory'},
+  {name:'RapidAPI',             rangerName:'RapidAPI',             url:'rapidapi.com',              cat:'API Marketplace'},
+  {name:'public-apis.io',       rangerName:'public-apis.io',       url:'public-apis.io',            cat:'API Directory'},
+  {name:'APILayer',             rangerName:'APILayer',             url:'apilayer.com',              cat:'API Marketplace'},
+  {name:'npmjs',                rangerName:'npmjs',                url:'npmjs.com',                 cat:'Package Registry'},
+  {name:'PyPI',                 rangerName:'PyPI',                 url:'pypi.org',                  cat:'Package Registry'},
+  {name:'awesome-mcp-servers',  rangerName:'awesome-mcp-servers',  url:'github.com/punkpeye/awesome-mcp-servers', cat:'GitHub List'},
+  {name:'awesome-ai-agents',    rangerName:'awesome-ai-agents',    url:'github.com/e2b-dev/awesome-ai-agents',    cat:'GitHub List'},
+  {name:'DeFi Llama',           rangerName:'DeFi Llama Tools',     url:'defillama.com',             cat:'Crypto Finance'},
+  {name:'CoinGecko',            rangerName:'CoinGecko Apps',       url:'coingecko.com',             cat:'Crypto Finance'},
+  {name:'G2',                   rangerName:'G2 Software',          url:'g2.com',                    cat:'B2B Reviews'},
+  {name:'Product Hunt',         rangerName:'ProductHunt',          url:'producthunt.com',           cat:'Product Launch'},
+  {name:'AlternativeTo',        rangerName:'AlternativeTo',        url:'alternativeto.net',         cat:'Discovery'},
+  {name:'Devhunt.org',          rangerName:'Devhunt.org',          url:'devhunt.org',               cat:'Dev Tools'},
+  {name:'dev.to',               rangerName:'dev.to',               url:'dev.to',                    cat:'Dev Community'},
+];
+
+const SUBREDDITS = [
+  {name:'r/MachineLearning',       focus:'AI/ML research & tooling',      priority:'HIGH'},
+  {name:'r/LocalLLaMA',            focus:'LLM deployment & agents',       priority:'HIGH'},
+  {name:'r/algotrading',           focus:'Algorithmic trading systems',    priority:'HIGH'},
+  {name:'r/AIAgents',              focus:'AI agent frameworks',           priority:'HIGH'},
+  {name:'r/CryptoCurrency',        focus:'Crypto infrastructure',         priority:'MEDIUM'},
+  {name:'r/xrp',                   focus:'XRPL/RLUSD ecosystem',          priority:'MEDIUM'},
+  {name:'r/artificial',            focus:'General AI discussion',         priority:'MEDIUM'},
+  {name:'r/programming',           focus:'Developer tooling',             priority:'MEDIUM'},
+  {name:'r/SideProject',           focus:'Bootstrapped products',         priority:'MEDIUM'},
+  {name:'r/startups',              focus:'B2B SaaS founders',             priority:'MEDIUM'},
+  {name:'r/learnmachinelearning',  focus:'ML education',                  priority:'LOW'},
+  {name:'r/webdev',               focus:'API integrations',               priority:'LOW'},
+  {name:'HackerNews',             focus:'Show HN + Ask HN threads',       priority:'HIGH'},
+];
+
+/* Mirrors agent/dept/community_scout.py's real SEARCH_QUERIES exactly — keep in sync when that list changes. */
+const SEARCH_QUERIES = [
+  'MCP server trading',
+  'x402 payment protocol',
+  'autonomous trading agent',
+  'Claude MCP finance',
+  'squeeze momentum indicator',
+  'XRPL autonomous agent',
+  'RLUSD payment',
+  'AI agent market data API',
+  'institutional signals API',
+  'MCP server finance',
+  'pay per call AI API',
+  'agent micropayment',
+  'answer engine optimization AI',
+  'AEO citation tracking',
+  'AI agent credit score',
+  'GEO generative engine optimization',
+  'SEO agent swarm',
+];
+
+const DISCOVERY_ENDPOINTS = [
+  {path:'/.well-known/mcp.json',       desc:'MCP server manifest'},
+  {path:'/.well-known/ai-plugin.json', desc:'ChatGPT/LLM plugin'},
+  {path:'/.well-known/openapi.json',   desc:'OpenAPI 3.1.0 spec'},
+  {path:'/.well-known/agents.json',    desc:'Agent discovery'},
+  {path:'/.well-known/server.json',    desc:'Server metadata'},
+  {path:'/llms.txt',                   desc:'LLM context file'},
+  {path:'/.well-known/security.txt',   desc:'Security contact'},
+];
+
+const WELLKNOWN = [
+  {file:'mcp.json',       status:'active', desc:'52 MCP tools registered'},
+  {file:'ai-plugin.json', status:'active', desc:'ChatGPT plugin descriptor'},
+  {file:'openapi.json',   status:'active', desc:'OpenAPI 3.1.0 / 44 paths'},
+  {file:'agents.json',    status:'active', desc:'Agent capability manifest'},
+  {file:'server.json',    status:'active', desc:'Server info + pricing'},
+];
+
+/* Real agent activity only — see loadActivity() below. This used to be a
+   hardcoded looping array presented as a live feed. It wasn't real. It's
+   gone. The feed now reads from GET /api/marketing/activity, which only
+   ever contains events a real agent actually posted after doing real work. */
+
+/* ── RENDER ENDPOINTS ── */
+let activeCat = 'all';
+let searchText = '';
+
+function renderEndpoints() {
+  const tbody = document.getElementById('ep-tbody');
+  tbody.innerHTML = '';
+  ENDPOINTS.forEach((ep, i) => {
+    const catMatch = activeCat === 'all' || ep.cat === activeCat;
+    const searchMatch = !searchText || ep.path.toLowerCase().includes(searchText) || ep.desc.toLowerCase().includes(searchText);
+    const tr = document.createElement('tr');
+    if (!catMatch || !searchMatch) tr.className = 'ep-row-hidden';
+    tr.innerHTML = `
+      <td><span class="method-badge method-${ep.path === '/api/events' ? 'SSE' : ep.method}">${ep.path === '/api/events' ? 'SSE' : ep.method}</span></td>
+      <td><span class="ep-path">${ep.path}</span></td>
+      <td><span class="ep-desc">${ep.desc}</span></td>
+      <td>${ep.free ? '<span class="ep-cost-free">FREE</span>' : `<span class="ep-cost-paid">${ep.cost}</span>`}</td>
+      <td><span class="cat-pill">${ep.cat}</span></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function filterCat(cat, btn) {
+  activeCat = cat;
+  document.querySelectorAll('.filter-chips .chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  renderEndpoints();
+}
+
+function filterEndpoints() {
+  searchText = document.getElementById('ep-search').value.toLowerCase();
+  renderEndpoints();
+}
+
+/* ── RENDER DIRECTORIES — real status only, from the last actual Directory Ranger audit ── */
+function renderDirectoryCards(listedSet, unlistedSet, audited) {
+  const grid = document.getElementById('directory-grid');
+  grid.innerHTML = '';
+  DIRECTORIES.forEach(d => {
+    let status, label;
+    if (listedSet.has(d.rangerName))        { status = 'listed';    label = 'LISTED'; }
+    else if (unlistedSet.has(d.rangerName)) { status = 'unlisted';  label = 'NOT LISTED'; }
+    else                                     { status = 'pending';   label = audited ? 'UNCHECKED' : 'AWAITING AUDIT'; }
+
+    const el = document.createElement('div');
+    el.className = 'dir-card';
+    el.innerHTML = `
+      <span class="dir-name">${escapeHtml(d.name)}</span>
+      <span class="dir-url">${escapeHtml(d.url)}</span>
+      <span class="dir-status ${status}">${label}</span>
+      <span class="dir-category">${escapeHtml(d.cat)}</span>
+    `;
+    grid.appendChild(el);
+  });
+}
+
+/* Real directory audit state — SIS reach reads this, never a hardcoded
+   fraction. audited stays false (reach=0) until the real audit responds. */
+let dirAudit = { listedCount: null, total: DIRECTORIES.length, audited: false };
+
+async function renderDirectories() {
+  try {
+    const res = await fetch('https://squeezeos-api.onrender.com/api/marketing/directories', {
+      signal: AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const listedSet   = new Set(data.already_listed || []);
+    const unlistedSet = new Set(data.not_listed || []);
+
+    renderDirectoryCards(listedSet, unlistedSet, data.audited);
+
+    const listedCount = DIRECTORIES.filter(d => listedSet.has(d.rangerName)).length;
+    document.getElementById('dir-stat-listed').textContent   = data.audited ? listedCount : '—';
+    document.getElementById('dir-stat-pending').textContent  = data.audited ? (DIRECTORIES.length - listedCount) : '—';
+    document.getElementById('dir-stat-coverage').textContent = data.audited ? Math.round(listedCount / DIRECTORIES.length * 100) + '%' : '—';
+
+    const note = document.getElementById('dir-audit-note');
+    if (data.audited && data.checked_at) {
+      const ago = Math.round((Date.now() / 1000 - data.checked_at) / 3600);
+      note.textContent = `Last real audit: ${ago < 1 ? 'under an hour' : ago + 'h'} ago`;
+    } else {
+      note.textContent = 'Awaiting first real audit';
+    }
+
+    dirAudit = { listedCount, total: DIRECTORIES.length, audited: !!data.audited };
+    updateSIS(isOnline === true); // recompute SIS reach now that it's real
+  } catch (e) {
+    renderDirectoryCards(new Set(), new Set(), false);
+    document.getElementById('dir-audit-note').textContent = 'Audit data unavailable — awaiting connection';
+    dirAudit = { listedCount: null, total: DIRECTORIES.length, audited: false };
+    updateSIS(isOnline === true); // reach falls back to 0, not a guess
+  }
+}
+
+/* ── RENDER FEDERAL SCOUT — real status only, from the last actual Federal Scout scan ── */
+async function renderFederal() {
+  const highGrid = document.getElementById('federal-high-grid');
+  const legList  = document.getElementById('federal-legislative-list');
+  try {
+    const res = await fetch('https://squeezeos-api.onrender.com/api/marketing/federal', {
+      signal: AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+
+    document.getElementById('fed-stat-scanned').textContent = data.scanned ? data.opportunities_scanned : '—';
+    document.getElementById('fed-stat-high').textContent    = data.scanned ? (data.high_relevance || []).length : '—';
+    document.getElementById('fed-stat-medium').textContent  = data.scanned ? (data.medium_relevance || []).length : '—';
+
+    const note = document.getElementById('fed-scan-note');
+    if (data.scanned && data.scanned_at) {
+      const ago = Math.round((Date.now() / 1000 - data.scanned_at) / 3600);
+      note.textContent = `Last real scan: ${ago < 1 ? 'under an hour' : ago + 'h'} ago`;
+    } else {
+      note.textContent = 'Awaiting first real scan';
+    }
+
+    highGrid.innerHTML = '';
+    const highRelevance = data.high_relevance || [];
+    if (highRelevance.length === 0) {
+      highGrid.innerHTML = `<span class="activity-item">${data.scanned ? 'No high-relevance opportunities in the last scan' : 'Awaiting first real scan'}</span>`;
+    } else {
+      highRelevance.forEach(opp => {
+        const el = document.createElement('div');
+        el.className = 'dir-card';
+        el.innerHTML = `
+          <span class="dir-name">${escapeHtml(opp.title || 'Untitled opportunity')}</span>
+          <span class="dir-url">${escapeHtml(opp.agency || '')}</span>
+          <span class="dir-status listed">SCORE ${escapeHtml(String(opp.score ?? '—'))}</span>
+          <span class="dir-category">${escapeHtml(opp.deadline || 'no deadline listed')}</span>
+        `;
+        highGrid.appendChild(el);
+      });
+    }
+
+    legList.innerHTML = '';
+    const legislative = data.legislative_intel || [];
+    if (legislative.length === 0) {
+      legList.innerHTML = `<span class="activity-item">${data.scanned ? 'No legislative signals in the last scan' : 'Awaiting first real scan'}</span>`;
+    } else {
+      legislative.forEach(item => {
+        const el = document.createElement('span');
+        el.className = 'kw-chip';
+        el.textContent = item;
+        legList.appendChild(el);
+      });
+    }
+  } catch (e) {
+    document.getElementById('fed-scan-note').textContent = 'Scan data unavailable — awaiting connection';
+    highGrid.innerHTML = '<span class="activity-item">Scan data unavailable — awaiting connection</span>';
+  }
+}
+
+/* ── RENDER CAMPAIGNS ── */
+/* Target list is real config (these ARE the channels we intend to scan), not
+   a claim about current activity — actual scan results come from
+   renderCommunityScan() below, which is what used to be entirely faked. */
+function renderCampaigns() {
+  const grid = document.getElementById('subreddit-grid');
+  SUBREDDITS.forEach(s => {
+    const el = document.createElement('div');
+    el.className = 'sub-card';
+    const isHN = s.name === 'HackerNews';
+    el.innerHTML = `
+      <span class="sub-name">${escapeHtml(s.name)}</span>
+      <span class="sub-focus">${escapeHtml(s.focus)}</span>
+      <span class="sub-priority">${isHN ? 'LIVE SCAN' : 'PENDING CREDENTIALS'}</span>
+    `;
+    grid.appendChild(el);
+  });
+}
+
+/* ── RENDER COMMUNITY SCAN — real HN hit counts, honest about Reddit ── */
+async function renderCommunityScan() {
+  const kwList = document.getElementById('keyword-list');
+  try {
+    const res = await fetch('https://mcp-x402.onrender.com/api/marketing/community', {
+      signal: AbortSignal.timeout ? AbortSignal.timeout(15000) : undefined
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+
+    document.getElementById('comm-stat-hn-hits').textContent = data.scanned ? data.hn_total_hits.toLocaleString() : '—';
+    document.getElementById('comm-stat-reddit').textContent = 'PENDING';
+
+    const note = document.getElementById('comm-scan-note');
+    if (data.scanned && data.scanned_at) {
+      const ago = Math.round((Date.now() / 1000 - data.scanned_at));
+      note.textContent = `Last real HN scan: ${ago < 60 ? 'just now' : Math.round(ago / 60) + 'm ago'} · ${data.reddit_note || ''}`;
+    } else {
+      note.textContent = 'Awaiting first real scan';
+    }
+
+    kwList.innerHTML = '';
+    (data.hn_queries || []).forEach(q => {
+      const el = document.createElement('span');
+      el.className = 'kw-chip';
+      el.title = (q.hn_recent_titles || []).join(' · ');
+      el.textContent = `${q.query} (${q.hn_hits})`;
+      kwList.appendChild(el);
+    });
+  } catch (e) {
+    document.getElementById('comm-scan-note').textContent = 'Scan data unavailable — awaiting connection';
+    kwList.innerHTML = '';
+    SEARCH_QUERIES.forEach(q => {
+      const el = document.createElement('span');
+      el.className = 'kw-chip';
+      el.textContent = q;
+      kwList.appendChild(el);
+    });
+  }
+}
+
+/* ── RENDER AI INDEXER ── */
+function renderIndexer() {
+  const pluginJson = {
+    schema_version: 'v1',
+    name_for_model: 'SqueezeOS',
+    name_for_human: 'Script Master Labs — SqueezeOS',
+    description_for_model: 'Institutional-grade AI trading intelligence. 44 endpoints, 52 MCP tools, x402 RLUSD micropayments.',
+    auth: { type: 'none' },
+    api: { type: 'openapi', url: 'https://www.scriptmasterlabs.com/.well-known/openapi.json' },
+    logo_url: 'https://www.scriptmasterlabs.com/favicon.ico',
+    contact_email: 'timothy.walton45@gmail.com',
+    legal_info_url: 'https://www.scriptmasterlabs.com'
+  };
+
+  const raw = JSON.stringify(pluginJson, null, 2);
+  const highlighted = raw
+    .replace(/"([^"]+)":/g, '<span class="key">"$1"</span>:')
+    .replace(/: "([^"]+)"/g, ': <span class="str">"$1"</span>')
+    .replace(/[{}[\],]/g, '<span class="punc">$&</span>');
+  document.getElementById('plugin-json').innerHTML = highlighted;
+
+  const discEl = document.getElementById('discovery-endpoints');
+  DISCOVERY_ENDPOINTS.forEach(d => {
+    const row = document.createElement('div');
+    row.className = 'config-row';
+    row.innerHTML = `
+      <span class="config-val" style="font-size:11px">${d.path}</span>
+      <span class="config-key" style="text-align:right">${d.desc}</span>
+    `;
+    discEl.appendChild(row);
+  });
+
+  const wkEl = document.getElementById('wellknown-list');
+  WELLKNOWN.forEach(w => {
+    const row = document.createElement('div');
+    row.className = 'config-row';
+    row.innerHTML = `
+      <span class="config-val" style="font-size:11px">/.well-known/${w.file}</span>
+      <span class="ep-cost-free" style="font-size:10px" id="wk-status-${w.file}">CHECKING…</span>
+    `;
+    wkEl.appendChild(row);
+  });
+  verifyWellknown(); // never assume LIVE — actually check each file
+}
+
+/* Verifies each /.well-known file actually responds on this domain.
+   No status is ever assumed — CHECKING… until a real fetch resolves. */
+async function verifyWellknown() {
+  for (const w of WELLKNOWN) {
+    const el = document.getElementById('wk-status-' + w.file);
+    if (!el) continue;
+    try {
+      const res = await fetch('/.well-known/' + w.file, {
+        method: 'HEAD',
+        signal: AbortSignal.timeout ? AbortSignal.timeout(6000) : undefined
+      });
+      if (res.ok) {
+        el.textContent = '● LIVE';
+        el.className = 'ep-cost-free';
+        el.style.color = '';
+      } else {
+        el.textContent = '○ DOWN (' + res.status + ')';
+        el.className = '';
+        el.style.color = 'var(--red)';
+      }
+    } catch (_) {
+      el.textContent = '○ UNVERIFIED';
+      el.className = '';
+      el.style.color = 'var(--text3)';
+    }
+  }
+}
+
+/* ── ACTIVITY TICKER — real agent runs only, no fallback fabrication ── */
+function escapeHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = String(s);
+  return d.innerHTML;
+}
+
+async function loadActivity() {
+  const scroll = document.getElementById('activity-scroll');
+  try {
+    const res = await fetch('https://squeezeos-api.onrender.com/api/marketing/activity?limit=20', {
+      signal: AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const entries = data.entries || [];
+
+    if (entries.length === 0) {
+      scroll.innerHTML = '<span class="activity-item">No agent activity yet — CEO (Campaign Director) runs every 4 hours</span>';
+      return;
+    }
+
+    const items = entries.map(e =>
+      `<span class="activity-item"><span class="agent">[${escapeHtml(e.agent)}]</span> <span class="action">${escapeHtml(e.action)}</span></span>`
+    );
+    // Doubled only for the CSS marquee loop to appear seamless — same real entries, not duplicated fake ones
+    scroll.innerHTML = [...items, ...items].join('');
+  } catch (e) {
+    scroll.innerHTML = '<span class="activity-item">Activity feed unavailable — awaiting connection</span>';
+  }
+}
+
+/* ── CHECKOUT — real Stripe session via mcp-x402's live /api/checkout/create-session.
+   Prices shown ($29/$97) match what Stripe actually charges; keep both in sync if
+   either changes. No fabricated success — a failed call shows a real error, not a
+   fake redirect. ── */
+async function startCheckout(tier, btn) {
+  const status = document.getElementById('checkout-status');
+  const buttons = document.querySelectorAll('.checkout-btn');
+  buttons.forEach(b => b.disabled = true);
+  status.style.color = 'var(--text3)';
+  status.textContent = 'Contacting Stripe…';
+  try {
+    const res = await fetch('https://mcp-x402.onrender.com/api/checkout/create-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tier }),
+      signal: AbortSignal.timeout ? AbortSignal.timeout(15000) : undefined,
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if (!data.checkout_url) throw new Error('no checkout URL returned');
+    status.textContent = 'Redirecting to Stripe…';
+    window.location.href = data.checkout_url;
+  } catch (e) {
+    status.style.color = 'var(--red)';
+    status.textContent = 'Checkout unavailable right now (' + e.message + ') — try again shortly.';
+    buttons.forEach(b => b.disabled = false);
+  }
+}
+
+/* ── TAB SWITCHING ── */
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+/* ── RADAR CANVAS ── */
+const canvas = document.getElementById('radar-canvas');
+const ctx = canvas.getContext('2d');
+const W = 180, H = 180, cx = 90, cy = 90, R = 82;
+let angle = 0;
+let blips = [];
+let isOnline = null;
+
+function drawRadar() {
+  ctx.clearRect(0, 0, W, H);
+
+  const lc = isOnline === true ? '#10ff80' : isOnline === false ? '#ef4444' : '#f59e0b';
+  const lc_a = (a) => lc + Math.floor(a * 255).toString(16).padStart(2, '0');
+
+  // BG circle
+  ctx.beginPath();
+  ctx.arc(cx, cy, R, 0, Math.PI * 2);
+  ctx.fillStyle = '#06060f';
+  ctx.fill();
+
+  // Rings
+  [0.33, 0.66, 1].forEach(f => {
+    ctx.beginPath();
+    ctx.arc(cx, cy, R * f, 0, Math.PI * 2);
+    ctx.strokeStyle = lc_a(0.1);
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  });
+
+  // Cross
+  ctx.strokeStyle = lc_a(0.1);
+  ctx.lineWidth = 0.5;
+  [-R, R].forEach(dx => { ctx.beginPath(); ctx.moveTo(cx + dx, cy - R); ctx.lineTo(cx + dx, cy + R); });
+  ctx.beginPath(); ctx.moveTo(cx - R, cy); ctx.lineTo(cx + R, cy); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx, cy - R); ctx.lineTo(cx, cy + R); ctx.stroke();
+
+  // Sweep trail
+  const STEPS = 48;
+  for (let i = STEPS; i >= 0; i--) {
+    const a = angle - (i * 0.04);
+    const alpha = (1 - i / STEPS) * 0.35;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, R, a, a + 0.04);
+    ctx.closePath();
+    ctx.fillStyle = lc_a(alpha);
+    ctx.fill();
+  }
+
+  // Sweep line
+  ctx.beginPath();
+  ctx.moveTo(cx, cy);
+  ctx.lineTo(cx + R * Math.cos(angle), cy + R * Math.sin(angle));
+  ctx.strokeStyle = lc;
+  ctx.lineWidth = 1.5;
+  ctx.shadowBlur = 6;
+  ctx.shadowColor = lc;
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+
+  // Blips
+  const now = Date.now();
+  blips = blips.filter(b => now - b.born < 3500);
+  blips.forEach(b => {
+    const age = (now - b.born) / 3500;
+    const alpha = 1 - age;
+    const bx = cx + b.r * R * Math.cos(b.a);
+    const by = cy + b.r * R * Math.sin(b.a);
+    // Ring
+    ctx.beginPath();
+    ctx.arc(bx, by, 2 + age * 10, 0, Math.PI * 2);
+    ctx.strokeStyle = lc_a(alpha * 0.6);
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    // Dot
+    ctx.beginPath();
+    ctx.arc(bx, by, 2, 0, Math.PI * 2);
+    ctx.fillStyle = lc;
+    ctx.globalAlpha = alpha;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  });
+
+  // Center
+  ctx.beginPath();
+  ctx.arc(cx, cy, 3.5, 0, Math.PI * 2);
+  ctx.fillStyle = lc;
+  ctx.shadowBlur = 10;
+  ctx.shadowColor = lc;
+  ctx.fill();
+  ctx.shadowBlur = 0;
+}
+
+function rafLoop() {
+  angle += 0.022;
+  if (angle > Math.PI * 2) angle -= Math.PI * 2;
+
+  if (isOnline && Math.random() < 0.025) {
+    blips.push({ a: Math.random() * Math.PI * 2, r: 0.25 + Math.random() * 0.7, born: Date.now() });
+  }
+
+  drawRadar();
+  requestAnimationFrame(rafLoop);
+}
+
+/* ── API STATUS CHECK ── */
+let heartbeatInterval;
+
+function setSwarmStatus(status, pingMs, enginesCount) {
+  isOnline = status;
+
+  const pill = document.getElementById('swarm-pill');
+  const pillText = document.getElementById('pill-text');
+  const statusLabel = document.getElementById('status-label');
+  const pingDisplay = document.getElementById('ping-display');
+
+  const classes = {true: 'online', false: 'offline', null: 'checking'};
+  const labels  = {true: 'SWARM ONLINE', false: 'SWARM OFFLINE', null: 'CHECKING…'};
+  const slabels = {true: 'ONLINE', false: 'OFFLINE', null: 'CHECKING'};
+
+  pill.className = 'swarm-pill ' + classes[status];
+  pillText.textContent = labels[status];
+  statusLabel.className = 'status-label ' + classes[status];
+  statusLabel.textContent = slabels[status];
+
+  if (pingMs != null) {
+    pingDisplay.textContent = pingMs + ' ms';
+    document.getElementById('stat-ping').textContent = pingMs;
+    document.getElementById('metric-heartbeat').textContent = 'just now';
+  }
+
+  if (status === true) {
+    document.getElementById('stat-status').textContent = 'LIVE';
+    document.getElementById('stat-status').style.color = 'var(--green)';
+    updateSIS(true);
+  } else if (status === false) {
+    document.getElementById('stat-status').textContent = 'DOWN';
+    document.getElementById('stat-status').style.color = 'var(--red)';
+    updateSIS(false);
+  }
+}
+
+let lastPingAge = 0;
+
+async function loadAgentStats() {
+  try {
+    const res = await fetch('https://mcp-x402.onrender.com/api/stats', {
+      signal: AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    const today = data.aiAgentsToday ?? 0;
+    const total = data.aiAgentsAllTime ?? 0;
+
+    const fmt = n => n >= 1000 ? (n / 1000).toFixed(1) + 'k' : String(n);
+
+    ['metric-agents-today', 'stat-agents-today'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = fmt(today);
+    });
+    const totalEl = document.getElementById('metric-agents-total');
+    if (totalEl) totalEl.textContent = fmt(total);
+  } catch (_) { /* non-critical */ }
+}
+
+async function checkStatus() {
+  const start = Date.now();
+  try {
+    const res = await fetch('https://mcp-x402.onrender.com/health', {
+      signal: AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const ms = Date.now() - start;
+    const engines = data.engines_active ?? data.active_engines ?? data.engines ?? '—';
+    setSwarmStatus(true, ms, engines);
+    lastPingAge = 0;
+  } catch (e) {
+    setSwarmStatus(false, null, null);
+  }
+}
+
+/* heartbeat counter */
+function startHeartbeatCounter() {
+  setInterval(() => {
+    if (isOnline === true) {
+      lastPingAge++;
+      document.getElementById('metric-heartbeat').textContent = lastPingAge + 's ago';
+    }
+  }, 1000);
+}
+
+/* ── SIS™ — SWARM INTELLIGENCE SCORE ────────────────────── */
+/* Every component below is either 0 or computed from a real fetched value.
+   Nothing here is a hardcoded fraction — if the real data hasn't loaded yet,
+   the component stays at 0 rather than showing a guessed number. */
+const SIS_MAX = { coverage: 34, reach: 33, uptime: 33 };
+let sisState  = { coverage: 0, reach: 0, uptime: 0 };
+let sisAnimCurrent = 0;
+
+function computeSIS(networkUp) {
+  // Real live endpoint count (from loadLiveEndpoints' fetch of openapi.json)
+  // vs. the actual size of our endpoint catalog. 0 until the fetch succeeds.
+  const coverage = (liveEndpointCount != null && ENDPOINTS_CATALOG_SIZE > 0)
+    ? Math.round((liveEndpointCount / ENDPOINTS_CATALOG_SIZE) * SIS_MAX.coverage)
+    : 0;
+
+  // Real directory audit result (from renderDirectories' fetch) vs. the
+  // total directories we track. 0 until a real audit has actually run.
+  const reach = (dirAudit.audited && dirAudit.listedCount != null && dirAudit.total > 0)
+    ? Math.round((dirAudit.listedCount / dirAudit.total) * SIS_MAX.reach)
+    : 0;
+
+  // Reflects the real-time health check result — full points while the API is
+  // actually responding, zero while it isn't. Not a session-local counter, so
+  // it can't drift between tabs or reset on reload.
+  const uptime = networkUp ? SIS_MAX.uptime : 0;
+
+  sisState = { coverage, reach, uptime };
+  return coverage + reach + uptime;
+}
+
+function getSISGrade(score) {
+  if (score >= 90) return { label: 'SOVEREIGN',    color: 'var(--green)'   };
+  if (score >= 75) return { label: 'ELITE',        color: 'var(--cyan)'    };
+  if (score >= 60) return { label: 'ACTIVE',       color: 'var(--violet2)' };
+  if (score >= 40) return { label: 'BUILDING',     color: 'var(--amber)'   };
+  return              { label: 'INITIALIZING', color: 'var(--text3)'  };
+}
+
+function getSISDesc(score) {
+  if (score >= 90) return 'Maximum swarm penetration. All vectors sovereign.';
+  if (score >= 75) return 'Elite swarm coverage. Intelligence vectors flowing.';
+  if (score >= 60) return 'Active swarm deployment. Core vectors online.';
+  if (score >= 40) return 'Swarm building coverage. Agents acquiring targets.';
+  return 'Swarm initializing. Establishing vector baseline…';
+}
+
+function drawSISGauge(score) {
+  const canvas = document.getElementById('sis-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = 160, H = 160, cx = 80, cy = 88, r = 58;
+
+  ctx.clearRect(0, 0, W, H);
+
+  const arcStart = Math.PI * 0.8;      // ~144° — 8 o'clock
+  const arcEnd   = Math.PI * 2.2;      // ~396° — 4 o'clock  (240° sweep)
+
+  // Track ring
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, arcStart, arcEnd);
+  ctx.strokeStyle = 'rgba(255,255,255,0.07)';
+  ctx.lineWidth   = 9;
+  ctx.lineCap     = 'round';
+  ctx.stroke();
+
+  // Filled arc
+  if (score > 0) {
+    const fillEnd = arcStart + (arcEnd - arcStart) * (score / 100);
+    const grad = ctx.createLinearGradient(cx - r, cy, cx + r, cy);
+    grad.addColorStop(0,   '#7c3aed');
+    grad.addColorStop(0.5, '#06b6d4');
+    grad.addColorStop(1,   '#10ff80');
+
+    // Glow layer
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, arcStart, fillEnd);
+    ctx.strokeStyle = 'rgba(6,182,212,0.18)';
+    ctx.lineWidth   = 18;
+    ctx.lineCap     = 'round';
+    ctx.stroke();
+
+    // Main fill
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, arcStart, fillEnd);
+    ctx.strokeStyle = grad;
+    ctx.lineWidth   = 9;
+    ctx.lineCap     = 'round';
+    ctx.stroke();
+  }
+
+  // Segment dividers at 25%, 50%, 75%
+  [0.25, 0.5, 0.75].forEach(f => {
+    const ang = arcStart + (arcEnd - arcStart) * f;
+    ctx.beginPath();
+    ctx.moveTo(cx + (r - 7) * Math.cos(ang), cy + (r - 7) * Math.sin(ang));
+    ctx.lineTo(cx + (r + 7) * Math.cos(ang), cy + (r + 7) * Math.sin(ang));
+    ctx.strokeStyle = 'rgba(0,0,0,0.7)';
+    ctx.lineWidth   = 2;
+    ctx.stroke();
+  });
+
+  // Center label
+  ctx.textAlign     = 'center';
+  ctx.textBaseline  = 'middle';
+  ctx.fillStyle     = score > 0 ? '#e2e8f0' : '#4a5568';
+  ctx.font          = `bold 30px 'JetBrains Mono', monospace`;
+  ctx.fillText(score > 0 ? score : '—', cx, cy - 6);
+  ctx.fillStyle = '#4a5568';
+  ctx.font      = `11px 'Space Grotesk', sans-serif`;
+  ctx.fillText('SIS™', cx, cy + 16);
+}
+
+function updateSIS(networkUp) {
+  const score = computeSIS(networkUp === true);
+  const grade = getSISGrade(score);
+
+  // Animate the gauge
+  const target = score;
+  (function animFrame() {
+    const diff = target - sisAnimCurrent;
+    if (Math.abs(diff) < 0.5) { sisAnimCurrent = target; drawSISGauge(Math.round(sisAnimCurrent)); return; }
+    sisAnimCurrent += diff * 0.07;
+    drawSISGauge(Math.round(sisAnimCurrent));
+    requestAnimationFrame(animFrame);
+  })();
+
+  // Update card elements
+  const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  const setStyle = (id, prop, val) => { const el = document.getElementById(id); if (el) el.style[prop] = val; };
+
+  setEl('sis-card-num', score);
+  setEl('sis-grade-badge', grade.label);
+  setStyle('sis-grade-badge', 'color', grade.color);
+  setEl('sis-desc', getSISDesc(score));
+
+  function setDimBar(suffix, val, max) {
+    const bar = document.getElementById('sis-bar-' + suffix);
+    const valEl = document.getElementById('sis-val-' + suffix);
+    if (bar)   bar.style.width = (val / max * 100) + '%';
+    if (valEl) valEl.textContent = val;
+  }
+  setDimBar('coverage', sisState.coverage, SIS_MAX.coverage);
+  setDimBar('reach',    sisState.reach,    SIS_MAX.reach);
+  setDimBar('uptime',   sisState.uptime,   SIS_MAX.uptime);
+
+  // Sidebar SIS
+  setEl('sis-num', score);
+  const gradeEl = document.getElementById('sis-grade');
+  if (gradeEl) { gradeEl.textContent = grade.label; gradeEl.style.color = grade.color; }
+
+  // Sidebar mini bars
+  const setMini = (id, val, max) => {
+    const el = document.getElementById(id);
+    if (el) el.style.width = (val / max * 100) + '%';
+  };
+  setMini('sm-coverage', sisState.coverage, SIS_MAX.coverage);
+  setMini('sm-reach',    sisState.reach,    SIS_MAX.reach);
+  setMini('sm-uptime',   sisState.uptime,   SIS_MAX.uptime);
+}
+
+/* ── BOOT ── */
+renderEndpoints();   // draw hardcoded 44 immediately
+loadLiveEndpoints(); // async: overwrite with live spec if CORS allows
+renderDirectories();
+setInterval(renderDirectories, 300000); // real audit runs every 4h — 5-min poll is plenty
+renderFederal();
+setInterval(renderFederal, 300000); // real scan runs every 4h — 5-min poll is plenty
+renderCampaigns();
+renderCommunityScan();
+setInterval(renderCommunityScan, 300000); // live HN query on each poll — no server-side cache to go stale
+renderIndexer();
+loadActivity();
+setInterval(loadActivity, 60000);
+
+rafLoop();
+updateSIS(null);
+
+checkStatus();
+setInterval(checkStatus, 30000);
+startHeartbeatCounter();
+loadAgentStats();
+setInterval(loadAgentStats, 60000);
+
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "AgentSwarm SEO — Script Master Labs Command Center",
+  "description": "Live command center for Script Master Labs' AI marketing swarm — Directory Ranger, Community Scout, and Federal Scout — plus the x402 pay-per-call data API (44 live endpoints, 52 MCP tools) settled in USDC on Base.",
+  "url": "https://www.scriptmasterlabs.com/agentswarm-seo.html",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Any",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Script Master Labs LLC",
+    "url": "https://www.scriptmasterlabs.com"
+  }
+}
+</script>
+</body>
+</html>
+

@@ -1,0 +1,21 @@
+name: IndexNow Submit
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'sitemap.xml'
+      - 'scripts/indexnow-submit.sh'
+  workflow_dispatch:
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Wait for Vercel deploy to go live
+        run: sleep 60
+
+      - name: Submit sitemap URLs to IndexNow
+        run: bash scripts/indexnow-submit.sh

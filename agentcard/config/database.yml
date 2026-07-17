@@ -1,0 +1,34 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  # Connection pool: matches Puma thread count per worker
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  # Connection timeout in seconds
+  connect_timeout: 5
+  # Statement timeout: kill queries that run longer than 30s
+  variables:
+    statement_timeout: 30000
+    lock_timeout: 5000
+
+development:
+  <<: *default
+  database: agentcard_development
+  # Override with DATABASE_URL if set
+  url: <%= ENV["DATABASE_URL"] %>
+
+test:
+  <<: *default
+  database: agentcard_test
+  url: <%= ENV["DATABASE_URL_TEST"] || ENV["DATABASE_URL"] %>
+
+production:
+  <<: *default
+  # DATABASE_URL takes full precedence in production.
+  # Expected format: postgres://user:password@host:5432/agentcard_production
+  # Rails merges DATABASE_URL on top of the values below automatically.
+  url: <%= ENV["DATABASE_URL"] %>
+  database: agentcard_production
+  # Increase pool for production concurrency
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 10 } %>
+  # SSL required in production
+  sslmode: <%= ENV.fetch("DATABASE_SSLMODE", "require") %>

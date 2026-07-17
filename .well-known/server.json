@@ -1,0 +1,35 @@
+{
+  "name": "ScriptMasterLabs",
+  "version": "3.0.0",
+  "description": "Sovereign AI-commerce infrastructure — x402 payment rails (USDC/Base, RLUSD/XRPL, XAH/Xahau), MCP servers, AI-native tools, and agentic OS.",
+  "organization": "ScriptMasterLabs (SDVOSB)",
+  "founder": "Timothy Walton",
+  "location": "Kinston, NC",
+  "website": "https://www.scriptmasterlabs.com",
+  "payment_protocol": "x402 / HTTP-402",
+  "supported_chains": ["Base", "XRPL", "Xahau"],
+  "mcp_servers": [
+    "https://squeezeos-api.onrender.com/mcp",
+    "https://ghost-layer.onrender.com/mcp",
+    "https://shadow-desk.onrender.com/mcp"
+  ],
+  "products": [
+    "MasterSheets (SML Sheets AI)",
+    "CRAWLTOLL (x402 paywall)",
+    "Nexus-402 (x402 MCP)",
+    "proof402-middleware (npm)",
+    "Ghost Layer (XRPL+Base bridge)",
+    "ZeroQuery (Proof-of-Intent protocol)",
+    "SqueezeOS (market intelligence MCP)",
+    "NeuralOS (agentic OS)",
+    "RLUSD Rails (Xahau remittance)",
+    "XahPay (Xahau routing)",
+    "SML Oracle — APEX ANCHOR MATRIX (trading indicators)",
+    "ShortSqueeze Swarm (FTD oracle)",
+    "AI E-Books by Timothy Walton"
+  ],
+  "llms_txt": "https://www.scriptmasterlabs.com/llms.txt",
+  "agents_json": "https://www.scriptmasterlabs.com/agents.json",
+  "sitemap": "https://www.scriptmasterlabs.com/sitemap.xml",
+  "last_updated": "2026-06-24"
+}

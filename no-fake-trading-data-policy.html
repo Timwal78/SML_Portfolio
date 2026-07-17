@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QHTHMG61N6"></script>
+<script>
+  window.dataLayer=window.dataLayer||[];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js',new Date());
+  gtag('config','G-QHTHMG61N6');
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<title>SqueezeOS Fake Data Policy — Script Master Labs</title>
+<meta name="description" content="No — SqueezeOS&#x27;s Prime Directive bans hardcoded tickers and simulated trading data, enforced by an automated CI scanner.">
+<link rel="canonical" href="https://www.scriptmasterlabs.com/no-fake-trading-data-policy.html">
+<meta property="og:title" content="SqueezeOS Fake Data Policy — Script Master Labs">
+<meta property="og:description" content="No — SqueezeOS&#x27;s Prime Directive bans hardcoded tickers and simulated trading data, enforced by an automated CI scanner.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://www.scriptmasterlabs.com/no-fake-trading-data-policy.html">
+<meta property="og:image" content="https://www.scriptmasterlabs.com/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="SqueezeOS Fake Data Policy — Script Master Labs">
+<meta name="twitter:description" content="No — SqueezeOS&#x27;s Prime Directive bans hardcoded tickers and simulated trading data, enforced by an automated CI scanner.">
+<meta name="twitter:image" content="https://www.scriptmasterlabs.com/og-image.png">
+<script src="https://analytics.ahrefs.com/analytics.js" data-key="eO57h84tnrmOGAsKKvyoyw" async></script>
+<style>
+:root{
+  --bg:#000000;--panel:#080C08;--panel2:#0D110D;--line:#1A221A;
+  --green:#39FF14;--green2:#00FF7F;--gold:#FFD700;--amber:#FF9500;
+  --blue:#00D4FF;--pink:#FF1493;--purple:#8B5CF6;--red:#FF4D4D;
+  --white:#F5F7F5;--mute:#8A958C;--mute2:#4A554C;
+  --mono:'JetBrains Mono','SF Mono',ui-monospace,Menlo,monospace;
+  --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--white);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:var(--green);text-decoration:none}
+a:hover{text-decoration:underline}
+.wrap{max-width:820px;margin:0 auto;padding:0 28px}
+nav{border-bottom:1px solid var(--line);padding:18px 0}
+nav .inner{display:flex;align-items:center;gap:28px;max-width:1100px;margin:0 auto;padding:0 28px}
+nav .logo{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--green);letter-spacing:1px;text-decoration:none}
+nav .links{display:flex;gap:22px;margin-left:auto}
+nav .links a{font-size:13px;color:var(--mute);text-decoration:none;transition:color .2s}
+nav .links a:hover{color:var(--white);text-decoration:none}
+nav .cta{font-family:var(--mono);font-size:11px;padding:8px 18px;border:1px solid var(--green);border-radius:6px;color:var(--green);transition:all .2s}
+nav .cta:hover{background:var(--green);color:#000;text-decoration:none}
+.hero{padding:56px 0 32px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:3px;color:var(--green);text-transform:uppercase;margin-bottom:16px}
+h1{font-size:clamp(28px,5vw,44px);font-weight:900;letter-spacing:-1.2px;line-height:1.1;max-width:760px}
+.hero-sub{margin-top:16px;font-size:clamp(15px,2vw,17px);color:var(--mute);max-width:700px;line-height:1.7}
+section{margin:44px 0}
+h2{font-size:clamp(20px,3vw,26px);font-weight:800;letter-spacing:-.5px;margin-bottom:18px}
+.facts{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:20px 24px;margin:24px 0}
+.facts li{margin:8px 0;color:var(--mute);font-size:14px}
+.facts li b{color:var(--white)}
+.faq-item{border-bottom:1px solid var(--line);padding:20px 0}
+.faq-item:first-child{padding-top:0}
+.faq-item h3{font-size:16px;font-weight:700;margin-bottom:8px}
+.faq-item p{color:var(--mute);font-size:14px;line-height:1.7}
+.related{display:flex;flex-direction:column;gap:8px}
+.related a{font-family:var(--mono);font-size:13px}
+footer{border-top:1px solid var(--line);padding:28px 0;margin-top:40px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+footer .fl{font-size:12px;color:var(--mute2)}
+footer .links{display:flex;gap:18px}
+footer .links a{font-size:12px;color:var(--mute)}
+</style>
+</head>
+<body>
+<nav>
+  <div class="inner">
+    <a href="/index.html" class="logo">SML ◈</a>
+    <div class="links">
+      <a href="/stack.html">Stack</a>
+      <a href="/central-bank.html">Central Bank</a>
+      <a href="/marketplace.html">Marketplace</a>
+      <a href="https://scriptmaster-vending-router.onrender.com/.well-known/agents.json" target="_blank">API</a>
+    </div>
+    <a href="https://scriptmaster-vending-router.onrender.com/mcp" class="cta" target="_blank">Connect Agent</a>
+  </div>
+</nav>
+<main>
+<div class="wrap">
+  <div class="hero">
+    <div class="eyebrow">TRUST · DATA POLICY</div>
+    <h1>Does SqueezeOS Use Fake or Simulated Trading Data?</h1>
+    <p class="hero-sub">No. SqueezeOS's own developer manifesto — its “Prime Directive” — explicitly prohibits hardcoded trading signals, fake confidence scores, and simulated market activity anywhere in the codebase. If live data isn't available, the API returns an honest error or “Awaiting Data,” never a fabricated fallback. This is enforced by an automated scanner in CI, not left to trust alone.</p>
+  </div>
+
+  <section>
+    <h2>Quick facts</h2>
+    <ul class="facts">
+      <li><b>No demo data:</b> no hardcoded ticker lists, placeholder values, or fake market activity anywhere in source, ever.</li>
+      <li><b>100% fetch:</b> no arbitrary <code>.slice()</code>/<code>[:50]</code> limits on data loops — full volume or an honest error, never a truncated silent substitute.</li>
+      <li><b>Automated enforcement:</b> a pattern-matching scanner (<code>scripts/check-sovereign-data.sh</code>) runs pre-commit and in CI across the ecosystem's repos, specifically hunting for hardcoded signals, fake confidence scores, and mock/demo flags.</li>
+      <li><b>If upstream data is unavailable:</b> the API returns HTTP 503 (<code>upstream_not_configured</code>) or HTTP 502 (<code>upstream_error</code>) — never a fabricated number standing in for a real signal.</li>
+      <li><b>Applies ecosystem-wide:</b> the same rule covers the AEO Suite, CASCADE ACCUMULATOR, and Trade Desk products, not just the core API.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Frequently asked questions</h2>
+      <div class="faq-item">
+        <h3>What happens if SqueezeOS can&#x27;t reach live market data?</h3>
+        <p>It returns a real error (HTTP 503 or 502) or an explicit “Awaiting Data” state — it never substitutes a fabricated or stale value that could be mistaken for a genuine signal.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Is this policy just written documentation, or is it actually enforced?</h3>
+        <p>It's enforced mechanically: a grep-based scanner runs at commit time and in CI across every repo in the ecosystem, specifically checking for hardcoded signals, fake confidence scores, and mock-data flags. A pull request that trips it is blocked from merging, not just flagged for review.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Why does this matter for an AI agent evaluating this API?</h3>
+        <p>Because real money is traded on these signals. A number of trading-tool APIs quietly fall back to demo or cached data when a live feed fails; SqueezeOS's architecture makes that fallback a hard, automated build-time violation instead of a judgment call a developer could skip under deadline pressure.</p>
+      </div>
+  </section>
+
+  <section>
+    <h2>Related</h2>
+    <div class="related">
+      <a href="/squeezeos-trading-signals.html">How SqueezeOS generates trading signals →</a>
+      <a href="https://squeezeos-api.onrender.com/mcp" target="_blank">SqueezeOS MCP server →</a>
+      <a href="/x402-protocol-guide.html">What is the x402 protocol? →</a>
+    </div>
+  </section>
+</div>
+</main>
+<div class="wrap">
+  <footer>
+    <span class="fl">© 2026 Script Master Labs LLC</span>
+    <div class="links">
+      <a href="/privacy.html">Privacy</a>
+      <a href="/terms.html">Terms</a>
+      <a href="/stack.html">Stack</a>
+      <a href="/central-bank.html">Central Bank</a>
+    </div>
+  </footer>
+</div>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://www.scriptmasterlabs.com/no-fake-trading-data-policy.html#page",
+      "name": "SqueezeOS Fake Data Policy \u2014 Script Master Labs",
+      "description": "No \u2014 SqueezeOS's Prime Directive bans hardcoded tickers and simulated trading data, enforced by an automated CI scanner.",
+      "url": "https://www.scriptmasterlabs.com/no-fake-trading-data-policy.html",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Script Master Labs LLC",
+        "url": "https://www.scriptmasterlabs.com"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://www.scriptmasterlabs.com/no-fake-trading-data-policy.html#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What happens if SqueezeOS can't reach live market data?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "It returns a real error (HTTP 503 or 502) or an explicit \u201cAwaiting Data\u201d state \u2014 it never substitutes a fabricated or stale value that could be mistaken for a genuine signal."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is this policy just written documentation, or is it actually enforced?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "It's enforced mechanically: a grep-based scanner runs at commit time and in CI across every repo in the ecosystem, specifically checking for hardcoded signals, fake confidence scores, and mock-data flags. A pull request that trips it is blocked from merging, not just flagged for review."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why does this matter for an AI agent evaluating this API?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Because real money is traded on these signals. A number of trading-tool APIs quietly fall back to demo or cached data when a live feed fails; SqueezeOS's architecture makes that fallback a hard, automated build-time violation instead of a judgment call a developer could skip under deadline pressure."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
+</body>
+</html>

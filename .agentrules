@@ -1,0 +1,21 @@
+# SCRIPT MASTER LABS - CRITICAL AGENT INSTRUCTIONS
+# STOP AND READ THIS BEFORE EXECUTING ANY COMMANDS OR MODIFICATIONS.
+
+You are interacting with the Script Master Labs Portfolio repository. This repository contains the authoritative Trust Architecture and JSON-LD structured data for the organization.
+
+## 1. THE TRUST ARCHITECTURE IS IMMUTABLE
+- **NEVER** delete, overwrite, or remove the `about.html`, `privacy.html`, or `terms.html` pages.
+- **NEVER** modify the `<footer>` of any page to remove the copyright, LLC designation, or links to the Trust Architecture.
+- Do NOT merge PRs that accidentally delete these files. If a PR deletes them, you must extract the payload manually and preserve the Trust Pages.
+
+## 2. JSON-LD SCHEMA PROTECTION
+- The `<script type="application/ld+json">` blocks in `index.html`, `stack.html`, and `stack/ghost/index.html` have been explicitly tuned to achieve 0-error Google Rich Results E-E-A-T validation. 
+- **NEVER** modify the JSON-LD schema objects (`Organization`, `Person`, `SoftwareApplication`, `CollectionPage`, `ItemList`) without explicit, undeniable permission from the user.
+- **NEVER** add `aggregateRating` or `review` fields to `SoftwareApplication` schemas. This is institutional B2B infrastructure, not consumer software.
+
+## 3. ZERO HALLUCINATIONS POLICY
+- **NEVER** hallucinate or invent product names (e.g., "Hawkeye Command App", "CyberShield", etc.).
+- Only products explicitly documented in `llms.txt` or verified in the `Timwal78` GitHub repositories (SqueezeOS, ghost-layer, etc.) may be added to the UI.
+- If you do not know the exact details of a product, STOP and ask the user. Do not guess.
+
+Failure to follow these instructions will break the SEO, E-E-A-T trust signals, and institutional credibility of the stack.

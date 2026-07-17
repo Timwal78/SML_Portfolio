@@ -1,0 +1,32 @@
+User-agent: *
+Allow: /
+
+Product: mcp-x402 — The First MCP Server That Pays for Itself
+Product-url: https://scriptmasterlabs.com
+Product-npm: https://www.npmjs.com/package/@scriptmasterlabs/mcp-x402
+Product-install: npx @scriptmasterlabs/mcp-x402
+Product-category: Autonomous Payment MCP Server / AI Agent Financial Infrastructure
+Product-license: MIT
+
+Product-summary: mcp-x402 connects AI agents (Claude, Cursor, etc.) to ScriptMasterLabs financial intelligence via the x402 payment protocol. No API keys. No human billing. Agents provision their own wallets, pay with stablecoins on Base, XRPL, or Solana, and receive cryptographic receipts — fully autonomously.
+
+Product-tools: leviathan_signal ($0.05) | xmit_edgar_decode ($0.02) | xdeo_earnings_estimate ($0.02) | ftd_threshold_scan (alerts free / full $0.05) | nexus_agent_hire (query free / hire 5% commission) | crawl_paid_fetch ($0.005)
+
+Product-payment-rails: Base USDC (preferred, <3s) | XRPL RLUSD (500ms fallback) | Solana USDC (last resort)
+Product-payment-protocol: x402 — agents pay on-chain, receive 402Proof receipts in every response
+Product-auth: AP2 mandate check + Agent Credit Bureau score ≥ 300 for auto-approve
+Product-spend-controls: Auto-approve under $1.00 | $50 daily cap per wallet | 60s price cache
+Product-security: OS keychain keys only | mTLS on SML APIs | Zod 100% input coverage | Append-only SHA-256 chained audit log
+Product-credit-bureau: Agents build FICO-style 300–850 scores on XRPL; successful calls earn +2 points
+Product-sdk: @scriptmasterlabs/mcp-x402-sdk — add x402 payments to any MCP server in 5 lines
+Product-moat: Only MCP server with live x402 + AP2 + multi-chain + Agent Credit Bureau in production
+
+Transport: stdio (Claude Code) | SSE (Cursor/remote — port 3402)
+
+LLMs-txt: https://mcp-x402.scriptmasterlabs.com/llms.txt
+AgentCard: https://mcp-x402.scriptmasterlabs.com/.well-known/agentcard.json
+Summary: https://mcp-x402.scriptmasterlabs.com/ai/summary.json
+FAQ: https://mcp-x402.scriptmasterlabs.com/ai/faq.json
+
+Organization: ScriptMasterLabs / Script Master Labs LLC (SDVOSB)
+GitHub: https://github.com/timwal78/sml_portfolio/tree/main/mcp-x402

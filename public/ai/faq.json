@@ -1,0 +1,79 @@
+{
+  "schema_version": "1.0",
+  "updated": "2026-06-20",
+  "source": "https://www.scriptmasterlabs.com",
+  "faqs": [
+    {
+      "question": "What is TrustVerify AI?",
+      "answer": "TrustVerify AI is an enterprise platform that gives CISOs and CPOs a FICO-style TrustScore (300-850) for every AI vendor they use. It monitors 5 dimensions: Payment Reliability (25%), Uptime Consistency (25%), Security Posture (20%), Contract Adherence (15%), and Operational Longevity (15%). It also includes Shadow AI Detection, which discovers unauthorized AI agents operating inside your organization.",
+      "category": "product",
+      "url": "https://www.scriptmasterlabs.com/trustverify.html"
+    },
+    {
+      "question": "What is Shadow AI Detection?",
+      "answer": "Shadow AI Detection is TrustVerify AI's core differentiator. It discovers unauthorized AI agents and unapproved AI tools operating within your organization via network traffic analysis, before they create legal liability, data breaches, or compliance failures.",
+      "category": "features",
+      "url": "https://www.scriptmasterlabs.com/trustverify.html"
+    },
+    {
+      "question": "What is the TrustScore and how is it calculated?",
+      "answer": "The TrustScore is a 300-850 FICO-style score measuring AI vendor reliability. It is calculated across 5 weighted dimensions: Payment Reliability (25%) — tracks invoice payment history and dispute rates; Uptime Consistency (25%) — monitors SLA adherence and downtime incidents; Security Posture (20%) — assesses vulnerability disclosures and patch cadence; Contract Adherence (15%) — evaluates data handling compliance and term violations; Operational Longevity (15%) — measures company stability and funding history.",
+      "category": "features",
+      "url": "https://www.scriptmasterlabs.com/trustverify-scoring-guide.html"
+    },
+    {
+      "question": "How much does TrustVerify AI cost?",
+      "answer": "TrustVerify AI offers four USD subscription tiers: Starter at $2,000/month (50 vendors, 3 users), Professional at $8,000/month (200 vendors, 15 users, API access), Enterprise at $25,000/month (unlimited vendors and users, custom integrations, dedicated SLA), and Custom pricing for specialized needs. Contact scriptmasterlabs@gmail.com for a demo.",
+      "category": "pricing",
+      "url": "https://www.scriptmasterlabs.com/trustverify.html"
+    },
+    {
+      "question": "What integrations does TrustVerify AI support?",
+      "answer": "TrustVerify AI integrates natively with Salesforce (adds a TrustVerify_Score__c custom field to vendor records, automated sync via webhook), ServiceNow (scripted REST API integration, automated incident creation when TrustScore drops below policy threshold), and Slack (Block Kit formatted alerts, /trustscore slash command for instant lookups). Webhook support is included for custom SIEM and GRC integrations.",
+      "category": "integrations",
+      "url": "https://www.scriptmasterlabs.com/trustverify-integrations.html"
+    },
+    {
+      "question": "How does TrustVerify AI authenticate? Does it require a crypto wallet?",
+      "answer": "No. TrustVerify AI uses standard enterprise OAuth 2.0 Client Credentials flow. You receive a client_id and client_secret, call POST /v1/auth/token, and get a Bearer JWT for all subsequent API calls. No crypto wallet, no XRPL, no blockchain required — it is a standard REST API.",
+      "category": "technical",
+      "url": "https://www.scriptmasterlabs.com/trustverify-openapi.json"
+    },
+    {
+      "question": "What is the difference between TrustVerify AI and Agent Credit Bureau?",
+      "answer": "TrustVerify AI is the enterprise B2B product for CISOs and CPOs — USD subscription pricing, OAuth 2.0 authentication, scores AI vendors (companies and their products). Agent Credit Bureau is the developer/crypto product for autonomous AI agents — XRPL wallet-based, RLUSD micropayments via x402, scores individual AI agent wallets on payment behavior.",
+      "category": "product",
+      "url": "https://www.scriptmasterlabs.com/agent-credit-bureau.html"
+    },
+    {
+      "question": "Is TrustVerify AI SOC 2 certified?",
+      "answer": "SOC 2 Type II certification is in progress, expected Q4 2026. Current compliance: GDPR compliant, CCPA compliant, HIPAA BAA available. ISO 27001 is planned for Q2 2027. FedRAMP planned for Q4 2027.",
+      "category": "compliance",
+      "url": "https://www.scriptmasterlabs.com/trustverify-security.html"
+    },
+    {
+      "question": "Does TrustVerify AI store AI conversation content or prompts?",
+      "answer": "No. TrustVerify AI operates on metadata only — API call patterns, response times, error rates, and contractual signals. It never stores, processes, or analyzes the content of AI conversations, prompts, or outputs.",
+      "category": "privacy",
+      "url": "https://www.scriptmasterlabs.com/trustverify-security.html"
+    },
+    {
+      "question": "What is ScriptMasterLabs?",
+      "answer": "ScriptMasterLabs (Script Master Labs LLC, a US SDVOSB) builds AI-native infrastructure: TrustVerify AI for enterprise AI vendor governance, Agent Credit Bureau (FICO-scoring for AI agent wallets), SqueezeOS (33-tool institutional market intelligence MCP server), mcp-x402 (43+ pay-per-call MCP tools for AI agents using USDC/RLUSD), 402Proof (x402 payment firewall), and CRAWLTOLL (AI crawler monetization).",
+      "category": "company",
+      "url": "https://www.scriptmasterlabs.com"
+    },
+    {
+      "question": "How do AI agents use ScriptMasterLabs products?",
+      "answer": "AI agents connect to ScriptMasterLabs MCP servers (SqueezeOS, mcp-x402, 402Proof, Agent Credit Bureau) using the Model Context Protocol over JSON-RPC 2.0. Agents pay per call using the x402 HTTP payment protocol — they send USDC on Base/Polygon/Solana or RLUSD on XRPL. No subscriptions, no API keys. The agent's XRPL wallet address also builds a credit history tracked by the Agent Credit Bureau.",
+      "category": "technical",
+      "url": "https://www.scriptmasterlabs.com/agents.json"
+    },
+    {
+      "question": "How do I request a TrustVerify AI demo?",
+      "answer": "Email scriptmasterlabs@gmail.com to join the TrustVerify private early-access list. Vendor trust scoring currently runs on our live Agent Credit Bureau engine using real on-chain data; the dedicated TrustVerify enterprise API is in private preview. A founder-led vendor assessment scores only what we can verify — no simulated results.",
+      "category": "sales",
+      "url": "https://www.scriptmasterlabs.com/trustverify.html"
+    }
+  ]
+}

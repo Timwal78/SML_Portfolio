@@ -1,0 +1,31 @@
+name: mcp-x402 Keepalive
+
+# Pings the SSE health endpoint every 14 minutes to prevent cold starts
+# on free-tier Render instances (which sleep after 15 minutes of inactivity).
+on:
+  schedule:
+    - cron: '*/14 * * * *'  # every 14 minutes, 24/7
+  workflow_dispatch:        # allow manual trigger
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Ping mcp-x402 health endpoint
+        env:
+          MCP_X402_URL: ${{ secrets.MCP_X402_URL }}
+        run: |
+          URL="${MCP_X402_URL:-https://mcp-x402.scriptmasterlabs.com}"
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 "${URL}/health")
+          echo "Health check HTTP ${STATUS} — ${URL}/health"
+          if [ "$STATUS" != "200" ]; then
+            echo "::warning::Health check returned HTTP ${STATUS}. Service may be degraded."
+          fi
+
+      - name: Ping SqueezeOS keepalive (ecosystem dependency)
+        run: |
+          curl -s --max-time 30 https://squeezeos-api.onrender.com/api/status > /dev/null || true
+          curl -s --max-time 30 https://four02proof.onrender.com/health > /dev/null || true
+          curl -s --max-time 30 https://ghost-layer.onrender.com/health > /dev/null || true
+          echo "Ecosystem keepalives sent."

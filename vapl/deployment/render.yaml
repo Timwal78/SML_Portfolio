@@ -1,0 +1,37 @@
+# Render.com deployment for VAPL Registry Service
+# Deploy from the vapl/ subdirectory of sml_portfolio.
+#
+# Environment variables to set in Render dashboard:
+#   VAPL_SOUL_FILE    Path to persistent soul JSON (use a Render Disk)
+#   SQUEEZEOS_BASE    https://squeezeos-api.onrender.com
+#   REDIS_URL         From a Render Redis instance
+
+services:
+  - type: web
+    name: vapl-registry
+    runtime: docker
+    dockerfilePath: ./deployment/Dockerfile
+    dockerContext: .
+    plan: starter
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        value: 8400
+      - key: VAPL_SOUL_FILE
+        value: /var/data/vapl_soul.json
+      - key: SQUEEZEOS_BASE
+        value: https://squeezeos-api.onrender.com
+      - key: REDIS_URL
+        fromService:
+          name: vapl-redis
+          type: redis
+          property: connectionString
+    disk:
+      name: vapl-soul-disk
+      mountPath: /var/data
+      sizeGB: 1
+
+  - type: redis
+    name: vapl-redis
+    plan: starter
+    maxmemoryPolicy: allkeys-lru

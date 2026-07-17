@@ -1,0 +1,37 @@
+name = "xaap"
+main = "worker/src/index.ts"
+compatibility_date = "2024-12-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+ENVIRONMENT = "production"
+EDGAR_BASE_URL = "https://data.sec.gov"
+EDGAR_SUBMISSIONS_URL = "https://www.sec.gov/cgi-bin/browse-edgar"
+X402_FACILITATOR_URL = "https://x402.org/facilitator"
+BASE_RPC_URL = "https://mainnet.base.org"
+XAAP_CORE_ADDRESS = ""
+XAAP_REPUTATION_ADDRESS = ""
+XAAP_TREASURY_ADDRESS = ""
+PROTOCOL_FEE_BPS = "500"
+FREE_DELAY_HOURS = "48"
+MAX_FINDINGS_PER_WALLET = "50"
+MAX_LISTINGS_GLOBAL = "10000"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "xaap-db"
+database_id = ""
+
+[[r2_buckets]]
+binding = "EVIDENCE"
+bucket_name = "xaap-evidence"
+
+[[kv_namespaces]]
+binding = "CACHE"
+id = ""
+
+[triggers]
+crons = ["*/1 * * * *"]
+
+[build]
+command = "npm run typecheck"

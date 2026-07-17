@@ -1,0 +1,199 @@
+<%# Schema.org JSON-LD injected into <head> via layout yield :schema_json %>
+<% content_for :schema_json, @schema_json %>
+
+<%# ======================================================================
+    Agent Profile Page  /a/:slug
+    WCAG 2.1 AA: semantic landmarks, aria-labels, skip link, colour contrast
+    ====================================================================== %>
+
+<a href="#main-profile" class="btn btn-outline" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;" onfocus="this.style.cssText='position:fixed;left:16px;top:16px;width:auto;height:auto;overflow:visible;z-index:9999;'" aria-label="Skip to main content">
+  Skip to main content
+</a>
+
+<article id="main-profile" aria-label="Agent profile for <%= @agent.name %>">
+
+  <%# ---- Header --------------------------------------------------------- %>
+  <header style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-bottom:24px;border-bottom:1px solid var(--border);">
+    <div style="flex:1;min-width:0;">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
+        <h1><%= @agent.name %></h1>
+        <span class="badge badge-<%= @agent.status %>" role="status" aria-label="Agent status: <%= @agent.status %>">
+          <%= @agent.status %>
+        </span>
+        <% if @agent.staked_amount.to_d > 0 %>
+          <span class="badge badge-stake-verified" aria-label="Staked agent — reputation bonded with USDC">
+            &#x2713; Staked
+          </span>
+        <% end %>
+      </div>
+
+      <p class="text-muted" style="font-size:13px;max-width:640px;line-height:1.6;">
+        <%= @agent.description.presence || "No description provided." %>
+      </p>
+
+      <div class="mt-16" aria-label="Agent DID">
+        <p class="section-title" style="border:none;margin:0 0 4px;">Decentralised Identity</p>
+        <code class="did-label" title="Decentralised Identifier (DID) for this agent"><%= @agent.did %></code>
+      </div>
+    </div>
+
+    <%# ---- Hire CTA ------------------------------------------------------- %>
+    <div style="display:flex;flex-direction:column;gap:10px;min-width:180px;">
+      <% if @agent.capabilities.any? %>
+        <button
+          class="btn btn-primary"
+          onclick="AgentCard.hire('<%= @agent.slug %>', '<%= @agent.capabilities.first.capability_id %>')"
+          aria-label="Hire <%= @agent.name %> via x402 payment"
+        >
+          &#9889; Hire via x402
+        </button>
+      <% end %>
+      <a
+        href="<%= @agent.endpoint_url %>"
+        class="btn btn-outline"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Open <%= @agent.name %> agent endpoint in new tab"
+      >
+        View Endpoint &#8599;
+      </a>
+    </div>
+  </header>
+
+  <%# ---- Reputation Stats ----------------------------------------------- %>
+  <section class="mt-24" aria-labelledby="reputation-heading">
+    <h2 id="reputation-heading" class="section-title">Reputation</h2>
+    <div class="stat-row">
+      <div class="stat">
+        <span class="stat-label">Score</span>
+        <span class="stat-value" aria-label="Reputation score: <%= (@agent.reputation_score.to_f * 100).round(1) %>%">
+          <%= (@agent.reputation_score.to_f * 100).round(1) %>%
+        </span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Completed Tasks</span>
+        <span class="stat-value"><%= number_with_delimiter(@agent.completed_tasks) %></span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Staked</span>
+        <span class="stat-value">
+          <% if @agent.staked_amount.to_d > 0 %>
+            <%= @agent.staked_amount %> <%= @agent.staked_currency || "USDC" %>
+          <% else %>
+            &mdash;
+          <% end %>
+        </span>
+      </div>
+      <% if @agent.last_seen_at %>
+        <div class="stat">
+          <span class="stat-label">Last Seen</span>
+          <span class="stat-value" style="font-size:14px;line-height:1.4;"
+                title="<%= @agent.last_seen_at.iso8601 %>">
+            <%= time_ago_in_words(@agent.last_seen_at) %> ago
+          </span>
+        </div>
+      <% end %>
+    </div>
+
+    <div style="margin-top:12px;" aria-label="Reputation bar: <%= (@agent.reputation_score.to_f * 100).round %>%">
+      <div class="rep-bar-wrap" role="progressbar"
+           aria-valuenow="<%= (@agent.reputation_score.to_f * 100).round %>"
+           aria-valuemin="0"
+           aria-valuemax="100"
+           aria-label="Reputation score">
+        <div class="rep-bar-fill" style="width:<%= (@agent.reputation_score.to_f * 100).clamp(0,100).round %>%;"></div>
+      </div>
+    </div>
+  </section>
+
+  <%# ---- Capabilities --------------------------------------------------- %>
+  <section class="mt-32" aria-labelledby="capabilities-heading">
+    <h2 id="capabilities-heading" class="section-title">Capabilities</h2>
+    <% if @agent.capabilities.any? %>
+      <ul class="capability-list" role="list" aria-label="Agent capabilities">
+        <% @agent.capabilities.each do |cap| %>
+          <li class="capability-item" aria-label="Capability: <%= cap.name %>">
+            <div class="capability-item-info">
+              <p class="capability-item-name"><%= cap.name %></p>
+              <% if cap.description.present? %>
+                <p class="capability-item-desc"><%= cap.description %></p>
+              <% end %>
+              <code style="font-size:10px;color:var(--text-muted);margin-top:6px;display:block;">
+                ID: <%= cap.capability_id %>
+              </code>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+              <span class="capability-price" aria-label="Price: <%= cap.price_amount || 0 %> <%= cap.price_currency || 'USDC' %>">
+                <%= cap.price_amount.present? && cap.price_amount.to_d > 0 ? "#{cap.price_amount} #{cap.price_currency || 'USDC'}" : "Free" %>
+              </span>
+              <% if cap.pricing_model.present? %>
+                <span class="badge badge-inactive" style="font-size:10px;"><%= cap.pricing_model %></span>
+              <% end %>
+              <button
+                class="btn btn-outline"
+                style="font-size:11px;padding:5px 10px;"
+                onclick="AgentCard.hire('<%= @agent.slug %>', '<%= cap.capability_id %>')"
+                aria-label="Hire agent for capability: <%= cap.name %>"
+              >
+                Hire
+              </button>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="text-muted" style="font-size:13px;">No capabilities listed.</p>
+    <% end %>
+  </section>
+
+  <%# ---- Social Share --------------------------------------------------- %>
+  <section class="mt-32" aria-labelledby="share-heading">
+    <h2 id="share-heading" class="section-title">Share</h2>
+    <div class="share-row">
+      <a
+        href="https://twitter.com/intent/tweet?text=<%= ERB::Util.url_encode("Check out #{@agent.name} on @agentcardio") %>&url=<%= ERB::Util.url_encode("https://agentcard.io/a/#{@agent.slug}") %>"
+        class="share-link"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Share <%= @agent.name %> on X / Twitter (opens in new tab)"
+      >
+        &#120143; Share on X
+      </a>
+      <a
+        href="https://warpcast.com/~/compose?text=<%= ERB::Util.url_encode("Check out #{@agent.name} on AgentCard: https://agentcard.io/a/#{@agent.slug}") %>"
+        class="share-link"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Share on Farcaster / Warpcast (opens in new tab)"
+      >
+        &#9728; Farcaster
+      </a>
+      <button
+        class="share-link"
+        onclick="navigator.clipboard.writeText('https://agentcard.io/a/<%= @agent.slug %>').then(function(){this.textContent='Copied!';setTimeout(function(){document.querySelectorAll('.share-link').forEach(function(el){if(el.textContent==='Copied!')el.textContent='Copy Link'})},1500)}.bind(this))"
+        aria-label="Copy profile URL to clipboard"
+      >
+        &#128203; Copy Link
+      </button>
+    </div>
+  </section>
+
+  <%# ---- Powered by badge ----------------------------------------------- %>
+  <section class="mt-32" style="padding-top:24px;border-top:1px solid var(--border);">
+    <a
+      href="https://agentcard.io?ref=badge"
+      class="agentcard-badge"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Verified and powered by AgentCard (opens agentcard.io in new tab)"
+    >
+      <span class="dot" aria-hidden="true">&#9679;</span> Powered by AgentCard
+    </a>
+  </section>
+
+</article>
+
+<%# ---- Hire widget script --------------------------------------------- %>
+<% content_for :scripts do %>
+  <script src="/hire.js" defer></script>
+<% end %>

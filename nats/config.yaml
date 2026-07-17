@@ -1,0 +1,82 @@
+# NATS v2.0 — all tunable parameters. No values here should be hardcoded
+# elsewhere in src/; every module reads from this file at startup.
+
+backtest:
+  start_date: "2018-01-01"
+  end_date: "2024-12-31"
+  min_bars: 1250
+  regimes_required: [bull, bear, crisis, recovery, high_vol, low_vol]
+
+ensemble:
+  base_allocation_weight: 0.60
+  performance_weight: 0.40
+  trade_threshold: 0.05
+  rebalance_frequency: weekly
+  min_agent_weight: 0.02
+  max_agent_weight: 0.20
+  shadow_flow_cap: 0.01
+
+risk:
+  max_position_pct: 0.02
+  daily_circuit_breaker: -0.03
+  kelly_fraction: 0.25
+  var_confidence: 0.95
+  regime_confidence_min: 0.60
+  crypto_max_allocation: 0.10
+
+execution:
+  slippage_bps: 5
+  commission_per_share: 0.005
+  market_impact_bps: 3
+  no_trade_open_minutes: 15
+  no_trade_close_minutes: 15
+
+validation:
+  min_psr: 0.95
+  min_deflated_sr: 0.90
+  monte_carlo_simulations: 10000
+  max_realistic_sharpe_flag: 2.5
+  purged_kfold:
+    n_splits: 5
+    embargo_bars: 5
+  regime_coverage:
+    bull_market: 0.20
+    bear_market: 0.15
+    high_volatility: 0.15
+    crisis: 0.05
+
+regime:
+  n_clusters: 4
+  min_window_bars: 252
+  labels: [risk_on, risk_off, neutral, crisis]
+
+# Paper-trading v1 launch universe. Restricted to the 8 agents that only
+# need plain OHLCV + VIX data — Tradier (src/data/tradier_client.py) is the
+# live source. Widen once Polygon/Alpha Vantage/Binance/etc. are live
+# (see docs/API_REFERENCE.md's implementation-status table).
+paper_trading:
+  universe: [SPY, QQQ, IWM]
+  # Tradier's index-quote symbol convention for VIX — verify against a real
+  # account once this runs somewhere with network access; some Tradier
+  # entitlements use a different symbol/prefix for index history.
+  vix_symbol: "VIX"
+  lookback_days: 400  # >= 200dma + buffer for rolling factor windows
+  # Bootstrap ensemble: equal-weight across the 8 implemented agents until
+  # enough live signal history exists to compute rolling_30d_sharpe for the
+  # real meta-learning weights (src/ensemble/meta_learning_engine.py).
+  implemented_agents:
+    - MomentumHunter
+    - MeanReversionSniper
+    - VolRegimeDetector
+    - SeasonalityExpert
+    - BollingerBouncer
+    - VolumeConfirmer
+    - TrendFollower
+    - FearGreedContrarian
+  # Regime confidence gate needs the live expanding-window detector
+  # (Phase 2); until then this fixed value feeds src/risk/risk_engine.py's
+  # regime_confidence_min check — set >= risk.regime_confidence_min to
+  # avoid blocking every trade, and revisit once RollingRegimeDetector
+  # is wired to this loop.
+  default_regime_confidence: 0.75
+  stop_loss_pct: 0.03

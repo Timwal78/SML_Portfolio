@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QHTHMG61N6"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-QHTHMG61N6');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <title>Privacy Policy | ScriptMasterLabs</title>
+  <link rel="canonical" href="https://www.scriptmasterlabs.com/privacy.html">
+    <meta name="description" content="Privacy Policy for ScriptMasterLabs, SqueezeOS, and related products including the SqueezeOS Slack App.">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.scriptmasterlabs.com/privacy.html">
+    <meta property="og:title" content="Privacy Policy | ScriptMasterLabs">
+    <meta property="og:description" content="Privacy Policy for ScriptMasterLabs, SqueezeOS, and related products including the SqueezeOS Slack App.">
+    <meta property="og:image" content="https://www.scriptmasterlabs.com/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@scriptmasterlabs">
+    <meta name="twitter:title" content="Privacy Policy | ScriptMasterLabs">
+    <meta name="twitter:description" content="Privacy Policy for ScriptMasterLabs, SqueezeOS, and related products including the SqueezeOS Slack App.">
+    <meta name="twitter:image" content="https://www.scriptmasterlabs.com/og-image.png">
+    <!-- Google Fonts (non-blocking) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Fira+Code:wght@400;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet"></noscript>
+    <!-- Font Awesome (non-blocking) -->
+    <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" onload="this.onload=null;this.rel='stylesheet'" integrity="sha384-ieclq183/IXax/3T/r0FNTV1XqRkJoxv7/TU/z5oRoebRLriDg5J7i1xFZ+7nKA" crossorigin="anonymous">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha384-ieclq183/IXax/3T/r0FNTV1XqRkJoxv7/TU/z5oRoebRLriDg5J7i1xFZ+7nKA" crossorigin="anonymous"></noscript>
+    
+    <!-- Google AdSense Global Snippet -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9396445805927087" crossorigin="anonymous"></script>
+    
+    <style>
+        :root {
+            --bg-color: #050507;
+            --text-color: #f1f1f1;
+            --text-muted: #8892b0;
+            --accent-cyan: #00f0ff;
+            --accent-purple: #b026ff;
+            --accent-green: #00ff66;
+            --accent-orange: #ff5e00;
+            --card-bg: rgba(20, 20, 25, 0.6);
+            --card-border: rgba(255, 255, 255, 0.05);
+            --glass-blur: blur(12px);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            opacity: 0.4;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1.5rem 0;
+            background: rgba(5, 5, 7, 0.8);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            z-index: 100;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .nav-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Fira Code', monospace;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--accent-cyan);
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-cyan);
+        }
+
+        .privacy-content {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            line-height: 1.9;
+            max-width: 860px;
+        }
+
+        .privacy-content h2 {
+            color: var(--accent-cyan);
+            font-family: 'Fira Code', monospace;
+            font-size: 1.15rem;
+            margin-top: 2.5rem;
+            margin-bottom: 0.75rem;
+            letter-spacing: 0.5px;
+        }
+
+        .privacy-content p {
+            margin-bottom: 1rem;
+        }
+
+        .privacy-content ul {
+            list-style: none;
+            padding-left: 0;
+            margin-bottom: 1rem;
+        }
+
+        .privacy-content ul li {
+            padding-left: 1.5rem;
+            position: relative;
+            margin-bottom: 0.4rem;
+        }
+
+        .privacy-content ul li::before {
+            content: '\25B8';
+            color: var(--accent-cyan);
+            position: absolute;
+            left: 0;
+        }
+
+        .privacy-content .tag {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            background: rgba(0, 240, 255, 0.08);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            color: var(--accent-cyan);
+            padding: 2px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .privacy-content .block {
+            background: rgba(20, 20, 30, 0.7);
+            border: 1px solid var(--card-border);
+            border-left: 3px solid var(--accent-cyan);
+            border-radius: 6px;
+            padding: 1.2rem 1.5rem;
+            margin: 1.2rem 0;
+        }
+
+        .privacy-content .block.green {
+            border-left-color: var(--accent-green);
+        }
+
+        .privacy-content .block.purple {
+            border-left-color: var(--accent-purple);
+        }
+
+        .privacy-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .privacy-content th {
+            text-align: left;
+            color: var(--accent-cyan);
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            padding: 0.6rem 1rem;
+            border-bottom: 1px solid rgba(0, 240, 255, 0.2);
+        }
+
+        .privacy-content td {
+            padding: 0.55rem 1rem;
+            border-bottom: 1px solid var(--card-border);
+            vertical-align: top;
+        }
+
+        .privacy-content tr:last-child td {
+            border-bottom: none;
+        }
+
+        footer {
+            padding: 3rem 0;
+            text-align: center;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--card-border);
+        }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .privacy-content table { font-size: 0.85rem; }
+        }
+    </style>
+<script src="https://analytics.ahrefs.com/analytics.js" data-key="eO57h84tnrmOGAsKKvyoyw" async></script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.scriptmasterlabs.com/privacy.html",
+  "url": "https://www.scriptmasterlabs.com/privacy.html",
+  "name": "Privacy Policy — ScriptMasterLabs",
+  "isPartOf": { "@id": "https://www.scriptmasterlabs.com/#org" },
+  "publisher": { "@id": "https://www.scriptmasterlabs.com/#org" }
+}
+</script>
+</head>
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+
+    <header>
+        <div class="container nav-inner">
+            <a href="/" class="logo">&lt;ScriptMasterLabs /&gt;</a>
+            <nav class="nav-links">
+                <a href="/#about"><span style="color: var(--accent-cyan);">01.</span> About</a>
+                <a href="/#core"><span style="color: var(--accent-cyan);">02.</span> Core</a>
+                <a href="/#finance"><span style="color: var(--accent-cyan);">03.</span> Alpha</a>
+                <a href="/#web3"><span style="color: var(--accent-cyan);">04.</span> Web3</a>
+                <a href="/#saas"><span style="color: var(--accent-cyan);">05.</span> SaaS</a>
+                <a href="about.html"><span style="color: var(--accent-cyan);">06.</span> Trust</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container" style="padding-top: 120px; padding-bottom: 80px; min-height: calc(100vh - 100px);">
+        <h1 style="color: var(--accent-cyan); font-family: 'Fira Code', monospace; margin-bottom: 6px;">Privacy Policy</h1>
+        <p style="color: var(--text-muted); font-size: 0.9rem; font-family: 'Fira Code', monospace; margin-bottom: 40px;">Last Updated: June 25, 2026</p>
+
+        <div class="privacy-content">
+
+            <!-- ─── 1. INTRODUCTION ─────────────────────────────────────── -->
+            <h2>1. Introduction</h2>
+            <p>ScriptMaster Labs (&ldquo;we&rdquo;, &ldquo;our&rdquo;, or &ldquo;us&rdquo;) operates <strong>scriptmasterlabs.com</strong> and the software products in the ScriptMasterLabs ecosystem, including <strong>SqueezeOS</strong> (institutional AI market intelligence), the <strong>SqueezeOS Slack App</strong>, Ghost Layer, 402Proof, and related services.</p>
+            <p>This Privacy Policy explains what information we collect, why we collect it, how we use it, and your rights regarding that information. By using any of our services you agree to the practices described here.</p>
+
+            <!-- ─── 2. INFORMATION WE COLLECT ─────────────────────────── -->
+            <h2>2. Information We Collect</h2>
+
+            <p><strong>2a. Website &amp; API visitors</strong></p>
+            <ul>
+                <li><strong>Usage data</strong> &mdash; Pages visited, HTTP request metadata (IP address, browser/agent string, referrer, timestamp). Collected automatically by server access logs and Google Analytics (GA4).</li>
+                <li><strong>Contact information</strong> &mdash; Name, email address, and any message content you voluntarily submit via contact forms or email.</li>
+                <li><strong>API call metadata</strong> &mdash; Endpoint called, User-Agent string, response time, and payment token status (paid / unpaid). No payload body content is logged to persistent storage.</li>
+            </ul>
+
+            <p><strong>2b. SqueezeOS MCP / REST API</strong></p>
+            <ul>
+                <li><strong>Agent wallet address</strong> &mdash; The XRPL or Base wallet address submitted by an AI agent when invoking premium endpoints (passed via <span class="tag">X-Agent-Wallet</span> header). Used solely to verify payment proof and compute Credit Bureau score.</li>
+                <li><strong>Payment token</strong> &mdash; A short-lived signed JWT (1-hour TTL) issued by 402Proof after a confirmed on-chain payment. We verify and discard it; we do not store the full token or the underlying transaction details.</li>
+                <li><strong>Symbol / ticker input</strong> &mdash; The market symbol you supply to endpoints like <span class="tag">/api/council</span> or <span class="tag">/api/preview</span>. Processed in real time; not linked to your identity.</li>
+            </ul>
+
+            <!-- ─── 3. SQUEEZEOS SLACK APP ─────────────────────────────── -->
+            <h2>3. SqueezeOS Slack App &mdash; Data Disclosure</h2>
+
+            <div class="block">
+                <p style="margin-bottom: 0.5rem;"><strong>Required by Slack App Directory listing.</strong> This section specifically describes what the SqueezeOS Slack App collects from your Slack workspace, how it is used, and what it does not collect.</p>
+            </div>
+
+            <p><strong>3a. OAuth Installation</strong></p>
+            <p>When a Slack workspace administrator installs the SqueezeOS app via OAuth 2.0, Slack issues us a bot access token. We store this token (encrypted at rest) solely to post command responses back to the channel where the command was invoked. We do not use the token to read message history, browse channels, or access any data beyond what is necessary to respond to the triggering slash command.</p>
+
+            <p><strong>3b. Data collected per slash command invocation</strong></p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Command</th>
+                        <th>Data received from Slack</th>
+                        <th>How it is used</th>
+                        <th>Stored?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="tag">/squeeze [SYMBOL]</span></td>
+                        <td>workspace ID, channel ID, user ID, command text (the ticker symbol)</td>
+                        <td>Symbol is passed to the SqueezeOS AI council engine to produce a real-time market verdict. Response is posted to the originating channel.</td>
+                        <td>No</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag">/scan</span></td>
+                        <td>workspace ID, channel ID, user ID</td>
+                        <td>Triggers a full squeeze scan across the live $1&ndash;$50 universe. No user-supplied text is processed.</td>
+                        <td>No</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag">/preview [SYMBOL]</span></td>
+                        <td>workspace ID, channel ID, user ID, command text (the ticker symbol)</td>
+                        <td>Symbol is passed to the free bias + regime preview endpoint. Response posted to originating channel.</td>
+                        <td>No</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag">/ftd [GME|AMC]</span></td>
+                        <td>workspace ID, channel ID, user ID, command text</td>
+                        <td>Command text (GME or AMC) is used to fetch SEC Reg SHO Fails-To-Deliver data. Response posted to originating channel.</td>
+                        <td>No</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag">/sqstatus</span></td>
+                        <td>workspace ID, channel ID, user ID</td>
+                        <td>Returns engine health status. No user-supplied text processed.</td>
+                        <td>No</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p><strong>Data fields explained:</strong></p>
+            <ul>
+                <li><strong>Workspace ID</strong> &mdash; Slack's identifier for your organization. Used to route the response to the correct workspace. Never shared or cross-referenced with other data.</li>
+                <li><strong>Channel ID</strong> &mdash; Slack's identifier for the channel where the command was typed. Used only to send the response back to that channel.</li>
+                <li><strong>User ID</strong> &mdash; Slack's anonymous identifier for the invoking user. Used only to display &ldquo;@username requested this&rdquo; in the response header. We do not resolve this to a real name, email address, or any external identity.</li>
+                <li><strong>Command text (ticker symbol)</strong> &mdash; The text argument to the slash command (e.g., <code>GME</code>). Passed directly to our market data engine. Not stored after the response is delivered.</li>
+            </ul>
+
+            <p><strong>3c. What the SqueezeOS Slack App does NOT collect</strong></p>
+            <div class="block green">
+                <ul style="margin-bottom: 0;">
+                    <li>We do <strong>not</strong> read, access, or store your Slack message history.</li>
+                    <li>We do <strong>not</strong> read direct messages (DMs) unless you explicitly invite the bot to a DM and type a supported command.</li>
+                    <li>We do <strong>not</strong> collect Slack user profile information (email addresses, phone numbers, display names, avatars).</li>
+                    <li>We do <strong>not</strong> collect the list of channels in your workspace or the list of workspace members.</li>
+                    <li>We do <strong>not</strong> use Slack data for advertising, profiling, or any purpose other than delivering the requested market intelligence response.</li>
+                    <li>We do <strong>not</strong> sell, rent, or share your Slack workspace data with any third party.</li>
+                </ul>
+            </div>
+
+            <p><strong>3d. OAuth scopes requested</strong></p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Scope</th>
+                        <th>Why it is needed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="tag">commands</span></td>
+                        <td>Register and receive slash command payloads.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag">chat:write</span></td>
+                        <td>Post signal responses to channels the bot is a member of.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag">chat:write.public</span></td>
+                        <td>Post responses to public channels without requiring an explicit invite.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag">incoming-webhook</span></td>
+                        <td>Deliver async command responses via the Slack response_url webhook.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag">app_mentions:read</span></td>
+                        <td>Receive events when users @mention the bot to ask a question.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag">im:history</span> / <span class="tag">im:read</span> / <span class="tag">im:write</span></td>
+                        <td>Respond to direct messages when a user invokes a supported command in a DM with the bot.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag">channels:read</span></td>
+                        <td>Verify the bot can post to the requested channel before attempting delivery.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p><strong>3e. Premium features &amp; x402 micropayments</strong></p>
+            <p>Certain SqueezeOS commands (e.g., <span class="tag">/squeeze</span> full AI council verdict) require a micropayment via the x402 protocol using RLUSD on the XRP Ledger. This payment flow occurs <em>outside of Slack</em> &mdash; the user obtains a payment token from our 402Proof service by completing an on-chain transaction using their own XRPL wallet. We receive the XRPL wallet address and a proof-of-payment token. We do not receive or store any payment card numbers, bank details, or personally identifying payment information.</p>
+
+            <!-- ─── 4. HOW WE USE YOUR INFORMATION ────────────────────── -->
+            <h2>4. How We Use Your Information</h2>
+            <ul>
+                <li>To deliver the real-time market intelligence service you requested.</li>
+                <li>To verify payment proof for premium endpoints (HMAC-SHA256 token check, no network call to third parties).</li>
+                <li>To monitor system health, detect abuse (honeypot pattern matching), and maintain service reliability.</li>
+                <li>To respond to support inquiries submitted via email or contact forms.</li>
+                <li>To improve our services based on aggregate, anonymized usage patterns.</li>
+                <li>To comply with applicable laws and regulations.</li>
+            </ul>
+            <p>We do <strong>not</strong> sell, rent, or trade your personal information with third parties. We do not use your information for behavioral advertising.</p>
+
+            <!-- ─── 5. DATA RETENTION ─────────────────────────────────── -->
+            <h2>5. Data Retention</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Data type</th>
+                        <th>Retention period</th>
+                        <th>Storage location</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Slack slash command payloads</td>
+                        <td><strong>Not stored.</strong> Processed in-memory and discarded after the response is sent (typically &lt;3 seconds).</td>
+                        <td>In-memory only (Render.com instance RAM)</td>
+                    </tr>
+                    <tr>
+                        <td>Slack bot access token (OAuth)</td>
+                        <td>Until the workspace admin revokes app authorization or uninstalls the app.</td>
+                        <td>Encrypted environment variable on Render.com</td>
+                    </tr>
+                    <tr>
+                        <td>Signal history (market verdicts)</td>
+                        <td>Up to 200 most recent verdicts per ticker symbol; cleared on server restart.</td>
+                        <td>In-memory ring buffer (Render.com instance RAM)</td>
+                    </tr>
+                    <tr>
+                        <td>API access logs</td>
+                        <td>Up to 30 days in Render.com server logs.</td>
+                        <td>Render.com managed log storage</td>
+                    </tr>
+                    <tr>
+                        <td>Website analytics</td>
+                        <td>26 months (Google Analytics 4 default).</td>
+                        <td>Google Analytics infrastructure</td>
+                    </tr>
+                    <tr>
+                        <td>Contact form submissions</td>
+                        <td>Until the inquiry is resolved, then deleted within 90 days.</td>
+                        <td>Email inbox (Google Workspace)</td>
+                    </tr>
+                    <tr>
+                        <td>XRPL agent wallet address</td>
+                        <td>Not stored to disk. Held in memory only for the duration of the API request.</td>
+                        <td>In-memory only</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- ─── 6. THIRD-PARTY DATA PROCESSORS ───────────────────── -->
+            <h2>6. Third-Party Data Processors</h2>
+            <p>We share the minimum necessary data with the following processors to deliver our services:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Processor</th>
+                        <th>Purpose</th>
+                        <th>Data shared</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Slack Technologies, LLC</strong></td>
+                        <td>Slack platform &mdash; delivers app responses to your workspace.</td>
+                        <td>Bot access token, formatted message payloads (no user PII beyond Slack-native IDs).</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tradier Brokerage</strong></td>
+                        <td>Real-time and delayed market data, options chains.</td>
+                        <td>Ticker symbol only. No user identity is transmitted.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Alpaca Markets</strong></td>
+                        <td>Fallback real-time quote provider.</td>
+                        <td>Ticker symbol only.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Polygon.io</strong></td>
+                        <td>Fallback market data provider.</td>
+                        <td>Ticker symbol only.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Render.com</strong></td>
+                        <td>Cloud hosting for the SqueezeOS API.</td>
+                        <td>Server access logs (IP, User-Agent, timestamp).</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Google Analytics (GA4)</strong></td>
+                        <td>Website usage analytics.</td>
+                        <td>Anonymized page-view events, browser/device metadata.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Neo4j (AuraDB)</strong></td>
+                        <td>Market relationship graph (optional feature). Only active if Neo4j credentials are configured.</td>
+                        <td>Ticker symbols and computed Greek/flow metrics. No user identity.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>We do not share data with any ad networks, data brokers, or analytics companies beyond what is listed above.</p>
+
+            <!-- ─── 7. REVOKING SLACK ACCESS ──────────────────────────── -->
+            <h2>7. Revoking Slack App Access</h2>
+            <p>You can remove the SqueezeOS Slack App from your workspace at any time:</p>
+            <ol style="list-style: decimal; padding-left: 1.5rem; margin-bottom: 1rem;">
+                <li>Go to <strong>Slack &rarr; Apps &rarr; SqueezeOS &rarr; App Settings &rarr; Remove App</strong>.</li>
+                <li>Alternatively, a workspace admin can revoke access from <strong>Manage Apps</strong>.</li>
+            </ol>
+            <p>Upon removal, Slack immediately invalidates the bot access token. We stop receiving any events from your workspace. Any residual in-memory data is flushed on the next server restart (typically within 24 hours on our free Render tier due to inactivity spin-down).</p>
+            <p>To request deletion of any data we may hold about your workspace or any contact information you provided, email us at <a href="mailto:scriptmasterlabs@gmail.com" style="color: var(--accent-cyan);">scriptmasterlabs@gmail.com</a> with the subject line <strong>DATA DELETION REQUEST</strong>. We will respond within 10 business days.</p>
+
+            <!-- ─── 8. YOUR RIGHTS ─────────────────────────────────────── -->
+            <h2>8. Your Rights</h2>
+            <p>Depending on your jurisdiction, you may have the right to:</p>
+            <ul>
+                <li><strong>Access</strong> &mdash; Request a copy of the personal data we hold about you.</li>
+                <li><strong>Correction</strong> &mdash; Request correction of inaccurate data.</li>
+                <li><strong>Deletion</strong> &mdash; Request deletion of your personal data.</li>
+                <li><strong>Portability</strong> &mdash; Request your data in a machine-readable format.</li>
+                <li><strong>Objection</strong> &mdash; Object to certain uses of your data.</li>
+                <li><strong>Restriction</strong> &mdash; Request restricted processing of your data.</li>
+            </ul>
+            <p>To exercise any of these rights, contact us at <a href="mailto:scriptmasterlabs@gmail.com" style="color: var(--accent-cyan);">scriptmasterlabs@gmail.com</a>. We do not charge for data rights requests and will respond within 30 days (or 45 days where permitted by law).</p>
+            <p>If you are located in the European Economic Area (EEA), you have the right to lodge a complaint with your local data protection supervisory authority.</p>
+            <p>California residents may have additional rights under the California Consumer Privacy Act (CCPA). Because we do not sell personal information, many CCPA provisions do not apply, but you may still contact us to exercise your access and deletion rights.</p>
+
+            <!-- ─── 9. DATA SECURITY ───────────────────────────────────── -->
+            <h2>9. Data Security</h2>
+            <p>We employ the following technical and organizational measures to protect your information:</p>
+            <ul>
+                <li>All data in transit is encrypted using TLS 1.2 or higher.</li>
+                <li>API payment tokens use HMAC-SHA256 signatures with a server-side secret; they are verified and discarded without being written to disk.</li>
+                <li>The SqueezeOS API is deployed on Render.com with HSTS, X-Content-Type-Options, and X-Frame-Options security headers enforced on every response.</li>
+                <li>Slack bot tokens are stored only as encrypted environment variables on Render.com&rsquo;s managed infrastructure.</li>
+                <li>Slash command payloads are verified against a cryptographic HMAC-SHA256 signature from Slack before any processing occurs (Slack&rsquo;s signing secret validation).</li>
+                <li>Honeypot routes actively detect and log malicious scanners before they reach real application logic.</li>
+            </ul>
+            <p>No electronic transmission or storage is 100% secure. If you discover a security vulnerability, please report it responsibly to <a href="mailto:scriptmasterlabs@gmail.com" style="color: var(--accent-cyan);">scriptmasterlabs@gmail.com</a>.</p>
+
+            <!-- ─── 10. COOKIES & TRACKING ────────────────────────────── -->
+            <h2>10. Cookies &amp; Tracking Technologies</h2>
+            <p>Our website uses the following tracking technologies:</p>
+            <ul>
+                <li><strong>Google Analytics 4 (GA4)</strong> &mdash; First-party analytics cookie (<span class="tag">_ga</span>, <span class="tag">_ga_*</span>). Tracks page views and session data in aggregate. You can opt out via <a href="https://tools.google.com/dlpage/gaoptout" style="color: var(--accent-cyan);">Google Analytics Opt-out Browser Add-on</a>.</li>
+                <li><strong>Google AdSense</strong> &mdash; May place advertising cookies. You can manage preferences at <a href="https://www.google.com/settings/ads" style="color: var(--accent-cyan);">Google Ads Settings</a>.</li>
+            </ul>
+            <p>The SqueezeOS REST API and Slack App do not use cookies. All session state is managed via short-lived signed tokens.</p>
+
+            <!-- ─── 11. CHILDREN'S PRIVACY ────────────────────────────── -->
+            <h2>11. Children&rsquo;s Privacy</h2>
+            <p>Our services are not directed to children under the age of 13 (or 16 in the EEA). We do not knowingly collect personal information from children. If you believe a child has provided us with personal information, contact us immediately at <a href="mailto:scriptmasterlabs@gmail.com" style="color: var(--accent-cyan);">scriptmasterlabs@gmail.com</a> and we will delete it promptly.</p>
+
+            <!-- ─── 12. CHANGES TO THIS POLICY ───────────────────────── -->
+            <h2>12. Changes to This Privacy Policy</h2>
+            <p>We may update this Privacy Policy from time to time. Material changes will be announced on this page with an updated &ldquo;Last Updated&rdquo; date. We encourage you to review this page periodically. Your continued use of our services after any changes constitutes your acceptance of the updated policy.</p>
+
+            <!-- ─── 13. CONTACT ───────────────────────────────────────── -->
+            <h2>13. Contact Us</h2>
+            <p>If you have questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact us:</p>
+            <div class="block purple">
+                <p style="margin-bottom: 0.3rem;"><strong>ScriptMaster Labs</strong></p>
+                <p style="margin-bottom: 0.3rem;">Founder: Timothy Walton</p>
+                <p style="margin-bottom: 0.3rem;">Email: <a href="mailto:scriptmasterlabs@gmail.com" style="color: var(--accent-cyan);">scriptmasterlabs@gmail.com</a></p>
+                <p style="margin-bottom: 0;">Website: <a href="https://www.scriptmasterlabs.com" style="color: var(--accent-cyan);">https://www.scriptmasterlabs.com</a></p>
+            </div>
+
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 ScriptMaster Labs. All Rights Reserved. | A Pending Service-Disabled Veteran-Owned Small Business (SDVOSB) | Founder of VA Ratings (EIN 41-3828332)</p>
+        <p style="margin-top: 10px;">
+            <a href="about.html" style="color: inherit; text-decoration: none; margin: 0 10px;">About</a> |
+            <a href="privacy.html" style="color: inherit; text-decoration: none; margin: 0 10px;">Privacy Policy</a> |
+            <a href="terms.html" style="color: inherit; text-decoration: none; margin: 0 10px;">Terms of Service</a>
+        </p>
+    </footer>
+
+    <script>
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height, particles;
+
+        function initCanvas() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            particles = [];
+            const numParticles = Math.min(width * height / 15000, 100);
+            for (let i = 0; i < numParticles; i++) {
+                particles.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    vx: (Math.random() - 0.5) * 0.5,
+                    vy: (Math.random() - 0.5) * 0.5,
+                    size: Math.random() * 2,
+                    color: Math.random() > 0.5 ? '#00f0ff' : '#8892b0'
+                });
+            }
+        }
+
+        function drawParticles() {
+            ctx.clearRect(0, 0, width, height);
+            for (let i = 0; i < particles.length; i++) {
+                let p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                if (p.x < 0 || p.x > width) p.vx *= -1;
+                if (p.y < 0 || p.y > height) p.vy *= -1;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = 0.5;
+                ctx.fill();
+                for (let j = i + 1; j < particles.length; j++) {
+                    let p2 = particles[j];
+                    let dx = p.x - p2.x;
+                    let dy = p.y - p2.y;
+                    let dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 150) {
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.strokeStyle = p.color;
+                        ctx.globalAlpha = 1 - (dist / 150);
+                        ctx.lineWidth = 0.5;
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(drawParticles);
+        }
+
+        window.addEventListener('resize', initCanvas);
+        initCanvas();
+        drawParticles();
+    </script>
+
+</body>
+</html>

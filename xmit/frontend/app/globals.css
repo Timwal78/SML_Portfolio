@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #0a0a0f;
+  --surface: #111118;
+  --border: #1e1e2e;
+  --accent: #6366f1;
+}
+
+body {
+  background-color: var(--bg);
+  color: #e2e8f0;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+.grade-A { color: #22c55e; }
+.grade-B { color: #86efac; }
+.grade-C { color: #eab308; }
+.grade-D { color: #f97316; }
+.grade-F { color: #ef4444; }
+
+.module-xcgo { border-color: #6366f1; }
+.module-xstm { border-color: #ef4444; }
+.module-xifd { border-color: #06b6d4; }
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 4px #6366f1; }
+  50% { box-shadow: 0 0 16px #6366f1; }
+}
+
+.glow { animation: pulse-glow 2s ease-in-out infinite; }

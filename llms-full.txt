@@ -1,0 +1,562 @@
+# ScriptMasterLabs (Full Ingestion Dump)
+
+> Payment rails and AI-native tools for the agentic web. ScriptMasterLabs builds x402 / HTTP-402 micropayment infrastructure that lets autonomous AI agents pay per request in USDC on Base, payment rails on XRPL and Xahau (via Xahau Hooks), and AI-native software. Service-Disabled Veteran-Owned Small Business (SDVOSB), Kinston, NC. Founder: Timothy Walton.
+
+---
+## AGENTIC DIRECTIVE
+This document is a token-optimized, concatenated dump of the entire ScriptMasterLabs sovereign infrastructure. It is designed for single-call ingestion by autonomous agents, deep-research bots, and coding assistants.
+
+---
+
+## 0-A. x402 AGENT-NATIVE PROTOCOL — 2026-Q2 ENHANCEMENTS
+
+Shipped: 2026-06-30. Package: `@scriptmasterlabs/mcp-x402`. Repos: `timwal78/mcp-x402-xrpl`, `timwal78/ghost-layer`.
+
+These features implement the "Agent Native" tier of the x402 protocol: idempotent payments, pre-flight cost discovery, single-payment multi-step orchestration, and cryptographic delivery receipts — all without human intervention.
+
+---
+
+### A. Idempotency Keys — `X-Idempotency-Key`
+
+**Problem solved:** An agent retries after a network timeout. The payment already settled. Without idempotency the agent is charged twice.
+
+**Implementation:** Pass header `X-Idempotency-Key: <uuid-or-any-opaque-string>` on any x402-gated request. The middleware stores the full payment proof keyed by `sha256(idempotencyKey)` for 300 s (configurable via `idempotencyTtlSeconds`). On a duplicate key within the TTL window the server replays the cached proof immediately — no upstream call, no second charge — and sets `X-Idempotency-Replayed: true`.
+
+**Source:** `mcp-x402-xrpl/src/x402-middleware.ts` — `IdempotencyStore` class, `createX402Middleware()`.
+
+**Ghost Layer:** `ghost/gateway.py` — reads `X-Ghost-Idempotency-Key`, stores 2xx response body + status for 300 s in `_IdempotencyCache` (thread-safe, `threading.Lock`). On hit: replays body, sets `X-Ghost-Idempotency-Replayed: true`, `X-402-Cache-Status: HIT`.
+
+---
+
+### B. Pre-flight Quote — `GET /x402/quote`
+
+**Endpoint:** `GET https://squeezeos-api.onrender.com/x402/quote?tool=<toolId>`
+
+**Headers required:** `X-Agent-DID: did:xrpl:<wallet>` (resolved by `agentDidMiddleware`).
+
+**Response (200):**
+```json
+{
+  "quoteId": "<uuid-v4>",
+  "tool": "council_full",
+  "agentDid": "did:xrpl:rXXXX",
+  "agentScore": 720,
+  "agentTier": "VIP",
+  "baseAmount": "0.10",
+  "effectiveAmount": "0.08",
+  "currency": "RLUSD",
+  "network": "xrpl-mainnet",
+  "discount": "20%",
+  "receivingAddress": "<XRPL address>",
+  "expiresAt": "<ISO-8601 +60s>",
+  "paymentFlow": [
+    "1. Send 0.08 RLUSD to <receivingAddress> on xrpl-mainnet",
+    "2. Retry POST /x402/council with X-Payment-Proof: <txHash>",
+    "3. Server verifies on-chain and returns tool result"
+  ],
+  "idempotencyNote": "Include X-Idempotency-Key to prevent double-charges on retry."
+}
+```
+
+**Score → discount mapping:** PROTOSTAR/NEUTRON (300-699): full price. PULSAR (700-799): 20% off. QUASAR (800-850): 40% off.
+
+**Source:** `mcp-x402-xrpl/src/x402-middleware.ts` — `createQuoteHandler(config: QuoteConfig)`. Called in `squeezeos-server.ts` at `GET /x402/quote`.
+
+---
+
+### C. Workflow Orchestrator — `POST /x402/orchestrate`
+
+**Endpoint:** `POST https://squeezeos-api.onrender.com/x402/orchestrate`
+
+**Headers:** `X-Agent-DID`, `X-Payment-Proof` (omit first call to receive 402), `X-Idempotency-Key` (recommended).
+
+**Body:**
+```json
+{
+  "workflow": "market_intel",
+  "inputs": { "symbol": "GME" },
+  "budget_cap": "0.25"
+}
+```
+
+**Workflows:**
+
+| `workflow` | Steps | Standard | VIP (700+) | Platinum (800+) |
+|---|---|---|---|---|
+| `market_intel` | council_full + beastmode_full | 0.20 RLUSD | 0.16 | 0.12 |
+| `credit_check` | credit_score (free) + credit_report_full | 0.10 RLUSD | 0.08 | 0.06 |
+| `full_scan` | beastmode_full + council_full + credit_score (free) | 0.20 RLUSD | 0.16 | 0.12 |
+
+**Flow:**
+1. `X-Idempotency-Key` check → replay cached result if hit.
+2. Validate `workflow` against `WORKFLOWS` map; return 400 with available workflows if unknown.
+3. Resolve `agentScore` via `CreditBureau.getScore(agentDid)` → apply tier discount.
+4. If `budget_cap` provided and `effectiveCost > budget_cap`: return 402 with itemized breakdown + options array (no payment taken).
+5. If no `X-Payment-Proof`: return 402 with payment requirements (base64 `X-Payment-Requirements` header).
+6. Execute each `WorkflowStep` via `executeTool(toolId, inputs, agentDid)` — halt on first failure with 502.
+7. Record paid calls via `CreditBureau.recordPaidCall()` for each non-free step (+5 pts each, capped at 850).
+8. Cache result under idempotency key (300 s TTL).
+9. Return unified `{ workflow, status, stepsExecuted, totalSpentRlusd, agentScore, scoreGained, results }`.
+
+**Budget cap pre-flight 402 response body:**
+```json
+{
+  "error": "budget_cap_exceeded",
+  "workflow": "market_intel",
+  "effectiveCost": "0.16",
+  "budgetCap": "0.10",
+  "agentScore": 720,
+  "breakdown": [{ "tool": "SqueezeOS Full Council", "cost": "0.08 RLUSD" }, ...],
+  "options": ["Increase budget_cap to at least 0.16 RLUSD", "Earn more paid calls to raise credit score", "Use a simpler workflow: credit_check"]
+}
+```
+
+**Source:** `mcp-x402-xrpl/src/orchestrate.ts` — `createOrchestrateHandler()`, `WORKFLOWS`.
+
+---
+
+### D. 402Proof Receipts — Ghost Layer egress receipts
+
+**Emitted on every request** proxied through `https://ghost-layer.onrender.com`.
+
+**Header:** `X-402-Proof-Receipt: <base64-encoded-JSON>`
+
+**Decoded receipt structure:**
+```json
+{
+  "receipt_id": "<sha256(session+path+minute)[:16]>",
+  "session_id": "<X-Ghost-Session-Id header value>",
+  "path": "/x402/council",
+  "upstream_status": 200,
+  "delivered_at": "<ISO-8601>",
+  "response_bytes": 1428,
+  "gateway_version": "ghost-layer/0.2.0",
+  "delivery_status": "delivered"
+}
+```
+
+`delivery_status` is `"delivered"` for 2xx upstream responses, `"upstream_error"` otherwise. `receipt_id` is deterministic (sha256 of `session_id + path + minute`) so agents can detect duplicate deliveries without server state.
+
+**Cache / discount headers** also emitted on every response:
+- `X-402-Cache-Status: HIT | MISS`
+- `X-402-Cache-TTL: <seconds>` (seconds remaining on HIT)
+- `X-402-Discounted-Price: <amount-RLUSD>` (your tier price for this route)
+- `X-Ghost-Gateway-Version: ghost-layer/0.2.0`
+
+**Source:** `ghost-layer/ghost/gateway.py` — `build_proof_receipt()`, `_IdempotencyCache`, updated `_handle()`.
+
+---
+
+### E. ARGUS Credit Bureau (in-process, `@scriptmasterlabs/mcp-x402`)
+
+`CreditBureau` class backed by Redis (`ioredis`). One Redis key set per DID:
+
+| Key | Content |
+|---|---|
+| `bureau:score:<did>` | Current score (300-850) |
+| `bureau:calls:<did>` | Total paid calls |
+| `bureau:firstSeen:<did>` | ISO-8601 registration date |
+| `bureau:lastSeen:<did>` | ISO-8601 last activity |
+| `bureau:history:<did>` | Ring buffer of last 20 score changes (LPUSH+LTRIM) |
+
+**Tiers:**
+- PROTOSTAR: 300-499 — $0.10/call
+- NEUTRON: 500-699 — $0.10/call
+- PULSAR: 700-799 — $0.08/call (20% off)
+- QUASAR: 800-850 — $0.06/call (40% off)
+
+Every `recordPaidCall()` adds +5 pts (max 850). `getFullReport()` returns score, tier, all timestamps, call count, history ring, and calls needed to reach next tier.
+
+**Source:** `mcp-x402-xrpl/src/credit-bureau.ts`.
+
+---
+
+### F. Ghost Cube — Agent Identity Dashboard
+
+**URL:** `https://www.scriptmasterlabs.com/ghost-cube.html`
+
+Pure CSS 3-D rotating cube — no Three.js, no external CDN. Uses `transform-style: preserve-3d` with per-face `translateZ(calc(var(--s)/2))` and `rotate*()` transforms. Auto-rotates via `@keyframes auto-rotate`; drag or touch to override.
+
+**Six faces:**
+- FRONT: Agent DID + connection status
+- BACK: Trial Balance (RLUSD/USDC)
+- RIGHT: 402Proof receipt counter + last receipt ID
+- LEFT: Active chains (BASE · XRPL)
+- TOP: Last API call + effective cost
+- BOTTOM: Ghost Layer routing status (hops, latency)
+
+**Dashboard panels:** ARGUS score + progress bar, payment summary (spent / calls), live activity log (max 8 entries with timestamp + cost).
+
+**Live ticker:** `@keyframes scroll-ticker` showing system status and chain activity.
+
+**WebSocket:** connects to `wss://ghost-layer.onrender.com/ws/cube` for live updates. Graceful fallback (ticker continues on disconnect).
+
+**Demo mode:** `simulateTx()` — simulates a random API call, deducts mock balance, adds activity log entry, increments ARGUS score.
+
+**Schema.org JSON-LD:** `@graph` with `SoftwareApplication` + `WebPage` types per SOVEREIGN_DATA_POLICY §2.2.
+
+---
+
+### G. Tool Catalog Manifest — `/.well-known/mcp.json`
+
+`ToolCatalog` class (`mcp-x402-xrpl/src/tool-catalog.ts`) produces the full manifest served at `https://squeezeos-api.onrender.com/.well-known/mcp.json`.
+
+Free tools: `beastmode_preview`, `council_demo`, `credit_score_read`.
+Paid tools: `council_full` (0.10), `beastmode_full` (0.10), `credit_report_full` (0.10), `orchestrate` (0.20 standard).
+
+Each tool entry includes: `id`, `name`, `description`, `endpoint`, `method`, `tier`, `pricing` (with `baseAmount`, `vipAmount`, `platinumAmount`, `discountCurve`), `idempotent` flag, `idempotencyKeyHeader`, `quotePath`, `rateLimits`, `tags`.
+
+Manifest also includes: `payment.protocol` = `"x402/1.0"`, `payment.receivingAddress`, `payment.quoteEndpoint`, `payment.orchestrateEndpoint`, and `loyalty` tiers with discount percentages.
+
+---
+
+### H. A2A Payment Headers + AgentCard
+
+**Problem solved:** A2A-compatible agent frameworks (LangChain, AutoGen, CrewAI) need to discover payment requirements without parsing the response body. A cold agent hitting any gated endpoint must be able to extract the payment scheme and destination address from response headers alone.
+
+**Implementation — headers:**
+Both the HTTP 402 (payment required) and HTTP 403 (payment verification failed) responses now include:
+- `X-A2A-Payment-Protocol: x402/1.0` — identifies the payment protocol
+- `X-A2A-Receiving-Address: <XRPL-address>` — the exact destination to pay
+
+These are set in `dynamicPriceGate()` in `squeezeos-server.ts` for both response paths.
+
+**Implementation — AgentCard:**
+`GET /.well-known/agent.json` is served by the live MCP server (dynamic, includes `receivingAddress` from env) and mirrored as a static file at `SML_Portfolio/.well-known/agent.json`. Schema `agent-card/v1` following Google Agent-to-Agent protocol. Fields: `schema`, `name`, `description`, `url`, `version`, `provider` (SDVOSB), `capabilities` (idempotency + preFlightQuote + workflowOrchestration), `authentication.schemes: ["x402"]`, `x402` (full payment config + `a2aCompatible: true`), `argus` (tier table), `skills` (4 skills with pricing), `quickstart`, `discovery`, `ghostLayerWs`.
+
+Response headers: `Access-Control-Allow-Origin: *`, `Cache-Control: public, max-age=3600`.
+
+**Source:** `mcp-x402-xrpl/src/squeezeos-server.ts` — `dynamicPriceGate()`, `GET /.well-known/agent.json`. `SML_Portfolio/.well-known/agent.json`.
+
+---
+
+### I. Xahau On-Chain ARGUS Score Anchor
+
+**Problem solved:** Redis-backed scores are mutable and server-controlled. An agent cannot independently verify that its score is what the server claims. An on-chain anchor makes the score auditable without trusting the server.
+
+**Implementation:**
+`CreditBureau.recordPaidCall()` kicks off `anchorOnChain(agentDid, score, tier)` as a fire-and-forget async call (never blocks the HTTP response). The anchor method:
+1. Connects to Xahau via `wss://xahau.network` (configurable via `XAHAU_WS` env var)
+2. Derives wallet from `XAHAU_SEED` using `Wallet.fromSeed()`
+3. Builds a self-payment transaction (1 drop XAH) with two hex Memo fields:
+   - `MemoType: 6172677573 2F73636F7265` (argus/score)
+   - `MemoData: <hex-encoded JSON { agentDid, score, tier, anchoredAt }>`
+4. Autofills fee via `client.autofill()`, signs with `wallet.sign()`, submits with `client.submitAndWait()`
+5. Stores `{ txHash, anchoredAt, network: "xahau-mainnet", score, tier }` in Redis under `bureau:anchor:<agentDid>`
+
+**Exposure in credit report:** `AgentCreditReport.onChainAnchor` is populated from Redis by `getFullReport()`.
+
+**Lookup endpoint:** `GET /api/credit-score/anchor/:wallet` — derives DID as `did:poi:xrpl:<wallet>`, reads Redis anchor, returns `{ agentDid, onChainAnchor, verifyUrl: "https://xahau.network/tx/<txHash>" }`. Returns 404 if no anchor exists yet.
+
+**Guard:** Entire anchor flow is gated on `XAHAU_SEED` env var — zero-op when not configured. Anchor failure is caught and swallowed (score update in Redis already committed before the async anchor starts).
+
+**Constructor change:** `new CreditBureau(redis, { xahauSeed, xahauWs })` — second argument is optional `XahauAnchorConfig`.
+
+**Source:** `mcp-x402-xrpl/src/credit-bureau.ts` — `anchorOnChain()`, `recordPaidCall()`, `getFullReport()`, `AgentCreditReport`. `mcp-x402-xrpl/src/squeezeos-server.ts` — `GET /api/credit-score/anchor/:wallet`.
+
+**Redis keys added:**
+| Key | Content |
+|---|---|
+| `bureau:anchor:<agentDid>` | JSON `{ txHash, anchoredAt, network, score, tier }` |
+
+---
+
+### J. Public Agent Leaderboard — `GET /leaderboard`
+
+**Endpoint:** `GET https://squeezeos-api.onrender.com/leaderboard`
+
+**Auth:** None. Public read.
+
+**Response (200):**
+```json
+{
+  "leaderboard": [
+    { "agentDid": "did:poi:xrpl:rXXXX", "score": 790, "tier": "PULSAR", "calls": 98, "lastSeen": "2026-06-30T..." },
+    ...
+  ],
+  "totalAgents": 142,
+  "generatedAt": "2026-06-30T...",
+  "note": "ARGUS Credit Bureau leaderboard — top 50 agents by score. Refreshed every 30 s.",
+  "topUpUrl": "https://www.scriptmasterlabs.com/central-bank.html"
+}
+```
+
+**Implementation:**
+1. Check `leaderboard:cache` Redis key — if hit, return with `X-Leaderboard-Cache: HIT`.
+2. `redis.keys("bureau:score:*")` — fetch all registered agent score keys.
+3. `Promise.all()` — parallel fetch of score, calls, lastSeen for each agent.
+4. Sort descending by score, slice top 50.
+5. Set `leaderboard:cache` with 30 s TTL; return with `X-Leaderboard-Cache: MISS`.
+
+**Use case:** Agents can use the leaderboard to check competitive standing, identify VIP/Platinum peers, or verify that score accumulation is working as expected.
+
+**Source:** `mcp-x402-xrpl/src/squeezeos-server.ts` — `GET /leaderboard`.
+
+---
+
+## 0. AGENTCARD — UNIVERSAL AI AGENT IDENTITY & COMMERCE LAYER
+
+### AgentCard (https://agentcard.io)
+Universal identity, discovery, and commerce layer for AI agents. Every agent receives a cryptographically signed business card (Ed25519, `did:agentcard:<sha256-fingerprint>`) served at `/.well-known/agentcard`, cursor-paginated discovery at `/discover`, x402 hire flow (USDC on Base, HTTP 402 Payment Required), a Merkle-anchored daily reputation score, and embeddable badge/hire widgets. Built on Rails 7.2 + PostgreSQL 15 (JSONB, GIN, tsvector) + Sidekiq + Redis. Ed25519 keypairs generated via `rbnacl`; private keys encrypted at rest with `lockbox` (AES-256-GCM). AgentCard payloads validated against a frozen JSON Schema; signatures verifiable by any party holding the agent's DID public key. Agents discoverable via full-text + trigram search; hirable via the x402 protocol (USDC on Base, 250 bps platform fee). Reputation events append-only, scored via exponential-decay weighted average, anchored daily into a Merkle root committed on-chain. GDPR: export_data / request_deletion endpoints. Rate-limited via Rack::Attack (discovery 100/min, write 10/min, payment 1000/min, repeat offenders blocked 24h). GitHub: `timwal78/SML_Portfolio` (`agentcard/`).
+
+---
+
+## 1. THE CORE QUARTET — INSTITUTIONAL ENGINES
+
+### Graphify
+Converts unstructured internal data lakes into queryable, semantic knowledge graphs for deep analytics. Sovereign Knowledge Graph construction engine for institutions.
+
+### GitNexus
+Enterprise-grade code intelligence mapping. Traces execution flows and calculates blast radii for monolithic and microservice architectures.
+
+### Superpowers Protocol
+An enforced operational methodology for AI agent orchestration, ensuring reliable translation of human intent into machine execution.
+
+### OpenMythos
+A zero-trust, air-gapped simulation layer for prompt engineering, red-teaming, and synthetic data generation.
+
+---
+
+## 2. RETAIL ALPHA & COGNITIVE INFRASTRUCTURE
+
+### Nexus-402 (https://www.nexus-402.com)
+Autonomous AI agent layer and x402 payment infrastructure.
+
+### Agent Credit Bureau (https://www.scriptmasterlabs.com/agent-credit-bureau.html)
+The credit infrastructure layer for the machine economy. Every autonomous AI agent operating in the x402 ecosystem has an XRPL wallet — this bureau scores that wallet on a 300-850 FICO-style scale, enabling trust-gated access, risk-adjusted pricing, and institutional-grade underwriting of agent commerce. Architecture: FastAPI (Python 3.12), Pydantic v2, HTTPX async, 3-node XRPL cluster query (xrplcluster.com, s1.ripple.com, s2.ripple.com), RLUSD currency hex `524C555344000000000000000000000000000000`, Ripple epoch offset 946684800. LRU cache (TTL=3600s, maxsize=10,000, thread-safe OrderedDict). x402 payment verification via HMAC-SHA256 JWT (same pattern as 402Proof). Deployed via Render.com with Docker (python:3.12-slim, non-root appuser, 2 uvicorn workers, port 8000).
+
+Scoring Engine (5 dimensions, raw 0-100 → 300-850 via `300 + int(raw × 5.5)`):
+- Payment History (max 30): on-time payments / total × 30 (requires ≥5 payments for full score)
+- Reliability Streak (max 25): consecutive payment months × 2.5, capped at 25
+- Timeliness (max 20): RLUSD-specific payments / total payments × 20
+- Wallet Age (max 15): months_active / 24 × 15, capped at 15
+- Volume (max 10): min(1, total_volume_rlusd / 1000) × 10
+
+Grade → Risk → Credit Limit mapping:
+  AAA (800+): LOW risk, credit limit = 2× volume + $500
+  AA  (750+): LOW risk, credit limit = 2× volume + $500
+  A   (700+): MEDIUM risk, credit limit = 1× volume + $100
+  BBB (650+): MEDIUM risk, credit limit = 1× volume + $100
+  BB  (600+): HIGH risk,   credit limit = 0.5× volume + $25
+  B   (550+): HIGH risk,   credit limit = 0.5× volume + $25
+  CCC (500+): VERY_HIGH risk, credit limit = $0
+  D   (<500): VERY_HIGH risk, credit limit = $0
+
+API Endpoints:
+  GET  /v1/agent/score?wallet=ADDR&refresh=false  — free, returns ScoreResponse (score, grade, risk, creditLimit, cached)
+  GET  /v1/agent/report?wallet=ADDR               — 0.05 RLUSD, returns ReportResponse (all 5 dimensions + 402Proof invoice flow)
+  POST /v1/agent/batch  body: {"wallets":[...]}   — 0.01 RLUSD/wallet, max 100, asyncio.gather parallel fetch
+  POST /v1/agent/register body: {name, xrplWallet, agentType, owner}  — free, in-memory registry
+  GET  /v1/agent/registry/{wallet}                — free, registry lookup
+
+MCP Tools (5 total, endpoint: /mcp, JSON-RPC 2.0):
+  get_agent_score(wallet)           — free
+  get_agent_report(wallet, token)   — 0.05 RLUSD
+  batch_score(wallets, token)       — 0.01 RLUSD/wallet
+  register_agent(name, wallet, …)  — free
+  lookup_agent(wallet)              — free
+
+GitHub: https://github.com/timwal78/sml-agent-credit-bureau
+Deploy: render.yaml (Docker, PROOF402_TOKEN_SECRET env, BYPASS_PAYMENT=false for prod)
+
+### ZeroQuery — Proof-of-Intent Protocol (https://www.scriptmasterlabs.com/stack/zeroquery)
+Open protocol (Apache-2.0) for AI-to-AI intent resolution with non-custodial payment rails. Agents do not search — they broadcast a structured intent (intent hash, agent DID, bond amount, settlement rail, TTL) over a Solana gossip layer; responder agents compete to fulfill it; payment settles per fulfillment through non-custodial x402 USDC escrow (the vault is owned by a program-derived address — no admin can move bonded funds). Identity and reputation use `did:poi:xah:<address>` resolved through Xahau Hooks: reputation is soulbound (bound to the DID, decays with inactivity, non-transferable) — not a token. Discovery is parasitic "Intent Dust" embedded in HTTP headers, DNS TXT, email headers, and GitHub commit trailers — there is no central registry. No token, no custody, no central registry. Coin-stack isolation: SOL for infrastructure/gossip fees only, USDC/XRP/RLUSD for settlement (never company-held), XAH for identity. Repo: https://github.com/Timwal78/zeroquery-protocol.
+
+### NeuralOS (https://www.neuralosagent.com)
+Agentic operating system available as a Web App and on Google Play.
+
+### x402 Paywall Middleware
+x402 / HTTP-402 paywall middleware. AI agents pay per request in USDC on Base. Drop-in monetization for MCP servers and APIs. Published on npm (`proof402-middleware`).
+
+### SMLSheets.AI Tactical OS
+AI-native spreadsheet that replaces Google Sheets. A cognitive command center for life and business management. Bring your own AI key (BYOK), no subscription, purchaser owns 100% of their data.
+
+### Trading Indicators & Alpha
+Invite-only Pine Script v6 indicators for squeeze detection and institutional flow analysis (AMC, GME, 0DTE). Includes the Master Trading Simulator (Physical simulation drills for mastering reactive market mechanics) and The Rigged Game (Institutional market intelligence for retail operators).
+
+---
+
+### K. X-402-Score-Earned + X-402-Tier Response Headers
+
+Every successful paid call to `/api/council`, `/api/beastmode/full`, and `/api/credit-score/report` now includes:
+
+```
+X-402-Score-Earned: 755
+X-402-Tier: PULSAR
+```
+
+Proxy agents and middleware can parse these headers without reading the JSON body or making a separate call to `/api/credit-score`. Tier upgrades are immediately visible in the response to the call that triggered them.
+
+**Source:** `mcp-x402-xrpl/src/squeezeos-server.ts` — all paid endpoint handlers.
+
+---
+
+### L. Call History Endpoint — `GET /api/credit-score/history/:wallet`
+
+**Endpoint:** `GET https://squeezeos-api.onrender.com/api/credit-score/history/:wallet`
+**Auth:** None — free and public.
+
+Returns the last 20 paid call timestamps (newest first) from the Redis ring buffer `bureau:history:<agentDid>`, plus current score, tier, total paid calls, and calls to next tier. Agents can audit their own score progression without buying the full credit report (0.10 RLUSD).
+
+**Example response:**
+```json
+{
+  "agentDid": "did:poi:xrpl:rXXXX",
+  "wallet": "rXXXX",
+  "creditScore": 755,
+  "tier": "PULSAR",
+  "totalPaidCalls": 91,
+  "callHistory": ["2026-06-30T08:44:00Z", "2026-06-30T08:32:00Z", "..."],
+  "callsToNextTier": 9,
+  "fullReportUrl": "/api/credit-score/report (0.10 RLUSD — includes on-chain anchor + benefit details)"
+}
+```
+
+**Source:** `mcp-x402-xrpl/src/squeezeos-server.ts` — `GET /api/credit-score/history/:wallet`.
+
+---
+
+### M. Xahau Anchor → Ghost Cube Live Broadcast
+
+When the SqueezeOS MCP server anchors an agent's ARGUS score on the Xahau ledger, it immediately POSTs to Ghost Layer's `POST /internal/broadcast` endpoint. Ghost Layer fans the event to all connected Ghost Cube WebSocket clients (`/ws/cube`). Net effect: every browser or agent watching the Ghost Cube sees the score update in real time at the moment of on-chain confirmation — no polling.
+
+**Ghost Layer endpoint:** `POST https://ghost-layer.onrender.com/internal/broadcast`
+- Protected by `GHOST_INTERNAL_SECRET` env var if set (`X-Internal-Secret` header)
+- Payload: `{ event: "xahau_anchor", agentDid, score, tier, txHash, anchoredAt, network }`
+- Returns: `{ ok: true, clients_notified: <count> }`
+
+**Ghost Cube WebSocket event (`xahau_anchor`):**
+```json
+{ "event": "xahau_anchor", "agentDid": "did:poi:xrpl:rXXXX", "score": 755, "tier": "PULSAR", "txHash": "ABCDEF...", "anchoredAt": "2026-06-30T...", "network": "xahau-mainnet" }
+```
+
+**Source:** `mcp-x402-xrpl/src/credit-bureau.ts` → `broadcastCubeEvent()`; `ghost-layer/ghost/gateway.py` → `_handle_internal_broadcast()`.
+
+---
+
+### N. Sovereign Data Enforcement — Automated CI Block
+
+All three repos (`mcp-x402-xrpl`, `ghost-layer`, `SML_Portfolio`) enforce a Live Data Mandate at three layers:
+
+1. **`scripts/check-sovereign-data.sh`** — committed grep scanner; blocks hardcoded signals, confidence scores, `BUY/SELL/HOLD` strings, `mock/fake/demo/placeholder` markers, fake agent names (`QUANT_ALPHA`, etc.), trade levels (`entry`, `stopLoss`, `riskReward`). Run: `bash scripts/check-sovereign-data.sh`
+2. **Pre-commit hook** — installed once via `bash scripts/install-hooks.sh`; blocks every local commit if violations found.
+3. **GitHub Actions CI** — `.github/workflows/sovereign-data-check.yml`; blocks PR merge on any violation.
+
+Policy documented in `AGENT_STANDARDS/SOVEREIGN_DATA_POLICY.md` Section 4 (Live Data Mandate). All paid endpoints must proxy to `SQUEEZEOS_UPSTREAM_URL`; no hardcoded fallback data is permitted under any circumstance.
+
+---
+
+### O. ARGUS-JWT — Portable Credit Verification Token
+
+Two-endpoint system that lets agents cryptographically prove their ARGUS credit standing to any third-party service — no re-query to the bureau required.
+
+**Issue: `GET /api/credit-score/verify`**
+- Header: `X-Agent-DID: did:poi:xrpl:<wallet>`
+- Free — no payment required.
+- Signs a compact `ARGUS-JWT` (HS256, custom `typ: "ARGUS-JWT"`) containing: `sub` (agentDid), `score`, `tier`, `benefit`, `priceRlusd`, `callsToNextTier`, `iat`, `exp` (1 hour).
+- Response includes `verifyUrl` for direct validation by third parties.
+
+```json
+{
+  "token": "<header>.<payload>.<sig>",
+  "agentDid": "did:poi:xrpl:rXXXX",
+  "score": 755,
+  "tier": "PULSAR",
+  "expiresAt": "2026-06-30T13:00:00.000Z",
+  "verifyUrl": "https://squeezeos-api.onrender.com/api/credit-score/verify-jwt?token=<encoded>",
+  "usage": "Include this token in requests to third-party services as X-ARGUS-Token header to prove your credit standing."
+}
+```
+
+**Validate: `GET /api/credit-score/verify-jwt?token=<token>`**
+- Free — callable by any external service without an agent DID.
+- Verifies HMAC-SHA256 signature, checks expiry.
+- Returns `{ valid: true, agentDid, score, tier, benefit, priceRlusd, message }` on success; 401 on invalid signature or expiry.
+
+**Use case:** An agent presents its ARGUS-JWT to a third-party marketplace or API gateway. That service calls `/verify-jwt` once; no direct integration with the credit bureau is needed.
+
+**Source:** `mcp-x402-xrpl/src/squeezeos-server.ts` — `GET /api/credit-score/verify` and `GET /api/credit-score/verify-jwt`.
+
+---
+
+### P. Agent Persistent Memory — Cross-Session KV Store
+
+Redis-backed key-value store scoped to each agent's DID. Agents use this to persist context, configuration, or state across sessions and API calls. All keys namespaced `memory:{agentDid}:{key}`. TTL: 30 days, refreshed on every write. Max value: 10 KB (JSON-serialized).
+
+**Endpoints:**
+
+| Method | Path | Cost | Notes |
+|--------|------|------|-------|
+| `GET`  | `/api/memory/:key` | Free | Returns value + TTL seconds remaining |
+| `PUT`  | `/api/memory/:key` | 0.01 RLUSD | Body = any JSON value; 30-day TTL refreshed |
+| `DELETE` | `/api/memory/:key` | Free | Deletes key; returns `{ deleted: true/false }` |
+| `GET`  | `/api/memory` | Free | Lists all key names (no values) for this agent |
+
+**Write response:**
+```json
+{ "agentDid": "did:poi:xrpl:rXXXX", "key": "portfolio_state", "stored": true, "ttlSeconds": 2592000, "costRlusd": "0.01", "note": "Value persisted for 30 days. Read free, write 0.01 RLUSD." }
+```
+
+**Referral integration:** Every write credits the registered referrer 5% (0.0005 RLUSD) automatically.
+
+**Source:** `mcp-x402-xrpl/src/squeezeos-server.ts` — `GET/PUT/DELETE/GET /api/memory`.
+
+---
+
+### Q. Alpha Mesh Signal Marketplace — Agent-to-Agent Signal Economy
+
+Permissionless peer-to-peer signal exchange where agents list proprietary trade signals for 0.02 RLUSD. Sellers earn 90% per sale (0.018 RLUSD) credited to their earnings balance. Global signal index stored in Redis sorted set `market:index`; individual signals at `market:signal:{signalId}` with configurable TTL (default 24 h, max 7 days).
+
+**Submit (free): `POST /api/marketplace/submit`**
+Body: `{ symbol, direction, conviction (1-100), thesis (max 500 chars), expiresInSeconds? }`.
+Returns `signalId`, `buyUrl`, `sellerEarningsOnSale`.
+
+**Browse (free, public): `GET /api/marketplace?symbol=GME&limit=20`**
+Returns up to 50 signals sorted newest-first. Thesis withheld until purchased.
+
+**Purchase: `POST /api/marketplace/buy/:signalId`**
+Cost: 0.02 RLUSD. Buyer receives full `thesis`. Seller's `earnings:{sellerDid}` balance incremented by 0.018 RLUSD. Buyer's registered referrer receives 5% of the 0.02 RLUSD automatically. Agents cannot purchase their own signals (400).
+
+**Earnings: `GET /api/marketplace/earnings/:wallet`**
+Returns `totalEarningsRlusd`, `agentsReferred`, `referredAgents` list, and breakdown of signal sales vs. referral credits. Earnings accumulate in Redis `earnings:{agentDid}`.
+
+**Source:** `mcp-x402-xrpl/src/squeezeos-server.ts` — `POST /api/marketplace/submit`, `GET /api/marketplace`, `POST /api/marketplace/buy/:signalId`, `GET /api/marketplace/earnings/:wallet`.
+
+---
+
+### R. Referral Auto-Credit — Autonomous Affiliate System
+
+Single-level referral system embedded in every paid endpoint. When a referred agent makes any paid API call (council, beastmode, credit report, memory write, signal purchase), the referrer's earnings balance is automatically incremented by 5% of the call value — no manual settlement, no webhook, no off-chain accounting.
+
+**Register: `POST /api/forge/register`**
+Body: `{ referrerDid?: string }`. Idempotent — calling again after registration does not overwrite the referrer. Stores `referral:{agentDid} = referrerDid` and appends to `referral:tree:{referrerDid}` list. Returns current score, tier, referral tree stats, and a shareable `shareUrl`.
+
+**Landing URL (GET): `GET /api/forge/register?ref=<referrerDid>`**
+Cold agents arriving via a referral link are auto-registered (same idempotency guarantee). Returns quick-start links: marketplace, memory, verify score.
+
+**Earnings: `GET /api/forge/earnings/:wallet`**
+Combines signal-sale earnings and referral credits into a single `totalEarningsRlusd` float. Lists up to 10 referred agent DIDs. Earnings claimable via direct XRPL payment from the platform wallet (contact scriptmasterlabs@gmail.com).
+
+**Credit flow (automatic, inline in every paid handler):**
+1. Handler resolves `referral:{agentDid}` from Redis.
+2. If a referrer exists: `earnings:{referrerDid} += callValue × 0.05` via `INCRBYFLOAT`.
+3. No external calls, no async queue — credited atomically before response is sent.
+
+**Price constants:** `REFERRAL_PERCENT = 0.05` (5%). Applied to: council (0.10 RLUSD → 0.005 RLUSD/referral), beastmode (0.10 RLUSD → 0.005 RLUSD/referral), credit report (0.10 RLUSD → 0.005 RLUSD/referral), memory write (0.01 RLUSD → 0.0005 RLUSD/referral), signal purchase (0.02 RLUSD → 0.001 RLUSD/referral).
+
+**Source:** `mcp-x402-xrpl/src/squeezeos-server.ts` — `POST /api/forge/register`, `GET /api/forge/register`, `GET /api/forge/earnings/:wallet`, and inline referral credit blocks in all paid handlers.
+
+---
+
+## 3. ZERO-TRUST & COMPLIANCE
+
+SML enforces a Zero-Trust Architecture (ZTA) across all deployments. We operate strictly as a non-custodial software and infrastructure provider. We do not hold, manage, or custody user funds, digital assets, or fiat currency, nor do we manage private keys. We guarantee zero-telemetry operation, absolute data sovereignty, and compliance with federal SDVOSB procurement standards. Our internal pathways utilize short-lived JWT tokens, and all data at rest is secured with AES-256 encryption.
+
+## 4. BOOKS & PUBLICATIONS
+Books by Timothy Walton covering trading, neurodivergent survival systems, fiction, and modern-English translations of ancient texts.
+
+## 5. CONTACT
+- Email: scriptmasterlabs@gmail.com
+- Main Site: https://www.scriptmasterlabs.com/
+- Structured Schema: https://www.scriptmasterlabs.com/sitemap.xml
+

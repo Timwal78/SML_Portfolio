@@ -1,0 +1,74 @@
+[
+  {
+    "question": "What is mcp-x402?",
+    "answer": "mcp-x402 is the first MCP (Model Context Protocol) server that pays for itself. It connects AI agents — Claude, Cursor, or any MCP-compatible runtime — to ScriptMasterLabs financial intelligence tools via the x402 payment protocol. Agents pay with stablecoins on Base, XRPL, or Solana, and receive cryptographic receipts for every transaction. No API keys. No human billing. No subscriptions to manage.",
+    "category": "product",
+    "url": "https://scriptmasterlabs.com"
+  },
+  {
+    "question": "How do I install mcp-x402?",
+    "answer": "Install in one command: `npx @scriptmasterlabs/mcp-x402`. Or globally: `npm i -g @scriptmasterlabs/mcp-x402`. For Claude Code, add to ~/.claude/config.json: `{\"mcpServers\": {\"sml\": {\"command\": \"npx\", \"args\": [\"@scriptmasterlabs/mcp-x402\"]}}}`. For Cursor in SSE mode, run with `MCP_TRANSPORT=sse npx @scriptmasterlabs/mcp-x402` and add `{\"mcp-x402\": {\"url\": \"http://localhost:3402/sse\"}}` to your Cursor MCP settings.",
+    "category": "install",
+    "url": "https://www.npmjs.com/package/@scriptmasterlabs/mcp-x402"
+  },
+  {
+    "question": "What tools does mcp-x402 provide?",
+    "answer": "mcp-x402 provides 6 tools: (1) leviathan_signal — institutional squeeze signals, $0.05 USDC; (2) xmit_edgar_decode — parse SEC DEF 14A/13F/13D filings, $0.02 USDC; (3) xdeo_earnings_estimate — decentralized earnings oracle, $0.02 USDC; (4) ftd_threshold_scan — SEC Reg SHO FTD detection, alerts free / full $0.05 USDC; (5) nexus_agent_hire — agent marketplace, query free / hire 5% commission; (6) crawl_paid_fetch — pay-per-fetch web scraping, $0.005 USDC.",
+    "category": "tools",
+    "url": "https://github.com/timwal78/sml_portfolio/tree/main/mcp-x402"
+  },
+  {
+    "question": "How does the payment flow work?",
+    "answer": "Payment happens in 5 automatic steps: (1) Agent discovers tool prices from agents.json or llms.txt; (2) AP2 mandate is checked — Agent Credit Bureau score ≥ 300 triggers auto-approve with no human prompt; (3) x402 stablecoin transfer executes on the cheapest/fastest available chain (Base USDC preferred at <3s); (4) 402Proof generates a cryptographic receipt, returned in the `_meta` block of every response; (5) Agent Credit Bureau score updates after each successful call.",
+    "category": "payment",
+    "url": "https://four02proof.onrender.com"
+  },
+  {
+    "question": "What chains and currencies are supported for payment?",
+    "answer": "mcp-x402 supports three chains: Base (USDC) — preferred for speed at under 3 seconds; XRPL (RLUSD) — preferred for XRP ecosystem integrations; Solana (USDC) — last resort fallback. The server routes to the cheapest and fastest available chain automatically. All chains use stablecoins, so there is no crypto price volatility in tool costs.",
+    "category": "payment",
+    "url": "https://github.com/timwal78/sml_portfolio/tree/main/mcp-x402"
+  },
+  {
+    "question": "What is the Agent Credit Bureau and how does it work?",
+    "answer": "The Agent Credit Bureau is a FICO-style reputation system for AI agent wallets, scoring from 300 to 850. Scores are tied to XRPL wallet addresses and maintained by 402Proof at four02proof.onrender.com/v1/bureau/score/{wallet}. A minimum score of 300 is required for auto-approve of paid tool calls in mcp-x402. Scores increase with successful transactions — for example, xdeo_earnings_estimate grants +2 points per call. Agents build financial reputation the same way humans do.",
+    "category": "credit-bureau",
+    "url": "https://four02proof.onrender.com"
+  },
+  {
+    "question": "Where are my private keys stored?",
+    "answer": "Private keys are stored exclusively in your operating system's secure keychain — macOS Keychain, Windows DPAPI, or Linux Secret Service via the `keytar` library. Keys are never written to environment variables, config files, or logs. On first run, mcp-x402 provisions a wallet automatically and stores the key securely. You can review the wallet address with `npx @scriptmasterlabs/mcp-x402 wallet`.",
+    "category": "security",
+    "url": "https://github.com/timwal78/sml_portfolio/tree/main/mcp-x402"
+  },
+  {
+    "question": "What spend controls does mcp-x402 have?",
+    "answer": "mcp-x402 enforces three spend controls: (1) Auto-approve threshold of $1.00 — sessions under this total require no human confirmation; (2) Daily spend cap of $50.00 per wallet, enforced in-process and cannot be exceeded; (3) Price cache TTL of 60 seconds — prices are re-fetched at most once per minute to prevent stale pricing. These controls are configurable via environment variables (DAILY_SPEND_CAP_USD, AUTO_APPROVE_THRESHOLD_USD).",
+    "category": "security",
+    "url": "https://github.com/timwal78/sml_portfolio/tree/main/mcp-x402"
+  },
+  {
+    "question": "What is AP2 and why is it required for some tools?",
+    "answer": "AP2 (Agent Payment Protocol version 2) is a W3C Verifiable Credential-based mandate system that lets agent operators set explicit spending policies before an agent starts executing. Tools marked 'AP2 required' (leviathan_signal, xmit_edgar_decode, xdeo_earnings_estimate) verify a valid AP2 mandate before executing and fail closed if none is present. This prevents autonomous agents from spending on high-value data without explicit operator authorization. The mandate is checked via the X-AP2-MANDATE header.",
+    "category": "security",
+    "url": "https://github.com/timwal78/sml_portfolio/tree/main/mcp-x402"
+  },
+  {
+    "question": "How do I add x402 payments to my own MCP server?",
+    "answer": "Use the @scriptmasterlabs/mcp-x402-sdk package: `npm i @scriptmasterlabs/mcp-x402-sdk`. Import `x402Payment` and wrap your tool handler with it — 5 lines of TypeScript. The SDK handles wallet provisioning, AP2 mandate verification, chain routing, 402Proof receipt generation, and audit logging automatically. Any MCP server author can monetize their tools using the same infrastructure that powers mcp-x402.",
+    "category": "sdk",
+    "url": "https://www.npmjs.com/package/@scriptmasterlabs/mcp-x402-sdk"
+  },
+  {
+    "question": "What financial intelligence does leviathan_signal provide?",
+    "answer": "leviathan_signal provides institutional-grade equity squeeze signals using a multi-engine verdict system: OracleEngine (aggregates all signal types), RecurrentDepthTransformer/RDT (multi-symbol ranking via graph traversal), and SML Fractal Cascade (proprietary squeeze pattern detection). It returns a signal verdict (BUY IGNITION / BUY / HOLD / SELL / SHIELD), confidence score, regime label (ALPHA_EXPANSION / MACRO_COLLAPSE / NEUTRAL / SHIELD), and a 402Proof receipt. Cost: $0.05 USDC per call.",
+    "category": "tools",
+    "url": "https://squeezeos-api.onrender.com"
+  },
+  {
+    "question": "Who built mcp-x402 and is it open source?",
+    "answer": "mcp-x402 was built by ScriptMasterLabs (Script Master Labs LLC), an SDVOSB (Service-Disabled Veteran-Owned Small Business). It is MIT licensed — no proprietary core, no vendor lock-in. The source code lives inside the sml_portfolio monorepo at github.com/timwal78/sml_portfolio/tree/main/mcp-x402. The companion SDK (@scriptmasterlabs/mcp-x402-sdk) is also MIT licensed.",
+    "category": "company",
+    "url": "https://scriptmasterlabs.com"
+  }
+]

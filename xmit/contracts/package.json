@@ -1,0 +1,12 @@
+{
+  "name": "xmit-contracts",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "forge build",
+    "test": "forge test -vvv",
+    "deploy:testnet": "forge script script/Deploy.s.sol --rpc-url base_sepolia --broadcast --verify",
+    "deploy:mainnet": "forge script script/Deploy.s.sol --rpc-url base --broadcast --verify",
+    "clean": "forge clean"
+  }
+}

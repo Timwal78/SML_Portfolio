@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #0A0A0F;
+  --surface: #12121A;
+  --border: #1E1E2E;
+  --text: #E8E8F0;
+  --muted: #6B6B8A;
+  --red: #FF3B3B;
+  --orange: #FF8C00;
+  --green: #00C853;
+  --yellow: #FFD700;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.mono { font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+
+.grade-a-plus { color: #00C853; }
+.grade-a      { color: #69F0AE; }
+.grade-b      { color: #FFD740; }
+.grade-c      { color: #FF9100; }
+.grade-d      { color: #FF5722; }
+.grade-f      { color: #FF1744; }
+
+.severity-critical { color: #FF1744; }
+.severity-high     { color: #FF5722; }
+.severity-medium   { color: #FF9100; }
+.severity-low      { color: #FFD740; }
+
+.tier-grand-inquisitor { color: #CF6679; }
+.tier-auditor          { color: #B39DDB; }
+.tier-investigator     { color: #80DEEA; }
+.tier-detective        { color: #A5D6A7; }
+.tier-citizen          { color: #6B6B8A; }

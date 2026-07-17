@@ -1,0 +1,117 @@
+# Kubernetes manifests for VAPL Registry Service
+# Tested on GKE, EKS, and k3s.
+#
+# Prerequisites:
+#   kubectl create namespace vapl
+#   kubectl create secret generic vapl-soul \
+#     --namespace=vapl \
+#     --from-file=soul.json=/path/to/soul.json
+#
+# Deploy:
+#   kubectl apply -f deployment/kubernetes/
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: vapl
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vapl-config
+  namespace: vapl
+data:
+  VAPL_SOUL_FILE: "/secrets/soul/soul.json"
+  PORT: "8400"
+  SQUEEZEOS_BASE: "https://squeezeos-api.onrender.com"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vapl-registry
+  namespace: vapl
+  labels:
+    app: vapl-registry
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: vapl-registry
+  template:
+    metadata:
+      labels:
+        app: vapl-registry
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        fsGroup: 1001
+      containers:
+        - name: vapl-registry
+          image: ghcr.io/timwal78/vapl-registry:latest
+          ports:
+            - containerPort: 8400
+          envFrom:
+            - configMapRef:
+                name: vapl-config
+          volumeMounts:
+            - name: soul-secret
+              mountPath: /secrets/soul
+              readOnly: true
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8400
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8400
+            initialDelaySeconds: 5
+            periodSeconds: 10
+      volumes:
+        - name: soul-secret
+          secret:
+            secretName: vapl-soul
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vapl-registry
+  namespace: vapl
+spec:
+  selector:
+    app: vapl-registry
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8400
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: vapl-registry
+  namespace: vapl
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+    - host: vapl.yourdomain.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: vapl-registry
+                port:
+                  number: 80

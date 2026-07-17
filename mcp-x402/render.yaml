@@ -1,0 +1,127 @@
+services:
+  - type: web
+    name: mcp-x402
+    runtime: docker
+    branch: main
+    dockerfilePath: ./mcp-x402/Dockerfile
+    dockerContext: ./mcp-x402
+    plan: starter
+    region: oregon
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Stripe checkout was failing in production with a generic
+      # "StripeConnectionError, retried 2 times" — confirmed the SDK and
+      # network path are fine from outside Render (a fake key gets a proper
+      # auth error, not a connection error), and other outbound HTTPS calls
+      # from this same container work fine (Community Scout hits HN's
+      # Algolia API successfully). That pattern — works everywhere except one
+      # specific host, from a container — is the signature of Node's IPv6-
+      # first DNS resolution (default since Node 17+) hitting a bad IPv6 path
+      # to that one host specifically. Forcing IPv4 is the standard,
+      # low-risk fix; safe to leave on even if this isn't the actual cause.
+      - key: NODE_OPTIONS
+        value: "--dns-result-order=ipv4first"
+      - key: MCP_TRANSPORT
+        value: sse
+      - key: MCP_SSE_PORT
+        value: 3402
+      - key: SML_API_BASE
+        sync: false
+      - key: SQUEEZEOS_API_BASE
+        value: "https://squeezeos-api.onrender.com"
+      - key: SML_API_KEY
+        sync: false
+      - key: WALLET_SEED
+        sync: false
+      # Base USDC address that COLLECTS payments from agent tool calls (public).
+      - key: SML_PAYMENT_RECEIVER
+        value: "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700"
+      - key: BASE_RPC_URL
+        sync: false
+      - key: XRPL_RPC_URL
+        sync: false
+      - key: SOLANA_RPC_URL
+        sync: false
+      # LEVIATHAN ACP v2 — Virtuals Protocol seller agent
+      - key: ACP_WALLET_ADDRESS
+        value: "0x0f035c36c4ce65a6f1bf4370f779bac722d59004"
+      - key: ACP_WALLET_ID
+        sync: false
+      - key: ACP_SIGNER_PRIVATE_KEY
+        sync: false
+      - key: LEVIATHAN_BYPASS_SECRET
+        sync: false
+      - key: LEVIATHAN_BASE_URL
+        value: "https://mcp-x402.onrender.com"
+      - key: DAILY_SPEND_CAP_USD
+        value: "50"
+      - key: AUTO_APPROVE_THRESHOLD_USD
+        value: "1"
+      - key: PRICE_CACHE_TTL_MS
+        value: "60000"
+      - key: PROOF402_URL
+        value: https://four02proof.onrender.com
+      - key: TESTNET
+        value: "false"
+      # Coinbase Developer Platform x402 facilitator — optional. If BOTH are set,
+      # CdpFacilitator is tried first in the hybrid chain (facilitators.ts); a real
+      # settled payment through it is what gets these routes cataloged in the x402
+      # Bazaar. Paste the actual key ID/secret only here in Render, never in git.
+      - key: CDP_API_KEY_ID
+        sync: false
+      - key: CDP_API_KEY_SECRET
+        sync: false
+      # Equities/options heatmap tools (equities-heatmap.ts) — self-contained,
+      # not proxied through SqueezeOS. Required for equities_heatmap_full /
+      # options_delta_heatmap_full and the /x402/equities-heatmap(-preview)
+      # and /x402/options-delta-heatmap(-preview) REST routes.
+      # Data source priority: TRADIER_API_KEY first (real market-quoted Greeks
+      # on options), falling back to POLYGON_API_KEY. At least one of the two
+      # is required; ANTHROPIC_API_KEY is always required for the swarm verdict.
+      - key: TRADIER_API_KEY
+        sync: false
+      - key: TRADIER_ENV
+        value: "production"
+      - key: POLYGON_API_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: ANTHROPIC_MODEL
+        value: "claude-sonnet-4-5"
+      # Stripe subscription checkout (Starter/Elite buttons on agentswarm-seo.html).
+      # Secret key must be set in the Render dashboard, never in git. Price IDs are
+      # not secret (Stripe scopes them to a specific product/amount), so the known
+      # live IDs are declared here directly like SML_PAYMENT_RECEIVER above.
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_PRICE_STARTER
+        value: "price_1TdcN6QL50L4TFzsynvRdAID"
+      - key: STRIPE_PRICE_ELITE
+        value: "price_1Tgy87QL50L4TFzs4O9tNh01"
+      # Webhook signing secret from the Stripe Dashboard (Developers > Webhooks
+      # > add endpoint https://mcp-x402.onrender.com/api/stripe/webhook,
+      # events: checkout.session.completed, customer.subscription.deleted,
+      # customer.subscription.paused, invoice.payment_failed). Without this,
+      # checkout still takes payment but never provisions an entitled key.
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      # AWS Marketplace fulfillment (/aws/marketplace/resolve) for
+      # prod-lop2m2yjjcs76 "Script Master Labs Federal, Medical & Finance MCP
+      # (x402)". IAM user needs ONLY aws-marketplace:ResolveCustomer — no
+      # broader AWS access. Reuses the same Supabase project as SUPABASE_URL/
+      # SUPABASE_SERVICE_ROLE_KEY below (table: aws_marketplace_customers).
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+      - key: AWS_REGION
+        value: "us-east-1"
+      - key: SUPABASE_URL
+        value: "https://gqzkwwchahmzenacwmhj.supabase.co"
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+    autoDeploy: true
+    # Render restarts the service automatically on crash
+    # healthCheckPath triggers restart if /health returns non-2xx

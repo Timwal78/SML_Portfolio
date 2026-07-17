@@ -1,0 +1,571 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "TrustVerify AI — Enterprise API",
+    "description": "Enterprise AI vendor risk intelligence. Continuously monitors AI vendors across 5 operational dimensions and assigns TrustScores (300-850). Integrates with Salesforce, ServiceNow, and Slack.\n\n**Base URL:** `https://api.trustverify.ai/v1`\n\n**Authentication:** OAuth 2.0 Client Credentials (Bearer token)\n\n**Rate Limits:**\n- Starter: 100 req/min\n- Professional: 500 req/min\n- Enterprise: 2000 req/min",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Script Master Labs Enterprise",
+      "email": "enterprise@scriptmasterlabs.com",
+      "url": "https://www.scriptmasterlabs.com/trustverify"
+    },
+    "license": { "name": "Proprietary" }
+  },
+  "servers": [
+    { "url": "https://api.trustverify.ai/v1", "description": "Production" },
+    { "url": "https://api-staging.trustverify.ai/v1", "description": "Staging" }
+  ],
+  "security": [ { "BearerAuth": [] } ],
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "TrustScore": {
+        "type": "integer",
+        "minimum": 300,
+        "maximum": 850,
+        "description": "Composite TrustScore from 300 (critical) to 850 (exceptional)",
+        "example": 742
+      },
+      "VendorCategory": {
+        "type": "string",
+        "enum": ["chatbot", "document_processing", "analytics", "coding_assistant", "image_generation", "voice", "other"]
+      },
+      "VendorStatus": {
+        "type": "string",
+        "enum": ["active", "inactive", "blocked", "pending_review", "shadow"]
+      },
+      "AlertSeverity": {
+        "type": "string",
+        "enum": ["low", "medium", "high", "critical"]
+      },
+      "AlertType": {
+        "type": "string",
+        "enum": ["security", "uptime", "payment", "contract", "score_drop", "shadow_ai"]
+      },
+      "DimensionDetail": {
+        "type": "object",
+        "properties": {
+          "score": { "$ref": "#/components/schemas/TrustScore" },
+          "weight": { "type": "number", "description": "Fractional weight in composite score", "example": 0.25 },
+          "details": { "type": "object", "additionalProperties": true }
+        }
+      },
+      "Dimensions": {
+        "type": "object",
+        "properties": {
+          "payment_reliability": { "$ref": "#/components/schemas/DimensionDetail" },
+          "uptime_consistency": { "$ref": "#/components/schemas/DimensionDetail" },
+          "security_posture": { "$ref": "#/components/schemas/DimensionDetail" },
+          "contract_adherence": { "$ref": "#/components/schemas/DimensionDetail" },
+          "operational_longevity": { "$ref": "#/components/schemas/DimensionDetail" }
+        }
+      },
+      "Alert": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "example": "alert_xyz789" },
+          "type": { "$ref": "#/components/schemas/AlertType" },
+          "severity": { "$ref": "#/components/schemas/AlertSeverity" },
+          "message": { "type": "string" },
+          "detected_at": { "type": "string", "format": "date-time" },
+          "status": { "type": "string", "enum": ["open", "acknowledged", "resolved"] },
+          "vendor_id": { "type": "string" }
+        }
+      },
+      "Vendor": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "example": "vendor_abc123" },
+          "name": { "type": "string", "example": "DocuBot AI" },
+          "description": { "type": "string" },
+          "website": { "type": "string", "format": "uri" },
+          "category": { "$ref": "#/components/schemas/VendorCategory" },
+          "trust_score": { "$ref": "#/components/schemas/TrustScore" },
+          "score_change_30d": { "type": "integer", "example": -12 },
+          "status": { "$ref": "#/components/schemas/VendorStatus" },
+          "last_updated": { "type": "string", "format": "date-time" },
+          "dimensions": { "$ref": "#/components/schemas/Dimensions" },
+          "alerts": { "type": "array", "items": { "$ref": "#/components/schemas/Alert" } },
+          "created_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Policy": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "condition": {
+            "type": "object",
+            "properties": {
+              "field": { "type": "string", "enum": ["trust_score", "score_change_30d", "dimension.security_posture", "dimension.uptime_consistency"] },
+              "operator": { "type": "string", "enum": ["lt", "lte", "gt", "gte", "eq", "change_gt"] },
+              "value": { "type": "number" }
+            }
+          },
+          "action": {
+            "type": "string",
+            "enum": ["alert_email", "alert_slack", "alert_servicenow", "restrict_data_access", "block_vendor", "require_review"]
+          },
+          "enabled": { "type": "boolean" },
+          "created_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Webhook": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "url": { "type": "string", "format": "uri" },
+          "events": {
+            "type": "array",
+            "items": { "type": "string", "enum": ["score.updated", "score.dropped", "alert.created", "vendor.blocked", "shadow_ai.detected"] }
+          },
+          "secret": { "type": "string", "description": "HMAC-SHA256 signing secret" },
+          "enabled": { "type": "boolean" },
+          "created_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Pagination": {
+        "type": "object",
+        "properties": {
+          "total": { "type": "integer" },
+          "limit": { "type": "integer" },
+          "offset": { "type": "integer" },
+          "has_more": { "type": "boolean" }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": { "type": "string" },
+          "message": { "type": "string" },
+          "request_id": { "type": "string" }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/auth/token": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Get OAuth 2.0 access token",
+        "description": "Exchange client credentials for a Bearer token. Tokens expire in 3600 seconds.",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["client_id", "client_secret", "grant_type"],
+                "properties": {
+                  "client_id": { "type": "string" },
+                  "client_secret": { "type": "string" },
+                  "grant_type": { "type": "string", "enum": ["client_credentials"] }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Token issued",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "access_token": { "type": "string" },
+                    "token_type": { "type": "string", "example": "Bearer" },
+                    "expires_in": { "type": "integer", "example": 3600 },
+                    "scope": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Invalid credentials", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
+    "/vendors": {
+      "get": {
+        "tags": ["Vendors"],
+        "summary": "List monitored vendors",
+        "parameters": [
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 50, "maximum": 250 } },
+          { "name": "offset", "in": "query", "schema": { "type": "integer", "default": 0 } },
+          { "name": "status", "in": "query", "schema": { "$ref": "#/components/schemas/VendorStatus" } },
+          { "name": "min_score", "in": "query", "schema": { "type": "integer" } },
+          { "name": "max_score", "in": "query", "schema": { "type": "integer" } },
+          { "name": "category", "in": "query", "schema": { "$ref": "#/components/schemas/VendorCategory" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vendor list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "type": "array", "items": { "$ref": "#/components/schemas/Vendor" } },
+                    "pagination": { "$ref": "#/components/schemas/Pagination" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Vendors"],
+        "summary": "Add vendor to monitoring",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "category"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "website": { "type": "string", "format": "uri" },
+                  "category": { "$ref": "#/components/schemas/VendorCategory" },
+                  "api_endpoint": { "type": "string", "format": "uri" },
+                  "notes": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Vendor added", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Vendor" } } } },
+          "400": { "description": "Validation error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
+    "/vendors/{vendor_id}": {
+      "get": {
+        "tags": ["Vendors"],
+        "summary": "Get detailed vendor profile",
+        "parameters": [ { "name": "vendor_id", "in": "path", "required": true, "schema": { "type": "string" } } ],
+        "responses": {
+          "200": { "description": "Vendor detail", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Vendor" } } } },
+          "404": { "description": "Not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      },
+      "delete": {
+        "tags": ["Vendors"],
+        "summary": "Remove vendor from monitoring",
+        "parameters": [ { "name": "vendor_id", "in": "path", "required": true, "schema": { "type": "string" } } ],
+        "responses": {
+          "204": { "description": "Vendor removed" },
+          "404": { "description": "Not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
+    "/vendors/{vendor_id}/score-history": {
+      "get": {
+        "tags": ["Vendors"],
+        "summary": "Get vendor score history",
+        "parameters": [
+          { "name": "vendor_id", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "days", "in": "query", "schema": { "type": "integer", "default": 30, "maximum": 365 } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Score history",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "vendor_id": { "type": "string" },
+                    "history": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "date": { "type": "string", "format": "date" },
+                          "score": { "$ref": "#/components/schemas/TrustScore" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/vendors/discover": {
+      "post": {
+        "tags": ["Vendors", "Shadow AI"],
+        "summary": "Trigger shadow AI discovery scan",
+        "description": "Initiates a network traffic analysis scan to discover unauthorized AI vendors. Enterprise and Professional plans only.",
+        "responses": {
+          "202": {
+            "description": "Scan initiated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "scan_id": { "type": "string" },
+                    "status": { "type": "string", "example": "running" },
+                    "estimated_completion": { "type": "string", "format": "date-time" }
+                  }
+                }
+              }
+            }
+          },
+          "403": { "description": "Plan does not include shadow AI detection", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
+    "/policies": {
+      "get": {
+        "tags": ["Policies"],
+        "summary": "List automated policies",
+        "responses": {
+          "200": {
+            "description": "Policy list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "type": "array", "items": { "$ref": "#/components/schemas/Policy" } }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Policies"],
+        "summary": "Create automated policy",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "condition", "action"],
+                "properties": {
+                  "name": { "type": "string", "example": "Block Low-Score Vendors from Customer Data" },
+                  "description": { "type": "string" },
+                  "condition": {
+                    "type": "object",
+                    "properties": {
+                      "field": { "type": "string", "example": "trust_score" },
+                      "operator": { "type": "string", "example": "lt" },
+                      "value": { "type": "number", "example": 600 }
+                    }
+                  },
+                  "action": { "type": "string", "example": "restrict_data_access" },
+                  "enabled": { "type": "boolean", "default": true }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Policy created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Policy" } } } }
+        }
+      }
+    },
+    "/policies/{policy_id}": {
+      "put": {
+        "tags": ["Policies"],
+        "summary": "Update policy",
+        "parameters": [ { "name": "policy_id", "in": "path", "required": true, "schema": { "type": "string" } } ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Policy" } } }
+        },
+        "responses": {
+          "200": { "description": "Policy updated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Policy" } } } }
+        }
+      },
+      "delete": {
+        "tags": ["Policies"],
+        "summary": "Delete policy",
+        "parameters": [ { "name": "policy_id", "in": "path", "required": true, "schema": { "type": "string" } } ],
+        "responses": { "204": { "description": "Policy deleted" } }
+      }
+    },
+    "/alerts": {
+      "get": {
+        "tags": ["Alerts"],
+        "summary": "List alerts",
+        "parameters": [
+          { "name": "status", "in": "query", "schema": { "type": "string", "enum": ["open", "acknowledged", "resolved"] } },
+          { "name": "severity", "in": "query", "schema": { "$ref": "#/components/schemas/AlertSeverity" } },
+          { "name": "vendor_id", "in": "query", "schema": { "type": "string" } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 50 } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Alert list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "type": "array", "items": { "$ref": "#/components/schemas/Alert" } },
+                    "pagination": { "$ref": "#/components/schemas/Pagination" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/alerts/{alert_id}/acknowledge": {
+      "post": {
+        "tags": ["Alerts"],
+        "summary": "Acknowledge an alert",
+        "parameters": [ { "name": "alert_id", "in": "path", "required": true, "schema": { "type": "string" } } ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": { "note": { "type": "string" } }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Alert acknowledged", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Alert" } } } }
+        }
+      }
+    },
+    "/reports/vendor-trust": {
+      "get": {
+        "tags": ["Reports"],
+        "summary": "Generate vendor trust report",
+        "description": "Returns a full vendor trust summary suitable for board/CISO reporting.",
+        "parameters": [
+          { "name": "format", "in": "query", "schema": { "type": "string", "enum": ["json", "pdf", "csv"], "default": "json" } },
+          { "name": "period_days", "in": "query", "schema": { "type": "integer", "default": 90 } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Report data or file",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "generated_at": { "type": "string", "format": "date-time" },
+                    "period_days": { "type": "integer" },
+                    "total_vendors": { "type": "integer" },
+                    "score_distribution": {
+                      "type": "object",
+                      "properties": {
+                        "exceptional": { "type": "integer" },
+                        "excellent": { "type": "integer" },
+                        "good": { "type": "integer" },
+                        "fair": { "type": "integer" },
+                        "marginal": { "type": "integer" },
+                        "poor": { "type": "integer" },
+                        "critical": { "type": "integer" }
+                      }
+                    },
+                    "alerts_30d": { "type": "integer" },
+                    "shadow_ai_discovered": { "type": "integer" },
+                    "average_score": { "type": "number" },
+                    "vendors": { "type": "array", "items": { "$ref": "#/components/schemas/Vendor" } }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/webhooks": {
+      "get": {
+        "tags": ["Webhooks"],
+        "summary": "List webhooks",
+        "responses": {
+          "200": {
+            "description": "Webhook list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "data": { "type": "array", "items": { "$ref": "#/components/schemas/Webhook" } } }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Webhooks"],
+        "summary": "Register webhook endpoint",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["url", "events"],
+                "properties": {
+                  "url": { "type": "string", "format": "uri" },
+                  "events": {
+                    "type": "array",
+                    "items": { "type": "string", "enum": ["score.updated", "score.dropped", "alert.created", "vendor.blocked", "shadow_ai.detected"] }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Webhook registered", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Webhook" } } } }
+        }
+      }
+    },
+    "/webhooks/{webhook_id}": {
+      "put": {
+        "tags": ["Webhooks"],
+        "summary": "Update webhook",
+        "parameters": [ { "name": "webhook_id", "in": "path", "required": true, "schema": { "type": "string" } } ],
+        "requestBody": {
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Webhook" } } }
+        },
+        "responses": {
+          "200": { "description": "Webhook updated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Webhook" } } } }
+        }
+      },
+      "delete": {
+        "tags": ["Webhooks"],
+        "summary": "Delete webhook",
+        "parameters": [ { "name": "webhook_id", "in": "path", "required": true, "schema": { "type": "string" } } ],
+        "responses": { "204": { "description": "Webhook deleted" } }
+      }
+    }
+  },
+  "tags": [
+    { "name": "Authentication", "description": "OAuth 2.0 token management" },
+    { "name": "Vendors", "description": "Vendor monitoring and scoring" },
+    { "name": "Shadow AI", "description": "Unauthorized AI vendor discovery" },
+    { "name": "Policies", "description": "Automated risk policies" },
+    { "name": "Alerts", "description": "Risk alerts and notifications" },
+    { "name": "Reports", "description": "Board and CISO reporting" },
+    { "name": "Webhooks", "description": "Real-time event notifications" }
+  ]
+}

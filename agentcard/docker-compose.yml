@@ -1,0 +1,55 @@
+version: '3.9'
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: agentcard_development
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  web:
+    build: .
+    command: bundle exec rails server -b 0.0.0.0
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/agentcard_development
+      REDIS_URL: redis://redis:6379/0
+      RAILS_ENV: development
+      SECRET_KEY_BASE: development_secret_change_in_production
+      LOCKBOX_MASTER_KEY: 0000000000000000000000000000000000000000000000000000000000000000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - .:/app
+      - bundle_cache:/usr/local/bundle
+
+  sidekiq:
+    build: .
+    command: bundle exec sidekiq -C config/sidekiq.yml
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/agentcard_development
+      REDIS_URL: redis://redis:6379/0
+      RAILS_ENV: development
+      SECRET_KEY_BASE: development_secret_change_in_production
+      LOCKBOX_MASTER_KEY: 0000000000000000000000000000000000000000000000000000000000000000
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - .:/app
+      - bundle_cache:/usr/local/bundle
+
+volumes:
+  postgres_data:
+  bundle_cache:

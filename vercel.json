@@ -1,0 +1,284 @@
+{
+  "rewrites": [
+    {
+      "source": "/:path*",
+      "has": [{"type": "host", "value": "aeo.scriptmasterlabs.com"}],
+      "destination": "/aeo.html"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/aeo",
+      "destination": "/aeo.html",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "scriptmasterlabs.com"
+        }
+      ],
+      "destination": "https://www.scriptmasterlabs.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/agentswarm-seo",
+      "destination": "/agentswarm-seo.html",
+      "permanent": true
+    },
+    {
+      "source": "/slack",
+      "destination": "/slack.html",
+      "permanent": true
+    },
+    {
+      "source": "/privacy",
+      "destination": "/privacy.html",
+      "permanent": true
+    },
+    {
+      "source": "/terms",
+      "destination": "/terms.html",
+      "permanent": true
+    },
+    {
+      "source": "/trustverify",
+      "destination": "/trustverify.html",
+      "permanent": true
+    },
+    {
+      "source": "/stack",
+      "destination": "/stack.html",
+      "permanent": true
+    },
+    {
+      "source": "/affiliate",
+      "destination": "/affiliate.html",
+      "permanent": true
+    },
+    {
+      "source": "/stack/nexus-402",
+      "destination": "https://neuralosagent.com/",
+      "permanent": false
+    },
+    {
+      "source": "/stack/nexus402",
+      "destination": "https://neuralosagent.com/",
+      "permanent": false
+    },
+    {
+      "source": "/stack/proof402",
+      "destination": "https://four02proof.onrender.com/",
+      "permanent": false
+    },
+    {
+      "source": "/stack/402proof",
+      "destination": "https://four02proof.onrender.com/",
+      "permanent": false
+    },
+    {
+      "source": "/stack/squeezeos",
+      "destination": "https://squeezeos-api.onrender.com/health",
+      "permanent": false
+    },
+    {
+      "source": "/stack/ghost",
+      "destination": "/stack.html",
+      "permanent": false
+    },
+    {
+      "source": "/stack/zeroquery",
+      "destination": "/stack.html",
+      "permanent": false
+    },
+    {
+      "source": "/stack/xahpay",
+      "destination": "/stack.html",
+      "permanent": false
+    },
+    {
+      "source": "/stack/xah_portal",
+      "destination": "/stack.html",
+      "permanent": false
+    },
+    {
+      "source": "/store",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/apps/exo-brain",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/neurospark",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/enoch-adhd",
+      "destination": "/books.html",
+      "permanent": true
+    },
+    {
+      "source": "/NeuroStack",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/MasterSheets",
+      "destination": "/smlsheets.html",
+      "permanent": true
+    },
+    {
+      "source": "/apps/fee-forge",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/trading-indicators",
+      "destination": "/indicators.html",
+      "permanent": true
+    },
+    {
+      "source": "/books/book-of-enoch",
+      "destination": "/books.html",
+      "permanent": true
+    },
+    {
+      "source": "/mastersheets.html",
+      "destination": "/smlsheets.html",
+      "permanent": true
+    },
+    {
+      "source": "/mastersheets",
+      "destination": "/smlsheets.html",
+      "permanent": true
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=(), payment=()"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=63072000; includeSubDomains; preload"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://pagead2.googlesyndication.com https://www.google-analytics.com https://googleads.g.doubleclick.net https://analytics.ahrefs.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https: blob:; connect-src 'self' https://mcp-x402.onrender.com https://squeezeos-api.onrender.com https://sml-nlweb.onrender.com https://scriptmaster-vending-router.onrender.com https://www.google-analytics.com https://analytics.google.com https://stats.g.doubleclick.net https://pagead2.googlesyndication.com https://analytics.ahrefs.com; frame-src https://googleads.g.doubleclick.net https://tpc.googlesyndication.com; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self' mailto:"
+        }
+      ]
+    },
+    {
+      "source": "/agents.json",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600"
+        }
+      ]
+    },
+    {
+      "source": "/ai/summary.json",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600"
+        }
+      ]
+    },
+    {
+      "source": "/ai/faq.json",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600"
+        }
+      ]
+    },
+    {
+      "source": "/sitemap.xml",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/xml"
+        }
+      ]
+    },
+    {
+      "source": "/.well-known/security.txt",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/plain; charset=utf-8"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400"
+        }
+      ]
+    },
+    {
+      "source": "/.well-known/ai.txt",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/plain; charset=utf-8"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600"
+        }
+      ]
+    }
+  ],
+  "git": {
+    "deploymentEnabled": {
+      "main": true
+    }
+  },
+  "cleanUrls": false,
+  "trailingSlash": false,
+  "framework": null,
+  "outputDirectory": ".",
+  "alias": [
+    "scriptmasterlabs.com",
+    "www.scriptmasterlabs.com"
+  ]
+}

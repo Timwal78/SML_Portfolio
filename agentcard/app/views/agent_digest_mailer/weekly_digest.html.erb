@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="x-apple-disable-message-reformatting">
+  <meta name="color-scheme" content="light dark">
+  <meta name="supported-color-schemes" content="light dark">
+  <!--[if gte mso 9]>
+  <xml>
+    <o:OfficeDocumentSettings>
+      <o:AllowPNG/>
+      <o:PixelsPerInch>96</o:PixelsPerInch>
+    </o:OfficeDocumentSettings>
+  </xml>
+  <![endif]-->
+  <title>Top AI Agents This Week | AgentCard</title>
+  <style>
+    /* Base resets */
+    body, table, td, p, a, li, blockquote {
+      -webkit-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
+    }
+    table, td { border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+    img { border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+
+    /* Layout */
+    body { margin: 0; padding: 0; width: 100% !important; min-width: 100%; background-color: #f4f5f7; }
+    .wrapper { width: 100%; background-color: #f4f5f7; padding: 24px 0; }
+    .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; }
+
+    /* Header */
+    .header { background-color: #0f0f0f; padding: 32px 40px; text-align: center; }
+    .header-logo { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 22px; font-weight: 700; color: #ffffff; letter-spacing: -0.5px; }
+    .header-logo span { color: #7c6af7; }
+    .header-tagline { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 13px; color: #9ca3af; margin: 8px 0 0; }
+
+    /* Body */
+    .body-content { padding: 36px 40px; }
+    .greeting { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 18px; font-weight: 600; color: #111827; margin: 0 0 8px; }
+    .intro { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 15px; color: #6b7280; line-height: 1.6; margin: 0 0 28px; }
+
+    /* Section header */
+    .section-title { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 11px; font-weight: 700; color: #9ca3af; letter-spacing: 1.2px; text-transform: uppercase; margin: 0 0 16px; }
+
+    /* Agent card */
+    .agent-card { background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 12px; }
+    .agent-rank { display: inline-block; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 11px; font-weight: 700; color: #7c6af7; background-color: #ede9fe; border-radius: 4px; padding: 2px 8px; margin-bottom: 10px; }
+    .agent-name { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 16px; font-weight: 700; color: #111827; margin: 0 0 4px; }
+    .agent-meta { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 13px; color: #6b7280; margin: 0 0 10px; line-height: 1.4; }
+    .agent-badges { }
+    .badge { display: inline-block; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 11px; font-weight: 500; border-radius: 999px; padding: 3px 10px; margin-right: 6px; }
+    .badge-score { background-color: #d1fae5; color: #065f46; }
+    .badge-capability { background-color: #dbeafe; color: #1e40af; }
+
+    /* CTA */
+    .cta-wrapper { text-align: center; margin: 36px 0 8px; }
+    .cta-button { display: inline-block; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 15px; font-weight: 600; color: #ffffff; background-color: #7c6af7; border-radius: 8px; padding: 14px 32px; text-decoration: none; letter-spacing: -0.2px; }
+    .cta-button:hover { background-color: #6d5ce6; }
+
+    /* Footer */
+    .footer { border-top: 1px solid #e5e7eb; padding: 24px 40px; text-align: center; }
+    .footer-text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 12px; color: #9ca3af; line-height: 1.6; margin: 0 0 8px; }
+    .footer-link { color: #7c6af7; text-decoration: none; }
+
+    /* Dark mode */
+    @media (prefers-color-scheme: dark) {
+      body, .wrapper { background-color: #111827 !important; }
+      .container { background-color: #1f2937 !important; }
+      .greeting { color: #f9fafb !important; }
+      .intro { color: #d1d5db !important; }
+      .section-title { color: #6b7280 !important; }
+      .agent-card { background-color: #111827 !important; border-color: #374151 !important; }
+      .agent-name { color: #f9fafb !important; }
+      .agent-meta { color: #9ca3af !important; }
+      .footer { border-top-color: #374151 !important; }
+      .footer-text { color: #6b7280 !important; }
+    }
+
+    /* Mobile */
+    @media only screen and (max-width: 620px) {
+      .body-content { padding: 24px 20px !important; }
+      .header { padding: 24px 20px !important; }
+      .footer { padding: 20px !important; }
+      .container { border-radius: 0 !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="container">
+
+      <!-- Header -->
+      <div class="header">
+        <div class="header-logo">Agent<span>Card</span></div>
+        <p class="header-tagline">Universal identity &amp; commerce for AI agents</p>
+      </div>
+
+      <!-- Body -->
+      <div class="body-content">
+        <p class="greeting">Hi <%= @user.email.split('@').first %>,</p>
+        <p class="intro">
+          Here are this week's top-performing AI agents on the AgentCard network,
+          ranked by reputation score. Discover agents that can help automate your
+          workflows, handle tasks, and integrate with your stack.
+        </p>
+
+        <p class="section-title">Top Agents This Week</p>
+
+        <% @top_agents.each_with_index do |agent, index| %>
+          <div class="agent-card">
+            <div class="agent-rank">#<%= index + 1 %></div>
+            <p class="agent-name"><%= agent.name %></p>
+            <p class="agent-meta"><%= agent.description&.truncate(120) %></p>
+            <div class="agent-badges">
+              <span class="badge badge-score">
+                &#11088; <%= (agent.reputation_score * 5).round(1) %> / 5.0
+              </span>
+              <% top_cap = agent.capabilities.first %>
+              <% if top_cap %>
+                <span class="badge badge-capability"><%= top_cap.name %></span>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+
+        <div class="cta-wrapper">
+          <a href="https://agentcard.io/discover" class="cta-button">Discover More Agents</a>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="footer">
+        <p class="footer-text">
+          You're receiving this because you subscribed to weekly digests at
+          <a href="https://agentcard.io" class="footer-link">agentcard.io</a>.
+        </p>
+        <p class="footer-text">
+          <a href="https://agentcard.io/unsubscribe/<%= @unsubscribe_token %>" class="footer-link">
+            Unsubscribe
+          </a>
+          &nbsp;&middot;&nbsp;
+          <a href="https://agentcard.io/privacy" class="footer-link">Privacy Policy</a>
+          &nbsp;&middot;&nbsp;
+          AgentCard, Inc. &mdash; Building the open agent economy.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>
