@@ -2104,7 +2104,6 @@ async function runSSE(): Promise<void> {
         { name: 'state', in: 'query', required: false, schema: { type: 'string' }, description: '2-letter state code.' },
         { name: 'set_aside', in: 'query', required: false, schema: { type: 'string', enum: ['SDVOSB', 'WOSB', 'SDB', 'MINORITY'], default: 'SDVOSB' } },
         { name: 'rows', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 25, default: 10 } },
-        { name: 'X-Sam-Key', in: 'header', required: false, schema: { type: 'string' }, description: 'BYOK: your own SAM.gov API key, takes priority over the server default.' },
       ],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.08', amountUnits: '80000', payTo: X402_PAY_TO, settlement: 'onchain-tx', paymentHeader: 'X-PAYMENT-TX' },
       responses: { '200': { description: 'Matching firms' }, '402': { description: 'Payment required — pay USDC then retry with X-PAYMENT-TX.' } },
@@ -2178,7 +2177,7 @@ async function runSSE(): Promise<void> {
       operationId: 'entityCompliance',
       summary: 'SAM entity compliance bundle: registration + exclusion + set-asides + NAICS.',
       description: 'Full compliance check by UEI or CAGE: active status, expiry, exclusion flag, set-aside certifications, size standard. Pay 0.35 USDC on Base.',
-      parameters: [{ name: 'uei', in: 'query', required: false, schema: { type: 'string' }, description: 'SAM UEI (preferred).', example: 'JF19MPF74LN7' }, { name: 'cage', in: 'query', required: false, schema: { type: 'string' }, description: 'CAGE code (alternative).' }, { name: 'X-Sam-Key', in: 'header', required: false, schema: { type: 'string' }, description: 'BYOK: your own SAM.gov API key, takes priority over the server default.' }],
+      parameters: [{ name: 'uei', in: 'query', required: false, schema: { type: 'string' }, description: 'SAM UEI (preferred).', example: 'JF19MPF74LN7' }, { name: 'cage', in: 'query', required: false, schema: { type: 'string' }, description: 'CAGE code (alternative).' }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.35', amountUnits: '350000', payTo: X402_PAY_TO },
       responses: { '200': { description: 'Compliance report', content: { 'application/json': { schema: { type: 'object' } } } }, '402': { description: 'Payment required.' } },
     } }, '/x402/agent-score': { get: {
@@ -2269,7 +2268,7 @@ async function runSSE(): Promise<void> {
       operationId: 'fecFinance',
       summary: 'FEC campaign finance — candidates, committees, and contribution totals.',
       description: 'Search FEC open data for political candidates or committees by name. Returns receipts, disbursements, party, and election cycle data. Pay 0.10 USDC on Base.',
-      parameters: [{ name: 'name', in: 'query', required: false, schema: { type: 'string' }, example: 'Biden' }, { name: 'committee', in: 'query', required: false, schema: { type: 'string' } }, { name: 'cycle', in: 'query', required: false, schema: { type: 'string' }, example: '2024' }, { name: 'X-Fec-Key', in: 'header', required: false, schema: { type: 'string' }, description: 'BYOK: your own FEC API key, takes priority over the server default (falls back to the public DEMO_KEY if neither is set).' }],
+      parameters: [{ name: 'name', in: 'query', required: false, schema: { type: 'string' }, example: 'Biden' }, { name: 'committee', in: 'query', required: false, schema: { type: 'string' } }, { name: 'cycle', in: 'query', required: false, schema: { type: 'string' }, example: '2024' }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.10', amountUnits: '100000', payTo: X402_PAY_TO },
       responses: { '200': { description: 'FEC campaign finance data' }, '402': { description: 'Payment required.' } },
     } }, '/x402/epa-violations': { get: {
@@ -2290,7 +2289,7 @@ async function runSSE(): Promise<void> {
       operationId: 'congressBills',
       summary: 'Congress.gov bill search — legislation by keyword and congress number.',
       description: 'Search bills by keyword for any Congress session. Returns bill number, title, latest action, sponsor, and Congress.gov URL. Requires CONGRESS_API_KEY (free at api.congress.gov). Pay 0.08 USDC on Base.',
-      parameters: [{ name: 'query', in: 'query', required: true, schema: { type: 'string' }, example: 'artificial intelligence' }, { name: 'congress', in: 'query', required: false, schema: { type: 'string', default: '119' }, example: '119' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 20, default: 10 } }, { name: 'X-Congress-Key', in: 'header', required: false, schema: { type: 'string' }, description: 'BYOK: your own Congress.gov API key, takes priority over the server default.' }],
+      parameters: [{ name: 'query', in: 'query', required: true, schema: { type: 'string' }, example: 'artificial intelligence' }, { name: 'congress', in: 'query', required: false, schema: { type: 'string', default: '119' }, example: '119' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: 20, default: 10 } }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.08', amountUnits: '80000', payTo: X402_PAY_TO },
       responses: { '200': { description: 'Congressional bills' }, '402': { description: 'Payment required.' }, '503': { description: 'CONGRESS_API_KEY not configured on this server.' } },
     } }, '/x402/fda-warnings': { get: {
@@ -2412,9 +2411,6 @@ async function runSSE(): Promise<void> {
       parameters: [
         { name: 'tickers', in: 'query', required: false, schema: { type: 'string' }, description: 'Comma-separated tickers, up to 20. Defaults to AMC/GME/IWM plus real dynamically-discovered top movers.', example: 'AAPL,MSFT,NVDA' },
         { name: 'timeframe', in: 'query', required: false, schema: { type: 'string', enum: ['1h', '1d'], default: '1h' } },
-        { name: 'X-Polygon-Key', in: 'header', required: false, schema: { type: 'string' }, description: 'BYOK: your own Polygon.io API key, takes priority over the server default.' },
-        { name: 'X-Alpaca-Key', in: 'header', required: false, schema: { type: 'string' }, description: 'BYOK: your own Alpaca API key ID, paired with X-Alpaca-Secret.' },
-        { name: 'X-Alpaca-Secret', in: 'header', required: false, schema: { type: 'string' }, description: 'BYOK: your own Alpaca API secret, paired with X-Alpaca-Key.' },
       ],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.10', amountUnits: '100000', payTo: X402_PAY_TO, settlement: 'onchain-tx', paymentHeader: 'X-PAYMENT-TX' },
       responses: { '200': { description: 'RSI heatmap + swarm verdict' }, '402': { description: 'Payment required — pay USDC then retry with X-PAYMENT-TX.' } },
@@ -2426,7 +2422,6 @@ async function runSSE(): Promise<void> {
         { name: 'underlying', in: 'query', required: false, schema: { type: 'string' }, description: 'Underlying ticker. Defaults to AMC.', example: 'AMC' },
         { name: 'expiration_date', in: 'query', required: false, schema: { type: 'string' }, description: 'YYYY-MM-DD. Defaults to nearest available.' },
         { name: 'option_type', in: 'query', required: false, schema: { type: 'string', enum: ['call', 'put'], default: 'call' } },
-        { name: 'X-Polygon-Key', in: 'header', required: false, schema: { type: 'string' }, description: 'BYOK: your own Polygon.io API key, takes priority over the server default.' },
       ],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.15', amountUnits: '150000', payTo: X402_PAY_TO, settlement: 'onchain-tx', paymentHeader: 'X-PAYMENT-TX' },
       responses: { '200': { description: 'Options Delta heatmap + swarm verdict' }, '402': { description: 'Payment required — pay USDC then retry with X-PAYMENT-TX.' } },
@@ -2449,14 +2444,13 @@ async function runSSE(): Promise<void> {
       operationId: 'cryptoTokenPrice',
       summary: 'Real-time token price, market cap, and 24h volume/change.',
       description: 'CoinGecko simple price. Pay 0.01 USDC on Base.',
-      parameters: [{ name: 'ids', in: 'query', required: true, schema: { type: 'string' }, description: 'Comma-separated CoinGecko coin IDs, e.g. "bitcoin,ethereum,ripple".', example: 'bitcoin,ethereum' }, { name: 'vs_currencies', in: 'query', required: false, schema: { type: 'string', default: 'usd' } }, { name: 'include_market_cap', in: 'query', required: false, schema: { type: 'boolean' } }, { name: 'include_24hr_vol', in: 'query', required: false, schema: { type: 'boolean' } }, { name: 'include_24hr_change', in: 'query', required: false, schema: { type: 'boolean' } }, { name: 'X-Coingecko-Key', in: 'header', required: false, schema: { type: 'string' }, description: 'BYOK: your own CoinGecko Demo API key, takes priority over the server default.' }],
+      parameters: [{ name: 'ids', in: 'query', required: true, schema: { type: 'string' }, description: 'Comma-separated CoinGecko coin IDs, e.g. "bitcoin,ethereum,ripple".', example: 'bitcoin,ethereum' }, { name: 'vs_currencies', in: 'query', required: false, schema: { type: 'string', default: 'usd' } }, { name: 'include_market_cap', in: 'query', required: false, schema: { type: 'boolean' } }, { name: 'include_24hr_vol', in: 'query', required: false, schema: { type: 'boolean' } }, { name: 'include_24hr_change', in: 'query', required: false, schema: { type: 'boolean' } }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.01', amountUnits: '10000', payTo: X402_PAY_TO },
       responses: { '200': { description: 'Token price data' }, '402': { description: 'Payment required.' } },
     } }, '/x402/crypto-trending': { get: {
       operationId: 'cryptoTrending',
       summary: 'Top trending coins, NFTs, and categories in the last 24h.',
       description: 'CoinGecko trending search. Top 15 coins, 7 NFTs, 6 categories by user search activity. Pay 0.01 USDC on Base.',
-      parameters: [{ name: 'X-Coingecko-Key', in: 'header', required: false, schema: { type: 'string' }, description: 'BYOK: your own CoinGecko Demo API key, takes priority over the server default.' }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'base', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.01', amountUnits: '10000', payTo: X402_PAY_TO },
       responses: { '200': { description: 'Trending coins/NFTs/categories' }, '402': { description: 'Payment required.' } },
     } }, '/x402/fx-rate': { get: {
