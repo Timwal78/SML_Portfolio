@@ -160,6 +160,12 @@ Auto-selects the cheapest/fastest chain. No configuration needed.
 - Rate limit: 100 req/min per tool, 1000 req/day per wallet
 - Zod validation on all inputs
 
+## Discovery
+
+- A2A Agent Card: https://mcp-x402.onrender.com/.well-known/agent.json — spec-shaped (Google/Linux Foundation A2A) capability card, generated live from the same OpenAPI+x402 document below. Every skill lists its real REST endpoint, method, and x402 price.
+- OpenAPI + x402 document: https://mcp-x402.onrender.com/.well-known/x402 — full machine-readable route/param/price list that x402scan and the agent card both read from.
+- Agent identity card: https://mcp-x402.onrender.com/.well-known/agentcard.json — Ed25519 agent identity (mint/lookup/verify), separate concept from the A2A capability card above.
+
 ## Links
 
 - npm: https://www.npmjs.com/package/@scriptmasterlabs/mcp-x402
