@@ -2483,6 +2483,100 @@ async function runSSE(): Promise<void> {
   app.get('/openapi.json', (_req, res) => { res.set('Access-Control-Allow-Origin', '*').json(OPENAPI_DOC); });
   app.get('/x402/.well-known/x402', (_req, res) => { res.set('Access-Control-Allow-Origin', '*').json(OPENAPI_DOC); });
   app.get('/x402/openapi.json', (_req, res) => { res.set('Access-Control-Allow-Origin', '*').json(OPENAPI_DOC); });
+
+  // ── A2A Protocol Agent Card (/.well-known/agent.json) ─────────────────────
+  // Spec: A2A Protocol (Google/Linux Foundation) agent-card shape. Generated
+  // live from OPENAPI_DOC.paths — the exact same object /.well-known/x402
+  // already serves to x402scan/Bazaar — so this card can never list a skill
+  // or price that isn't real, and never drifts from it (one source, not two).
+  // preferredTransport is HTTP+JSON, not JSONRPC: this server has no separate
+  // A2A task-lifecycle endpoint (message/send, tasks/get), so the card does
+  // not claim one. Each skill's x-endpoint is the real, callable REST route —
+  // invoke it directly and pay via X-PAYMENT / X-PAYMENT-TX per its x-price,
+  // exactly as /.well-known/x402 already documents.
+  type OpenApiOp = {
+    operationId?: string;
+    summary?: string;
+    description?: string;
+    parameters?: unknown[];
+    'x-payment-info'?: Record<string, unknown>;
+  };
+  const buildA2ASkills = (baseUrl: string): Array<Record<string, unknown>> => {
+    const skills: Array<Record<string, unknown>> = [];
+    for (const [route, pathItem] of Object.entries(OPENAPI_DOC.paths) as Array<
+      [string, Record<string, OpenApiOp>]
+    >) {
+      for (const method of ['get', 'post'] as const) {
+        const op = pathItem[method];
+        if (!op?.operationId) continue;
+        const pi = op['x-payment-info'];
+        skills.push({
+          id: op.operationId,
+          name: String(op.summary ?? op.operationId).replace(/\.$/, ''),
+          description: op.description ?? op.summary ?? '',
+          tags: [method, pi ? 'paid' : 'free', 'x402'],
+          inputModes: ['application/json'],
+          outputModes: ['application/json'],
+          'x-endpoint': `${baseUrl}${route}`,
+          'x-method': method.toUpperCase(),
+          ...(Array.isArray(op.parameters) ? { 'x-parameters': op.parameters } : {}),
+          'x-price': pi
+            ? {
+                amount: `$${pi['amount']}`,
+                maxAmountRequired: pi['amountUnits'],
+                asset: pi['asset'],
+                network: pi['network'],
+                payTo: pi['payTo'],
+                scheme: pi['scheme'] ?? 'exact',
+              }
+            : { amount: '$0.00', scheme: 'free' },
+        });
+      }
+    }
+    return skills;
+  };
+  app.get('/.well-known/agent.json', (req, res) => {
+    const baseUrl = `https://${req.headers.host ?? 'mcp-x402.onrender.com'}`;
+    const skills = buildA2ASkills(baseUrl);
+    const paidCount = skills.filter((s) => (s['tags'] as string[]).includes('paid')).length;
+    res
+      .set('Access-Control-Allow-Origin', '*')
+      .set('Cache-Control', 'public, max-age=300')
+      .json({
+        protocolVersion: '0.3.0',
+        name: 'ScriptMasterLabs mcp-x402 Data Node',
+        description:
+          `Self-monetizing execution node exposing ${skills.length} capabilities (${paidCount} paid via x402, ` +
+          `${skills.length - paidCount} free) — federal grants/contracts, SEC filings, FDA/clinical data, market ` +
+          'intelligence, crypto/FX rates, and agent reputation scoring. Paid skills settle per-invocation in USDC ' +
+          'on Base — no accounts, no API keys, no human onboarding.',
+        url: baseUrl,
+        preferredTransport: 'HTTP+JSON',
+        provider: { organization: 'Script Master Labs LLC', url: 'https://www.scriptmasterlabs.com' },
+        version: VERSION,
+        documentationUrl: `${baseUrl}/llms.txt`,
+        capabilities: {
+          streaming: false,
+          pushNotifications: false,
+          stateTransitionHistory: false,
+          extensions: [
+            {
+              uri: 'https://github.com/coinbase/x402',
+              description:
+                'Paid skills are gated by HTTP 402. Call a skill\'s x-endpoint directly; an unpaid call returns ' +
+                'the x402 "accepts" challenge (see /.well-known/x402 for the full OpenAPI+x402 document this card ' +
+                'is generated from). Retry with X-PAYMENT (standard, facilitator-settled) or X-PAYMENT-TX ' +
+                '(sovereign, on-chain tx hash) per the skill\'s x-price.',
+              required: false,
+            },
+          ],
+        },
+        defaultInputModes: ['application/json'],
+        defaultOutputModes: ['application/json'],
+        skills,
+      });
+  });
+
   app.get('/favicon.ico', (_req, res) => {
     res.set('Content-Type', 'image/x-icon').set('Cache-Control', 'public, max-age=86400').send(FAVICON_ICO);
   });
@@ -2544,6 +2638,8 @@ async function runSSE(): Promise<void> {
         sse_messages: 'POST /messages',
         health: 'GET /health',
         agentCard: 'GET /.well-known/agentcard.json',
+        a2aAgentCard: 'GET /.well-known/agent.json',
+        openApiX402: 'GET /.well-known/x402',
         llms: 'GET /llms.txt',
       },
       links: {
