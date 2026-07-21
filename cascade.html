@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CASCADE ACCUMULATOR — ScriptMaster Labs</title>
+<meta name="description" content="Institutional systematic position-building engine. Real 5-year backtest: +138.6% NVDA, +140.6% PLTR, 86.6% win rate on SPY.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "name": "CASCADE ACCUMULATOR",
+      "url": "https://www.scriptmasterlabs.com/cascade",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Web, API, MCP",
+      "description": "Institutional systematic position-building engine. Generates ENTER, ADD, EXIT, and STOP directives from a 5-layer EMA ribbon. Real 5-year backtest across 10 symbols.",
+      "offers": [
+        {"@type": "Offer", "name": "Monthly Subscription", "price": "149", "priceCurrency": "USD", "url": "https://squeezeos-api.onrender.com/api/cascade/stripe/checkout"},
+        {"@type": "Offer", "name": "AI Agent (x402)", "price": "0.25", "priceCurrency": "RLUSD", "url": "https://four02proof.onrender.com/v1/invoice"}
+      ],
+      "provider": {
+        "@type": "Organization",
+        "name": "ScriptMaster Labs",
+        "url": "https://www.scriptmasterlabs.com"
+      }
+    },
+    {
+      "@type": "Dataset",
+      "name": "CASCADE ACCUMULATOR 5-Year Backtest",
+      "description": "Real split-adjusted daily OHLCV backtest, 2021-07 to 2026-07, 10 symbols, next-bar entries, no lookahead, no synthetic data.",
+      "url": "https://github.com/timwal78/squeezeos/blob/main/docs/ENGINE_SCOREBOARD_2026-07-17.md",
+      "creator": {"@type": "Organization", "name": "ScriptMaster Labs"}
+    }
+  ]
+}
+</script>
+<style>
+  :root {
+    --bg: #050505;
+    --surface: rgba(20,20,20,0.65);
+    --border: rgba(255,255,255,0.10);
+    --accent: #00FF88;
+    --accent-glow: rgba(0,255,136,0.35);
+    --red: #FF4444;
+    --text: #FFFFFF;
+    --text-dim: #8A8A8A;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    background-image: radial-gradient(circle at 50% 0%, rgba(0,255,136,0.06) 0%, transparent 55%);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 60px 24px 100px; }
+  header { text-align: center; margin-bottom: 50px; }
+  .badge {
+    display: inline-block; color: var(--accent); font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem; letter-spacing: 3px; text-transform: uppercase;
+    border: 1px solid rgba(0,255,136,0.35); border-radius: 999px; padding: 6px 16px;
+    margin-bottom: 24px;
+  }
+  h1 {
+    font-size: clamp(2.4rem, 6vw, 4rem); font-weight: 800; margin: 0 0 12px;
+    letter-spacing: -1.5px; line-height: 1.05;
+    background: linear-gradient(to bottom, #fff, #999);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .tagline { font-size: 1.15rem; color: var(--text-dim); max-width: 640px; margin: 0 auto; }
+  .tagline b { color: var(--accent); font-weight: 600; }
+
+  .stats-row {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(140px,1fr));
+    gap: 14px; margin: 44px 0;
+  }
+  .stat {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 22px 16px; text-align: center; backdrop-filter: blur(8px);
+  }
+  .stat .num { font-family: 'JetBrains Mono', monospace; font-size: 1.9rem; font-weight: 700; color: var(--accent); }
+  .stat .lbl { font-size: 0.8rem; color: var(--text-dim); margin-top: 6px; letter-spacing: 0.5px; }
+
+  section { margin: 56px 0; }
+  h2 {
+    font-size: 1.5rem; font-weight: 700; margin-bottom: 18px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  h2::before { content: ''; width: 4px; height: 22px; background: var(--accent); border-radius: 2px; display: inline-block; }
+
+  table { width: 100%; border-collapse: collapse; font-family: 'JetBrains Mono', monospace; font-size: 0.92rem; }
+  th, td { padding: 12px 10px; text-align: right; border-bottom: 1px solid var(--border); }
+  th:first-child, td:first-child { text-align: left; }
+  th { color: var(--text-dim); font-weight: 500; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1px; }
+  td.pos { color: var(--accent); font-weight: 700; }
+  tr:last-child td { border-bottom: none; }
+
+  .callout {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 20px 22px; font-size: 0.95rem; color: var(--text-dim); line-height: 1.6;
+  }
+  .callout b { color: var(--text); }
+
+  .disclaimer {
+    font-size: 0.78rem; color: #666; line-height: 1.6; border-top: 1px solid var(--border);
+    padding-top: 20px; margin-top: 20px;
+  }
+
+  .pricing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 640px) { .pricing-grid { grid-template-columns: 1fr; } }
+  .price-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+    padding: 32px 26px; position: relative; overflow: hidden;
+  }
+  .price-card.primary { border-color: rgba(0,255,136,0.4); box-shadow: 0 0 40px rgba(0,255,136,0.06); }
+  .price-card h3 { margin: 0 0 4px; font-size: 1.1rem; color: var(--text-dim); font-weight: 500; }
+  .price { font-family: 'JetBrains Mono', monospace; font-size: 2.4rem; font-weight: 700; margin: 10px 0 6px; }
+  .price span { font-size: 0.95rem; color: var(--text-dim); font-weight: 400; }
+  .price-card ul { list-style: none; padding: 0; margin: 18px 0 26px; color: var(--text-dim); font-size: 0.9rem; }
+  .price-card li { margin-bottom: 9px; padding-left: 20px; position: relative; }
+  .price-card li::before { content: '✓'; color: var(--accent); position: absolute; left: 0; font-weight: 700; }
+
+  .btn {
+    display: block; width: 100%; text-align: center; padding: 15px; border-radius: 10px;
+    font-weight: 700; font-size: 1rem; cursor: pointer; border: none; transition: all 0.2s ease;
+    text-decoration: none; font-family: inherit;
+  }
+  .btn.primary { background: var(--accent); color: #000; }
+  .btn.primary:hover { box-shadow: 0 0 24px var(--accent-glow); transform: translateY(-1px); }
+  .btn.primary:disabled { opacity: 0.6; cursor: wait; }
+  .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  .btn.ghost:hover { border-color: #fff; }
+  #checkout-msg { font-size: 0.82rem; color: var(--text-dim); margin-top: 10px; text-align: center; min-height: 18px; }
+
+  footer { text-align: center; margin-top: 70px; color: var(--text-dim); font-size: 0.85rem; }
+  footer a { color: var(--accent); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="badge">ScriptMaster Labs · Live Product</div>
+    <h1>CASCADE ACCUMULATOR</h1>
+    <p class="tagline">Institutional systematic position-building engine. A 5-layer EMA ribbon decides
+      when to <b>accumulate</b>, <b>pyramid</b>, or <b>get out</b> — measured on
+      <b>5 real years</b> of daily market data, not a promise.</p>
+  </header>
+
+  <div class="stats-row">
+    <div class="stat"><div class="num">+138.6%</div><div class="lbl">NVDA, 5yr</div></div>
+    <div class="stat"><div class="num">+140.6%</div><div class="lbl">PLTR, 5yr</div></div>
+    <div class="stat"><div class="num">86.6%</div><div class="lbl">SPY win rate</div></div>
+    <div class="stat"><div class="num">7 / 10</div><div class="lbl">symbols profitable or protective</div></div>
+  </div>
+
+  <section>
+    <h2>The backtest, in full</h2>
+    <table>
+      <thead><tr><th>Symbol</th><th>Trades</th><th>Win %</th><th>Profit Factor</th><th>Strategy Return</th><th>Buy &amp; Hold</th></tr></thead>
+      <tbody>
+        <tr><td>NVDA</td><td>142</td><td>66.9%</td><td>1.43</td><td class="pos">+138.6%</td><td>+903.4%</td></tr>
+        <tr><td>PLTR</td><td>129</td><td>60.5%</td><td>1.41</td><td class="pos">+140.6%</td><td>+435.5%</td></tr>
+        <tr><td>SPY</td><td>82</td><td>86.6%</td><td>1.66</td><td class="pos">+30.2%</td><td>+72.7%</td></tr>
+        <tr><td>QQQ</td><td>76</td><td>78.9%</td><td>1.42</td><td class="pos">+25.7%</td><td>+96.1%</td></tr>
+        <tr><td>IWM</td><td>52</td><td>78.8%</td><td>1.37</td><td class="pos">+18.0%</td><td>+27.1%</td></tr>
+        <tr><td>TSLA</td><td>52</td><td>59.6%</td><td>1.44</td><td class="pos">+43.7%</td><td>+73.1%</td></tr>
+        <tr><td>HOOD</td><td>111</td><td>58.6%</td><td>1.09</td><td class="pos">+2.4%</td><td>+204.5%</td></tr>
+        <tr><td>AMC</td><td>0</td><td>—</td><td>—</td><td class="pos">0.0% (stayed out)</td><td>−99.4%</td></tr>
+      </tbody>
+    </table>
+    <p class="callout" style="margin-top:18px">
+      <b>What the AMC line means:</b> the engine's anchor filter refused to touch a stock that lost
+      99% of its value over five years — and never traded it once. That's not a gap in the data,
+      that's the risk filter working. We're also showing you every winning line, not cherry-picking one.
+      Two symbols in the full 10-symbol test (GME, MSTR) lost money — full breakdown in the
+      <a href="https://github.com/timwal78/squeezeos/blob/main/docs/ENGINE_SCOREBOARD_2026-07-17.md" style="color:var(--accent)">public methodology doc</a>.
+    </p>
+  </section>
+
+  <section>
+    <h2>Get access</h2>
+    <div class="pricing-grid">
+      <div class="price-card primary">
+        <h3>Monthly Subscription</h3>
+        <div class="price">$149<span>/mo</span></div>
+        <ul>
+          <li>Unlimited ENTER / ADD / EXIT / STOP directives</li>
+          <li>Any symbol, real-time via Tradier</li>
+          <li>Slack command: <code>/cascade [SYMBOL]</code></li>
+          <li>Cancel anytime</li>
+        </ul>
+        <button class="btn primary" id="subscribe-btn" onclick="subscribe()">Subscribe — $149/mo</button>
+        <div id="checkout-msg"></div>
+      </div>
+      <div class="price-card">
+        <h3>AI Agents (x402)</h3>
+        <div class="price">0.25<span> RLUSD / call</span></div>
+        <ul>
+          <li>Pay-per-call on the XRP Ledger</li>
+          <li>No subscription, no API key</li>
+          <li>1-hour signed JWT per payment</li>
+          <li>MCP tool: <code>cascade_accumulator</code></li>
+        </ul>
+        <a class="btn ghost" href="https://four02proof.onrender.com/v1/invoice" target="_blank" rel="noopener">Get an Invoice →</a>
+      </div>
+    </div>
+  </section>
+
+  <p class="disclaimer">
+    Backtested results, not live-traded results. Past performance — including simulated or
+    backtested performance — does not guarantee future results. This is not investment advice;
+    CASCADE ACCUMULATOR provides systematic signals, not a promise of profit. Two of ten tested
+    symbols (GME, MSTR) lost money in this same backtest — the strategy does not win everywhere,
+    and it will not win on every future trade either. Trading involves risk of loss.
+  </p>
+
+  <footer>
+    Powered by <a href="https://squeezeos-api.onrender.com/api/status" target="_blank" rel="noopener">SqueezeOS</a>
+    · <a href="https://squeezeos-api.onrender.com/api/cascade/info" target="_blank" rel="noopener">API docs</a>
+    · ScriptMaster Labs
+  </footer>
+
+</div>
+
+<script>
+async function subscribe() {
+  const btn = document.getElementById('subscribe-btn');
+  const msg = document.getElementById('checkout-msg');
+  btn.disabled = true;
+  btn.textContent = 'Connecting to Stripe…';
+  msg.textContent = '';
+  try {
+    const resp = await fetch('https://squeezeos-api.onrender.com/api/cascade/stripe/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({})
+    });
+    const data = await resp.json();
+    if (data.checkout_url) {
+      window.location.href = data.checkout_url;
+    } else {
+      msg.textContent = data.error || 'Checkout is temporarily unavailable — try again shortly.';
+      btn.disabled = false;
+      btn.textContent = 'Subscribe — $149/mo';
+    }
+  } catch (e) {
+    msg.textContent = 'Could not reach the checkout server — try again shortly.';
+    btn.disabled = false;
+    btn.textContent = 'Subscribe — $149/mo';
+  }
+}
+</script>
+</body>
+</html>
