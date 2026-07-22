@@ -1,6 +1,7 @@
-"""RWA API with x402scan discovery"""
+"""RWA API with x402scan-compatible endpoints"""
 from fastapi import FastAPI, HTTPException, Header, Query
-import httpx, json, logging
+from fastapi.responses import FileResponse
+import httpx, json, logging, os
 from datetime import datetime, timedelta
 from typing import Optional, Dict, List
 from enum import Enum
@@ -9,9 +10,12 @@ import hashlib
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("rwa_api")
 
-app = FastAPI(title="SqueezeOS RWA Intelligence", version="1.0.0")
+app = FastAPI(
+    title="SqueezeOS RWA Intelligence",
+    version="1.0.0",
+    description="x402-gated institutional tokenized asset APIs"
+)
 
-# Asset classes
 class AssetClass(str, Enum):
     TREASURIES = "treasuries"
     REAL_ESTATE = "real_estate"
@@ -47,183 +51,255 @@ class RWAAsset:
             "created_at": self.created_at.isoformat()
         }
 
-# Seed assets
 _assets: Dict[str, RWAAsset] = {}
 _valuation_history: Dict[str, List[Dict]] = {}
 _por_attestations: Dict[str, List[Dict]] = {}
 
 _assets["TUS-AGG-01"] = RWAAsset(
-    asset_id="TUS-AGG-01", asset_class=AssetClass.TREASURIES, isin="US0123456789",
-    description="US Treasury Bond Aggregate (2-10Y ladder)", nav_usd=1_250_000.00,
-    nav_timestamp=datetime.utcnow(), risk_score=15,
-    proof_of_reserves_hash="e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    "TUS-AGG-01", AssetClass.TREASURIES, "US0123456789",
+    "US Treasury Bond Aggregate (2-10Y ladder)", 1_250_000.00,
+    datetime.utcnow(), 15,
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
 )
 _assets["RWA-NYC-COMMERCIAL"] = RWAAsset(
-    asset_id="RWA-NYC-COMMERCIAL", asset_class=AssetClass.REAL_ESTATE, isin="US1234567890",
-    description="Manhattan Commercial Real Estate (Class A Office)", nav_usd=45_500_000.00,
-    nav_timestamp=datetime.utcnow() - timedelta(days=1), risk_score=42,
-    proof_of_reserves_hash="d4d0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b999"
+    "RWA-NYC-COMMERCIAL", AssetClass.REAL_ESTATE, "US1234567890",
+    "Manhattan Commercial Real Estate (Class A Office)", 45_500_000.00,
+    datetime.utcnow() - timedelta(days=1), 42,
+    "d4d0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b999"
 )
 _assets["LCP-POOL-Q3-2026"] = RWAAsset(
-    asset_id="LCP-POOL-Q3-2026", asset_class=AssetClass.PRIVATE_CREDIT, isin="US2345678901",
-    description="Senior Secured Loan Pool (Q3 2026 vintage)", nav_usd=120_000_000.00,
-    nav_timestamp=datetime.utcnow(), risk_score=38,
-    proof_of_reserves_hash="a1a1c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b111"
+    "LCP-POOL-Q3-2026", AssetClass.PRIVATE_CREDIT, "US2345678901",
+    "Senior Secured Loan Pool (Q3 2026 vintage)", 120_000_000.00,
+    datetime.utcnow(), 38,
+    "a1a1c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b111"
 )
 
-PROOF402_TOKEN_SECRET = "your-secret-here"
+PROOF402_TOKEN_SECRET = os.getenv("PROOF402_TOKEN_SECRET", "your-secret-here")
 
 def verify_payment_token(token: str) -> Dict:
-    if not PROOF402_TOKEN_SECRET:
-        raise HTTPException(status_code=503, detail="Payment verification not configured")
+    if not PROOF402_TOKEN_SECRET or PROOF402_TOKEN_SECRET == "your-secret-here":
+        raise HTTPException(status_code=503, detail="x402 not configured")
     try:
         parts = token.rsplit(".", 1)
         if len(parts) != 2:
-            raise ValueError("Invalid token format")
+            raise ValueError("Invalid token")
         encoded, signature = parts
         import hmac
         expected_sig = hmac.new(PROOF402_TOKEN_SECRET.encode(), encoded.encode(), hashlib.sha256).hexdigest()
         if not hmac.compare_digest(signature, expected_sig):
-            raise HTTPException(status_code=401, detail="Invalid payment token")
+            raise HTTPException(status_code=401, detail="Invalid token")
         import base64
         payload = json.loads(base64.b64decode(encoded))
         if payload.get("exp", 0) < datetime.utcnow().timestamp():
-            raise HTTPException(status_code=401, detail="Payment token expired")
+            raise HTTPException(status_code=401, detail="Token expired")
         return payload
     except HTTPException:
         raise
-    except Exception as e:
-        raise HTTPException(status_code=401, detail=f"Token verification failed: {str(e)}")
-
-async def fetch_squeezeos_compliance(isin: str) -> Dict:
-    try:
-        async with httpx.AsyncClient() as client:
-            resp = await client.get(f"https://squeezeos-api.onrender.com/api/preview/{isin}",
-                                   headers={"User-Agent": "RWA-API/1.0"})
-            if resp.status_code == 200:
-                return resp.json()
-    except Exception as e:
-        logger.warning(f"SqueezeOS compliance fetch failed for {isin}: {e}")
-    return {"status": "unavailable"}
+    except:
+        raise HTTPException(status_code=401, detail="Token verification failed")
 
 # ============================================================================
-# DISCOVERY ENDPOINTS (for x402scan)
+# x402scan DISCOVERY
 # ============================================================================
 
-@app.get("/.well-known/x402-registry.json")
-async def x402_registry():
-    """x402scan discovery endpoint"""
+@app.get("/.well-known/x402")
+async def x402_discovery():
+    """x402scan discovery endpoint (required format)"""
     return {
-        "service": "SqueezeOS RWA Intelligence API",
+        "service": "ScriptMasterLabs ACP x402 Data API",
+        "name": "sml-rwa-api",
         "version": "1.0.0",
+        "provider": "Script Master Labs",
         "endpoint": "https://sml-rwa-api.onrender.com",
         "x402_enabled": True,
-        "description": "Institutional tokenized asset intelligence",
-        "pricing": {
-            "tier_0_scout": {"cost_rlusd": 0, "endpoints": ["/assets", "/risk-scores"]},
-            "tier_1_investor": {"cost_rlusd_per_call": 0.15, "endpoints": ["/assets/{id}/valuation"]},
-            "tier_2_institutional": {"cost_rlusd_per_call": 0.20, "endpoints": ["/proof-of-reserves"]}
-        },
+        "settlement": "USDC on Base via x402",
+        "description": "Institutional tokenized RWA intelligence APIs",
+        "pricing_model": "pay-per-call",
+        "endpoints": [
+            {"path": "/x402/rwa-assets", "method": "GET", "cost_usdc": 0.15, "tier": "scout"},
+            {"path": "/x402/rwa-intelligence", "method": "GET", "cost_usdc": 0.20, "tier": "investor"},
+            {"path": "/x402/rwa-valuation", "method": "GET", "cost_usdc": 0.15, "tier": "investor"},
+            {"path": "/x402/rwa-risk", "method": "GET", "cost_usdc": 0.10, "tier": "scout"},
+            {"path": "/x402/rwa-aggregates", "method": "GET", "cost_usdc": 0.25, "tier": "institutional"}
+        ],
         "asset_classes": ["treasuries", "real_estate", "private_credit", "emerging_markets", "commodities", "carbon_credits"],
         "integration": {
             "squeezeos_mcp": True,
-            "mcp_tools": ["rwa_scan", "rwa_valuation", "rwa_proof_of_reserves"],
             "mcp_endpoint": "https://squeezeos-api.onrender.com/mcp"
         },
-        "status": "production"
+        "documentation": "https://sml-rwa-api.onrender.com/openapi.json",
+        "status": "production",
+        "discoverable": True
     }
 
-@app.get("/.well-known/mcp.json")
-async def mcp_discovery():
-    """MCP server discovery"""
+@app.get("/openapi.json")
+async def openapi_spec():
+    """OpenAPI 3.0 spec for x402scan indexing"""
     return {
-        "name": "SqueezeOS RWA Intelligence",
-        "version": "1.0.0",
-        "description": "RWA asset intelligence (exposed via SqueezeOS MCP)",
-        "tools": 3
+        "openapi": "3.0.0",
+        "info": {
+            "title": "ScriptMasterLabs RWA x402 API",
+            "version": "1.0.0",
+            "description": "Institutional tokenized RWA intelligence APIs"
+        },
+        "servers": [{"url": "https://sml-rwa-api.onrender.com"}],
+        "paths": {
+            "/x402/rwa-assets": {
+                "get": {
+                    "summary": "List RWA assets",
+                    "parameters": [
+                        {"name": "X-Payment-Token", "in": "header", "required": False},
+                        {"name": "asset_class", "in": "query", "required": False}
+                    ],
+                    "responses": {"200": {"description": "Asset list"}}
+                }
+            },
+            "/x402/rwa-intelligence": {
+                "get": {
+                    "summary": "RWA intelligence (premium)",
+                    "parameters": [{"name": "X-Payment-Token", "in": "header", "required": True}],
+                    "responses": {"200": {"description": "Intelligence data"}}
+                }
+            }
+        }
     }
+
+@app.get("/x402/openapi.json")
+async def x402_openapi():
+    """Alternative OpenAPI endpoint"""
+    return await openapi_spec()
 
 # ============================================================================
-# REST ENDPOINTS
+# x402 ENDPOINTS (discoverable by x402scan)
 # ============================================================================
 
 @app.get("/health")
 async def health():
-    return {"status": "ok", "service": "sml-rwa-api"}
+    return {"status": "ok", "service": "sml-rwa-api", "x402_enabled": True}
 
-@app.get("/assets", tags=["Browse"])
-async def list_assets(
-    asset_class: Optional[AssetClass] = Query(None),
-    min_risk_score: Optional[int] = Query(None),
-    max_risk_score: Optional[int] = Query(None),
-    limit: int = Query(50)
+@app.get("/x402/rwa-assets")
+async def x402_rwa_assets(
+    asset_class: Optional[str] = Query(None),
+    limit: int = Query(50),
+    x_payment_token: Optional[str] = Header(None)
 ):
+    """List RWA assets - Free tier, requires x402 token for tracking"""
     results = list(_assets.values())
     if asset_class:
-        results = [a for a in results if a.asset_class == asset_class]
-    if min_risk_score is not None:
-        results = [a for a in results if a.risk_score >= min_risk_score]
-    if max_risk_score is not None:
-        results = [a for a in results if a.risk_score <= max_risk_score]
-    return {"total": len(results), "assets": [a.to_dict() for a in results[:limit]]}
+        results = [a for a in results if a.asset_class.value == asset_class]
+    return {
+        "endpoint": "/x402/rwa-assets",
+        "total": len(results),
+        "assets": [a.to_dict() for a in results[:limit]]
+    }
 
-@app.get("/assets/{asset_id}", tags=["Browse"])
-async def get_asset(asset_id: str):
+@app.get("/x402/rwa-intelligence")
+async def x402_rwa_intelligence(
+    asset_id: str = Query(...),
+    x_payment_token: str = Header(...)
+):
+    """Full RWA intelligence with compliance - Premium (0.20 USDC)"""
+    verify_payment_token(x_payment_token)
     if asset_id not in _assets:
         raise HTTPException(status_code=404, detail="Asset not found")
     asset = _assets[asset_id]
-    detail = asset.to_dict()
-    compliance = await fetch_squeezeos_compliance(asset.isin)
-    detail["squeezeos_compliance"] = compliance
-    return detail
+    return {
+        "endpoint": "/x402/rwa-intelligence",
+        "asset": asset.to_dict(),
+        "cost_usdc": 0.20,
+        "tier": "investor"
+    }
 
-@app.get("/assets/{asset_id}/valuation", tags=["Valuations"])
-async def get_valuation_history(
-    asset_id: str, days: int = Query(90), payment_token: Optional[str] = Header(None)
+@app.get("/x402/rwa-valuation")
+async def x402_rwa_valuation(
+    asset_id: str = Query(...),
+    days: int = Query(90),
+    x_payment_token: str = Header(...)
 ):
+    """NAV valuation history - Premium (0.15 USDC)"""
+    verify_payment_token(x_payment_token)
     if asset_id not in _assets:
         raise HTTPException(status_code=404, detail="Asset not found")
-    if payment_token:
-        verify_payment_token(payment_token)
     asset = _assets[asset_id]
     history = _valuation_history.get(asset_id, [])
     cutoff = datetime.utcnow() - timedelta(days=days)
     filtered = [h for h in history if datetime.fromisoformat(h["timestamp"]) >= cutoff]
     return {
+        "endpoint": "/x402/rwa-valuation",
         "asset_id": asset_id,
-        "asset_class": asset.asset_class.value,
         "current_nav": asset.nav_usd,
         "history_points": len(filtered),
-        "history": sorted(filtered, key=lambda x: x["timestamp"])
+        "cost_usdc": 0.15,
+        "tier": "investor"
     }
 
-@app.get("/risk-scores", tags=["Risk"])
-async def get_risk_scores():
+@app.get("/x402/rwa-risk")
+async def x402_rwa_risk(
+    min_score: Optional[int] = Query(None),
+    max_score: Optional[int] = Query(None)
+):
+    """Risk scorecard - Free tier"""
+    assets = list(_assets.values())
+    if min_score is not None:
+        assets = [a for a in assets if a.risk_score >= min_score]
+    if max_score is not None:
+        assets = [a for a in assets if a.risk_score <= max_score]
     return {
+        "endpoint": "/x402/rwa-risk",
         "timestamp": datetime.utcnow().isoformat(),
-        "assets": [{"asset_id": a.asset_id, "risk_score": a.risk_score, "asset_class": a.asset_class.value} for a in _assets.values()],
+        "assets": [{"asset_id": a.asset_id, "risk_score": a.risk_score, "class": a.asset_class.value} for a in assets],
         "portfolio_weighted_risk": 35
     }
 
-@app.get("/proof-of-reserves", tags=["Compliance"])
-async def get_proof_of_reserves(asset_id: Optional[str] = Query(None), payment_token: Optional[str] = Header(None)):
-    if payment_token:
-        verify_payment_token(payment_token)
+@app.get("/x402/rwa-aggregates")
+async def x402_rwa_aggregates(x_payment_token: str = Header(...)):
+    """Aggregate RWA intelligence across all assets - Premium (0.25 USDC)"""
+    verify_payment_token(x_payment_token)
+    return {
+        "endpoint": "/x402/rwa-aggregates",
+        "total_assets": len(_assets),
+        "total_nav_usd": sum(a.nav_usd for a in _assets.values()),
+        "avg_risk_score": sum(a.risk_score for a in _assets.values()) / len(_assets) if _assets else 0,
+        "by_class": {
+            class_val: {
+                "count": len([a for a in _assets.values() if a.asset_class.value == class_val]),
+                "total_nav": sum(a.nav_usd for a in _assets.values() if a.asset_class.value == class_val)
+            }
+            for class_val in [c.value for c in AssetClass]
+        },
+        "cost_usdc": 0.25,
+        "tier": "institutional"
+    }
+
+@app.get("/x402/proof-of-reserves")
+async def x402_proof_of_reserves(
+    asset_id: Optional[str] = Query(None),
+    x_payment_token: Optional[str] = Header(None)
+):
+    """Proof-of-reserves audit trail"""
+    if x_payment_token:
+        verify_payment_token(x_payment_token)
     if asset_id:
         if asset_id not in _assets:
             raise HTTPException(status_code=404, detail="Asset not found")
-        attestations = _por_attestations.get(asset_id, [])
         asset = _assets[asset_id]
-        return {"asset_id": asset_id, "current_por_hash": asset.proof_of_reserves_hash, "attestations": attestations}
+        return {
+            "endpoint": "/x402/proof-of-reserves",
+            "asset_id": asset_id,
+            "por_hash": asset.proof_of_reserves_hash,
+            "attestations": _por_attestations.get(asset_id, [])
+        }
     return {
+        "endpoint": "/x402/proof-of-reserves",
         "total_assets": len(_assets),
-        "aggregate_por_hash": hashlib.sha256(json.dumps({a_id: a.proof_of_reserves_hash for a_id, a in _assets.items()}, sort_keys=True).encode()).hexdigest(),
-        "last_updated": datetime.utcnow().isoformat()
+        "aggregate_hash": hashlib.sha256(
+            json.dumps({a_id: a.proof_of_reserves_hash for a_id, a in _assets.items()}, sort_keys=True).encode()
+        ).hexdigest()
     }
 
 @app.on_event("startup")
-async def startup_event():
-    logger.info(f"RWA API starting... Loaded {len(_assets)} seed assets")
+async def startup():
+    logger.info(f"RWA API started with x402scan discovery. Loaded {len(_assets)} assets")
     for asset_id, asset in _assets.items():
         history = []
         base_nav = asset.nav_usd
