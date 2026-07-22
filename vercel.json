@@ -29,6 +29,16 @@
       "permanent": true
     },
     {
+      "source": "/hermes",
+      "destination": "/hermes.html",
+      "permanent": true
+    },
+    {
+      "source": "/cascade",
+      "destination": "/cascade.html",
+      "permanent": true
+    },
+    {
       "source": "/slack",
       "destination": "/slack.html",
       "permanent": true
