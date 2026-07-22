@@ -8,6 +8,12 @@ This document is a token-optimized, concatenated dump of the entire ScriptMaster
 
 ---
 
+## 0-0. AGENT ECONOMY OS — "BUILD YOUR OWN HERMES" (2026-07-22)
+
+The packaged, sellable pitch for the whole stack. Landing page: `https://www.scriptmasterlabs.com/hermes`. One-liner install: `npx @scriptmasterlabs/mcp-x402` (MIT). Offer structure — (1) FREE discovery tier: `sml_discover` catalog with live prices, status tools, signal previews, `proof_credit_score` lookups, all $0.00; (2) x402 pay-per-call: premium tools from $0.005 (`crawl_paid_fetch`) to $0.15 (`options_delta_heatmap_full`) in USDC on Base / RLUSD on XRPL / USDC on Solana, receipts on every call, advertised price == charged price (drift-tested); (3) marketplace commission via `nexus_agent_hire` (query free, commission on hires); (4) self-host/SDK funnel (MIT package + `x402Payment` SDK wrapper for third-party MCP servers). Agent credit: ARGUS 300–850 FICO-style scores with tier discounts (PROTOSTAR/NEUTRON/PULSAR/QUASAR). Ready-to-run agent prompt: `mcp-x402/docs/HERMES_TEMPLATE.md` (repo `timwal78/sml_portfolio`). Pricing source of truth: `mcp-x402/src/server/registry/pricing.ts` + `docs/AGENT_ECONOMY_OS_PRICING.md` (also documents which tiers are proposed-but-NOT-yet-wired — hosted subscriptions and white-label have no Stripe products yet and must not be sold as live). A dedicated Hermes Sales Agent (SqueezeOS `agent/dept/hermes_sales.py`) works this funnel every 4h: live storefront checks, Reddit/HN buying-intent lead gen, drafted pitches queued at `/api/outreach` for human approval — it never auto-posts. Signals are informational market intelligence, never financial advice; no profit is promised.
+
+---
+
 ## 0-A. x402 AGENT-NATIVE PROTOCOL — 2026-Q2 ENHANCEMENTS
 
 Shipped: 2026-06-30. Package: `@scriptmasterlabs/mcp-x402`. Repos: `timwal78/mcp-x402-xrpl`, `timwal78/ghost-layer`.
