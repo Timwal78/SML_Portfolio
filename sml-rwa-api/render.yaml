@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: sml-rwa-api
+    runtime: docker
+    plan: starter
+    autoDeploy: true
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: PORT
+        value: "8183"
+      - key: PROOF402_TOKEN_SECRET
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: SQUEEZEOS_BASE_URL
+        value: "https://squeezeos-api.onrender.com"
+      - key: LOG_LEVEL
+        value: "info"
+      - key: ENVIRONMENT
+        value: "production"
+    healthCheckPath: /health
+    healthCheckInterval: 30
+    healthCheckTimeout: 10
+    healthCheckStartPeriod: 5
