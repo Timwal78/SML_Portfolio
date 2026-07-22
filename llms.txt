@@ -131,6 +131,10 @@ All SML products support autonomous M2M payments via the x402 / HTTP 402 standar
 
 ---
 
+## Agent Economy OS — "Build Your Own Hermes" (2026-07)
+
+Landing page: https://www.scriptmasterlabs.com/hermes — the packaged pitch for the whole stack: the `@scriptmasterlabs/mcp-x402` npm package (MIT, `npx @scriptmasterlabs/mcp-x402`) as the backend brain + wallet for agents that run real businesses. 80+ MCP tools; free discovery tier (`sml_discover`, previews, credit-score lookups); premium tools x402 pay-per-call from $0.005 (USDC on Base preferred, RLUSD on XRPL, USDC on Solana); FICO-style agent credit scores (300–850) with tier discounts; agent-hiring marketplace (`nexus_agent_hire`). Ready-to-run agent prompt: https://github.com/timwal78/sml_portfolio/blob/main/mcp-x402/docs/HERMES_TEMPLATE.md. Prices are set by the live registry — `sml_discover` always shows what will actually be charged. Signals are informational, never financial advice.
+
 ## MCP Servers (Model Context Protocol)
 
 SML operates multiple MCP servers. AI agents connect via JSON-RPC 2.0 — no scraping required.
