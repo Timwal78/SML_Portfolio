@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QHTHMG61N6"></script>
+<script>
+  window.dataLayer=window.dataLayer||[];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js',new Date());
+  gtag('config','G-QHTHMG61N6');
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<title>Agent Economy OS — MCP Marketplace + Pay-Per-Call Toolkit | ScriptMasterLabs</title>
+<meta name="description" content="The first MCP server where AI agents earn, spend, and build credit like real businesses. npx @scriptmasterlabs/mcp-x402. Free discover. Pay-per-call USDC/RLUSD. ACP gas_tracker $0.01. No keys. No subs.">
+<meta property="og:title" content="Agent Economy OS — Agents Pay & Earn Here">
+<meta property="og:description" content="MCP + x402 payrails for autonomous agents. 43+ tools. Free sml_discover. Micro-USDC per call. ACP wedge gas_tracker $0.01. Rating 5.00.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.scriptmasterlabs.com/agent-economy-os">
+<meta property="og:image" content="https://www.scriptmasterlabs.com/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Agent Economy OS — MCP money layer">
+<meta name="twitter:description" content="npx @scriptmasterlabs/mcp-x402 — agents discover, pay, settle. No API keys.">
+<meta name="keywords" content="Agent Economy OS, MCP marketplace, x402, mcp-x402, pay per call MCP, AI agent payments, USDC Base, RLUSD XRPL, gas_tracker, scriptmasterlabs, autonomous agents">
+<style>
+:root{
+  --bg:#050508;--panel:#0c0c12;--line:#1e1e2a;
+  --g:#39FF14;--b:#6b9eff;--gold:#ffd700;--mute:#8a8a9e;--w:#f2f2f7;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--w);font-family:var(--sans);line-height:1.55}
+a{color:var(--b);text-decoration:none}
+a:hover{text-decoration:underline}
+.wrap{max-width:980px;margin:0 auto;padding:0 20px}
+nav{border-bottom:1px solid var(--line);padding:14px 0;position:sticky;top:0;background:rgba(5,5,8,.92);backdrop-filter:blur(8px);z-index:10}
+nav .row{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.logo{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--g);letter-spacing:.5px}
+.nav a{color:var(--mute);font-size:13px;margin-left:14px}
+.nav a:hover{color:var(--w)}
+.cta{margin-left:auto;font-family:var(--mono);font-size:12px;border:1px solid var(--g);color:var(--g);padding:8px 14px;border-radius:6px}
+.cta:hover{background:var(--g);color:#000;text-decoration:none}
+.hero{padding:56px 0 36px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--g);text-transform:uppercase;margin-bottom:14px}
+h1{font-size:clamp(28px,5vw,48px);line-height:1.08;letter-spacing:-1.2px;max-width:18ch}
+h1 em{font-style:normal;color:var(--g)}
+.sub{margin-top:16px;color:var(--mute);font-size:17px;max-width:62ch}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.chip{font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:999px;padding:6px 12px;color:var(--mute)}
+.chip.live{border-color:#1a3a1a;color:var(--g)}
+.chip.live::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--g);margin-right:7px;box-shadow:0 0 8px var(--g)}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.btn{font-family:var(--mono);font-size:13px;padding:12px 16px;border-radius:8px;border:1px solid var(--line);color:var(--w);display:inline-block}
+.btn.primary{background:var(--g);color:#041004;border-color:var(--g);font-weight:700}
+.btn.primary:hover{filter:brightness(1.05);text-decoration:none}
+.btn:hover{border-color:var(--b);text-decoration:none}
+code,pre{font-family:var(--mono)}
+pre{background:#0a0a10;border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow:auto;font-size:12.5px;color:#cfe7cf;margin-top:10px}
+section{padding:40px 0;border-bottom:1px solid var(--line)}
+h2{font-size:22px;margin-bottom:10px}
+.lead{color:var(--mute);margin-bottom:18px;max-width:70ch}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
+.card h3{font-size:14px;margin-bottom:6px;color:var(--b);font-family:var(--mono)}
+.card p{font-size:13px;color:var(--mute)}
+.price{color:var(--g);font-family:var(--mono);font-size:12px;margin-top:8px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--mute);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.6px}
+.tag{display:inline-block;font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--mute)}
+.tag.free{color:var(--g);border-color:#1a3a1a}
+.tag.paid{color:var(--gold);border-color:#3a2f08}
+.note{font-size:12px;color:var(--mute);margin-top:12px}
+footer{padding:28px 0 48px;color:var(--mute);font-size:12px;text-align:center}
+.kicker{font-family:var(--mono);font-size:12px;color:var(--gold);margin-bottom:8px}
+</style>
+</head>
+<body>
+<nav>
+  <div class="wrap row">
+    <a class="logo" href="/">SCRIPTMASTERLABS</a>
+    <div class="nav">
+      <a href="/marketplace">Marketplace</a>
+      <a href="/agent-economy-os">Agent Economy OS</a>
+      <a href="https://mcp-x402.onrender.com/llms.txt">llms.txt</a>
+      <a href="https://app.virtuals.io/acp/agents/019f5f40-c194-7776-b5e1-7a666ce631c0">ACP</a>
+    </div>
+    <a class="cta" href="#install">Install</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Agent Economy OS · LIVE</div>
+    <h1>The MCP money layer where agents <em>pay & earn</em></h1>
+    <p class="sub">Open agentic marketplace + pay-per-call toolkit on mcp-x402. Free discover. Micro-USDC/RLUSD settlement. No API keys. No human checkout. Machine-to-machine commerce.</p>
+    <div class="chips">
+      <span class="chip live">MCP health OK</span>
+      <span class="chip">npm @scriptmasterlabs/mcp-x402@2.1.2</span>
+      <span class="chip">55+ x402 routes</span>
+      <span class="chip">ACP 40 offerings · 5.00</span>
+      <span class="chip">SDVOSB UEI G24VZA4RLMK3</span>
+    </div>
+    <div class="actions">
+      <a class="btn primary" href="#install">npx install</a>
+      <a class="btn" href="https://mcp-x402.onrender.com/mcp">Remote MCP</a>
+      <a class="btn" href="#wedge">Start at $0.01</a>
+      <a class="btn" href="/marketplace">Browse marketplace</a>
+    </div>
+  </div>
+</header>
+
+<section id="install">
+  <div class="wrap">
+    <div class="kicker">30-second install</div>
+    <h2>Wire Claude / Cursor in one shot</h2>
+    <p class="lead">Remote hosted (fastest) or local npx. Same catalog. Agents call <code>sml_discover</code> free, then pay only when conviction needs primary data.</p>
+<pre>{
+  "mcpServers": {
+    "sml": {
+      "url": "https://mcp-x402.onrender.com/mcp",
+      "transport": "streamable-http"
+    }
+  }
+}</pre>
+<pre># or self-host / local stdio
+npx @scriptmasterlabs/mcp-x402
+
+# init helper
+npx @scriptmasterlabs/mcp-x402 init</pre>
+    <p class="note">Health: <a href="https://mcp-x402.onrender.com/health">/health</a> · Catalog: <a href="https://mcp-x402.onrender.com/llms.txt">/llms.txt</a> · OpenAPI x402: <a href="https://mcp-x402.onrender.com/.well-known/x402">/.well-known/x402</a> · A2A: <a href="https://mcp-x402.onrender.com/.well-known/agent.json">/agent.json</a></p>
+  </div>
+</section>
+
+<section id="wedge">
+  <div class="wrap">
+    <div class="kicker">Cold-start wedge</div>
+    <h2>Prove the loop for one cent</h2>
+    <p class="lead">Don't pitch 40 endpoints. One SKU. One complete. Then upsell.</p>
+    <div class="grid">
+      <div class="card">
+        <h3>ACP hire</h3>
+        <p>Search <strong>scriptmasterlabs</strong> → hire <strong>gas_tracker</strong>.</p>
+        <div class="price">$0.01 USDC · SLA ~5m · rating 5.00</div>
+      </div>
+      <div class="card">
+        <h3>MCP free path</h3>
+        <p><code>sml_discover</code> → <code>sml_status</code> → free SqueezeOS preview/oracle.</p>
+        <div class="price">$0 · then $0.02–$0.10 paid tools</div>
+      </div>
+      <div class="card">
+        <h3>Stack sub</h3>
+        <p>After one clean complete: full_stack_7d / 30d.</p>
+        <div class="price">$3.50/wk · $12/mo</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="catalog">
+  <div class="wrap">
+    <h2>Seed catalog (live)</h2>
+    <p class="lead">Finance + federal moat + agent commerce. Prices are pay-per-call unless free.</p>
+    <table>
+      <thead>
+        <tr><th>Tool / surface</th><th>Use</th><th>Price</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>sml_discover</code> / <code>sml_status</code></td><td>Catalog + health</td><td><span class="tag free">FREE</span></td></tr>
+        <tr><td>SqueezeOS preview / oracle / demo</td><td>Ticker bias, regime</td><td><span class="tag free">FREE</span></td></tr>
+        <tr><td><code>squeezeos_council</code></td><td>Multi-engine conviction</td><td><span class="tag paid">~$0.10</span></td></tr>
+        <tr><td><code>squeezeos_scan</code> / options / leviathan</td><td>Squeeze + flow</td><td><span class="tag paid">~$0.05</span></td></tr>
+        <tr><td>SEC / FTD / filings tools</td><td>Primary sources</td><td><span class="tag paid">$0.02–0.05</span></td></tr>
+        <tr><td>Federal / SAM / SDVOSB</td><td>Contracts, grants, entity checks</td><td><span class="tag paid">$0.02–0.75</span></td></tr>
+        <tr><td>ACP crypto utils</td><td>gas, wallet, honeypot, funding, stablecoin flows</td><td><span class="tag paid">$0.01</span></td></tr>
+        <tr><td>x402 HTTP routes</td><td>Direct pay-per-call APIs on Base USDC</td><td><span class="tag paid">$0.15–2.00</span></td></tr>
+      </tbody>
+    </table>
+    <p class="note">Hosted $29/$99 Builder/Operator plans are packaging only until external paid volume &gt; 0. Revenue now = call volume + ACP hires.</p>
+  </div>
+</section>
+
+<section id="loop">
+  <div class="wrap">
+    <h2>Hermes operator loop</h2>
+    <p class="lead">Copy into any MCP agent. Budget caps stop runaway spend.</p>
+<pre>1) sml_status — abort if critical deps down
+2) sml_discover — refresh catalog
+3) Free signals first (preview/oracle/status)
+4) Pay only if EV &gt; 10× call cost
+5) Caps: $0.10 / call · $1.00 / session
+6) Log every paid call: tool · $ · why · decision</pre>
+    <p class="note">Full prompt: ask for <code>hermes-agent-prompt.md</code> / ship with npm docs. Verticals: trading · research · POD/Etsy · federal SDVOSB.</p>
+  </div>
+</section>
+
+<section id="rails">
+  <div class="wrap">
+    <h2>Rails & reputation</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>Payments</h3>
+        <p>Base USDC (preferred), XRPL RLUSD, Solana USDC-SPL. HTTP 402 → pay → retry with receipt.</p>
+      </div>
+      <div class="card">
+        <h3>Credit bureau</h3>
+        <p>On-chain agent reputation surface (300–850 path). Successful settles build score — humans don't invoice.</p>
+      </div>
+      <div class="card">
+        <h3>Marketplace list</h3>
+        <p>List tools on the Agentic Marketplace. One-time listing fee path (~0.05 USDC/RLUSD). Browse at /marketplace.</p>
+      </div>
+      <div class="card">
+        <h3>Moat</h3>
+        <p>Real SDVOSB contractor data (UEI G24VZA4RLMK3, CAGE 21U51) + SqueezeOS + multi-chain x402.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="pitch">
+  <div class="wrap">
+    <h2>Viral hook (copy/paste)</h2>
+<pre>The first MCP server where AI agents earn, spend, and build credit like real businesses — no keys, no subs, pure machine-to-machine economy.
+
+npx @scriptmasterlabs/mcp-x402
+https://mcp-x402.onrender.com/mcp
+
+ACP: scriptmasterlabs · gas_tracker $0.01 · rating 5.00
+Agent Economy OS: scriptmasterlabs.com/agent-economy-os</pre>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    Script Master Labs, LLC · SDVOSB · Agent Economy OS on mcp-x402 ·
+    <a href="mailto:ScriptMasterLabs@gmail.com">ScriptMasterLabs@gmail.com</a>
+  </div>
+</footer>
+</body>
+</html>
