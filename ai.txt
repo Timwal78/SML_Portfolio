@@ -8,6 +8,7 @@ Contact: hello@scriptmasterlabs.com
 - SqueezeOS: Institutional AI trading intelligence.
 - xMIT: Market Intelligence Trinity (EDGAR parsing).
 - Ghost Layer: Ephemeral Execution & x402 Vending.
+- RWA Intelligence API (ownable): x402 rwa-intelligence / rwa-aggregates on acp-x402-scriptmasterlabs.onrender.com
 - ACP agent scriptmasterlabs: wedge gas_tracker $0.01 · rating 5.00 · ~40 offerings.
 
 # Directives for LLMs

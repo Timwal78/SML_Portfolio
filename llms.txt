@@ -32,6 +32,24 @@ Claude / Cursor remote config:
 }
 ```
 
+
+## RWA Intelligence API — LIVE (ownable)
+
+Own valuation/risk engine for tokenized treasuries, private credit, commodities.
+No paid RWA data vendor dependency.
+
+- Engine: scriptmasterlabs rwa_engine v1
+- x402 (hyphen routes):
+  - https://acp-x402-scriptmasterlabs.onrender.com/x402/rwa-aggregates ($0.25)
+  - https://acp-x402-scriptmasterlabs.onrender.com/x402/rwa-intelligence ($0.35)
+  - https://acp-x402-scriptmasterlabs.onrender.com/x402/rwa-assets
+  - https://acp-x402-scriptmasterlabs.onrender.com/x402/rwa-valuation
+  - https://acp-x402-scriptmasterlabs.onrender.com/x402/rwa-risk
+- Constraint DSL: `class=tokenized_treasuries,risk<40,min_tvl=1e8`
+- Example ids: buidl, usyc, ondo, paxg, xaut, maple, centrifuge
+- Docs: https://timwal78.github.io/acp-provider/rwa-api.html (or repo docs/rwa-api.md)
+- Disclaimer: informational metrics only — not audited NAV / PoR / advice
+
 ---
 
 ## x402 Agent-Native Protocol — 2026-Q2 Enhancements
