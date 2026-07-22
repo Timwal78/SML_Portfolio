@@ -1,0 +1,48 @@
+{
+  "service": "SqueezeOS RWA Intelligence API",
+  "version": "1.0.0",
+  "endpoint": "https://sml-rwa-api.onrender.com",
+  "x402_enabled": true,
+  "description": "Institutional tokenized asset intelligence (treasuries, real estate, private credit, emerging markets)",
+  "pricing": {
+    "tier_0_scout": {
+      "cost_rlusd": 0,
+      "endpoints": ["/assets", "/risk-scores", "/health"],
+      "description": "Free tier: browse all RWA assets and risk scorecards"
+    },
+    "tier_1_investor": {
+      "cost_rlusd_per_call": 0.15,
+      "endpoints": ["/assets/{id}/valuation"],
+      "description": "Premium: valuation history and NAV trends (0.15 RLUSD/call)"
+    },
+    "tier_2_institutional": {
+      "cost_rlusd_per_call": 0.20,
+      "endpoints": ["/proof-of-reserves"],
+      "description": "Enterprise: proof-of-reserves audit trail (0.20 RLUSD/call)"
+    }
+  },
+  "asset_classes": [
+    "treasuries",
+    "real_estate",
+    "private_credit",
+    "emerging_markets",
+    "commodities",
+    "carbon_credits"
+  ],
+  "integration": {
+    "squeezeos_mcp": true,
+    "mcp_tools": ["rwa_scan", "rwa_valuation", "rwa_proof_of_reserves"],
+    "mcp_endpoint": "https://squeezeos-api.onrender.com/mcp"
+  },
+  "storage": "PostgreSQL + TimescaleDB + Redis",
+  "features": [
+    "NAV valuation history (90-day timeseries)",
+    "Proof-of-reserves audit trail",
+    "Risk scoring (0-100 scale)",
+    "SqueezeOS compliance integration (SEC/FDA data)",
+    "x402 payment gating",
+    "MCP tool exposure"
+  ],
+  "status": "production",
+  "discoverable_by": ["x402scan", "squeezeos-mcp", "public-apis.io"]
+}
