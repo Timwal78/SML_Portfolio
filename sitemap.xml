@@ -2,9 +2,11 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
   <!-- ── Core ─────────────────────────────────────────────────────────── -->
-  <url><loc>https://www.scriptmasterlabs.com/</loc><changefreq>daily</changefreq><priority>1.0</priority><lastmod>2026-06-24</lastmod></url>
+  <url><loc>https://www.scriptmasterlabs.com/</loc><changefreq>daily</changefreq><priority>1.0</priority><lastmod>2026-07-22</lastmod></url>
+  <url><loc>https://www.scriptmasterlabs.com/agent-economy-os.html</loc><changefreq>daily</changefreq><priority>1.0</priority><lastmod>2026-07-22</lastmod></url>
+  <url><loc>https://www.scriptmasterlabs.com/agent-economy-os</loc><changefreq>daily</changefreq><priority>1.0</priority><lastmod>2026-07-22</lastmod></url>
   <url><loc>https://www.scriptmasterlabs.com/stack.html</loc><changefreq>weekly</changefreq><priority>0.9</priority><lastmod>2026-07-12</lastmod></url>
-  <url><loc>https://www.scriptmasterlabs.com/marketplace.html</loc><changefreq>daily</changefreq><priority>0.95</priority><lastmod>2026-07-06</lastmod></url>
+  <url><loc>https://www.scriptmasterlabs.com/marketplace.html</loc><changefreq>daily</changefreq><priority>0.95</priority><lastmod>2026-07-22</lastmod></url>
   <url><loc>https://www.scriptmasterlabs.com/affiliate.html</loc><changefreq>monthly</changefreq><priority>0.8</priority><lastmod>2026-06-24</lastmod></url>
 
   <!-- ── AEO/GEO Intelligence Suite (revenue) ──────────────────────── -->

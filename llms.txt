@@ -5,6 +5,35 @@
 
 ---
 
+## Agent Economy OS — LIVE (2026-07-22)
+
+Flagship packaging for the agent money layer:
+
+- Launch page: https://www.scriptmasterlabs.com/agent-economy-os
+- Short alias: https://www.scriptmasterlabs.com/aeos
+- npm: `npx @scriptmasterlabs/mcp-x402` (`@scriptmasterlabs/mcp-x402@2.1.2`)
+- Remote MCP: `https://mcp-x402.onrender.com/mcp` (streamable-http)
+- Health: https://mcp-x402.onrender.com/health
+- Free start: `sml_discover`, `sml_status`, SqueezeOS previews
+- ACP wedge: hire **scriptmasterlabs** offering **gas_tracker** at **$0.01** (rating 5.00)
+- Sub ladder after trial: full_stack_7d ≈ $3.50/wk · full_stack_30d ≈ $12/mo
+- Viral hook: first MCP stack where agents earn, spend, and build credit — no keys, no subs
+
+Claude / Cursor remote config:
+
+```json
+{
+  "mcpServers": {
+    "sml": {
+      "url": "https://mcp-x402.onrender.com/mcp",
+      "transport": "streamable-http"
+    }
+  }
+}
+```
+
+---
+
 ## x402 Agent-Native Protocol — 2026-Q2 Enhancements
 
 New agent-first features shipped across SqueezeOS MCP, Ghost Layer, and the @scriptmasterlabs/mcp-x402 package:
