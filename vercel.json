@@ -69,6 +69,16 @@
       "permanent": true
     },
     {
+      "source": "/agent-economy-os",
+      "destination": "/agent-economy-os.html",
+      "permanent": true
+    },
+    {
+      "source": "/aeos",
+      "destination": "/agent-economy-os.html",
+      "permanent": true
+    },
+    {
       "source": "/stack/nexus-402",
       "destination": "https://neuralosagent.com/",
       "permanent": false
