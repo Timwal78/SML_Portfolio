@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ScriptDocs MCP — 30s demo</title>
-  <meta name="description" content="30-second demo: ScriptDocs MCP hits live npm/PyPI/OSV so coding agents stop inventing package APIs. Free install." />
+  <title>ScriptDocs MCP — 30s demo (VO + loop)</title>
+  <meta name="description" content="30-second ScriptDocs MCP demo with voiceover. Auto-loop versions for Shorts/Reels/TikTok." />
   <style>
     :root { color-scheme: dark; --bg:#0b0b10; --fg:#e8e8ef; --mut:#9aa0b4; --acc:#39FF14; }
     body { margin:0; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background:var(--bg); color:var(--fg); }
@@ -16,23 +16,28 @@
     video { width: 100%; max-width: 420px; display:block; margin: 1.25rem auto; border-radius: 16px; border: 1px solid #222233; background:#000; }
     pre { background:#12121a; padding:1rem; border-radius:12px; overflow:auto; color:#d7ffe0; }
     .pill { display:inline-block; border:1px solid #2a2a3a; border-radius:999px; padding:.15rem .6rem; margin:.15rem .25rem 0 0; font-size:.75rem; }
+    ul { color: var(--mut); }
   </style>
 </head>
 <body>
 <main>
-  <h1>ScriptDocs MCP <span>// 30s</span></h1>
+  <h1>ScriptDocs MCP <span>// 30s + VO + loop</span></h1>
   <p>Agents invent package APIs from stale memory. ScriptDocs hits <strong style="color:var(--acc)">live</strong> npm / PyPI / crates / OSV instead.</p>
   <p>
-    <span class="pill">free</span>
-    <span class="pill">MCP registry 0.3.0</span>
-    <span class="pill">no simulated docs</span>
+    <span class="pill">voiceover</span>
+    <span class="pill">auto-loop files</span>
+    <span class="pill">free MCP 0.3.0</span>
   </p>
-  <video controls playsinline poster="/downloads/scriptdocs/preview-hook.png">
-    <source src="/downloads/scriptdocs/scriptdocs-30s.mp4" type="video/mp4" />
+  <video controls autoplay muted loop playsinline poster="/downloads/scriptdocs/preview-hook.png">
+    <source src="/downloads/scriptdocs/scriptdocs-30s-vo-loop3.mp4" type="video/mp4" />
   </video>
-  <p><a href="/downloads/scriptdocs/scriptdocs-30s.mp4" download>Download MP4</a></p>
+  <ul>
+    <li><a href="/downloads/scriptdocs/scriptdocs-30s-vo.mp4">30s + VO</a> (single play)</li>
+    <li><a href="/downloads/scriptdocs/scriptdocs-30s-vo-loop2.mp4">60s loop ×2</a> (post this)</li>
+    <li><a href="/downloads/scriptdocs/scriptdocs-30s-vo-loop3.mp4">90s loop ×3</a> (max dwell)</li>
+    <li><a href="/downloads/scriptdocs/scriptdocs-30s.mp4">silent 30s</a></li>
+  </ul>
   <pre>npx @scriptmasterlabs/scriptdocs-mcp-server</pre>
-  <p>Registry: <code>io.github.Timwal78/scriptdocs-mcp-server</code></p>
 </main>
 </body>
 </html>
