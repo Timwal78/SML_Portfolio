@@ -24,7 +24,7 @@ logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"))
 logger = logging.getLogger("sml-rwa-api")
 
 APP_NAME = "SML RWA Intelligence Suite"
-VERSION = "1.1.0"
+VERSION = "1.1.1"
 BASE_URL = os.getenv("PUBLIC_BASE_URL", "https://sml-rwa-api.onrender.com").rstrip("/")
 NETWORK = os.getenv("X402_NETWORK", "base")
 PAY_TO = os.getenv("X402_PAY_TO", "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa")
@@ -32,6 +32,7 @@ USDC = os.getenv("X402_USDC", "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913")
 FACILITATOR = os.getenv("X402_FACILITATOR", "https://x402.org/facilitator").rstrip("/")
 MAX_TIMEOUT = int(os.getenv("X402_MAX_TIMEOUT", "300"))
 X402_VERSION = 2
+DEPLOY_STAMP = "2026-07-23T00:35Z-real-x402"
 
 PRICES = {
     "rwa-assets": "0.00",  # free lead-gen
