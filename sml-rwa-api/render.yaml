@@ -5,22 +5,19 @@ services:
     plan: starter
     autoDeploy: true
     dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
     envVars:
       - key: PORT
-        value: "8183"
-      - key: PROOF402_TOKEN_SECRET
-        sync: false
-      - key: DATABASE_URL
-        sync: false
-      - key: REDIS_URL
-        sync: false
-      - key: SQUEEZEOS_BASE_URL
-        value: "https://squeezeos-api.onrender.com"
+        value: "8080"
+      - key: PUBLIC_BASE_URL
+        value: "https://sml-rwa-api.onrender.com"
+      - key: X402_NETWORK
+        value: "base"
+      - key: X402_PAY_TO
+        value: "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa"
+      - key: X402_USDC
+        value: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+      - key: X402_FACILITATOR
+        value: "https://x402.org/facilitator"
       - key: LOG_LEVEL
         value: "info"
-      - key: ENVIRONMENT
-        value: "production"
-    healthCheckPath: /health
-    healthCheckInterval: 30
-    healthCheckTimeout: 10
-    healthCheckStartPeriod: 5
