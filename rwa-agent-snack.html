@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>RWA Agent Snack — ScriptMasterLabs</title>
-  <meta name="description" content="10-line agent integration: free RWA scan → x402 valuation. ACP rwa_intelligence $0.03. No portal browsing." />
+  <meta name="description" content="10-line agent integration: free LIVE RWA scan (DefiLlama+CoinGecko) → x402 valuation. ACP rwa_intelligence $0.03. No demo catalog." />
   <style>
     :root { color-scheme: dark; --bg:#0b0b10; --fg:#e8e8ef; --mut:#9aa0b4; --acc:#39FF14; --card:#14141c; }
     body { margin:0; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background:var(--bg); color:var(--fg); line-height:1.5; }
@@ -22,21 +22,23 @@
 <body>
 <main>
   <h1>RWA Agent Snack <span>// 10 lines</span></h1>
-  <p>Platforms host. They don’t market. Wire this mid-loop — free scan, micro-pay valuation.</p>
+  <p>Platforms host. They don’t market. Wire this mid-loop — <strong class="ok">live</strong> scan (DefiLlama TVL + CoinGecko), micro-pay valuation. <strong>No synthetic catalog.</strong></p>
   <div class="card">
-    <span class="pill ok">free rwa_scan</span>
+    <span class="pill ok">free rwa_scan (live)</span>
     <span class="pill">x402 0.15 USDC valuation</span>
+    <span class="pill">source-integrity SHA-256</span>
     <span class="pill">ACP rwa_intelligence $0.03</span>
-    <span class="pill">SqueezeOS MCP</span>
   </div>
   <div class="card">
     <strong class="ok">Canonical hosts</strong>
     <ul>
-      <li>Free: <a href="https://sml-rwa-api.onrender.com/x402/rwa-assets?limit=5">/x402/rwa-assets</a></li>
-      <li>Paid: <a href="https://sml-rwa-api.onrender.com/x402/rwa-valuation?asset_id=rwa-000001">/x402/rwa-valuation</a></li>
+      <li>Free live scan: <a href="https://sml-rwa-api.onrender.com/x402/rwa-assets?limit=5">/x402/rwa-assets</a></li>
+      <li>Paid valuation: <a href="https://sml-rwa-api.onrender.com/x402/rwa-valuation?asset_id=buidl">/x402/rwa-valuation?asset_id=buidl</a></li>
+      <li>PoR / source hash: <a href="https://sml-rwa-api.onrender.com/x402/proof-of-reserves?asset_id=buidl">/x402/proof-of-reserves</a></li>
       <li>OpenAPI: <a href="https://sml-rwa-api.onrender.com/.well-known/x402">/.well-known/x402</a></li>
-      <li>ACP: search <strong>scriptmasterlabs</strong> → hire <strong>rwa_intelligence</strong></li>
+      <li>ACP: search <strong>scriptmasterlabs</strong> → hire <strong>rwa_intelligence</strong> @ $0.03</li>
     </ul>
+    <p>IDs: <code>buidl</code> · <code>usyc</code> · <code>ousg</code> · <code>ondo</code> · <code>paxg</code> · <code>maple</code> · …</p>
   </div>
   <div class="card">
     <strong class="ok">Python agent loop</strong>
@@ -54,7 +56,7 @@ def get(path, payment=None):
         return e.code, json.loads(e.read().decode())
 
 _, assets = get("/x402/rwa-assets?limit=5")
-aid = assets["assets"][0]["asset_id"]
+aid = assets["assets"][0]["asset_id"]  # e.g. buidl
 code, body = get(f"/x402/rwa-valuation?asset_id={aid}")
 # code 402 → body.accepts[0] (base/USDC) → settle → retry with X-PAYMENT</pre>
   </div>
