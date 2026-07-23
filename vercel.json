@@ -2,7 +2,12 @@
   "rewrites": [
     {
       "source": "/:path*",
-      "has": [{"type": "host", "value": "aeo.scriptmasterlabs.com"}],
+      "has": [
+        {
+          "type": "host",
+          "value": "aeo.scriptmasterlabs.com"
+        }
+      ],
       "destination": "/aeo.html"
     }
   ],
@@ -177,6 +182,16 @@
       "source": "/mastersheets",
       "destination": "/smlsheets.html",
       "permanent": true
+    },
+    {
+      "source": "/rwa-agent-snack",
+      "destination": "/rwa-agent-snack.html",
+      "permanent": false
+    },
+    {
+      "source": "/rwa-snack",
+      "destination": "/rwa-agent-snack.html",
+      "permanent": false
     }
   ],
   "headers": [

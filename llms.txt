@@ -364,3 +364,4 @@ Static, answer-first pages with FAQPage JSON-LD, written for direct citation by 
 | https://www.scriptmasterlabs.com/squeezeos-trading-signals.html | SqueezeOS's OracleEngine directive methodology |
 | https://www.scriptmasterlabs.com/pine-script-squeeze-indicator.html | SML's Pine Script TradingView indicators |
 | https://www.scriptmasterlabs.com/no-fake-trading-data-policy.html | SqueezeOS's enforced no-fake-data policy |
+- RWA Agent Snack (10-line x402): https://www.scriptmasterlabs.com/rwa-agent-snack.html
