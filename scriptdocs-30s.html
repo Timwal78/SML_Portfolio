@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ScriptDocs MCP — 30s demo</title>
+  <meta name="description" content="30-second demo: ScriptDocs MCP hits live npm/PyPI/OSV so coding agents stop inventing package APIs. Free install." />
+  <style>
+    :root { color-scheme: dark; --bg:#0b0b10; --fg:#e8e8ef; --mut:#9aa0b4; --acc:#39FF14; }
+    body { margin:0; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background:var(--bg); color:var(--fg); }
+    main { max-width: 720px; margin: 0 auto; padding: 2rem 1rem 4rem; }
+    h1 { font-size: 1.25rem; }
+    h1 span { color: var(--acc); }
+    p { color: var(--mut); line-height: 1.5; }
+    a { color: var(--acc); }
+    video { width: 100%; max-width: 420px; display:block; margin: 1.25rem auto; border-radius: 16px; border: 1px solid #222233; background:#000; }
+    pre { background:#12121a; padding:1rem; border-radius:12px; overflow:auto; color:#d7ffe0; }
+    .pill { display:inline-block; border:1px solid #2a2a3a; border-radius:999px; padding:.15rem .6rem; margin:.15rem .25rem 0 0; font-size:.75rem; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>ScriptDocs MCP <span>// 30s</span></h1>
+  <p>Agents invent package APIs from stale memory. ScriptDocs hits <strong style="color:var(--acc)">live</strong> npm / PyPI / crates / OSV instead.</p>
+  <p>
+    <span class="pill">free</span>
+    <span class="pill">MCP registry 0.3.0</span>
+    <span class="pill">no simulated docs</span>
+  </p>
+  <video controls playsinline poster="/downloads/scriptdocs/preview-hook.png">
+    <source src="/downloads/scriptdocs/scriptdocs-30s.mp4" type="video/mp4" />
+  </video>
+  <p><a href="/downloads/scriptdocs/scriptdocs-30s.mp4" download>Download MP4</a></p>
+  <pre>npx @scriptmasterlabs/scriptdocs-mcp-server</pre>
+  <p>Registry: <code>io.github.Timwal78/scriptdocs-mcp-server</code></p>
+</main>
+</body>
+</html>
