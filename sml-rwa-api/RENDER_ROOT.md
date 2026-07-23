@@ -1,17 +1,15 @@
-# Render service settings (required)
+# Render root for sml-rwa-api
 
 Dashboard → sml-rwa-api → Settings:
 
 | Field | Value |
-|-------|-------|
-| Repo | Timwal78/SML_Portfolio |
-| Branch | main |
-| **Root Directory** | **sml-rwa-api** |
-| Runtime | Docker |
-| Dockerfile Path | ./Dockerfile |
-| Health Check Path | /health |
+|-------|--------|
+| **Repo** | `Timwal78/sml-rwa-api` |
+| **Root Directory** | *(repo root)* |
+| **Dockerfile** | `./Dockerfile` |
+| **Health** | `/health` |
 
-If Root Directory is empty/repo root, Render builds the wrong app and keeps serving the old fake-402 binary.
-
-After deploy, health must show `"version":"1.1.1"` and
-`GET /x402/rwa-valuation?asset_id=rwa-000001` must return HTTP 402 with `PAYMENT-REQUIRED` header.
+## Live proof after deploy
+- `GET /health` → version **2.0.0**, `synthetic: false`
+- `GET /x402/rwa-assets?limit=5` → live ids like `buidl`, `usyc` (NOT `rwa-000001`)
+- `GET /x402/rwa-valuation?asset_id=buidl` → HTTP 402 + `PAYMENT-REQUIRED`
