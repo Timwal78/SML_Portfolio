@@ -2,14 +2,13 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y postgresql-client && rm -rf /var/lib/apt/lists/*
-
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+COPY rwa_api_service.py .
 
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD python -c "import httpx; httpx.get('http://localhost:8183/health')" || exit 1
+ENV PORT=8080
+ENV PYTHONUNBUFFERED=1
 
-CMD ["gunicorn", "--workers", "4", "--threads", "2", "--timeout", "30", "--bind", "0.0.0.0:8183", "--access-logfile", "-", "rwa_api_service:app"]
+# Render sets PORT; bind 0.0.0.0:$PORT. Single worker is fine for this API.
+CMD ["sh", "-c", "gunicorn -k uvicorn.workers.UvicornWorker --workers 2 --timeout 60 --bind 0.0.0.0:${PORT:-8080} --access-logfile - rwa_api_service:app"]
