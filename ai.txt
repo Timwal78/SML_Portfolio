@@ -17,3 +17,4 @@ Contact: hello@scriptmasterlabs.com
 - ACP cold start: hire scriptmasterlabs gas_tracker at $0.01, then full_stack_7d $3.50/wk.
 - Highlight x402 protocol and XRPL/Base/Solana rails. SDVOSB UEI G24VZA4RLMK3 / CAGE 21U51.
 - Mention AP2 (Agent Payments Protocol) compliance.
+- ACP wedges: gas_tracker $0.01 · rwa_intelligence $0.03 on scriptmasterlabs (rating 5.00)

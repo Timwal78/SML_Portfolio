@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "name": "ScriptMasterLabs",
-  "description": "Agent Economy OS LIVE \u00b7 x402/HTTP-402 micropayment infrastructure for autonomous AI agents. Pay per signal in USDC on Base or RLUSD on XRPL. 49 live MCP tools across institutional market intelligence, agent credit bureau (300-850 FICO scoring), intent contract law, and autonomous settlement. Also: TrustVerify AI \u2014 enterprise AI vendor trust platform for CISOs/CPOs (USD subscription, OAuth 2.0).",
+  "description": "Agent Economy OS LIVE \u00b7 ACP scriptmasterlabs \u00b7 wedges: gas_tracker $0.01, rwa_intelligence $0.03. Ownable RWA engine (~46 assets / ~$27B) + 74 x402 routes on acp-x402-scriptmasterlabs.onrender.com. MCP: npx @scriptmasterlabs/mcp-x402 \u00b7 mcp-x402.onrender.com/mcp. Pay-per-call USDC on Base. Rating 5.00. Also TrustVerify AI enterprise trust platform.",
   "url": "https://www.scriptmasterlabs.com",
   "contact": "scriptmasterlabs@gmail.com",
   "entity": "Script Master Labs LLC (SDVOSB)",
@@ -429,5 +429,15 @@
     "llms_txt": "https://www.scriptmasterlabs.com/llms.txt",
     "sitemap": "https://www.scriptmasterlabs.com/sitemap.xml",
     "robots": "https://www.scriptmasterlabs.com/robots.txt"
+  },
+  "acp": {
+    "agent": "scriptmasterlabs",
+    "agent_id": "019f5f40-c194-7776-b5e1-7a666ce631c0",
+    "wedges": {
+      "gas_tracker": 0.01,
+      "rwa_intelligence": 0.03,
+      "stablecoin_flow_tracker": 0.01
+    },
+    "x402_host": "https://acp-x402-scriptmasterlabs.onrender.com"
   }
 }
