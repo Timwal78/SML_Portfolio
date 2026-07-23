@@ -1,0 +1,1087 @@
+[
+  {
+    "name": "Federal Contract Opportunities Feed",
+    "description": "Real-time feed of federal contract opportunities. Search by NAICS code, agency, state, or keyword. Includes solicitation type, response deadline, award value, and contracting office details.",
+    "parameters": [
+      {
+        "name": "naics",
+        "type": "string",
+        "required": false,
+        "description": "NAICS industry code filter"
+      },
+      {
+        "name": "agency",
+        "type": "string",
+        "required": false,
+        "description": "Contracting agency name"
+      },
+      {
+        "name": "state",
+        "type": "string",
+        "required": false,
+        "description": "2-letter state code"
+      },
+      {
+        "name": "keyword",
+        "type": "string",
+        "required": false,
+        "description": "Search keyword"
+      },
+      {
+        "name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Max results (default 50)"
+      }
+    ],
+    "suggested_endpoint": "/v1/federal-contract-opportunities-feed"
+  },
+  {
+    "name": "Federal Award History Tracker",
+    "description": "Historical federal contract award records. Track awarded contracts by recipient, agency, or date range. Includes award amount, recipient details, and contract performance data.",
+    "parameters": [
+      {
+        "name": "recipient",
+        "type": "string",
+        "required": false,
+        "description": "Contractor/recipient name"
+      },
+      {
+        "name": "agency",
+        "type": "string",
+        "required": false,
+        "description": "Awarding agency"
+      },
+      {
+        "name": "from_date",
+        "type": "string",
+        "required": false,
+        "description": "Start date YYYY-MM-DD"
+      },
+      {
+        "name": "to_date",
+        "type": "string",
+        "required": false,
+        "description": "End date YYYY-MM-DD"
+      },
+      {
+        "name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Max results (default 50)"
+      }
+    ],
+    "suggested_endpoint": "/v1/federal-award-history-tracker"
+  },
+  {
+    "name": "Set-Aside Contract Feed for Small Business",
+    "description": "Federal set-aside contract opportunities filtered by socio-economic category (SDVOSB, WOSB, HUBZone, 8(a)). Includes eligibility requirements and response deadlines.",
+    "parameters": [
+      {
+        "name": "category",
+        "type": "string",
+        "required": false,
+        "description": "Set-aside type: SDVOSB, WOSB, HUBZone, 8(a)"
+      },
+      {
+        "name": "naics",
+        "type": "string",
+        "required": false,
+        "description": "NAICS code filter"
+      },
+      {
+        "name": "state",
+        "type": "string",
+        "required": false,
+        "description": "2-letter state code"
+      },
+      {
+        "name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Max results (default 50)"
+      }
+    ],
+    "suggested_endpoint": "/v1/set-aside-contract-feed-for-small-business"
+  },
+  {
+    "name": "Entity Registration Verification",
+    "description": "Verify business entity registration status, exclusion/debarment flags, set-aside eligibility, and NAICS codes. Check if a contractor is registered and in good standing.",
+    "parameters": [
+      {
+        "name": "uei",
+        "type": "string",
+        "required": false,
+        "description": "Unique Entity Identifier"
+      },
+      {
+        "name": "cage",
+        "type": "string",
+        "required": false,
+        "description": "CAGE code"
+      },
+      {
+        "name": "entity_name",
+        "type": "string",
+        "required": false,
+        "description": "Legal entity name"
+      }
+    ],
+    "suggested_endpoint": "/v1/entity-registration-verification"
+  },
+  {
+    "name": "Federal Spending by Agency",
+    "description": "Federal spending breakdown by agency, category, and geographic distribution. Track obligation and outlay amounts across fiscal years.",
+    "parameters": [
+      {
+        "name": "agency",
+        "type": "string",
+        "required": false,
+        "description": "Agency name"
+      },
+      {
+        "name": "fiscal_year",
+        "type": "string",
+        "required": false,
+        "description": "Fiscal year (e.g. 2025)"
+      },
+      {
+        "name": "state",
+        "type": "string",
+        "required": false,
+        "description": "2-letter state code"
+      },
+      {
+        "name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Max results (default 50)"
+      }
+    ],
+    "suggested_endpoint": "/v1/federal-spending-by-agency"
+  },
+  {
+    "name": "Excluded Parties Check",
+    "description": "Check if an entity is on the federal excluded/debarred parties list. Cross-reference recipient records with award history for compliance screening.",
+    "parameters": [
+      {
+        "name": "entity_name",
+        "type": "string",
+        "required": true,
+        "description": "Entity or contractor name to check"
+      }
+    ],
+    "suggested_endpoint": "/v1/excluded-parties-check"
+  },
+  {
+    "name": "Annual Financial Report Filings",
+    "description": "Annual financial report filings for any public company. Retrieve filing dates, accession numbers, and direct links to full reports. Includes balance sheet, income statement, and cash flow data.",
+    "parameters": [
+      {
+        "name": "ticker",
+        "type": "string",
+        "required": true,
+        "description": "Stock ticker symbol (e.g. AAPL)"
+      },
+      {
+        "name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Max results (default 10, max 10)"
+      }
+    ],
+    "suggested_endpoint": "/v1/annual-financial-report-filings"
+  },
+  {
+    "name": "Quarterly Financial Report Filings",
+    "description": "Quarterly financial report filings for any public company. Retrieve filing dates, accession numbers, and links to full quarterly reports.",
+    "parameters": [
+      {
+        "name": "ticker",
+        "type": "string",
+        "required": true,
+        "description": "Stock ticker symbol"
+      },
+      {
+        "name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Max results (default 10, max 10)"
+      }
+    ],
+    "suggested_endpoint": "/v1/quarterly-financial-report-filings"
+  },
+  {
+    "name": "Material Event Filings Feed",
+    "description": "Real-time material event filings for any public company. Includes event type, filing date, and summary for event-driven trading and monitoring.",
+    "parameters": [
+      {
+        "name": "ticker",
+        "type": "string",
+        "required": true,
+        "description": "Stock ticker symbol"
+      }
+    ],
+    "suggested_endpoint": "/v1/material-event-filings-feed"
+  },
+  {
+    "name": "Insider Trading Activity Tracker",
+    "description": "Insider trading transaction filings for any public company. Track executive buys, sells, and option exercises with transaction dates, share counts, and prices.",
+    "parameters": [
+      {
+        "name": "ticker",
+        "type": "string",
+        "required": true,
+        "description": "Stock ticker symbol"
+      }
+    ],
+    "suggested_endpoint": "/v1/insider-trading-activity-tracker"
+  },
+  {
+    "name": "Institutional Holdings Filings",
+    "description": "Quarterly institutional investment manager holdings filings. Retrieve position-level data for funds and institutions with filing URLs to full holdings tables.",
+    "parameters": [
+      {
+        "name": "cik",
+        "type": "string",
+        "required": false,
+        "description": "CIK number of the institution"
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": false,
+        "description": "Institution or fund name"
+      }
+    ],
+    "suggested_endpoint": "/v1/institutional-holdings-filings"
+  },
+  {
+    "name": "Activist Investor Filings",
+    "description": "Activist investor 5%+ stake filings for any ticker. Track filer name, form type, filing date, and stake percentage for activist position monitoring.",
+    "parameters": [
+      {
+        "name": "ticker",
+        "type": "string",
+        "required": true,
+        "description": "Stock ticker symbol"
+      },
+      {
+        "name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Max results (default 20, max 20)"
+      }
+    ],
+    "suggested_endpoint": "/v1/activist-investor-filings"
+  },
+  {
+    "name": "Warning Letters Feed",
+    "description": "Regulatory warning letters issued to companies. Includes company name, subject, issued date, issuing office, and product type. Filter by company or product.",
+    "parameters": [
+      {
+        "name": "company",
+        "type": "string",
+        "required": false,
+        "description": "Company or issuer name"
+      },
+      {
+        "name": "product",
+        "type": "string",
+        "required": false,
+        "description": "Product, drug, or device name"
+      },
+      {
+        "name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Max results (default 50)"
+      }
+    ],
+    "suggested_endpoint": "/v1/warning-letters-feed"
+  },
+  {
+    "name": "Drug Recall Alerts",
+    "description": "Drug and medical device recall enforcement reports. Track recall events by drug name, recall class, and date. Includes recalling firm and recall reason.",
+    "parameters": [
+      {
+        "name": "drug",
+        "type": "string",
+        "required": false,
+        "description": "Drug or product name"
+      },
+      {
+        "name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Max results (default 50)"
+      }
+    ],
+    "suggested_endpoint": "/v1/drug-recall-alerts"
+  },
+  {
+    "name": "Adverse Event Reports",
+    "description": "Adverse event reports for drugs and medical products. Includes reaction type, severity, patient outcomes, and report dates. Filter by drug name.",
+    "parameters": [
+      {
+        "name": "drug",
+        "type": "string",
+        "required": true,
+        "description": "Drug or product name"
+      },
+      {
+        "name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Max results (default 50)"
+      }
+    ],
+    "suggested_endpoint": "/v1/adverse-event-reports"
+  },
+  {
+    "name": "Environmental Violation Records",
+    "description": "Facility environmental enforcement and violation records. Includes inspection counts, penalty amounts, and compliance status. Filter by facility, state, or industry code.",
+    "parameters": [
+      {
+        "name": "facility",
+        "type": "string",
+        "required": false,
+        "description": "Facility or company name"
+      },
+      {
+        "name": "state",
+        "type": "string",
+        "required": false,
+        "description": "2-letter state code"
+      },
+      {
+        "name": "naics",
+        "type": "string",
+        "required": false,
+        "description": "NAICS industry code"
+      },
+      {
+        "name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Max results (default 50)"
+      }
+    ],
+    "suggested_endpoint": "/v1/environmental-violation-records"
+  },
+  {
+    "name": "Workplace Safety Inspection Records",
+    "description": "Workplace safety inspection records with activity type, citations, penalties, and open/closed status. Filter by employer name, state, or industry code.",
+    "parameters": [
+      {
+        "name": "establishment",
+        "type": "string",
+        "required": false,
+        "description": "Employer or establishment name"
+      },
+      {
+        "name": "state",
+        "type": "string",
+        "required": false,
+        "description": "2-letter state code"
+      },
+      {
+        "name": "naics",
+        "type": "string",
+        "required": false,
+        "description": "6-digit NAICS code"
+      },
+      {
+        "name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Max results (default 50)"
+      }
+    ],
+    "suggested_endpoint": "/v1/workplace-safety-inspection-records"
+  },
+  {
+    "name": "Campaign Finance Data",
+    "description": "Campaign finance data with receipts, disbursements, party affiliation, office sought, and election cycle. Filter by candidate, committee, or cycle.",
+    "parameters": [
+      {
+        "name": "name",
+        "type": "string",
+        "required": false,
+        "description": "Candidate name"
+      },
+      {
+        "name": "committee",
+        "type": "string",
+        "required": false,
+        "description": "Committee name"
+      },
+      {
+        "name": "cycle",
+        "type": "string",
+        "required": false,
+        "description": "Election year (e.g. 2024)"
+      }
+    ],
+    "suggested_endpoint": "/v1/campaign-finance-data"
+  },
+  {
+    "name": "Legislation Search",
+    "description": "Search legislation by keyword, session number, and bill status. Includes sponsor, cosponsors, bill text, and legislative action history.",
+    "parameters": [
+      {
+        "name": "query",
+        "type": "string",
+        "required": true,
+        "description": "Search keyword"
+      },
+      {
+        "name": "congress",
+        "type": "string",
+        "required": false,
+        "description": "Congress number (e.g. 119)"
+      },
+      {
+        "name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Max results (default 20)"
+      }
+    ],
+    "suggested_endpoint": "/v1/legislation-search"
+  },
+  {
+    "name": "Lobbying Disclosures Feed",
+    "description": "Lobbying registration and disclosure filings. Includes client, registrant, issue areas, and reported amounts. Filter by client, registrant, or issue code.",
+    "parameters": [
+      {
+        "name": "client",
+        "type": "string",
+        "required": false,
+        "description": "Client name"
+      },
+      {
+        "name": "registrant",
+        "type": "string",
+        "required": false,
+        "description": "Registrant (lobbying firm) name"
+      },
+      {
+        "name": "issue",
+        "type": "string",
+        "required": false,
+        "description": "Issue area code (e.g. TAX, HCR, DEF)"
+      },
+      {
+        "name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Max results (default 50)"
+      }
+    ],
+    "suggested_endpoint": "/v1/lobbying-disclosures-feed"
+  },
+  {
+    "name": "Economic Indicators Dashboard",
+    "description": "Economic indicators including GDP, inflation, unemployment, interest rates, and consumer sentiment. Filter by indicator series ID or category.",
+    "parameters": [
+      {
+        "name": "series_id",
+        "type": "string",
+        "required": false,
+        "description": "Economic series ID"
+      },
+      {
+        "name": "category",
+        "type": "string",
+        "required": false,
+        "description": "Indicator category (e.g. inflation, employment)"
+      },
+      {
+        "name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Max results (default 20)"
+      }
+    ],
+    "suggested_endpoint": "/v1/economic-indicators-dashboard"
+  },
+  {
+    "name": "Perpetual Futures Funding Rates",
+    "description": "Aggregated funding rates across major perpetual futures exchanges. Track funding by coin, exchange, or time range. Includes prediction, basis, and spread data.",
+    "parameters": [
+      {
+        "name": "coin",
+        "type": "string",
+        "required": false,
+        "description": "Coin ticker (e.g. BTC, ETH)"
+      },
+      {
+        "name": "exchange",
+        "type": "string",
+        "required": false,
+        "description": "Exchange name"
+      },
+      {
+        "name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Max results (default 50)"
+      }
+    ],
+    "suggested_endpoint": "/v1/perpetual-futures-funding-rates"
+  },
+  {
+    "name": "Market Regime Indicator",
+    "description": "Market regime classification (risk-on, risk-off, transition) based on liquidity, volatility, and sentiment factors. Includes regime score and directional bias.",
+    "parameters": [
+      {
+        "name": "asset",
+        "type": "string",
+        "required": false,
+        "description": "Asset to analyze (e.g. BTC, SP500)"
+      },
+      {
+        "name": "timeframe",
+        "type": "string",
+        "required": false,
+        "description": "Analysis timeframe: short, medium, long"
+      }
+    ],
+    "suggested_endpoint": "/v1/market-regime-indicator"
+  },
+  {
+    "name": "DeFi Yield Rates Aggregator",
+    "description": "DeFi yield rates across 15000+ liquidity pools. Filter by minimum APY, minimum TVL, chain, or protocol. Includes risk scores and TVL data.",
+    "parameters": [
+      {
+        "name": "chain",
+        "type": "string",
+        "required": false,
+        "description": "Blockchain (e.g. Ethereum, Arbitrum)"
+      },
+      {
+        "name": "min_apy",
+        "type": "number",
+        "required": false,
+        "description": "Minimum APY percentage"
+      },
+      {
+        "name": "min_tvl",
+        "type": "number",
+        "required": false,
+        "description": "Minimum TVL in USD"
+      },
+      {
+        "name": "project",
+        "type": "string",
+        "required": false,
+        "description": "Protocol name filter"
+      },
+      {
+        "name": "top_n",
+        "type": "integer",
+        "required": false,
+        "description": "Max pools to return (default 50)"
+      }
+    ],
+    "suggested_endpoint": "/v1/defi-yield-rates-aggregator"
+  },
+  {
+    "name": "DeFi TVL Rankings",
+    "description": "Total Value Locked rankings across 7800+ DeFi protocols. Filter by chain, category, or top N. Includes 24h/7d/1m changes and market cap data.",
+    "parameters": [
+      {
+        "name": "chain",
+        "type": "string",
+        "required": false,
+        "description": "Blockchain filter"
+      },
+      {
+        "name": "category",
+        "type": "string",
+        "required": false,
+        "description": "Category (e.g. Lending, DEX, Liquid Staking)"
+      },
+      {
+        "name": "top_n",
+        "type": "integer",
+        "required": false,
+        "description": "Max protocols (default 50)"
+      }
+    ],
+    "suggested_endpoint": "/v1/defi-tvl-rankings"
+  },
+  {
+    "name": "Airdrop Eligibility Scanner",
+    "description": "Check wallet address for eligible airdrops across multiple blockchains. Returns claimable amounts, deadlines, and claim links.",
+    "parameters": [
+      {
+        "name": "wallet",
+        "type": "string",
+        "required": true,
+        "description": "Wallet address to check"
+      },
+      {
+        "name": "chain",
+        "type": "string",
+        "required": false,
+        "description": "Blockchain filter (ethereum, base, solana, arbitrum)"
+      }
+    ],
+    "suggested_endpoint": "/v1/airdrop-eligibility-scanner"
+  },
+  {
+    "name": "Wallet Analysis Tool",
+    "description": "On-chain wallet analysis including net worth, holdings, risk score, DeFi positions, and behavioral flags. Supports multiple blockchains.",
+    "parameters": [
+      {
+        "name": "address",
+        "type": "string",
+        "required": true,
+        "description": "Wallet address to analyze"
+      },
+      {
+        "name": "chain",
+        "type": "string",
+        "required": false,
+        "description": "Blockchain (ethereum, base, solana, arbitrum, bsc)"
+      }
+    ],
+    "suggested_endpoint": "/v1/wallet-analysis-tool"
+  },
+  {
+    "name": "Gas Price Tracker",
+    "description": "Real-time gas prices and transaction cost estimates across multiple blockchains. Includes priority fee recommendations and historical trends.",
+    "parameters": [
+      {
+        "name": "chain",
+        "type": "string",
+        "required": false,
+        "description": "Chain key e.g. ethereum, base, arbitrum, polygon"
+      },
+      {
+        "name": "unit",
+        "type": "string",
+        "required": false,
+        "description": "Return unit preference: gwei or usd"
+      }
+    ],
+    "suggested_endpoint": "/v1/gas-price-tracker"
+  },
+  {
+    "name": "Trending Tokens Scanner",
+    "description": "Trending tokens by trading volume, price momentum, and top gainers. Filter by chain and limit results. Includes momentum scores.",
+    "parameters": [
+      {
+        "name": "chain",
+        "type": "string",
+        "required": false,
+        "description": "Blockchain filter"
+      },
+      {
+        "name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Max tokens (default 20)"
+      }
+    ],
+    "suggested_endpoint": "/v1/trending-tokens-scanner"
+  },
+  {
+    "name": "Smart Money Flow Tracker",
+    "description": "Smart money wallet activity tracker. Monitor whale buys, sells, and token flows. Filter by token or limit results for copy trading signals.",
+    "parameters": [
+      {
+        "name": "token",
+        "type": "string",
+        "required": false,
+        "description": "Token symbol or address"
+      },
+      {
+        "name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Max alerts (default 20)"
+      }
+    ],
+    "suggested_endpoint": "/v1/smart-money-flow-tracker"
+  },
+  {
+    "name": "New Token Detection",
+    "description": "Recently launched token detection across major DEXes. Includes liquidity, volume, holder count, and age. Filter by chain.",
+    "parameters": [
+      {
+        "name": "chain",
+        "type": "string",
+        "required": false,
+        "description": "Blockchain filter"
+      },
+      {
+        "name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Max tokens (default 20)"
+      }
+    ],
+    "suggested_endpoint": "/v1/new-token-detection"
+  },
+  {
+    "name": "Liquidation Risk Monitor",
+    "description": "Liquidation risk assessment for leveraged positions. Calculate liquidation prices, health factors, and risk levels for any wallet.",
+    "parameters": [
+      {
+        "name": "address",
+        "type": "string",
+        "required": true,
+        "description": "Wallet address"
+      },
+      {
+        "name": "chain",
+        "type": "string",
+        "required": false,
+        "description": "Blockchain filter"
+      }
+    ],
+    "suggested_endpoint": "/v1/liquidation-risk-monitor"
+  },
+  {
+    "name": "Token Risk Audit Scanner",
+    "description": "Token risk audit including honeypot detection, rugpull risk, buy/sell tax analysis, ownership verification, and liquidity lock status.",
+    "parameters": [
+      {
+        "name": "chain_id",
+        "type": "integer",
+        "required": true,
+        "description": "Chain ID (1=Ethereum, 8453=Base, 56=BSC)"
+      },
+      {
+        "name": "token_address",
+        "type": "string",
+        "required": true,
+        "description": "Token contract address"
+      }
+    ],
+    "suggested_endpoint": "/v1/token-risk-audit-scanner"
+  },
+  {
+    "name": "Fact Check Oracle",
+    "description": "Grounding oracle that fact-checks claims against live government and regulatory data sources. Returns verdict, confidence score, and supporting sources.",
+    "parameters": [
+      {
+        "name": "claim",
+        "type": "string",
+        "required": true,
+        "description": "The claim to fact-check"
+      },
+      {
+        "name": "domain",
+        "type": "string",
+        "required": false,
+        "description": "Domain hint (e.g. health, finance, government)"
+      }
+    ],
+    "suggested_endpoint": "/v1/fact-check-oracle"
+  },
+  {
+    "name": "Entity Compliance Check",
+    "description": "Business entity compliance check including registration status, exclusion flags, set-aside eligibility, and industry code verification.",
+    "parameters": [
+      {
+        "name": "uei",
+        "type": "string",
+        "required": false,
+        "description": "Unique Entity Identifier"
+      },
+      {
+        "name": "cage",
+        "type": "string",
+        "required": false,
+        "description": "CAGE code"
+      }
+    ],
+    "suggested_endpoint": "/v1/entity-compliance-check"
+  },
+  {
+    "name": "Macro Regime Analysis",
+    "description": "Macro market regime analysis with liquidity outlook, forward view, and trade thesis. Classifies market as risk-on, risk-off, or transition. Includes asset recommendations and risk/reward ratios.",
+    "parameters": [
+      {
+        "name": "query",
+        "type": "string",
+        "required": true,
+        "description": "The macro question or scenario to analyze"
+      },
+      {
+        "name": "assets",
+        "type": "string",
+        "required": false,
+        "description": "Comma-separated tickers to focus on"
+      },
+      {
+        "name": "timeframe",
+        "type": "string",
+        "required": false,
+        "description": "Horizon: short, medium, or long"
+      }
+    ],
+    "suggested_endpoint": "/v1/macro-regime-analysis"
+  },
+  {
+    "name": "Compliance Anomaly Reporter",
+    "description": "Submit compliance anomalies for swarm-based scoring. Detects AML flags, financial crime indicators, and risk patterns. Returns severity score.",
+    "parameters": [
+      {
+        "name": "bank_id",
+        "type": "string",
+        "required": true,
+        "description": "Bank or institution identifier"
+      },
+      {
+        "name": "agent_id",
+        "type": "string",
+        "required": true,
+        "description": "Reporting agent identifier"
+      },
+      {
+        "name": "trigger",
+        "type": "string",
+        "required": true,
+        "description": "Anomaly trigger description"
+      },
+      {
+        "name": "detail",
+        "type": "string",
+        "required": true,
+        "description": "Detailed anomaly description"
+      },
+      {
+        "name": "severity",
+        "type": "string",
+        "required": false,
+        "description": "Severity level"
+      }
+    ],
+    "suggested_endpoint": "/v1/compliance-anomaly-reporter"
+  },
+  {
+    "name": "Bank Compliance Audit",
+    "description": "Full compliance audit cycle for financial institutions. Includes regulatory audit scoring, risk assessment, and compliance status dashboard.",
+    "parameters": [
+      {
+        "name": "bank_id",
+        "type": "string",
+        "required": true,
+        "description": "Bank or institution identifier"
+      }
+    ],
+    "suggested_endpoint": "/v1/bank-compliance-audit"
+  },
+  {
+    "name": "Regulatory Compliance Query",
+    "description": "Real-time regulatory compliance dashboard for financial institutions. Query compliance status, open issues, and regulatory findings.",
+    "parameters": [
+      {
+        "name": "bank_id",
+        "type": "string",
+        "required": true,
+        "description": "Bank or institution identifier"
+      }
+    ],
+    "suggested_endpoint": "/v1/regulatory-compliance-query"
+  },
+  {
+    "name": "Rugpull Detector",
+    "description": "Real-time rugpull risk detection for any token. Monitors liquidity removal, developer wallet activity, and contract manipulation patterns. Returns risk score and warning flags.",
+    "parameters": [
+      {
+        "name": "chain_id",
+        "type": "integer",
+        "required": true,
+        "description": "Chain ID (1=Ethereum, 8453=Base, 56=BSC)"
+      },
+      {
+        "name": "token_address",
+        "type": "string",
+        "required": true,
+        "description": "Token contract address to check"
+      }
+    ],
+    "suggested_endpoint": "/v1/rugpull-detector"
+  },
+  {
+    "name": "API Documentation Catalog",
+    "description": "Full API catalog with pricing, schemas, and data sources for all available endpoints. Includes example requests and response formats.",
+    "parameters": [
+      {
+        "name": "category",
+        "type": "string",
+        "required": false,
+        "description": "Optional capability category filter"
+      },
+      {
+        "name": "q",
+        "type": "string",
+        "required": false,
+        "description": "Keyword search across catalog entries"
+      },
+      {
+        "name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Max entries to return (default 50)"
+      }
+    ],
+    "suggested_endpoint": "/v1/api-documentation-catalog"
+  },
+  {
+    "name": "Capabilities Introspection Endpoint",
+    "description": "Free introspection endpoint returning the complete offering catalog with names, descriptions, prices, SLA minutes, and subscription options.",
+    "parameters": [
+      {
+        "name": "module",
+        "type": "string",
+        "required": false,
+        "description": "Module or product area to introspect"
+      },
+      {
+        "name": "include_examples",
+        "type": "boolean",
+        "required": false,
+        "description": "Include example payloads if true"
+      },
+      {
+        "name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Max capability rows (default 100)"
+      }
+    ],
+    "suggested_endpoint": "/v1/capabilities-introspection-endpoint"
+  },
+  {
+    "name": "DeFi Yield API Catalog",
+    "description": "Catalog page for DeFi yield rate endpoints. Lists all available yield farming and APY aggregation endpoints with parameters and examples.",
+    "parameters": [
+      {
+        "name": "category",
+        "type": "string",
+        "required": false,
+        "description": "Optional capability category filter"
+      },
+      {
+        "name": "q",
+        "type": "string",
+        "required": false,
+        "description": "Keyword search across catalog entries"
+      },
+      {
+        "name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Max entries to return (default 50)"
+      }
+    ],
+    "suggested_endpoint": "/v1/defi-yield-api-catalog"
+  },
+  {
+    "name": "Token Risk Detection API Catalog",
+    "description": "Catalog page for honeypot and rugpull detection endpoints. Lists all available token risk scanning endpoints with parameters and examples.",
+    "parameters": [
+      {
+        "name": "category",
+        "type": "string",
+        "required": false,
+        "description": "Optional capability category filter"
+      },
+      {
+        "name": "q",
+        "type": "string",
+        "required": false,
+        "description": "Keyword search across catalog entries"
+      },
+      {
+        "name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Max entries to return (default 50)"
+      }
+    ],
+    "suggested_endpoint": "/v1/token-risk-detection-api-catalog"
+  },
+  {
+    "name": "Perpetual Futures Funding API Catalog",
+    "description": "Catalog page for funding rate and perpetual futures data endpoints. Lists all available funding rate endpoints with parameters and examples.",
+    "parameters": [
+      {
+        "name": "category",
+        "type": "string",
+        "required": false,
+        "description": "Optional capability category filter"
+      },
+      {
+        "name": "q",
+        "type": "string",
+        "required": false,
+        "description": "Keyword search across catalog entries"
+      },
+      {
+        "name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Max entries to return (default 50)"
+      }
+    ],
+    "suggested_endpoint": "/v1/perpetual-futures-funding-api-catalog"
+  },
+  {
+    "name": "Trending Tokens API Catalog",
+    "description": "Catalog page for trending token scanner endpoints. Lists all available trending detection endpoints with parameters and examples.",
+    "parameters": [
+      {
+        "name": "category",
+        "type": "string",
+        "required": false,
+        "description": "Optional capability category filter"
+      },
+      {
+        "name": "q",
+        "type": "string",
+        "required": false,
+        "description": "Keyword search across catalog entries"
+      },
+      {
+        "name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Max entries to return (default 50)"
+      }
+    ],
+    "suggested_endpoint": "/v1/trending-tokens-api-catalog"
+  },
+  {
+    "name": "Wallet Analysis API Catalog",
+    "description": "Catalog page for wallet analysis and wallet analyzer endpoints. Lists all available wallet intelligence endpoints with parameters and examples.",
+    "parameters": [
+      {
+        "name": "category",
+        "type": "string",
+        "required": false,
+        "description": "Optional capability category filter"
+      },
+      {
+        "name": "q",
+        "type": "string",
+        "required": false,
+        "description": "Keyword search across catalog entries"
+      },
+      {
+        "name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Max entries to return (default 50)"
+      }
+    ],
+    "suggested_endpoint": "/v1/wallet-analysis-api-catalog"
+  }
+]
