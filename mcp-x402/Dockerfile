@@ -23,8 +23,12 @@ RUN apk add --no-cache dbus libsecret
 COPY package*.json ./
 RUN npm install --omit=dev --omit=optional --ignore-scripts
 COPY --from=builder /app/dist ./dist
+# ACP seller signer binary (signFn path — not PKCS8)
+COPY bin/acp-cli-signer-linux ./bin/acp-cli-signer-linux
+RUN chmod +x ./bin/acp-cli-signer-linux
 COPY agents.json llms.txt .well-known/ ./
 EXPOSE 3402
 ENV NODE_ENV=production
+ENV ACP_SIGNER_BIN=/app/bin/acp-cli-signer-linux
 USER node
 CMD ["node", "dist/server/index.js"]

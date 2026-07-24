@@ -30,7 +30,6 @@ import type { JobSession, JobRoomEntry, AgentMessage } from '@virtuals-protocol/
 import { base } from '@account-kit/infra';
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 
 // ─── CONFIG ──────────────────────────────────────────────────────────────────
@@ -835,21 +834,34 @@ const SCRIPTMASTER_PUBLIC_KEY =
   'MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEuEhRLPb6V2+8Muq+T+P2AQej0ztDzu4faXRXC+haeoEj80hz69JN3xlazGa75BT0RKS01t+oI8AeV/Sqa7gqvg==';
 
 function resolveSignerBin(): string {
-  if (process.env['ACP_SIGNER_BIN'] && existsSync(process.env['ACP_SIGNER_BIN'])) {
+  if (process.env['ACP_SIGNER_BIN'] && existsSync(process.env['ACP_SIGNER_BIN']!)) {
     return process.env['ACP_SIGNER_BIN']!;
   }
-  const here = dirname(fileURLToPath(import.meta.url));
+  // CJS-safe only — no import.meta (package is module-typeless; import.meta
+  // forces Node to reparse seller.js as ESM → "exports is not defined").
   const candidates = [
     join(process.cwd(), 'bin/acp-cli-signer-linux'),
     join(process.cwd(), 'mcp-x402/bin/acp-cli-signer-linux'),
-    join(here, '../../../bin/acp-cli-signer-linux'),
-    join(here, '../../../../bin/acp-cli-signer-linux'),
+    '/app/bin/acp-cli-signer-linux',
+    '/opt/render/project/src/mcp-x402/bin/acp-cli-signer-linux',
+    '/opt/render/project/src/bin/acp-cli-signer-linux',
     '/home/hermes/.hermes/skills/acp-cli/bin/acp-cli-signer-linux',
     '/usr/local/lib/node_modules/@virtuals-protocol/acp-cli/bin/acp-cli-signer-linux',
   ];
+  try {
+    const argv1 = process.argv[1] || '';
+    if (argv1) {
+      candidates.unshift(join(dirname(argv1), '../../bin/acp-cli-signer-linux'));
+      candidates.unshift(join(dirname(argv1), '../../../bin/acp-cli-signer-linux'));
+    }
+  } catch {
+    /* ignore */
+  }
   const hit = candidates.find((c) => existsSync(c));
   if (!hit) {
-    throw new Error(`acp-cli-signer-linux not found. Set ACP_SIGNER_BIN. tried=${candidates.join(',')}`);
+    throw new Error(
+      `acp-cli-signer-linux not found. Set ACP_SIGNER_BIN. tried=${candidates.join(',')}`,
+    );
   }
   return hit;
 }
