@@ -1,3 +1,5 @@
+MCP server for agents with autonomous USDC/RLUSD payments. x402 pay-per-call. 43+ trading + federal tools. No API keys. Free demo: curl -sS https://mcp-x402.onrender.com/health · gas_tracker $0.01 · rwa_intelligence $0.03
+
 Title: ScriptMasterLabs AI Overview
 Description: Institutional-grade AI trading intelligence, agentic micropayment layers, and zero-trust AI deployments.
 Contact: hello@scriptmasterlabs.com

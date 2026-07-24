@@ -1,7 +1,12 @@
 # mcp-x402 — ScriptMasterLabs Autonomous Payment MCP Server
-# The x402 Amazon: 64 tools, pay-per-call, no API keys
+# MCP server for agents with autonomous USDC/RLUSD payments
+# x402 pay-per-call · 43+ trading + federal tools · no API keys
 
-> The first MCP server that pays for itself.
+> Free: sml_discover / health · Paid wedges: gas_tracker $0.01 · rwa_intelligence $0.03
+> Demo: curl -sS https://mcp-x402.onrender.com/health
+> Remote: https://mcp-x402.onrender.com/mcp
+> npm: npx @scriptmasterlabs/mcp-x402
+> ACP: search scriptmasterlabs
 
 ## What this is
 

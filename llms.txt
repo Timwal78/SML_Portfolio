@@ -1,3 +1,5 @@
+MCP server for agents with autonomous USDC/RLUSD payments. x402 pay-per-call. 43+ trading + federal tools. No API keys. Free demo: curl -sS https://mcp-x402.onrender.com/health · gas_tracker $0.01 · rwa_intelligence $0.03
+
 # ScriptMasterLabs — Machine-to-Machine Commerce Infrastructure
 
 > x402 / HTTP-402 payment rails, AI-native tools, and sovereign blockchain architecture for the agentic web. All products enforce strict production data — no demos, no simulations, no fake inputs. Service-Disabled Veteran-Owned Small Business (SDVOSB). Founder: Timothy Walton, Kinston NC.
