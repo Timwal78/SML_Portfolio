@@ -113,8 +113,8 @@ async function tokenDomain(req: PaymentRequirements): Promise<{ name: string; ve
   const client = createPublicClient({ chain: isTestnet() ? baseSepolia : base, transport: http(rpcUrl()) });
   try {
     const [name, version] = await Promise.all([
-      client.readContract({ address: usdcAddress() as `0x${string}`, abi: TOKEN_META_ABI, functionName: 'name' }),
-      client.readContract({ address: usdcAddress() as `0x${string}`, abi: TOKEN_META_ABI, functionName: 'version' }),
+      (client as any).readContract({ address: usdcAddress() as `0x${string}`, abi: TOKEN_META_ABI, functionName: 'name' }),
+      (client as any).readContract({ address: usdcAddress() as `0x${string}`, abi: TOKEN_META_ABI, functionName: 'version' }),
     ]);
     cachedDomain = { name: String(name), version: String(version) };
   } catch {

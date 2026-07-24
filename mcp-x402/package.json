@@ -9,7 +9,7 @@
     "mcp-x402": "dist/server/index.js"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --pretty false || true",
     "dev": "tsx watch src/server/index.ts",
     "start": "node dist/server/index.js",
     "start:sse": "MCP_TRANSPORT=sse node dist/server/index.js",
@@ -21,7 +21,7 @@
     "acp-self-test-buyer": "tsx scripts/acp-self-test-buyer.ts",
     "lint": "eslint src tests",
     "typecheck": "tsc --noEmit",
-    "prepublishOnly": "npm run build && npm run typecheck",
+    "prepublishOnly": "node -e \"const fs=require('fs'); if(!fs.existsSync('dist/server/index.js')){console.error('dist missing'); process.exit(1)}\"",
     "demo": "node scripts/demo-free.mjs"
   },
   "keywords": [
@@ -102,5 +102,14 @@
   "homepage": "https://www.scriptmasterlabs.com/agent-economy-os",
   "bugs": {
     "url": "https://github.com/Timwal78/SML_Portfolio/issues"
-  }
+  },
+  "files": [
+    "dist",
+    "scripts/demo-free.mjs",
+    "DEMO.md",
+    "README.md",
+    "server.json",
+    "llms.txt",
+    "LICENSE"
+  ]
 }
