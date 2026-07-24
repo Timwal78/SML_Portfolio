@@ -1,0 +1,144 @@
+{
+  "marketplace": "API.market",
+  "operator": {
+    "name": "Script Master Labs, LLC",
+    "sdvosb": true,
+    "uei": "G24VZA4RLMK3",
+    "cage": "21U51",
+    "email": "timothy.walton45@gmail.com",
+    "site": "https://www.scriptmasterlabs.com"
+  },
+  "listings": [
+    {
+      "priority": 1,
+      "name": "Agent Wallet \u2014 AI Agent Business Kit",
+      "slug": "agent-wallet",
+      "one_liner": "Your AI agent is a business \u2014 wallet, pay, credit score, compliance log. No human merchant account.",
+      "category": [
+        "MCP",
+        "Payments",
+        "Identity",
+        "Compliance"
+      ],
+      "npm": "@scriptmasterlabs/agent-wallet",
+      "install": "npx @scriptmasterlabs/agent-wallet",
+      "landing": "https://www.scriptmasterlabs.com/agent-wallet",
+      "tools": [
+        "collect_payment",
+        "prove_creditworthiness",
+        "generate_compliance_log",
+        "agent_business_status"
+      ],
+      "pricing": {
+        "model": "freemium + micropay",
+        "free": "status + local ledger",
+        "paid_hint": "pair with x402/ACP paid tools; enterprise onboarding"
+      },
+      "description": "MCP server that treats the AI agent as the economic actor. Three tools only: collect_payment, prove_creditworthiness, generate_compliance_log. Built for Claude/GPT/Cursor hosts. SDVOSB operator. No merchant KYC theater.",
+      "use_cases": [
+        "Agent builders who want Stripe-for-bots",
+        "Enterprise controlled autonomous spend",
+        "Gov pilots needing agent audit trails"
+      ],
+      "keywords": [
+        "mcp",
+        "agent wallet",
+        "x402",
+        "compliance",
+        "sdvosb",
+        "audit trail",
+        "agent payments"
+      ]
+    },
+    {
+      "priority": 2,
+      "name": "Gov Procurement Intel \u2014 Federal Capture API",
+      "slug": "gov-procurement-intel",
+      "one_liner": "AI agent federal capture: awards, SDVOSB set-asides, agency spend, signed procurement logs.",
+      "category": [
+        "Government",
+        "Data",
+        "MCP",
+        "Compliance"
+      ],
+      "npm": "@scriptmasterlabs/gov-procurement-intel",
+      "install": "npx @scriptmasterlabs/gov-procurement-intel",
+      "landing": "https://www.scriptmasterlabs.com/gov-procurement",
+      "tools": [
+        "search_contract_awards",
+        "match_setasides",
+        "agency_spend_snapshot",
+        "verify_contractor_entity",
+        "export_capture_log"
+      ],
+      "pricing": {
+        "model": "freemium micropay",
+        "free": "3 calls/day per search tool",
+        "paid": "$0.05-$0.10 per search (marketplace/x402)",
+        "export": "HMAC-signed capture log included"
+      },
+      "description": "Federal procurement intelligence for autonomous agents and BD teams. USAspending-backed contract awards, set-aside oriented feeds, agency obligation snapshots, entity lookup, and HMAC-signed capture logs. Built by SDVOSB (UEI G24VZA4RLMK3, CAGE 21U51). Pair with Agent Wallet for payment + compliance shell. Not a cryptocurrency product.",
+      "use_cases": [
+        "SDVOSB/small-business capture research",
+        "Primes screening set-aside landscape",
+        "Agent-led opportunity monitoring with audit export"
+      ],
+      "keywords": [
+        "federal contracts",
+        "sdvosb",
+        "usaspending",
+        "procurement",
+        "set-aside",
+        "government api",
+        "mcp"
+      ]
+    },
+    {
+      "priority": 3,
+      "name": "Gas Price Tracker (Agent Micro-Oracle)",
+      "slug": "gas-tracker",
+      "one_liner": "Multi-chain gas oracle for trading/agent bots at $0.01 \u2014 ACP-proven wedge.",
+      "category": [
+        "Crypto",
+        "Infrastructure",
+        "Agents"
+      ],
+      "npm": null,
+      "acp": {
+        "agent": "scriptmasterlabs",
+        "offering": "gas_tracker",
+        "price_usd": 0.01
+      },
+      "endpoint": "https://acp-x402-scriptmasterlabs.onrender.com/x402/gas-tracker",
+      "landing": "https://www.scriptmasterlabs.com/agent-economy-os",
+      "pricing": {
+        "model": "micropay",
+        "price_usd": 0.01,
+        "note": "If marketplace bans crypto, skip or mark infrastructure-only"
+      },
+      "description": "Real-time multi-chain gas estimates for autonomous agents and trading bots. Proven ACP wedge at one cent. Use when the marketplace allows infrastructure/crypto data. Otherwise lead with Agent Wallet + Gov Procurement only.",
+      "use_cases": [
+        "Trading bots",
+        "TX cost guards",
+        "Agent ops"
+      ],
+      "keywords": [
+        "gas",
+        "ethereum",
+        "base",
+        "agent oracle",
+        "micropayment"
+      ]
+    }
+  ],
+  "submit_order": [
+    "1) Agent Wallet (universal, non-crypto-primary)",
+    "2) Gov Procurement Intel (gov/enterprise, non-crypto)",
+    "3) Gas tracker only if API.market allows crypto/infra data"
+  ],
+  "copy_paste_short": {
+    "agent_wallet": "Agent Wallet MCP: your AI agent is a business \u2014 pay, credit, compliance log. npx @scriptmasterlabs/agent-wallet \u00b7 scriptmasterlabs.com/agent-wallet \u00b7 SDVOSB",
+    "gov": "Gov Procurement Intel: federal awards + SDVOSB set-asides + signed capture logs. npx @scriptmasterlabs/gov-procurement-intel \u00b7 scriptmasterlabs.com/gov-procurement",
+    "gas": "gas_tracker $0.01 multi-chain gas oracle \u2014 search scriptmasterlabs on ACP or x402 /x402/gas-tracker"
+  }
+}

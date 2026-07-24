@@ -1,0 +1,6 @@
+# Gov Procurement Intel — ScriptMasterLabs
+AI agent federal capture tools: contract awards, SDVOSB set-asides, agency spend, HMAC capture logs.
+npm: npx @scriptmasterlabs/gov-procurement-intel
+SDVOSB UEI G24VZA4RLMK3 CAGE 21U51
+Pair with agent-wallet for pay/credit/compliance shell.
+Landing: https://www.scriptmasterlabs.com/gov-procurement
