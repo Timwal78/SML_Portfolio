@@ -1,10 +1,11 @@
 {
-  "name": "@scriptmasterlabs/squeezeos-x402-gateway",
-  "version": "1.0.1",
+  "name": "@scriptmasterlabs/agent-wallet",
+  "version": "1.0.0",
   "description": "Your AI agent is a business \u2014 wallet, pay, credit score, compliance log. 3 MCP tools. No human merchant account. SDVOSB.",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
+    "agent-wallet": "dist/index.js",
     "squeezeos-x402-gateway": "dist/index.js"
   },
   "files": [

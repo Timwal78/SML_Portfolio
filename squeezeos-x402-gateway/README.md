@@ -25,7 +25,7 @@ Not 43 tools. Not a protocol seminar. **Tent first.**
 ## 2-minute install
 
 ```bash
-npx @scriptmasterlabs/squeezeos-x402-gateway
+npx @scriptmasterlabs/agent-wallet
 ```
 
 Claude / Cursor / any MCP host:
@@ -35,7 +35,7 @@ Claude / Cursor / any MCP host:
   "mcpServers": {
     "agent-business": {
       "command": "npx",
-      "args": ["-y", "@scriptmasterlabs/squeezeos-x402-gateway"]
+      "args": ["-y", "@scriptmasterlabs/agent-wallet"]
     }
   }
 }
