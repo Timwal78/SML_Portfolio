@@ -439,5 +439,8 @@
       "stablecoin_flow_tracker": 0.01
     },
     "x402_host": "https://acp-x402-scriptmasterlabs.onrender.com"
-  }
+  },
+  "agent_wallet": "https://www.scriptmasterlabs.com/agent-wallet",
+  "squeezeos_x402_gateway": "@scriptmasterlabs/squeezeos-x402-gateway",
+  "agent_wallet_npm": "@scriptmasterlabs/agent-wallet"
 }

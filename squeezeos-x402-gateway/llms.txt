@@ -6,7 +6,7 @@ MCP tools (only 3):
 - prove_creditworthiness — will this bot pay?
 - generate_compliance_log — HMAC audit trail for SDVOSB/gov/enterprise
 
-npm: npx @scriptmasterlabs/squeezeos-x402-gateway
+npm: npx @scriptmasterlabs/agent-wallet
 Landing: https://www.scriptmasterlabs.com/agent-wallet
 SDVOSB UEI G24VZA4RLMK3 CAGE 21U51
 Remote optional: https://mcp-x402.onrender.com/mcp

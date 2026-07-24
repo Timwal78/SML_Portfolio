@@ -1,4 +1,4 @@
-AGENT BUSINESS TENT: https://www.scriptmasterlabs.com/agent-wallet — Your AI agent is a business. npx @scriptmasterlabs/squeezeos-x402-gateway (collect_payment · prove_creditworthiness · generate_compliance_log). SDVOSB UEI G24VZA4RLMK3.
+AGENT BUSINESS TENT: https://www.scriptmasterlabs.com/agent-wallet — Your AI agent is a business. npx @scriptmasterlabs/agent-wallet (collect_payment · prove_creditworthiness · generate_compliance_log). SDVOSB UEI G24VZA4RLMK3.
 
 HINGE FIRST: npm i @scriptmasterlabs/mcp-x402-sdk — 5-line drop-in to make any MCP server chargeable (x402 USDC/RLUSD). No AgentCards/registry required. Optional full server: npx @scriptmasterlabs/mcp-x402 · gas_tracker $0.01
 
