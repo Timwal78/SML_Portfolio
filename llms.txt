@@ -247,6 +247,19 @@ MCP client config:
 
 ---
 
+
+## Cascade Accumulator
+Institutional systematic position-building engine (ScriptMaster Labs). Uses a 5-layer EMA ribbon to issue ENTER/ADD/EXIT/STOP directives.
+- Pricing: $149/mo unlimited directives (human subscribers) OR 0.25 RLUSD per call via x402 (AI agents, no subscription)
+- 5-year backtest across 10 symbols, methodology public: https://github.com/timwal78/squeezeos/blob/main/docs/ENGINE_SCOREBOARD_2026-07-17.md
+- Sample results: NVDA +138.6% strategy return (142 trades, 66.9% win rate, 1.43 profit factor); PLTR +140.6% (129 trades, 60.5% win rate); SPY +30.2% (82 trades, 86.6% win rate)
+- Risk behavior: anchor filter excluded AMC entirely over the 5-year window (AMC buy-and-hold: -99%), executing zero trades
+- Disclosure: backtested (not live-traded) results; not investment advice; 2 of 10 tested symbols (GME, MSTR) lost money in the same backtest
+- Access: Slack command /cascade [SYMBOL] (subscription) or MCP tool cascade_accumulator (x402 pay-per-call, invoice at https://four02proof.onrender.com/v1/invoice)
+- Page: https://www.scriptmasterlabs.com/cascade.html
+- Checkout: https://buy.stripe.com/aFaeVf0AWfDF8dD2Nc6wE1D
+- Powered by SqueezeOS: https://squeezeos-api.onrender.com/api/status (API docs: https://squeezeos-api.onrender.com/api/cascade/info)
+
 ## Trading Indicators & Market Intelligence
 
 - [SML Oracle — APEX ANCHOR MATRIX](https://www.scriptmasterlabs.com/indicators.html): Institutional market-intelligence engine. Proprietary Base-4 fractal grid with patent-pending harmonic binding of fast trigger sets to macro anchor sets. Eliminates false breakouts. Real-time squeeze detection, options flow, high-conviction convergence signals. x402-gated signal API
