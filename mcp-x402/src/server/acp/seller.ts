@@ -28,6 +28,10 @@ import {
 } from '@virtuals-protocol/acp-node-v2';
 import type { JobSession, JobRoomEntry, AgentMessage } from '@virtuals-protocol/acp-node-v2';
 import { base } from '@account-kit/infra';
+import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { spawnSync } from 'node:child_process';
 
 // ─── CONFIG ──────────────────────────────────────────────────────────────────
 
@@ -820,12 +824,109 @@ async function handleEntry(session: JobSession, entry: JobRoomEntry): Promise<vo
 
 // ─── MAIN ────────────────────────────────────────────────────────────────────
 
-export async function startAcpSeller(): Promise<void> {
-  if (!WALLET_ID || !SIGNER_PRIVATE_KEY) {
-    throw new Error(
-      'SML-ACP requires ACP_WALLET_ID and ACP_SIGNER_PRIVATE_KEY — ' +
-      'get them from app.virtuals.io/acp/agents/ → Signers tab',
+
+// ─── Signer (same proven path as acp-render live_provider.mjs) ───────────────
+// Virtuals Privy AA wallets authorize via P-256 keystore + acp-cli-signer.
+// Raw ACP_SIGNER_PRIVATE_KEY PKCS8 on Render is usually NOT the authorized
+// signer (CLI keeps keys encrypted). Prefer signFn → acp-cli-signer.
+
+const SCRIPTMASTER_PUBLIC_KEY =
+  process.env['ACP_SIGNER_PUBLIC_KEY']?.trim() ||
+  'MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEuEhRLPb6V2+8Muq+T+P2AQej0ztDzu4faXRXC+haeoEj80hz69JN3xlazGa75BT0RKS01t+oI8AeV/Sqa7gqvg==';
+
+function resolveSignerBin(): string {
+  if (process.env['ACP_SIGNER_BIN'] && existsSync(process.env['ACP_SIGNER_BIN'])) {
+    return process.env['ACP_SIGNER_BIN']!;
+  }
+  const here = dirname(fileURLToPath(import.meta.url));
+  const candidates = [
+    join(process.cwd(), 'bin/acp-cli-signer-linux'),
+    join(process.cwd(), 'mcp-x402/bin/acp-cli-signer-linux'),
+    join(here, '../../../bin/acp-cli-signer-linux'),
+    join(here, '../../../../bin/acp-cli-signer-linux'),
+    '/home/hermes/.hermes/skills/acp-cli/bin/acp-cli-signer-linux',
+    '/usr/local/lib/node_modules/@virtuals-protocol/acp-cli/bin/acp-cli-signer-linux',
+  ];
+  const hit = candidates.find((c) => existsSync(c));
+  if (!hit) {
+    throw new Error(`acp-cli-signer-linux not found. Set ACP_SIGNER_BIN. tried=${candidates.join(',')}`);
+  }
+  return hit;
+}
+
+function ensureSignerKeystore(): void {
+  const raw = process.env['ACP_SIGNER_KEYS_JSON']?.trim();
+  if (!raw) return;
+  const home = process.env['HOME'] || '/home/hermes';
+  const dir = join(home, '.config/acp-cli');
+  mkdirSync(dir, { recursive: true });
+  const dest = join(dir, 'signer-keys.json');
+  if (!existsSync(dest) || process.env['ACP_SIGNER_KEYS_FORCE'] === '1') {
+    writeFileSync(dest, raw, { mode: 0o600 });
+    console.log(`[SML-ACP] wrote signer-keys.json (${raw.length} bytes) → ${dest}`);
+  }
+}
+
+function createSignFn(publicKeyB64: string, signerBin: string) {
+  return async (payload: Uint8Array): Promise<string> => {
+    const hex = Buffer.from(payload).toString('hex');
+    const res = spawnSync(
+      signerBin,
+      ['sign', '--public-key', publicKeyB64, '--payload', hex],
+      { encoding: 'utf8', env: process.env },
     );
+    if (res.error) throw res.error;
+    const out = (res.stdout || '').trim();
+    let parsed: { signature?: string; error?: string };
+    try {
+      parsed = JSON.parse(out);
+    } catch {
+      throw new Error(
+        `signer bad json rc=${res.status} out=${out.slice(0, 160)} err=${(res.stderr || '').slice(0, 120)}`,
+      );
+    }
+    if (parsed.error) throw new Error(`signer: ${parsed.error}`);
+    if (!parsed.signature) throw new Error(`signer: no signature in ${out.slice(0, 120)}`);
+    return parsed.signature;
+  };
+}
+
+function resolvePublicKey(): string {
+  if (process.env['ACP_SIGNER_PUBLIC_KEY']?.trim()) return process.env['ACP_SIGNER_PUBLIC_KEY']!.trim();
+  // config.json agents[wallet].publicKey
+  const cfgPaths = [
+    process.env['ACP_CONFIG'],
+    process.env['ACP_CONFIG_DIR'] ? join(process.env['ACP_CONFIG_DIR'], 'config.json') : '',
+    '/opt/acp-config/config.json',
+    '/workspace/config.json',
+    join(process.cwd(), 'config.json'),
+  ].filter(Boolean) as string[];
+  for (const cp of cfgPaths) {
+    try {
+      if (!existsSync(cp)) continue;
+      const cfg = JSON.parse(readFileSync(cp, 'utf8')) as {
+        agents?: Record<string, { publicKey?: string }>;
+      };
+      const w = WALLET_ADDRESS.toLowerCase();
+      const entry =
+        cfg.agents?.[WALLET_ADDRESS] ||
+        cfg.agents?.[w] ||
+        Object.entries(cfg.agents || {}).find(([k]) => k.toLowerCase() === w)?.[1];
+      if (entry?.publicKey) return entry.publicKey;
+    } catch {
+      /* continue */
+    }
+  }
+  return SCRIPTMASTER_PUBLIC_KEY;
+}
+
+
+export async function startAcpSeller(): Promise<void> {
+  if (!WALLET_ID) {
+    throw new Error('SML-ACP requires ACP_WALLET_ID (Privy wallet id odh4cz…)');
+  }
+  if (!SIGNER_PRIVATE_KEY && !process.env['ACP_SIGNER_KEYS_JSON'] && !existsSync(join(process.env['HOME'] || '', '.config/acp-cli/signer-keys.json'))) {
+    console.warn('[SML-ACP] No ACP_SIGNER_PRIVATE_KEY or ACP_SIGNER_KEYS_JSON — seller start may fail');
   }
   if (!BYPASS_SECRET) {
     console.warn('[SML-ACP] SML_ACP_BYPASS_SECRET/LEVIATHAN_BYPASS_SECRET is not set — x402 gates will reject calls');
@@ -835,13 +936,12 @@ export async function startAcpSeller(): Promise<void> {
   }
 
   // Validate key format before handing to Privy — helps diagnose Render env var issues.
-  const keyBytes = Buffer.from(SIGNER_PRIVATE_KEY, 'base64');
-  console.log(`[SML-ACP] key bytes=${keyBytes.length} starts=${SIGNER_PRIVATE_KEY.slice(0,8)} ends=${SIGNER_PRIVATE_KEY.slice(-8)}`);
-  if (keyBytes.indexOf(Buffer.from([0x04, 0x20])) === -1) {
-    throw new Error(
-      `Invalid wallet authorization private key — decoded to ${keyBytes.length} bytes, ` +
-      `pattern 0x04 0x20 not found. Key may be truncated, URL-encoded, or wrong format.`,
-    );
+  if (SIGNER_PRIVATE_KEY) {
+    const keyBytes = Buffer.from(SIGNER_PRIVATE_KEY, 'base64');
+    console.log(`[SML-ACP] PKCS8 key bytes=${keyBytes.length} starts=${SIGNER_PRIVATE_KEY.slice(0,8)} ends=${SIGNER_PRIVATE_KEY.slice(-8)}`);
+    if (keyBytes.indexOf(Buffer.from([0x04, 0x20])) === -1) {
+      console.warn(`[SML-ACP] PKCS8 key looks invalid (${keyBytes.length} bytes) — will prefer signFn/keystore`);
+    }
   }
 
   // Log raw ACP/Privy responses to diagnose auth failures.
@@ -864,15 +964,48 @@ export async function startAcpSeller(): Promise<void> {
   }
   let provider: Awaited<ReturnType<typeof PrivyAlchemyEvmProviderAdapter.create>>;
   try {
-    provider = await PrivyAlchemyEvmProviderAdapter.create({
-      walletAddress: WALLET_ADDRESS,
-      walletId: WALLET_ID,
-      // ACP SDK passes this directly to Privy's importPKCS8PrivateKey, which expects
-      // PKCS#8 base64 — pass the key as-is from the Virtuals "Add Signer" UI.
-      signerPrivateKey: SIGNER_PRIVATE_KEY as `0x${string}`,
-      chains: [base],
-      builderCode: process.env['ACP_BUILDER_CODE'] || process.env['BUILDER_CODE'] || 'bc_0gi3t7qi',
-    });
+    ensureSignerKeystore();
+    const signerBin = resolveSignerBin();
+    const publicKey = resolvePublicKey();
+    console.log(`[SML-ACP] signerBin=${signerBin}`);
+    console.log(`[SML-ACP] publicKey starts=${publicKey.slice(0, 24)}… len=${publicKey.length}`);
+
+    // Preflight: sign a tiny payload with keystore (proves key exists)
+    const pre = spawnSync(
+      signerBin,
+      ['sign', '--public-key', publicKey, '--payload', '6869'],
+      { encoding: 'utf8', env: process.env },
+    );
+    const preOut = (pre.stdout || '').trim();
+    console.log(`[SML-ACP] signer preflight rc=${pre.status} out=${preOut.slice(0, 120)}`);
+    if (pre.status !== 0 || preOut.includes('"error"')) {
+      console.warn('[SML-ACP] keystore sign failed — falling back to ACP_SIGNER_PRIVATE_KEY if set');
+    }
+
+    const useSignFn = pre.status === 0 && preOut.includes('signature');
+    if (useSignFn) {
+      provider = await PrivyAlchemyEvmProviderAdapter.create({
+        walletAddress: WALLET_ADDRESS,
+        walletId: WALLET_ID,
+        signFn: createSignFn(publicKey, signerBin),
+        chains: [base],
+        builderCode: process.env['ACP_BUILDER_CODE'] || process.env['BUILDER_CODE'] || 'bc_0gi3t7qi',
+      });
+      console.log('[SML-ACP] provider via signFn + acp-cli-signer (proven path)');
+    } else if (SIGNER_PRIVATE_KEY) {
+      provider = await PrivyAlchemyEvmProviderAdapter.create({
+        walletAddress: WALLET_ADDRESS,
+        walletId: WALLET_ID,
+        signerPrivateKey: SIGNER_PRIVATE_KEY as `0x${string}`,
+        chains: [base],
+        builderCode: process.env['ACP_BUILDER_CODE'] || process.env['BUILDER_CODE'] || 'bc_0gi3t7qi',
+      });
+      console.log('[SML-ACP] provider via signerPrivateKey fallback');
+    } else {
+      throw new Error(
+        'No working signer: set ACP_SIGNER_KEYS_JSON (same as acp-provider) + ship acp-cli-signer, or fix ACP_SIGNER_PRIVATE_KEY',
+      );
+    }
   } catch (err: unknown) {
     const e = err as Error & { details?: unknown; statusCode?: number; shortMessage?: string };
     console.error('[SML-ACP] PrivyAlchemyEvmProviderAdapter.create failed:', e.message,

@@ -51,6 +51,14 @@ services:
         sync: false
       - key: ACP_SIGNER_PRIVATE_KEY
         sync: false
+      - key: ACP_SIGNER_KEYS_JSON
+        sync: false
+      - key: ACP_SIGNER_PUBLIC_KEY
+        value: "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEuEhRLPb6V2+8Muq+T+P2AQej0ztDzu4faXRXC+haeoEj80hz69JN3xlazGa75BT0RKS01t+oI8AeV/Sqa7gqvg=="
+      - key: ACP_BUILDER_CODE
+        value: "bc_0gi3t7qi"
+      - key: ACP_SIGNER_BIN
+        value: "/opt/render/project/src/mcp-x402/bin/acp-cli-signer-linux"
       - key: SML_ACP_BYPASS_SECRET
         sync: false
       - key: LEVIATHAN_BYPASS_SECRET
