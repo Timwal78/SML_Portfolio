@@ -6,6 +6,14 @@ Built by a Service-Disabled Veteran · **SDVOSB** · UEI **G24VZA4RLMK3** · CAG
 
 Pairs with: [`@scriptmasterlabs/agent-wallet`](https://www.npmjs.com/package/@scriptmasterlabs/agent-wallet)
 
+## SAM.gov key
+
+```bash
+export SAM_API_KEY=your-sam-api-key
+```
+
+Without the key, award/set-aside tools still work via USAspending. **SAM opportunities require the key.**
+
 ## Install
 
 ```bash
@@ -27,6 +35,7 @@ npx @scriptmasterlabs/gov-procurement-intel
 
 | Tool | Free? | What |
 |------|-------|------|
+| `search_sam_opportunities` | 3/day free | **Live SAM.gov solicitations** (requires `SAM_API_KEY`) |
 | `search_contract_awards` | 3/day free | Federal contract awards (USAspending) by agency/NAICS/amount |
 | `match_setasides` | 3/day free | SDVOSB / small-business set-aside award feed |
 | `agency_spend_snapshot` | 3/day free | Top-tier agency obligation snapshot |
