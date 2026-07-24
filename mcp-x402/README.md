@@ -1,16 +1,45 @@
-# mcp-x402 — The First MCP Server That Pays for Itself
+# mcp-x402 — MCP Server for Agents with Autonomous USDC/RLUSD Payments
 
 [![npm](https://img.shields.io/npm/v/@scriptmasterlabs/mcp-x402)](https://www.npmjs.com/package/@scriptmasterlabs/mcp-x402)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Tests](https://github.com/timwal78/sml_portfolio/actions/workflows/mcp-x402-ci.yml/badge.svg)](https://github.com/timwal78/sml_portfolio/actions)
+[![x402](https://img.shields.io/badge/x402-pay--per--call-green.svg)](https://mcp-x402.onrender.com/health)
+[![No API Keys](https://img.shields.io/badge/API%20keys-not%20required-blue.svg)](#one-line-install)
 
-> **Demo video:** [30-second walkthrough](#) — coming within 48h of launch.
+> **MCP server for agents with autonomous USDC/RLUSD payments** · **x402 pay-per-call** · **43+ trading + federal tools** · **no API keys**
 
-AI agents should pay for their own data — instantly, autonomously, compliantly. `mcp-x402` makes that real.
+| Free now | Cheap wedge |
+|----------|-------------|
+| `sml_discover` / remote MCP health | ACP **gas_tracker $0.01** |
+| RWA assets lead (`/x402/rwa-assets`) | ACP **rwa_intelligence $0.03** |
 
+## 30-second demo (no wallet)
+```bash
+curl -sS https://mcp-x402.onrender.com/health
+curl -sS "https://sml-rwa-api.onrender.com/x402/rwa-assets?limit=3"
+# full script:
+bash scripts/demo-one-command.sh
+```
+
+See [DEMO.md](./DEMO.md).
+
+## One-line install
 ```bash
 npx @scriptmasterlabs/mcp-x402
 ```
+
+Remote MCP (Claude/Cursor) — free discover:
+```json
+{
+  "mcpServers": {
+    "sml": {
+      "url": "https://mcp-x402.onrender.com/mcp",
+      "transport": "streamable-http"
+    }
+  }
+}
+```
+
+ACP marketplace (agents that already pay): search **scriptmasterlabs** → hire **gas_tracker** @ **$0.01**.
 
 ---
 
