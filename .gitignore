@@ -1,3 +1,7 @@
 .vercel
 squeezeos-x402-gateway/node_modules/
 gov-procurement-intel/node_modules/
+
+# local signer secrets — never commit
+downloads/ACP_SIGNER_KEYS*
+**/signer-keys.json
