@@ -1,0 +1,12 @@
+# SqueezeOS x402 Gateway — agent is the business
+> Your AI agent is a business. It just doesn't have a bank account.
+
+MCP tools (only 3):
+- collect_payment — agent wallet pays; no human merchant account
+- prove_creditworthiness — will this bot pay?
+- generate_compliance_log — HMAC audit trail for SDVOSB/gov/enterprise
+
+npm: npx @scriptmasterlabs/squeezeos-x402-gateway
+Landing: https://www.scriptmasterlabs.com/agent-wallet
+SDVOSB UEI G24VZA4RLMK3 CAGE 21U51
+Remote optional: https://mcp-x402.onrender.com/mcp
