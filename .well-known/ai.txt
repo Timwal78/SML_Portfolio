@@ -36,7 +36,7 @@ Product-description: 33-tool institutional market intelligence MCP server. Counc
 
 Product: mcp-x402
 Product-url: https://mcp-x402.onrender.com
-Product-description: 43+ MCP tools for AI agents. Pay-per-call USDC on Base/Polygon/Solana.
+Product-description: 85+ MCP tools for AI agents. Pay-per-call USDC on Base/Polygon/Solana.
 
 # ── AI DISCOVERY FILES ────────────────────────────────────────────────────
 

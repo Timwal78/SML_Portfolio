@@ -5,7 +5,7 @@
 [![x402](https://img.shields.io/badge/x402-pay--per--call-green.svg)](https://mcp-x402.onrender.com/.well-known/x402)
 [![MCP](https://img.shields.io/badge/MCP-remote%20ready-purple.svg)](https://mcp-x402.onrender.com/mcp)
 
-> **MCP server for agents with autonomous USDC/RLUSD payments** · **x402 pay-per-call** · **43+ trading + federal tools** · **no API keys**
+> **MCP server for agents with autonomous USDC/RLUSD payments** · **x402 pay-per-call** · **85+ trading + federal tools** · **no API keys**
 
 AI agents pay for ScriptMasterLabs data mid-loop — no human API keys, no monthly key babysitting.
 
