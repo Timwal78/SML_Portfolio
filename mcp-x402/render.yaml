@@ -46,7 +46,7 @@ services:
         sync: false
       # ScriptMasterLabs ACP seller (mcp-x402) — Virtuals Protocol seller agent
       - key: ACP_WALLET_ADDRESS
-        value: "0x0f035c36c4ce65a6f1bf4370f779bac722d59004"
+        value: "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa"  # scriptmasterlabs — NOT old Leviathan 0x0f03
       - key: ACP_WALLET_ID
         sync: false
       - key: ACP_SIGNER_PRIVATE_KEY
