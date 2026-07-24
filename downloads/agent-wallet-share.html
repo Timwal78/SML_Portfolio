@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>Your AI Agent Is a Business — ScriptMasterLabs</title>
+<meta name="description" content="Your AI agent is a business. It just doesn't have a bank account. Agent wallet, pay, credit, compliance log. No merchant account. SDVOSB."/>
+<meta property="og:title" content="Your AI Agent Is a Business"/>
+<meta property="og:description" content="Get your agent a wallet in 2 minutes. No merchant account. Builds credit. Government-ready audit trails."/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://www.scriptmasterlabs.com/agent-wallet"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="theme-color" content="#0b0f14"/>
+<link rel="canonical" href="https://www.scriptmasterlabs.com/agent-wallet"/>
+<style>
+:root{
+  --bg:#070a0f;--bg2:#0d131c;--card:rgba(18,26,38,.82);--line:rgba(120,150,190,.18);
+  --text:#eef3fb;--muted:#93a0b4;--green:#3dd68c;--blue:#5b8cff;--gold:#e6c35c;
+  --danger:#ff6b7a;--radius:22px;--shadow:0 30px 80px rgba(0,0,0,.45);
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.55;-webkit-font-smoothing:antialiased}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;background:
+  radial-gradient(900px 500px at 50% -10%, rgba(91,140,255,.22), transparent 60%),
+  radial-gradient(700px 400px at 100% 20%, rgba(61,214,140,.08), transparent 50%),
+  radial-gradient(600px 400px at 0% 80%, rgba(230,195,92,.06), transparent 45%);z-index:0}
+.wrap{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:28px 18px 80px}
+.nav{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:28px}
+.brand{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);border:1px solid var(--line);padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.02)}
+.nav a{color:var(--muted);text-decoration:none;font-size:14px}
+.hero{border:1px solid var(--line);background:linear-gradient(180deg,rgba(24,32,48,.9),rgba(12,16,24,.92));border-radius:28px;padding:42px 28px;text-align:center;box-shadow:var(--shadow);backdrop-filter:blur(10px)}
+.kicker{display:inline-flex;gap:8px;align-items:center;color:var(--gold);font-size:12px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:18px}
+h1{font-size:clamp(2rem,6vw,3.4rem);line-height:1.05;letter-spacing:-.04em;margin:0 0 12px;font-weight:800}
+.sub{color:var(--muted);font-size:clamp(1.05rem,2.6vw,1.35rem);margin:0 auto 28px;max-width:34ch}
+.cta-row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:22px}
+.btn{appearance:none;border:0;border-radius:14px;padding:14px 18px;font-weight:750;font-size:15px;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:.15s transform,.15s opacity}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:linear-gradient(180deg,#7aa2ff,#5b8cff);color:#fff;box-shadow:0 10px 30px rgba(91,140,255,.35)}
+.btn-secondary{background:transparent;color:var(--text);border:1px solid var(--line)}
+.btn-green{background:linear-gradient(180deg,#57e5a4,#3dd68c);color:#04140c}
+.checks{list-style:none;padding:0;margin:26px auto 0;max-width:420px;text-align:left;display:grid;gap:10px}
+.checks li{color:var(--text);font-size:15px}
+.checks li:before{content:"✓ ";color:var(--green);font-weight:800}
+.grid{display:grid;gap:14px;margin-top:28px}
+@media(min-width:760px){.grid.3{grid-template-columns:repeat(3,1fr)}.grid.2{grid-template-columns:1.2fr .8fr}}
+.card{border:1px solid var(--line);background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:0 10px 40px rgba(0,0,0,.18);backdrop-filter:blur(8px)}
+.card h3{margin:0 0 8px;font-size:1.05rem}
+.card p,.card li{color:var(--muted);margin:0;font-size:.95rem}
+.section{margin-top:34px}
+.section h2{font-size:1.35rem;margin:0 0 12px;letter-spacing:-.02em}
+code,.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+pre{background:#05080d;border:1px solid var(--line);border-radius:16px;padding:16px;overflow:auto;color:#dce7f5;font-size:13px;line-height:1.5}
+.pill{display:inline-block;border:1px solid rgba(61,214,140,.35);background:rgba(61,214,140,.08);color:var(--green);border-radius:999px;padding:4px 10px;font-size:12px;margin:2px}
+.foot{margin-top:48px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-align:center}
+.sharebar{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:18px}
+.sharebar button,.sharebar a{border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--text);border-radius:999px;padding:10px 14px;font-size:13px;text-decoration:none;cursor:pointer}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:#152033;color:#fff;border:1px solid var(--line);padding:12px 16px;border-radius:12px;opacity:0;pointer-events:none;transition:.2s;z-index:50}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.metric{font-size:28px;font-weight:800;letter-spacing:-.03em;color:var(--text)}
+.metric span{display:block;font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.04em;text-transform:uppercase;margin-top:4px}
+a{color:var(--blue)}
+.video-box{margin-top:18px;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:#000}
+.video-box video{width:100%;display:block;max-height:520px;background:#000}
+.dl{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:14px}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="nav">
+      <div class="brand">ScriptMasterLabs · SDVOSB</div>
+      <a href="https://www.scriptmasterlabs.com">scriptmasterlabs.com</a>
+    </div>
+
+    <section class="hero">
+      <div class="kicker">Agent-as-business · Tent, not cathedral</div>
+      <h1>YOUR AI AGENT<br/>IS A BUSINESS</h1>
+      <p class="sub">It just doesn’t have a bank account.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#get-wallet">Get Your Agent a Wallet — 2 min</a>
+        <a class="btn btn-green" id="copyLinkBtn" href="#">Copy share link</a>
+        <a class="btn btn-secondary" href="https://www.npmjs.com/package/@scriptmasterlabs/agent-wallet">npm package</a>
+      </div>
+      <ul class="checks">
+        <li>No human merchant account required</li>
+        <li>Builds credit score automatically</li>
+        <li>Government-ready HMAC audit trails</li>
+        <li>Works with Claude, GPT, any MCP host</li>
+      </ul>
+      <div class="sharebar">
+        <button type="button" id="shareNative">Share</button>
+        <a id="shareX" target="_blank" rel="noopener">Post on X</a>
+        <a id="shareLi" target="_blank" rel="noopener">LinkedIn</a>
+        <button type="button" id="copyPitch">Copy pitch</button>
+      </div>
+      <p style="margin:18px 0 0;color:var(--gold);font-size:14px">Built by a Service-Disabled Veteran · SDVOSB · UEI G24VZA4RLMK3 · CAGE 21U51</p>
+    </section>
+
+    <section class="section grid 3">
+      <div class="card"><div class="metric">3<span>tools only</span></div></div>
+      <div class="card"><div class="metric">2 min<span>to install</span></div></div>
+      <div class="card"><div class="metric">$0<span>merchant setup</span></div></div>
+    </section>
+
+    <section class="section">
+      <h2>One sentence</h2>
+      <div class="card">
+        <p style="color:var(--text);font-size:1.12rem;margin:0">The only MCP path that lets <strong>AI agents</strong> get paid, build credit, and prove compliance — <strong>without a human merchant account</strong>.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Three tools. One problem.</h2>
+      <div class="grid 3">
+        <div class="card">
+          <h3>1. collect_payment</h3>
+          <p>Agent pays before work runs. The wallet belongs to the agent. Revenue center, not cost center.</p>
+        </div>
+        <div class="card">
+          <h3>2. prove_creditworthiness</h3>
+          <p>Answers the merchant question: <em>will this bot pay?</em> Score + attestation path.</p>
+        </div>
+        <div class="card">
+          <h3>3. generate_compliance_log</h3>
+          <p>HMAC-signed audit trail of agent transactions. Built for SDVOSB / federal / enterprise procurement.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section grid 2">
+      <div>
+        <h2>Who buys this</h2>
+        <div class="grid">
+          <div class="card"><h3>Government / SDVOSB</h3><p>Agencies must adopt AI and use SDVOSBs — but can’t let agents spend without audit trails. This is agent procurement infrastructure.</p></div>
+          <div class="card"><h3>Enterprise procurement</h3><p>“How do we let AI agents buy things without losing control?” Stripe doesn’t solve it. This does.</p></div>
+          <div class="card"><h3>Agent builders</h3><p>Stripe for bots, not humans. No KYC theater to make your agent a revenue center.</p></div>
+        </div>
+      </div>
+      <div>
+        <h2>Not page-one</h2>
+        <div class="card">
+          <p>Not 43 tools. Not multi-chain cosplay. Not “learn our protocol.”</p>
+          <p style="margin-top:10px;color:var(--text)"><strong>Tent first:</strong> wallet · pay · credit · audit log.<br/>Cathedral after you’re inside.</p>
+          <p style="margin-top:14px">
+            <span class="pill">wallet</span>
+            <span class="pill">pay</span>
+            <span class="pill">credit</span>
+            <span class="pill">audit</span>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="get-wallet">
+      <h2>Get your agent a wallet (2 minutes)</h2>
+      <div class="card">
+        <p style="margin-bottom:12px"><span class="pill">Free status</span> <span class="pill">3 tools</span> <span class="pill">MCP</span></p>
+        <pre class="mono"># install
+npx @scriptmasterlabs/agent-wallet
+
+# Claude / Cursor / any MCP host
+{
+  "mcpServers": {
+    "agent-business": {
+      "command": "npx",
+      "args": ["-y", "@scriptmasterlabs/agent-wallet"]
+    }
+  }
+}
+
+# optional remote catalog
+# https://mcp-x402.onrender.com/mcp</pre>
+        <div class="cta-row" style="margin-top:16px">
+          <a class="btn btn-primary" href="https://www.npmjs.com/package/@scriptmasterlabs/agent-wallet">Open on npm</a>
+          <a class="btn btn-secondary" href="mailto:timothy.walton45@gmail.com?subject=Agent%20wallet%20onboarding%20(SDVOSB)">Email founder — onboarding</a>
+          <a class="btn btn-secondary" href="https://www.scriptmasterlabs.com/agent-wallet">Live page</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Share this</h2>
+      <div class="card">
+        <pre id="pitchText">Your AI agent is a business.
+It just doesn't have a bank account.
+
+npx @scriptmasterlabs/agent-wallet
+
+3 tools: collect_payment · prove_creditworthiness · generate_compliance_log
+No merchant account. Builds credit. Government-ready audit trails.
+SDVOSB.
+
+https://www.scriptmasterlabs.com/agent-wallet</pre>
+        <div class="dl">
+          <button class="btn btn-green" type="button" id="copyPitch2">Copy pitch</button>
+          <a class="btn btn-secondary" href="https://www.scriptmasterlabs.com/agent-wallet">Open live URL</a>
+        </div>
+      </div>
+    </section>
+
+    <div class="foot">
+      Script Master Labs, LLC · Service-Disabled Veteran-Owned<br/>
+      UEI G24VZA4RLMK3 · CAGE 21U51 · This page is the tent. The stack is the cathedral.
+    </div>
+  </div>
+  <div class="toast" id="toast">Copied</div>
+<script>
+const LIVE='https://www.scriptmasterlabs.com/agent-wallet';
+const PITCH=document.getElementById('pitchText').innerText;
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1600)}
+async function copy(text){try{await navigator.clipboard.writeText(text);toast('Copied');}catch(e){toast('Copy failed')}}
+document.getElementById('copyLinkBtn').onclick=(e)=>{e.preventDefault();copy(LIVE)};
+document.getElementById('copyPitch').onclick=()=>copy(PITCH);
+document.getElementById('copyPitch2').onclick=()=>copy(PITCH);
+document.getElementById('shareX').href='https://twitter.com/intent/tweet?text='+encodeURIComponent(PITCH);
+document.getElementById('shareLi').href='https://www.linkedin.com/sharing/share-offsite/?url='+encodeURIComponent(LIVE);
+document.getElementById('shareNative').onclick=async()=>{
+  if(navigator.share){try{await navigator.share({title:'Your AI Agent Is a Business',text:PITCH,url:LIVE})}catch(e){}}
+  else copy(LIVE);
+};
+</script>
+</body>
+</html>
