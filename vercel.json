@@ -13,6 +13,16 @@
   ],
   "redirects": [
     {
+      "source": "/share/agent-wallet",
+      "destination": "/agent-wallet-share.html",
+      "permanent": false
+    },
+    {
+      "source": "/agent-wallet-share",
+      "destination": "/agent-wallet-share.html",
+      "permanent": false
+    },
+    {
       "source": "/agent-wallet",
       "destination": "/agent-wallet.html",
       "permanent": false
