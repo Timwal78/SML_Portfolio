@@ -73,6 +73,13 @@ const BASE_PRICES: Record<string, string> = {
   search_grants: '0.02',
   search_contracts: '0.03',
   lookup_entity: '0.02',
+  federal_sam_opportunities: '0.10',
+  federal_sam_entity: '0.10',
+  // federal.ts paid tools (baseline if pricing API down)
+  federal_grants: '0.15',
+  federal_usaspending_awards: '0.15',
+  federal_grants_gov: '0.15',
+  federal_sba_awards: '0.15',
   // Export compliance (Trade.gov Consolidated Screening List)
   screen_restricted_party: '0.03',
   // Export opportunities (Trade.gov Trade Leads)
