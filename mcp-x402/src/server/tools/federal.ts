@@ -356,4 +356,93 @@ export function registerFederal(server: McpServer): void {
     });
     return r.json();
   }));
+
+  // ── SAM.gov live (requires SAM_API_KEY on host) ─────────────────────────────
+
+  server.tool('federal_sam_opportunities', {
+    keyword: z.string().optional().describe('Title keyword'),
+    naics: z.string().optional().describe('NAICS code'),
+    ptype: z.string().optional().describe('SAM ptype: o=solicitation (default), k=combined, p=presolicitation'),
+    agency: z.string().optional().describe('Organization / agency name'),
+    set_aside: z.string().optional().describe('SAM typeOfSetAside code e.g. SDVOSBC'),
+    days: z.string().optional().describe('Lookback days. Default 30'),
+    limit: z.string().optional().describe('Max results (max 25). Default 10'),
+    wallet_address: z.string().optional().describe('Agent wallet address for USDC payment'),
+  }, async (args) => runPaidTool('federal_sam_opportunities', args.wallet_address, async () => {
+    const key = process.env['SAM_API_KEY'] ?? process.env['SAM_KEY'] ?? '';
+    if (!key) throw new Error('SAM_API_KEY not configured on this host');
+    const limit = Math.min(parseInt(args.limit ?? '10') || 10, 25);
+    const days = Math.min(parseInt(args.days ?? '30') || 30, 365);
+    const now = new Date();
+    const past = new Date(Date.now() - days * 86400000);
+    const fmt = (d: Date) =>
+      `${String(d.getUTCMonth() + 1).padStart(2, '0')}/${String(d.getUTCDate()).padStart(2, '0')}/${d.getUTCFullYear()}`;
+    const q = new URLSearchParams({
+      api_key: key,
+      limit: String(limit),
+      offset: '0',
+      postedFrom: fmt(past),
+      postedTo: fmt(now),
+      ptype: args.ptype ?? 'o',
+    });
+    if (args.keyword) q.set('title', args.keyword);
+    if (args.naics) q.set('ncode', args.naics);
+    if (args.agency) q.set('organizationName', args.agency);
+    if (args.set_aside) q.set('typeOfSetAside', args.set_aside);
+    const r = await fetch(`https://api.sam.gov/opportunities/v2/search?${q}`, {
+      headers: { Accept: 'application/json', 'User-Agent': 'ScriptMasterLabs-mcp-x402/2.1' },
+      signal: AbortSignal.timeout(25000),
+    });
+    const data: any = await r.json();
+    if (!r.ok) throw new Error(`SAM.gov HTTP ${r.status}`);
+    const opportunities = (data.opportunitiesData ?? []).map((o: any) => ({
+      notice_id: o.noticeId,
+      title: o.title,
+      solicitation_number: o.solicitationNumber,
+      agency_path: o.fullParentPathName,
+      posted_date: o.postedDate,
+      type: o.type,
+      set_aside: o.typeOfSetAsideDescription ?? o.typeOfSetAside,
+      response_deadline: o.responseDeadLine,
+      naics: o.naicsCode ?? (o.naicsCodes?.[0]),
+      ui_link: o.uiLink,
+      active: o.active,
+    }));
+    return {
+      source: 'SAM.gov opportunities API v2',
+      total_records: data.totalRecords,
+      returned: opportunities.length,
+      opportunities,
+      operator_sdvosb: { uei: 'G24VZA4RLMK3', cage: '21U51' },
+    };
+  }));
+
+  server.tool('federal_sam_entity', {
+    uei: z.string().optional().describe('SAM UEI'),
+    cage: z.string().optional().describe('CAGE code'),
+    entity_name: z.string().optional().describe('Legal business name'),
+    wallet_address: z.string().optional().describe('Agent wallet address for USDC payment'),
+  }, async (args) => runPaidTool('federal_sam_entity', args.wallet_address, async () => {
+    const key = process.env['SAM_API_KEY'] ?? process.env['SAM_KEY'] ?? '';
+    if (!key) throw new Error('SAM_API_KEY not configured on this host');
+    if (!args.uei && !args.cage && !args.entity_name) throw new Error('uei or cage or entity_name required');
+    const q = new URLSearchParams({ api_key: key });
+    if (args.uei) q.set('ueiSAM', args.uei);
+    if (args.cage) q.set('cageCode', args.cage);
+    if (args.entity_name) q.set('legalBusinessName', args.entity_name);
+    const r = await fetch(`https://api.sam.gov/entity-information/v3/entities?${q}`, {
+      headers: { Accept: 'application/json', 'User-Agent': 'ScriptMasterLabs-mcp-x402/2.1' },
+      signal: AbortSignal.timeout(25000),
+    });
+    const data: any = await r.json();
+    if (!r.ok) throw new Error(`SAM entity HTTP ${r.status}`);
+    return {
+      source: 'SAM.gov entity-information v3',
+      total_records: data.totalRecords,
+      entities: data.entityData ?? data,
+      operator_sdvosb: { uei: 'G24VZA4RLMK3', cage: '21U51' },
+    };
+  }));
+
+
 }
