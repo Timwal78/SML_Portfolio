@@ -1,7 +1,7 @@
 {
   "name": "@scriptmasterlabs/gov-procurement-intel",
-  "version": "1.0.0",
-  "description": "AI agent procurement intelligence for federal capture \u2014 contract awards, SDVOSB set-asides, agency spend, signed compliance logs. SDVOSB UEI G24VZA4RLMK3.",
+  "version": "1.1.0",
+  "description": "AI agent procurement intel: SAM.gov opportunities + USAspending awards, SDVOSB set-asides, agency spend, signed capture logs. Set SAM_API_KEY. SDVOSB UEI G24VZA4RLMK3.",
   "type": "module",
   "main": "dist/index.js",
   "bin": {

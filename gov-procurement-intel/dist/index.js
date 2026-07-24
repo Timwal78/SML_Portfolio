@@ -67,7 +67,7 @@ async function usaPost(path, body) {
         headers: {
             'Content-Type': 'application/json',
             Accept: 'application/json',
-            'User-Agent': 'ScriptMasterLabs-gov-procurement-intel/1.0',
+            'User-Agent': 'ScriptMasterLabs-gov-procurement-intel/1.1',
         },
         body: JSON.stringify(body),
         signal: AbortSignal.timeout(20000),
@@ -81,7 +81,7 @@ async function usaGet(path) {
     const res = await fetch(`${USA}${path}`, {
         headers: {
             Accept: 'application/json',
-            'User-Agent': 'ScriptMasterLabs-gov-procurement-intel/1.0',
+            'User-Agent': 'ScriptMasterLabs-gov-procurement-intel/1.1',
         },
         signal: AbortSignal.timeout(20000),
     });
@@ -240,6 +240,124 @@ async function verifyEntity(input) {
         ...sdvosbBlock(),
     };
 }
+async function searchSamOpportunities(input) {
+    const key = process.env['SAM_API_KEY'] ?? process.env['SAM_KEY'] ?? '';
+    if (!key) {
+        return {
+            error: 'sam_api_key_missing',
+            message: 'Set SAM_API_KEY in the environment to query live SAM.gov opportunities.',
+            fallback: 'Use search_contract_awards (USAspending) without a key.',
+            ...sdvosbBlock(),
+        };
+    }
+    const limit = Math.min(Math.max(input.limit ?? 10, 1), 25);
+    // SAM expects MM/dd/yyyy
+    const today = new Date();
+    const past = new Date(Date.now() - 30 * 86400000);
+    const fmt = (d) => `${String(d.getUTCMonth() + 1).padStart(2, '0')}/${String(d.getUTCDate()).padStart(2, '0')}/${d.getUTCFullYear()}`;
+    const postedFrom = input.posted_from ?? fmt(past);
+    const postedTo = input.posted_to ?? fmt(today);
+    const q = new URLSearchParams({
+        api_key: key,
+        limit: String(limit),
+        offset: '0',
+        postedFrom,
+        postedTo,
+    });
+    if (input.keyword)
+        q.set('title', input.keyword);
+    if (input.naics)
+        q.set('ncode', input.naics);
+    if (input.ncode)
+        q.set('ncode', input.ncode);
+    if (input.ptype)
+        q.set('ptype', input.ptype);
+    else
+        q.set('ptype', 'o'); // solicitations default
+    const url = `https://api.sam.gov/opportunities/v2/search?${q.toString()}`;
+    const res = await fetch(url, {
+        headers: {
+            Accept: 'application/json',
+            'User-Agent': 'ScriptMasterLabs-gov-procurement-intel/1.1',
+        },
+        signal: AbortSignal.timeout(25000),
+    });
+    const data = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+    if (!res.ok) {
+        return { error: `SAM.gov HTTP ${res.status}`, body: data, ...sdvosbBlock() };
+    }
+    const rows = data?.opportunitiesData ?? [];
+    const opportunities = rows.map((o) => ({
+        notice_id: o.noticeId,
+        title: o.title,
+        solicitation_number: o.solicitationNumber,
+        agency_path: o.fullParentPathName,
+        posted_date: o.postedDate,
+        type: o.type,
+        base_type: o.baseType,
+        set_aside: o.typeOfSetAsideDescription ?? o.typeOfSetAside,
+        response_deadline: o.responseDeadLine,
+        naics: o.naicsCode ?? (Array.isArray(o.naicsCodes) ? o.naicsCodes[0] : undefined),
+        naics_codes: o.naicsCodes,
+        place_of_performance: o.placeOfPerformance,
+        ui_link: o.uiLink,
+        active: o.active,
+    }));
+    return {
+        timestamp: new Date().toISOString(),
+        source: 'SAM.gov opportunities API v2',
+        total_records: data?.totalRecords,
+        returned: opportunities.length,
+        filters: {
+            keyword: input.keyword,
+            naics: input.naics ?? input.ncode,
+            ptype: input.ptype ?? 'o',
+            posted_from: postedFrom,
+            posted_to: postedTo,
+        },
+        opportunities,
+        ...sdvosbBlock(),
+    };
+}
+async function samEntityLookup(input) {
+    const key = process.env['SAM_API_KEY'] ?? process.env['SAM_KEY'] ?? '';
+    if (!key) {
+        return {
+            error: 'sam_api_key_missing',
+            message: 'Set SAM_API_KEY for SAM entity-information lookups.',
+            fallback: 'verify_contractor_entity uses USAspending without a key.',
+            ...sdvosbBlock(),
+        };
+    }
+    const q = new URLSearchParams({ api_key: key });
+    if (input.uei)
+        q.set('ueiSAM', input.uei);
+    if (input.cage)
+        q.set('cageCode', input.cage);
+    if (input.entity_name)
+        q.set('legalBusinessName', input.entity_name);
+    if (!input.uei && !input.cage && !input.entity_name) {
+        return { error: 'uei_or_cage_or_name_required' };
+    }
+    const url = `https://api.sam.gov/entity-information/v3/entities?${q.toString()}`;
+    const res = await fetch(url, {
+        headers: {
+            Accept: 'application/json',
+            'User-Agent': 'ScriptMasterLabs-gov-procurement-intel/1.1',
+        },
+        signal: AbortSignal.timeout(25000),
+    });
+    const data = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+    if (!res.ok)
+        return { error: `SAM entity HTTP ${res.status}`, body: data, ...sdvosbBlock() };
+    return {
+        timestamp: new Date().toISOString(),
+        source: 'SAM.gov entity-information v3',
+        total_records: data?.totalRecords,
+        entities: data?.entityData ?? data,
+        ...sdvosbBlock(),
+    };
+}
 function exportCaptureLog(input) {
     ensure();
     const raw = readFileSync(LEDGER, 'utf8').trim();
@@ -309,7 +427,7 @@ function gateFree(tool, x_payment) {
 }
 async function main() {
     ensure();
-    const server = new McpServer({ name: 'gov-procurement-intel', version: '1.0.0' });
+    const server = new McpServer({ name: 'gov-procurement-intel', version: '1.1.0' });
     const run = async (tool, params, x_payment, fn) => {
         const g = gateFree(tool, x_payment);
         if (!g.allowed)
@@ -346,6 +464,21 @@ async function main() {
             return text({ error: 'tool_failed', message: String(e) }, true);
         }
     };
+    server.tool('search_sam_opportunities', 'Live SAM.gov solicitations/opportunities (requires SAM_API_KEY). Filter by keyword, NAICS, posted dates.', {
+        keyword: z.string().optional(),
+        naics: z.string().optional(),
+        ptype: z.string().optional().describe('SAM ptype e.g. o=solicitation, k=combined, p=presolicitation'),
+        posted_from: z.string().optional().describe('MM/dd/yyyy'),
+        posted_to: z.string().optional().describe('MM/dd/yyyy'),
+        limit: z.number().optional(),
+        x_payment: z.string().optional(),
+    }, async (args) => run('search_sam_opportunities', args, args.x_payment, () => searchSamOpportunities(args)));
+    server.tool('sam_entity_lookup', 'SAM.gov entity registration lookup by UEI, CAGE, or legal name (requires SAM_API_KEY).', {
+        uei: z.string().optional(),
+        cage: z.string().optional(),
+        entity_name: z.string().optional(),
+        x_payment: z.string().optional(),
+    }, async (args) => run('sam_entity_lookup', args, args.x_payment, () => samEntityLookup(args)));
     server.tool('search_contract_awards', 'Search federal contract awards (USAspending). Filter by agency, NAICS, keyword, min amount. Free: 3/day.', {
         agency: z.string().optional(),
         naics: z.string().optional(),
@@ -371,13 +504,14 @@ async function main() {
         since: z.string().optional(),
     }, async (args) => text(exportCaptureLog(args)));
     server.tool('gov_intel_status', 'Free status: product one-liner, free quotas, SDVOSB operator ids.', {}, async () => {
-        const tools = ['search_contract_awards', 'match_setasides', 'agency_spend_snapshot', 'verify_contractor_entity'];
+        const tools = ['search_sam_opportunities', 'sam_entity_lookup', 'search_contract_awards', 'match_setasides', 'agency_spend_snapshot', 'verify_contractor_entity'];
         const quotas = Object.fromEntries(tools.map((t) => [t, freeRemaining(t)]));
         return text({
             slogan: 'AI agent procurement infrastructure for federal capture',
             tools: [...tools, 'export_capture_log'],
             free_per_day: FREE_PER_DAY,
             quotas,
+            sam_key_configured: Boolean(process.env['SAM_API_KEY'] ?? process.env['SAM_KEY']),
             pair_with: '@scriptmasterlabs/agent-wallet',
             landing: 'https://www.scriptmasterlabs.com/gov-procurement',
             ...sdvosbBlock(),
