@@ -13,6 +13,16 @@
   ],
   "redirects": [
     {
+      "source": "/agent-wallet",
+      "destination": "/agent-wallet.html",
+      "permanent": false
+    },
+    {
+      "source": "/get-agent-wallet",
+      "destination": "/agent-wallet.html",
+      "permanent": false
+    },
+    {
       "source": "/aeo",
       "destination": "/aeo.html",
       "permanent": true
