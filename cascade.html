@@ -147,10 +147,8 @@
   }
   .btn.primary { background: var(--accent); color: #000; }
   .btn.primary:hover { box-shadow: 0 0 24px var(--accent-glow); transform: translateY(-1px); }
-  .btn.primary:disabled { opacity: 0.6; cursor: wait; }
   .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
   .btn.ghost:hover { border-color: #fff; }
-  #checkout-msg { font-size: 0.82rem; color: var(--text-dim); margin-top: 10px; text-align: center; min-height: 18px; }
 
   footer { text-align: center; margin-top: 70px; color: var(--text-dim); font-size: 0.85rem; }
   footer a { color: var(--accent); text-decoration: none; }
@@ -210,8 +208,7 @@
           <li>Slack command: <code>/cascade [SYMBOL]</code></li>
           <li>Cancel anytime</li>
         </ul>
-        <button class="btn primary" id="subscribe-btn" onclick="subscribe()">Subscribe — $149/mo</button>
-        <div id="checkout-msg"></div>
+        <a class="btn primary" id="subscribe-btn" href="https://buy.stripe.com/aFaeVf0AWfDF8dD2Nc6wE1D" target="_blank" rel="noopener">Subscribe — $149/mo</a>
       </div>
       <div class="price-card">
         <h3>AI Agents (x402)</h3>
@@ -243,33 +240,5 @@
 
 </div>
 
-<script>
-async function subscribe() {
-  const btn = document.getElementById('subscribe-btn');
-  const msg = document.getElementById('checkout-msg');
-  btn.disabled = true;
-  btn.textContent = 'Connecting to Stripe…';
-  msg.textContent = '';
-  try {
-    const resp = await fetch('https://squeezeos-api.onrender.com/api/cascade/stripe/checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({})
-    });
-    const data = await resp.json();
-    if (data.checkout_url) {
-      window.location.href = data.checkout_url;
-    } else {
-      msg.textContent = data.error || 'Checkout is temporarily unavailable — try again shortly.';
-      btn.disabled = false;
-      btn.textContent = 'Subscribe — $149/mo';
-    }
-  } catch (e) {
-    msg.textContent = 'Could not reach the checkout server — try again shortly.';
-    btn.disabled = false;
-    btn.textContent = 'Subscribe — $149/mo';
-  }
-}
-</script>
 </body>
 </html>
