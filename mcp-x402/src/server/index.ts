@@ -2631,7 +2631,7 @@ async function runSSE(): Promise<void> {
     res.json({
       name: 'mcp-x402',
       version: VERSION,
-      description: 'The x402 Amazon — 43+ tools, pay-per-call via XRPL. scriptmasterlabs.com',
+      description: 'The x402 Amazon — 85+ tools, pay-per-call via XRPL. scriptmasterlabs.com',
       status: 'online',
       transport: 'streamable-http + sse',
       endpoints: {
@@ -2840,7 +2840,7 @@ async function runSSE(): Promise<void> {
         version: VERSION,
         protocol: 'MCP/streamable-http',
         status: 'ready',
-        tools: '43+ tools available',
+        tools: '85+ tools available',
         how_to_connect: 'POST /mcp with a JSON-RPC initialize request',
         sse_alternative: 'GET /sse for legacy SSE transport',
         health: '/health',
