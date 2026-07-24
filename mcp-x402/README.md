@@ -2,32 +2,26 @@
 
 [![npm](https://img.shields.io/npm/v/@scriptmasterlabs/mcp-x402)](https://www.npmjs.com/package/@scriptmasterlabs/mcp-x402)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![x402](https://img.shields.io/badge/x402-pay--per--call-green.svg)](https://mcp-x402.onrender.com/health)
-[![No API Keys](https://img.shields.io/badge/API%20keys-not%20required-blue.svg)](#one-line-install)
+[![x402](https://img.shields.io/badge/x402-pay--per--call-green.svg)](https://mcp-x402.onrender.com/.well-known/x402)
+[![MCP](https://img.shields.io/badge/MCP-remote%20ready-purple.svg)](https://mcp-x402.onrender.com/mcp)
 
 > **MCP server for agents with autonomous USDC/RLUSD payments** · **x402 pay-per-call** · **43+ trading + federal tools** · **no API keys**
 
-| Free now | Cheap wedge |
-|----------|-------------|
-| `sml_discover` / remote MCP health | ACP **gas_tracker $0.01** |
-| RWA assets lead (`/x402/rwa-assets`) | ACP **rwa_intelligence $0.03** |
+AI agents pay for ScriptMasterLabs data mid-loop — no human API keys, no monthly key babysitting.
 
-## 30-second demo (no wallet)
 ```bash
-curl -sS https://mcp-x402.onrender.com/health
-curl -sS "https://sml-rwa-api.onrender.com/x402/rwa-assets?limit=3"
-# full script:
-bash scripts/demo-one-command.sh
-```
+# one-command free demo (live host, no wallet)
+curl -s https://mcp-x402.onrender.com/health | jq .
 
-See [DEMO.md](./DEMO.md).
-
-## One-line install
-```bash
+# install / run
 npx @scriptmasterlabs/mcp-x402
+
+# package demo script
+npm run demo
 ```
 
-Remote MCP (Claude/Cursor) — free discover:
+**Remote MCP (Claude / Cursor / Windsurf) — stupidly easy:**
+
 ```json
 {
   "mcpServers": {
@@ -39,7 +33,10 @@ Remote MCP (Claude/Cursor) — free discover:
 }
 ```
 
-ACP marketplace (agents that already pay): search **scriptmasterlabs** → hire **gas_tracker** @ **$0.01**.
+**First call free path:** `tools/list` + discover-style tools · **Paid path:** x402 USDC/RLUSD  
+**ACP wedges:** search `scriptmasterlabs` → `gas_tracker` **$0.01** · `rwa_intelligence` **$0.03**  
+**Site:** https://www.scriptmasterlabs.com/agent-economy-os
+
 
 ---
 
@@ -60,6 +57,19 @@ This defeats the entire point of autonomous agents. If your agent has to stop an
 This is the infrastructure layer that makes truly autonomous AI agents possible.
 
 ---
+
+
+## Free demo (no keys)
+
+```bash
+npm run demo
+# or
+curl -s https://mcp-x402.onrender.com/health
+curl -s https://mcp-x402.onrender.com/
+```
+
+Live remote: `https://mcp-x402.onrender.com/mcp`  
+Keywords for directories: `x402` `pay-per-call` `USDC` `RLUSD` `MCP` `no API keys` `federal` `trading agents`
 
 ## One-Line Install
 
