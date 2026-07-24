@@ -2,7 +2,7 @@
   "name": "@scriptmasterlabs/mcp-x402",
   "version": "2.1.4",
   "mcpName": "io.github.Timwal78/mcp-x402",
-  "description": "START HERE for builders: npm i @scriptmasterlabs/mcp-x402-sdk — 5-line drop-in to charge any MCP tool (x402 USDC/RLUSD). Optional full server: 43+ tools, free sml_discover, no API keys.",
+  "description": "START HERE for builders: npm i @scriptmasterlabs/mcp-x402-sdk — 5-line drop-in to charge any MCP tool (x402 USDC/RLUSD). Optional full server: 85+ tools, free sml_discover, no API keys.",
   "main": "dist/server/index.js",
   "types": "dist/server/index.d.ts",
   "bin": {
