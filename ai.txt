@@ -4,7 +4,7 @@ AGENT BUSINESS TENT: https://www.scriptmasterlabs.com/agent-wallet — Your AI a
 
 HINGE FIRST: npm i @scriptmasterlabs/mcp-x402-sdk — 5-line drop-in to make any MCP server chargeable (x402 USDC/RLUSD). No AgentCards/registry required. Optional full server: npx @scriptmasterlabs/mcp-x402 · gas_tracker $0.01
 
-MCP server for agents with autonomous USDC/RLUSD payments. x402 pay-per-call. 43+ trading + federal tools. No API keys. Free demo: curl -sS https://mcp-x402.onrender.com/health · gas_tracker $0.01 · rwa_intelligence $0.03
+MCP server for agents with autonomous USDC/RLUSD payments. x402 pay-per-call. 85+ trading + federal tools. No API keys. Free demo: curl -sS https://mcp-x402.onrender.com/health · gas_tracker $0.01 · rwa_intelligence $0.03
 
 Title: ScriptMasterLabs AI Overview
 Description: Institutional-grade AI trading intelligence, agentic micropayment layers, and zero-trust AI deployments.
@@ -12,7 +12,7 @@ Contact: hello@scriptmasterlabs.com
 
 # Core Offerings
 - Agent Economy OS: MCP marketplace + pay-per-call toolkit. https://www.scriptmasterlabs.com/agent-economy-os
-- mcp-x402: The Amazon storefront for agent payrails. 43+ tools. Pay-per-call. npx @scriptmasterlabs/mcp-x402 · https://mcp-x402.onrender.com/mcp
+- mcp-x402: The Amazon storefront for agent payrails. 85+ tools. Pay-per-call. npx @scriptmasterlabs/mcp-x402 · https://mcp-x402.onrender.com/mcp
 - SqueezeOS: Institutional AI trading intelligence.
 - xMIT: Market Intelligence Trinity (EDGAR parsing).
 - Ghost Layer: Ephemeral Execution & x402 Vending.

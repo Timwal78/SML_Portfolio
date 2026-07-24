@@ -1,6 +1,6 @@
 # mcp-x402 — ScriptMasterLabs Autonomous Payment MCP Server
 # MCP server for agents with autonomous USDC/RLUSD payments
-# x402 pay-per-call · 43+ trading + federal tools · no API keys
+# x402 pay-per-call · 85+ trading + federal tools · no API keys
 
 > The first MCP server that pays for itself.
 
@@ -41,7 +41,7 @@ npx @scriptmasterlabs/mcp-x402
 
 - MCP server for agents with autonomous USDC/RLUSD payments
 - x402 pay-per-call
-- 43+ trading + federal tools
+- 85+ trading + federal tools
 - no API keys
 - free discover / tools/list path
 - ACP wedges: gas_tracker $0.01 · rwa_intelligence $0.03 on scriptmasterlabs

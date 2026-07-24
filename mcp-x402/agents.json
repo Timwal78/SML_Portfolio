@@ -1,7 +1,7 @@
 {
   "schema_version": "v1",
   "name": "mcp-x402",
-  "description": "MCP server for agents with autonomous USDC/RLUSD payments. x402 pay-per-call. 43+ trading + federal tools. No API keys.",
+  "description": "MCP server for agents with autonomous USDC/RLUSD payments. x402 pay-per-call. 85+ trading + federal tools. No API keys.",
   "url": "https://mcp-x402.onrender.com",
   "provider": {
     "name": "ScriptMasterLabs",

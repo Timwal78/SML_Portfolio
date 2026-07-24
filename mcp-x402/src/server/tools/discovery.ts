@@ -209,7 +209,7 @@ const CATALOG = {
 export function registerDiscovery(server: McpServer): void {
   server.tool(
     'sml_discover',
-    'Returns the complete ScriptMasterLabs product catalog — all 43 tools, prices, and payment instructions. Call this first. FREE.',
+    'Returns the complete ScriptMasterLabs product catalog — all 55 tools, prices, and payment instructions. Call this first. FREE.',
     {},
     async () => {
       AuditLogger.getInstance().info('sml_discover', {});
