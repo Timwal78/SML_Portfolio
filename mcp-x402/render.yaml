@@ -44,12 +44,14 @@ services:
         sync: false
       - key: SOLANA_RPC_URL
         sync: false
-      # LEVIATHAN ACP v2 — Virtuals Protocol seller agent
+      # ScriptMasterLabs ACP seller (mcp-x402) — Virtuals Protocol seller agent
       - key: ACP_WALLET_ADDRESS
         value: "0x0f035c36c4ce65a6f1bf4370f779bac722d59004"
       - key: ACP_WALLET_ID
         sync: false
       - key: ACP_SIGNER_PRIVATE_KEY
+        sync: false
+      - key: SML_ACP_BYPASS_SECRET
         sync: false
       - key: LEVIATHAN_BYPASS_SECRET
         sync: false
@@ -80,6 +82,8 @@ services:
       # Data source priority: TRADIER_API_KEY first (real market-quoted Greeks
       # on options), falling back to POLYGON_API_KEY. At least one of the two
       # is required; ANTHROPIC_API_KEY is always required for the swarm verdict.
+      - key: SAM_API_KEY
+        sync: false
       - key: TRADIER_API_KEY
         sync: false
       - key: TRADIER_ENV

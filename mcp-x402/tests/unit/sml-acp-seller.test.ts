@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { resolveOffering } from '../../src/server/acp/leviathan.js';
+import { resolveOffering } from '../../src/server/acp/seller.js';
 
 describe('resolveOffering', () => {
   it('matches the canonical Title Case key exactly', () => {
