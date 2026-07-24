@@ -1,7 +1,7 @@
 {
   "schema_version": "v1",
   "name": "mcp-x402",
-  "description": "The x402 Amazon — 55 pay-per-call MCP tools covering institutional market intelligence, SEC filings, XRPL/Solana/Base payments, copy-trading, memecoin launchpad, and more. No API keys. Agents pay autonomously with USDC or RLUSD.",
+  "description": "MCP server for agents with autonomous USDC/RLUSD payments. x402 pay-per-call. 43+ trading + federal tools. No API keys.",
   "url": "https://mcp-x402.onrender.com",
   "provider": {
     "name": "ScriptMasterLabs",
@@ -10,7 +10,11 @@
   },
   "version": "2.1.0",
   "mcp": {
-    "transport": ["stdio", "sse", "streamable-http"],
+    "transport": [
+      "stdio",
+      "sse",
+      "streamable-http"
+    ],
     "endpoints": {
       "streamable_http": "https://mcp-x402.onrender.com/mcp",
       "sse": "https://mcp-x402.onrender.com/sse"
@@ -18,68 +22,313 @@
   },
   "payment": {
     "protocol": "x402",
-    "chains": ["base", "xrpl", "solana", "xahau"],
-    "currencies": ["USDC", "RLUSD"],
+    "chains": [
+      "base",
+      "xrpl",
+      "solana",
+      "xahau"
+    ],
+    "currencies": [
+      "USDC",
+      "RLUSD"
+    ],
     "mandate": "ap2",
     "credit_bureau": "https://four02proof.onrender.com/v1/bureau/score",
     "daily_cap_usd": 50,
-    "auto_approve_threshold_usd": 1.00
+    "auto_approve_threshold_usd": 1.0
   },
   "tools": [
-    { "name": "sml_discover", "description": "Full SML product catalog with prices. Start here.", "price": "free" },
-    { "name": "sml_status", "description": "Health of all SML services.", "price": "free" },
-    { "name": "squeezeos_preview", "description": "Bias + regime preview for any ticker.", "price": "free" },
-    { "name": "squeezeos_demo", "description": "IWM council demo verdict.", "price": "free" },
-    { "name": "squeezeos_history", "description": "Recent signal ring buffer.", "price": "free" },
-    { "name": "squeezeos_oracle", "description": "Aggregated oracle directive.", "price": "free" },
-    { "name": "squeezeos_ftd", "description": "SEC Reg SHO FTD registry.", "price": "free" },
-    { "name": "squeezeos_status", "description": "SqueezeOS system health.", "price": "free" },
-    { "name": "squeezeos_marketplace_browse", "description": "Browse peer signal listings.", "price": "free" },
-    { "name": "squeezeos_futures_leaderboard", "description": "Top signal predictors.", "price": "free" },
-    { "name": "squeezeos_council", "description": "Multi-engine AI verdict for any ticker.", "price": "0.10", "currency": "USDC" },
-    { "name": "squeezeos_scan", "description": "Full $1–$50 institutional squeeze scanner.", "price": "0.05", "currency": "USDC" },
-    { "name": "squeezeos_options", "description": "Institutional options flow scanner.", "price": "0.05", "currency": "USDC" },
-    { "name": "squeezeos_iwm", "description": "IWM 0DTE contract scorer.", "price": "0.03", "currency": "USDC" },
-    { "name": "squeezeos_marketplace_read", "description": "Full signal thesis from marketplace.", "price": "0.02", "currency": "USDC" },
-    { "name": "equities_heatmap_preview", "description": "5-ticker RSI heatmap preview, no AI swarm.", "price": "free" },
-    { "name": "equities_heatmap_full", "description": "RSI heatmap, up to 20 tickers, 4-agent Claude swarm verdict.", "price": "0.10", "currency": "USDC" },
-    { "name": "options_delta_heatmap_preview", "description": "5-contract options Delta heatmap preview, no AI swarm.", "price": "free" },
-    { "name": "options_delta_heatmap_full", "description": "Options Delta heatmap, real Tradier greeks when configured (else Black-Scholes), 4-agent Claude swarm verdict.", "price": "0.15", "currency": "USDC" },
-    { "name": "leviathan_signal", "description": "Institutional squeeze signals, multi-engine verdict.", "price": "0.05", "currency": "USDC", "ap2_required": true },
-    { "name": "xmit_edgar_decode", "description": "Parse SEC DEF 14A / 13F / 13D filings.", "price": "0.02", "currency": "USDC", "ap2_required": true },
-    { "name": "xdeo_earnings_estimate", "description": "Decentralized earnings oracle. +2 bureau score.", "price": "0.02", "currency": "USDC", "ap2_required": true },
-    { "name": "ftd_threshold_scan", "description": "SEC Reg SHO FTD data. Alerts free; full data paid.", "price": "0.05", "currency": "USDC", "free_tier": "alerts_only" },
-    { "name": "echo_pattern_match", "description": "Historical pattern similarity scan.", "price": "free" },
-    { "name": "ghost_route", "description": "Route private XRPL payments via Ghost Layer.", "price": "variable" },
-    { "name": "ghost_status", "description": "Ghost Layer service health.", "price": "free" },
-    { "name": "rails_transfer", "description": "RLUSD/XRP remittance on XRPL/Xahau.", "price": "variable" },
-    { "name": "rails_status", "description": "Rails service health.", "price": "free" },
-    { "name": "copytrader_subscribe", "description": "Subscribe to whale wallet copy-trading.", "price": "variable" },
-    { "name": "copytrader_whales", "description": "Browse top whale wallets.", "price": "free" },
-    { "name": "copytrader_status", "description": "Copy-trader service health.", "price": "free" },
-    { "name": "launchpad_create", "description": "Deploy a bonding-curve memecoin on XRPL.", "price": "variable" },
-    { "name": "launchpad_buy", "description": "Buy a memecoin from the bonding curve.", "price": "variable" },
-    { "name": "launchpad_list", "description": "Browse active memecoins.", "price": "free" },
-    { "name": "launchpad_status", "description": "Launchpad service health.", "price": "free" },
-    { "name": "shadow_ingest", "description": "Ingest proprietary signal data.", "price": "variable" },
-    { "name": "shadow_query", "description": "Query shadow desk signal store.", "price": "variable" },
-    { "name": "forge_llm", "description": "BYOK LLM proxy — pay with USDC.", "price": "variable" },
-    { "name": "forge_status", "description": "Forge gateway health.", "price": "free" },
-    { "name": "crawl_paid_fetch", "description": "Web scraping, clean Markdown.", "price": "0.005", "currency": "USDC" },
-    { "name": "proof_invoice", "description": "Get payment invoice for any SML endpoint.", "price": "free" },
-    { "name": "proof_verify", "description": "Submit tx_hash → receive JWT access token.", "price": "free" },
-    { "name": "proof_credit_score", "description": "FICO-style 300–850 credit score for any wallet.", "price": "free" },
-    { "name": "nexus_agent_hire", "description": "Browse + hire agents. 5% commission on hire.", "price": "commission", "free_tier": "query_only" },
-    { "name": "agentcard_lookup", "description": "Look up agent card by DID or wallet.", "price": "free" },
-    { "name": "agentcard_mint", "description": "Mint a new agent identity card on XRPL.", "price": "variable" },
-    { "name": "agentcard_verify", "description": "Verify an agent card signature.", "price": "free" },
-    { "name": "tradier_quote", "description": "Real-time Tradier stock quote.", "price": "variable" },
-    { "name": "tradier_order", "description": "Place a Tradier brokerage order.", "price": "variable" },
-    { "name": "tradier_positions", "description": "Tradier account positions.", "price": "variable" },
-    { "name": "robinhood_quote", "description": "Robinhood stock quote.", "price": "variable" },
-    { "name": "robinhood_order", "description": "Place a Robinhood order.", "price": "variable" },
-    { "name": "robinhood_portfolio", "description": "Robinhood portfolio.", "price": "variable" },
-    { "name": "backtest_run", "description": "Run a strategy backtest.", "price": "variable" },
-    { "name": "backtest_validate", "description": "Validate backtest parameters.", "price": "free" }
+    {
+      "name": "sml_discover",
+      "description": "Full SML product catalog with prices. Start here.",
+      "price": "free"
+    },
+    {
+      "name": "sml_status",
+      "description": "Health of all SML services.",
+      "price": "free"
+    },
+    {
+      "name": "squeezeos_preview",
+      "description": "Bias + regime preview for any ticker.",
+      "price": "free"
+    },
+    {
+      "name": "squeezeos_demo",
+      "description": "IWM council demo verdict.",
+      "price": "free"
+    },
+    {
+      "name": "squeezeos_history",
+      "description": "Recent signal ring buffer.",
+      "price": "free"
+    },
+    {
+      "name": "squeezeos_oracle",
+      "description": "Aggregated oracle directive.",
+      "price": "free"
+    },
+    {
+      "name": "squeezeos_ftd",
+      "description": "SEC Reg SHO FTD registry.",
+      "price": "free"
+    },
+    {
+      "name": "squeezeos_status",
+      "description": "SqueezeOS system health.",
+      "price": "free"
+    },
+    {
+      "name": "squeezeos_marketplace_browse",
+      "description": "Browse peer signal listings.",
+      "price": "free"
+    },
+    {
+      "name": "squeezeos_futures_leaderboard",
+      "description": "Top signal predictors.",
+      "price": "free"
+    },
+    {
+      "name": "squeezeos_council",
+      "description": "Multi-engine AI verdict for any ticker.",
+      "price": "0.10",
+      "currency": "USDC"
+    },
+    {
+      "name": "squeezeos_scan",
+      "description": "Full $1\u2013$50 institutional squeeze scanner.",
+      "price": "0.05",
+      "currency": "USDC"
+    },
+    {
+      "name": "squeezeos_options",
+      "description": "Institutional options flow scanner.",
+      "price": "0.05",
+      "currency": "USDC"
+    },
+    {
+      "name": "squeezeos_iwm",
+      "description": "IWM 0DTE contract scorer.",
+      "price": "0.03",
+      "currency": "USDC"
+    },
+    {
+      "name": "squeezeos_marketplace_read",
+      "description": "Full signal thesis from marketplace.",
+      "price": "0.02",
+      "currency": "USDC"
+    },
+    {
+      "name": "equities_heatmap_preview",
+      "description": "5-ticker RSI heatmap preview, no AI swarm.",
+      "price": "free"
+    },
+    {
+      "name": "equities_heatmap_full",
+      "description": "RSI heatmap, up to 20 tickers, 4-agent Claude swarm verdict.",
+      "price": "0.10",
+      "currency": "USDC"
+    },
+    {
+      "name": "options_delta_heatmap_preview",
+      "description": "5-contract options Delta heatmap preview, no AI swarm.",
+      "price": "free"
+    },
+    {
+      "name": "options_delta_heatmap_full",
+      "description": "Options Delta heatmap, real Tradier greeks when configured (else Black-Scholes), 4-agent Claude swarm verdict.",
+      "price": "0.15",
+      "currency": "USDC"
+    },
+    {
+      "name": "leviathan_signal",
+      "description": "Institutional squeeze signals, multi-engine verdict.",
+      "price": "0.05",
+      "currency": "USDC",
+      "ap2_required": true
+    },
+    {
+      "name": "xmit_edgar_decode",
+      "description": "Parse SEC DEF 14A / 13F / 13D filings.",
+      "price": "0.02",
+      "currency": "USDC",
+      "ap2_required": true
+    },
+    {
+      "name": "xdeo_earnings_estimate",
+      "description": "Decentralized earnings oracle. +2 bureau score.",
+      "price": "0.02",
+      "currency": "USDC",
+      "ap2_required": true
+    },
+    {
+      "name": "ftd_threshold_scan",
+      "description": "SEC Reg SHO FTD data. Alerts free; full data paid.",
+      "price": "0.05",
+      "currency": "USDC",
+      "free_tier": "alerts_only"
+    },
+    {
+      "name": "echo_pattern_match",
+      "description": "Historical pattern similarity scan.",
+      "price": "free"
+    },
+    {
+      "name": "ghost_route",
+      "description": "Route private XRPL payments via Ghost Layer.",
+      "price": "variable"
+    },
+    {
+      "name": "ghost_status",
+      "description": "Ghost Layer service health.",
+      "price": "free"
+    },
+    {
+      "name": "rails_transfer",
+      "description": "RLUSD/XRP remittance on XRPL/Xahau.",
+      "price": "variable"
+    },
+    {
+      "name": "rails_status",
+      "description": "Rails service health.",
+      "price": "free"
+    },
+    {
+      "name": "copytrader_subscribe",
+      "description": "Subscribe to whale wallet copy-trading.",
+      "price": "variable"
+    },
+    {
+      "name": "copytrader_whales",
+      "description": "Browse top whale wallets.",
+      "price": "free"
+    },
+    {
+      "name": "copytrader_status",
+      "description": "Copy-trader service health.",
+      "price": "free"
+    },
+    {
+      "name": "launchpad_create",
+      "description": "Deploy a bonding-curve memecoin on XRPL.",
+      "price": "variable"
+    },
+    {
+      "name": "launchpad_buy",
+      "description": "Buy a memecoin from the bonding curve.",
+      "price": "variable"
+    },
+    {
+      "name": "launchpad_list",
+      "description": "Browse active memecoins.",
+      "price": "free"
+    },
+    {
+      "name": "launchpad_status",
+      "description": "Launchpad service health.",
+      "price": "free"
+    },
+    {
+      "name": "shadow_ingest",
+      "description": "Ingest proprietary signal data.",
+      "price": "variable"
+    },
+    {
+      "name": "shadow_query",
+      "description": "Query shadow desk signal store.",
+      "price": "variable"
+    },
+    {
+      "name": "forge_llm",
+      "description": "BYOK LLM proxy \u2014 pay with USDC.",
+      "price": "variable"
+    },
+    {
+      "name": "forge_status",
+      "description": "Forge gateway health.",
+      "price": "free"
+    },
+    {
+      "name": "crawl_paid_fetch",
+      "description": "Web scraping, clean Markdown.",
+      "price": "0.005",
+      "currency": "USDC"
+    },
+    {
+      "name": "proof_invoice",
+      "description": "Get payment invoice for any SML endpoint.",
+      "price": "free"
+    },
+    {
+      "name": "proof_verify",
+      "description": "Submit tx_hash \u2192 receive JWT access token.",
+      "price": "free"
+    },
+    {
+      "name": "proof_credit_score",
+      "description": "FICO-style 300\u2013850 credit score for any wallet.",
+      "price": "free"
+    },
+    {
+      "name": "nexus_agent_hire",
+      "description": "Browse + hire agents. 5% commission on hire.",
+      "price": "commission",
+      "free_tier": "query_only"
+    },
+    {
+      "name": "agentcard_lookup",
+      "description": "Look up agent card by DID or wallet.",
+      "price": "free"
+    },
+    {
+      "name": "agentcard_mint",
+      "description": "Mint a new agent identity card on XRPL.",
+      "price": "variable"
+    },
+    {
+      "name": "agentcard_verify",
+      "description": "Verify an agent card signature.",
+      "price": "free"
+    },
+    {
+      "name": "tradier_quote",
+      "description": "Real-time Tradier stock quote.",
+      "price": "variable"
+    },
+    {
+      "name": "tradier_order",
+      "description": "Place a Tradier brokerage order.",
+      "price": "variable"
+    },
+    {
+      "name": "tradier_positions",
+      "description": "Tradier account positions.",
+      "price": "variable"
+    },
+    {
+      "name": "robinhood_quote",
+      "description": "Robinhood stock quote.",
+      "price": "variable"
+    },
+    {
+      "name": "robinhood_order",
+      "description": "Place a Robinhood order.",
+      "price": "variable"
+    },
+    {
+      "name": "robinhood_portfolio",
+      "description": "Robinhood portfolio.",
+      "price": "variable"
+    },
+    {
+      "name": "backtest_run",
+      "description": "Run a strategy backtest.",
+      "price": "variable"
+    },
+    {
+      "name": "backtest_validate",
+      "description": "Validate backtest parameters.",
+      "price": "free"
+    }
   ]
 }

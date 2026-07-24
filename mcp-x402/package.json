@@ -2,7 +2,7 @@
   "name": "@scriptmasterlabs/mcp-x402",
   "version": "2.1.3",
   "mcpName": "io.github.Timwal78/mcp-x402",
-  "description": "MCP server for agents with autonomous USDC/RLUSD payments. x402 pay-per-call. 43+ trading + federal tools. No API keys. Free sml_discover \u00b7 gas $0.01 \u00b7 RWA $0.03.",
+  "description": "MCP server for agents with autonomous USDC/RLUSD payments. x402 pay-per-call \u00b7 43+ trading + federal tools \u00b7 no API keys. Free sml_discover demo. Remote: https://mcp-x402.onrender.com/mcp",
   "main": "dist/server/index.js",
   "types": "dist/server/index.d.ts",
   "bin": {
@@ -21,38 +21,40 @@
     "acp-self-test-buyer": "tsx scripts/acp-self-test-buyer.ts",
     "lint": "eslint src tests",
     "typecheck": "tsc --noEmit",
-    "prepublishOnly": "npm run build && npm run typecheck"
+    "prepublishOnly": "npm run build && npm run typecheck",
+    "demo": "node scripts/demo-free.mjs"
   },
   "keywords": [
     "mcp",
     "model-context-protocol",
-    "mcp-server",
     "x402",
-    "x402-pay-per-call",
+    "pay-per-call",
     "usdc",
     "rlusd",
-    "autonomous-payments",
+    "autonomous-agents",
     "ai-agents",
-    "agent-economy",
     "no-api-keys",
+    "mcp-server",
     "trading-tools",
     "federal-data",
     "sec-filings",
-    "rwa",
     "gas-tracker",
-    "claude",
-    "cursor",
+    "rwa",
     "scriptmasterlabs",
     "base",
     "xrpl",
     "solana",
-    "stablecoins"
+    "stablecoins",
+    "agent-economy",
+    "claude",
+    "cursor"
   ],
   "author": "ScriptMasterLabs <timothy.walton45@gmail.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/timwal78/sml_portfolio.git"
+    "url": "https://github.com/Timwal78/SML_Portfolio.git",
+    "directory": "mcp-x402"
   },
   "dependencies": {
     "@coinbase/cdp-sdk": "^1.51.2",
@@ -96,5 +98,9 @@
   },
   "workspaces": [
     "sdk/mcp-x402-sdk"
-  ]
+  ],
+  "homepage": "https://www.scriptmasterlabs.com/agent-economy-os",
+  "bugs": {
+    "url": "https://github.com/Timwal78/SML_Portfolio/issues"
+  }
 }
