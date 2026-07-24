@@ -1,0 +1,57 @@
+{
+  "name": "@scriptmasterlabs/gov-procurement-intel",
+  "version": "1.0.0",
+  "description": "AI agent procurement intelligence for federal capture \u2014 contract awards, SDVOSB set-asides, agency spend, signed compliance logs. SDVOSB UEI G24VZA4RLMK3.",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "gov-procurement-intel": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "llms.txt"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "federal",
+    "procurement",
+    "sdvosb",
+    "usaspending",
+    "government-contracts",
+    "set-aside",
+    "sam",
+    "agent-procurement",
+    "compliance",
+    "audit-trail",
+    "scriptmasterlabs"
+  ],
+  "author": "ScriptMasterLabs <timothy.walton45@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Timwal78/SML_Portfolio.git",
+    "directory": "gov-procurement-intel"
+  },
+  "homepage": "https://www.scriptmasterlabs.com/gov-procurement",
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.3"
+  }
+}

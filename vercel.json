@@ -13,6 +13,21 @@
   ],
   "redirects": [
     {
+      "source": "/federal-capture",
+      "destination": "/gov-procurement.html",
+      "permanent": false
+    },
+    {
+      "source": "/gov",
+      "destination": "/gov-procurement.html",
+      "permanent": false
+    },
+    {
+      "source": "/gov-procurement",
+      "destination": "/gov-procurement.html",
+      "permanent": false
+    },
+    {
       "source": "/share/agent-wallet",
       "destination": "/agent-wallet-share.html",
       "permanent": false
