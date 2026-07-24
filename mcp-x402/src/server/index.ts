@@ -195,7 +195,7 @@ async function runSSE(): Promise<void> {
     res.set('Access-Control-Allow-Origin', '*').json({ recent: _recentAgentHits });
   });
 
-  const LEVIATHAN_BYPASS_SECRET = process.env['LEVIATHAN_BYPASS_SECRET'] ?? '';
+  const LEVIATHAN_BYPASS_SECRET = (process.env['SML_ACP_BYPASS_SECRET'] ?? process.env['LEVIATHAN_BYPASS_SECRET'] ?? '').trim();
   const SML_API_KEY = process.env['SML_API_KEY'] ?? '';
   const API_MARKET_PROXY_SECRET = process.env['API_MARKET_PROXY_SECRET'] ?? '';
 
@@ -554,8 +554,10 @@ async function runSSE(): Promise<void> {
     const txHash = typeof req.headers['x-payment-tx'] === 'string' ? req.headers['x-payment-tx'] : '';
 
     // LEVIATHAN bypass — Virtuals Protocol USDC already settled on-chain
-    if (LEVIATHAN_BYPASS_SECRET && req.headers['x-leviathan-key'] === LEVIATHAN_BYPASS_SECRET) {
-      return { ok: true, payer: { rail: 'leviathan', from: 'did:leviathan:acp:scriptmasterlabs', tx: '' } };
+    const acpBypass = (process.env['SML_ACP_BYPASS_SECRET'] ?? LEVIATHAN_BYPASS_SECRET) || '';
+    const acpKey = String(req.headers['x-sml-acp-key'] ?? req.headers['x-leviathan-key'] ?? '');
+    if (acpBypass && acpKey && acpKey === acpBypass) {
+      return { ok: true, payer: { rail: 'sml-acp', from: 'did:sml:acp:scriptmasterlabs', tx: '' } };
     }
 
     // api.market bypass — requests proxied through api.market carry a custom
@@ -2721,7 +2723,7 @@ async function runSSE(): Promise<void> {
   }
 
   async function dynamicPriceGate(req: express.Request, res: express.Response, next: express.NextFunction) {
-    if (LEVIATHAN_BYPASS_SECRET && req.headers['x-leviathan-key'] === LEVIATHAN_BYPASS_SECRET) {
+    if (((process.env['SML_ACP_BYPASS_SECRET'] ?? LEVIATHAN_BYPASS_SECRET) || '') && (req.headers['x-sml-acp-key'] === (process.env['SML_ACP_BYPASS_SECRET'] ?? LEVIATHAN_BYPASS_SECRET) || req.headers['x-leviathan-key'] === (process.env['SML_ACP_BYPASS_SECRET'] ?? LEVIATHAN_BYPASS_SECRET))) {
       next(); return;
     }
     const did = (req as any).agentDid || "did:anonymous";
@@ -2900,15 +2902,15 @@ async function runSSE(): Promise<void> {
   console.error(`[mcp-x402] listening on :${port} — health: http://localhost:${port}/health`);
 
   if (process.env['ACP_WALLET_ID'] && process.env['ACP_SIGNER_PRIVATE_KEY']) {
-    import('./acp/leviathan.js').then(({ startLeviathan }) => {
-      startLeviathan().catch((err: unknown) => {
+    import('./acp/seller.js').then(({ startAcpSeller }) => {
+      startAcpSeller().catch((err: unknown) => {
         const e = err as Error & { details?: unknown; shortMessage?: string; statusCode?: number };
-        console.error('[LEVIATHAN] Failed to start:', e.message,
+        console.error('[SML-ACP] Failed to start:', e.message,
           e.shortMessage ?? '', JSON.stringify(e.details ?? ''));
       });
     });
   } else {
-    console.warn('[LEVIATHAN] Skipped — ACP_WALLET_ID or ACP_SIGNER_PRIVATE_KEY not set');
+    console.warn('[SML-ACP] Skipped — ACP_WALLET_ID or ACP_SIGNER_PRIVATE_KEY not set');
   }
 
   // Fire-and-forget: real, CloudTrail-visible GetEntitlements call so the
