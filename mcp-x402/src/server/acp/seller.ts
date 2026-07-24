@@ -871,6 +871,7 @@ export async function startAcpSeller(): Promise<void> {
       // PKCS#8 base64 — pass the key as-is from the Virtuals "Add Signer" UI.
       signerPrivateKey: SIGNER_PRIVATE_KEY as `0x${string}`,
       chains: [base],
+      builderCode: process.env['ACP_BUILDER_CODE'] || process.env['BUILDER_CODE'] || 'bc_0gi3t7qi',
     });
   } catch (err: unknown) {
     const e = err as Error & { details?: unknown; statusCode?: number; shortMessage?: string };
@@ -881,7 +882,12 @@ export async function startAcpSeller(): Promise<void> {
 
   let seller: Awaited<ReturnType<typeof AcpAgent.create>>;
   try {
-    seller = await AcpAgent.create({ provider });
+    // acp-node-v2 >=0.1.8 renamed create input: provider → evmProvider
+    // Keep fallback for older builds still on `provider`.
+    seller = await AcpAgent.create({
+      evmProvider: provider,
+      provider, // legacy 0.1.7
+    } as Parameters<typeof AcpAgent.create>[0]);
   } catch (err: unknown) {
     const e = err as Error & { details?: unknown; statusCode?: number; shortMessage?: string };
     console.error('[SML-ACP] AcpAgent.create failed:', e.message,
