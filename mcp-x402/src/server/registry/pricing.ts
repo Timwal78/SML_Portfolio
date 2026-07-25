@@ -8,25 +8,25 @@ const BASE_PRICES: Record<string, string> = {
   sml_discover: '0.00',
   sml_status: '0.00',
   // APM — Agent Preference Manifest (free preview, paid contract)
-  apm_negotiate: '0.002',
+  apm_negotiate: '0.001',
   // SqueezeOS signals
-  leviathan_signal: '0.005',
-  squeezeos_council: '0.01',
-  squeezeos_scan: '0.005',
-  squeezeos_options: '0.005',
-  squeezeos_iwm: '0.003',
+  leviathan_signal: '0.001',
+  squeezeos_council: '0.001',
+  squeezeos_scan: '0.001',
+  squeezeos_options: '0.001',
+  squeezeos_iwm: '0.001',
   squeezeos_preview: '0.00',
   squeezeos_status: '0.00',
   // Equities / Options heatmap (self-contained: Polygon.io + Claude swarm)
   equities_heatmap_preview: '0.00',
-  equities_heatmap_full: '0.01',
+  equities_heatmap_full: '0.001',
   options_delta_heatmap_preview: '0.00',
-  options_delta_heatmap_full: '0.015',
+  options_delta_heatmap_full: '0.001',
   // SEC / Earnings
-  xmit_edgar_decode: '0.002',
-  xdeo_earnings_estimate: '0.002',
+  xmit_edgar_decode: '0.001',
+  xdeo_earnings_estimate: '0.001',
   // FTD
-  ftd_threshold_scan: '0.005',
+  ftd_threshold_scan: '0.001',
   // Crawl
   crawl_paid_fetch: '0.001',
   // Agent marketplace
@@ -38,52 +38,52 @@ const BASE_PRICES: Record<string, string> = {
   rails_transfer: '0.001',
   rails_status: '0.00',
   // Launchpad
-  launchpad_create: '0.01',
+  launchpad_create: '0.001',
   launchpad_buy: '0.001',
   launchpad_list: '0.00',
   launchpad_status: '0.00',
   // Copy-Trader
-  copytrader_subscribe: '0.005',
+  copytrader_subscribe: '0.001',
   copytrader_status: '0.00',
   // Backtest
-  backtest_run: '0.005',
-  backtest_validate: '0.005',
+  backtest_run: '0.001',
+  backtest_validate: '0.001',
   backtest_status: '0.00',
   // Brokers (Tradier + Robinhood order execution)
   tradier_order: '0.001',
   robinhood_order: '0.001',
   // Shadow Desk
-  shadow_query: '0.002',
+  shadow_query: '0.001',
   shadow_ingest: '0.001',
   shadow_status: '0.00',
   // Forge (LLM gateway)
-  forge_llm: '0.002',
+  forge_llm: '0.001',
   forge_status: '0.00',
   // Proof402 (free)
   proof_invoice: '0.00',
   proof_verify: '0.00',
   proof_credit_score: '0.00',
   // Echo (pattern matching)
-  echo_pattern_match: '0.005',
+  echo_pattern_match: '0.001',
   // Agent card / identity
   agentcard_mint: '0.001',
   agentcard_verify: '0.00',
   agentcard_lookup: '0.00',
   // Federal data (Grants.gov + SAM.gov)
-  search_grants: '0.002',
-  search_contracts: '0.003',
-  lookup_entity: '0.002',
-  federal_sam_opportunities: '0.01',
-  federal_sam_entity: '0.01',
+  search_grants: '0.001',
+  search_contracts: '0.001',
+  lookup_entity: '0.001',
+  federal_sam_opportunities: '0.001',
+  federal_sam_entity: '0.001',
   // federal.ts paid tools (baseline if pricing API down)
-  federal_grants: '0.01',
-  federal_usaspending_awards: '0.01',
-  federal_grants_gov: '0.01',
-  federal_sba_awards: '0.01',
+  federal_grants: '0.001',
+  federal_usaspending_awards: '0.001',
+  federal_grants_gov: '0.001',
+  federal_sba_awards: '0.001',
   // Export compliance (Trade.gov Consolidated Screening List)
-  screen_restricted_party: '0.003',
+  screen_restricted_party: '0.001',
   // Export opportunities (Trade.gov Trade Leads)
-  search_trade_leads: '0.003',
+  search_trade_leads: '0.001',
   // Crypto market data (CoinGecko)
   crypto_token_price: '0.001',
   crypto_trending: '0.001',

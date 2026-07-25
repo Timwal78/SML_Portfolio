@@ -21,9 +21,9 @@ const CATALOG = {
       description: 'Live federal grant and contract intelligence — Grants.gov + SAM.gov, set-aside aware (SDVOSB, 8(a), WOSB, HUBZone)',
       backend: 'https://api.grants.gov + https://api.sam.gov',
       tools: [
-        { name: 'search_grants',    type: 'PAID', price_usdc: '0.002', description: 'Search federal grant opportunities via Grants.gov Search2 — keyword, agency, CFDA, status' },
-        { name: 'search_contracts', type: 'PAID', price_usdc: '0.003', description: 'Search SAM.gov contract opportunities — NAICS, set-aside, agency, title' },
-        { name: 'lookup_entity',    type: 'PAID', price_usdc: '0.002', description: 'SAM entity lookup by UEI — registration status, NAICS, set-aside eligibility' },
+        { name: 'search_grants',    type: 'PAID', price_usdc: '0.001', description: 'Search federal grant opportunities via Grants.gov Search2 — keyword, agency, CFDA, status' },
+        { name: 'search_contracts', type: 'PAID', price_usdc: '0.001', description: 'Search SAM.gov contract opportunities — NAICS, set-aside, agency, title' },
+        { name: 'lookup_entity',    type: 'PAID', price_usdc: '0.001', description: 'SAM entity lookup by UEI — registration status, NAICS, set-aside eligibility' },
       ],
     },
     {
@@ -31,7 +31,7 @@ const CATALOG = {
       description: 'Restricted-party screening against all 11 US export-control and sanctions lists in one search — BIS Denied Persons/Entity/Unverified Lists, State ITAR Debarred + Nonproliferation Sanctions, Treasury OFAC SDN and 5 more',
       backend: 'https://data.trade.gov',
       tools: [
-        { name: 'screen_restricted_party', type: 'PAID', price_usdc: '0.003', description: 'Screen an individual or entity name against the Consolidated Screening List — fuzzy name matching, filterable by source list or country' },
+        { name: 'screen_restricted_party', type: 'PAID', price_usdc: '0.001', description: 'Screen an individual or entity name against the Consolidated Screening List — fuzzy name matching, filterable by source list or country' },
       ],
     },
     {
@@ -39,7 +39,7 @@ const CATALOG = {
       description: 'Real overseas contract/tender opportunities for US exporters — foreign government tenders and private-sector RFPs sourced by ITA\'s global commercial network',
       backend: 'https://data.trade.gov',
       tools: [
-        { name: 'search_trade_leads', type: 'PAID', price_usdc: '0.003', description: 'Search live overseas trade leads — keyword, country, tender/contract date range' },
+        { name: 'search_trade_leads', type: 'PAID', price_usdc: '0.001', description: 'Search live overseas trade leads — keyword, country, tender/contract date range' },
       ],
     },
     {
@@ -72,11 +72,11 @@ const CATALOG = {
         { name: 'squeezeos_demo',               type: 'FREE',       description: 'Free IWM council verdict sample (5-min cache)' },
         { name: 'squeezeos_marketplace_browse', type: 'FREE',       description: 'Browse peer signal marketplace — listings and metadata' },
         { name: 'squeezeos_futures_leaderboard',type: 'FREE',       description: 'Top signal prediction market performers' },
-        { name: 'squeezeos_council',            type: 'PAID',       price_usdc: '0.01', description: 'Multi-engine AI council verdict for any symbol — highest confidence signal' },
-        { name: 'squeezeos_scan',               type: 'PAID',       price_usdc: '0.005', description: 'Full $1–$50 squeeze candidate scanner — ranked by squeeze score' },
-        { name: 'squeezeos_options',            type: 'PAID',       price_usdc: '0.005', description: 'Institutional options flow analysis — dark pool, sweep detection' },
-        { name: 'squeezeos_iwm',                type: 'PAID',       price_usdc: '0.003', description: 'IWM 0DTE contract scorer — real-time Greeks and probability' },
-        { name: 'squeezeos_marketplace_read',   type: 'PAID',       price_usdc: '0.002', description: 'Full signal thesis from peer marketplace — complete analysis' },
+        { name: 'squeezeos_council',            type: 'PAID',       price_usdc: '0.001', description: 'Multi-engine AI council verdict for any symbol — highest confidence signal' },
+        { name: 'squeezeos_scan',               type: 'PAID',       price_usdc: '0.001', description: 'Full $1–$50 squeeze candidate scanner — ranked by squeeze score' },
+        { name: 'squeezeos_options',            type: 'PAID',       price_usdc: '0.001', description: 'Institutional options flow analysis — dark pool, sweep detection' },
+        { name: 'squeezeos_iwm',                type: 'PAID',       price_usdc: '0.001', description: 'IWM 0DTE contract scorer — real-time Greeks and probability' },
+        { name: 'squeezeos_marketplace_read',   type: 'PAID',       price_usdc: '0.001', description: 'Full signal thesis from peer marketplace — complete analysis' },
       ],
     },
     {
@@ -85,9 +85,9 @@ const CATALOG = {
       backend: 'self-contained (Tradier and/or Polygon.io + Anthropic Claude)',
       tools: [
         { name: 'equities_heatmap_preview',      type: 'FREE', description: 'AMC/GME/IWM + 2 dynamically-discovered movers, RSI(14) preview, 1 group, no AI swarm' },
-        { name: 'equities_heatmap_full',         type: 'PAID', price_usdc: '0.01', description: 'RSI(14) heatmap across up to 20 tickers — AMC/GME/IWM always included, rest filled from real day gainers/losers unless explicit tickers are given — 4 groups + 4-agent Claude swarm verdict (MOMENTUM_QUANT, SECTOR_ROTATION, RISK_SENTINEL, MACRO_ORACLE)' },
+        { name: 'equities_heatmap_full',         type: 'PAID', price_usdc: '0.001', description: 'RSI(14) heatmap across up to 20 tickers — AMC/GME/IWM always included, rest filled from real day gainers/losers unless explicit tickers are given — 4 groups + 4-agent Claude swarm verdict (MOMENTUM_QUANT, SECTOR_ROTATION, RISK_SENTINEL, MACRO_ORACLE)' },
         { name: 'options_delta_heatmap_preview', type: 'FREE', description: '5-contract Delta preview (AMC calls by default), 1 group, no AI swarm' },
-        { name: 'options_delta_heatmap_full',    type: 'PAID', price_usdc: '0.015', description: 'Live options chain snapshot across up to 40 contracts — real Tradier Greeks when configured, else locally-computed Black-Scholes Delta — 4 groups + 4-agent Claude swarm verdict, plus a real 0.35-0.40 delta "sweet spot" scan with an explicit BUY/SELL + strike + expiration recommendation (GREEKS_ANALYST, IV_SKEW_HUNTER, GAMMA_WATCH, RISK_SENTINEL)' },
+        { name: 'options_delta_heatmap_full',    type: 'PAID', price_usdc: '0.001', description: 'Live options chain snapshot across up to 40 contracts — real Tradier Greeks when configured, else locally-computed Black-Scholes Delta — 4 groups + 4-agent Claude swarm verdict, plus a real 0.35-0.40 delta "sweet spot" scan with an explicit BUY/SELL + strike + expiration recommendation (GREEKS_ANALYST, IV_SKEW_HUNTER, GAMMA_WATCH, RISK_SENTINEL)' },
       ],
     },
     {
@@ -125,7 +125,7 @@ const CATALOG = {
       tools: [
         { name: 'copytrader_status',    type: 'FREE', description: 'Copy-Trader service health and active subscriptions count' },
         { name: 'copytrader_whales',    type: 'FREE', description: 'List tracked whale wallets, their recent moves, and performance metrics' },
-        { name: 'copytrader_subscribe', type: 'PAID', price_usdc: '0.005', description: 'Subscribe to mirror a whale wallet — auto-copies all future positions' },
+        { name: 'copytrader_subscribe', type: 'PAID', price_usdc: '0.001', description: 'Subscribe to mirror a whale wallet — auto-copies all future positions' },
       ],
     },
     {
@@ -135,7 +135,7 @@ const CATALOG = {
       tools: [
         { name: 'launchpad_status', type: 'FREE', description: 'Launchpad service health and total tokens launched' },
         { name: 'launchpad_list',   type: 'FREE', description: 'Browse live memecoins on bonding curve — price, volume, holders' },
-        { name: 'launchpad_create', type: 'PAID', price_usdc: '0.01', description: 'Create new memecoin with bonding curve — supply, price curve, metadata' },
+        { name: 'launchpad_create', type: 'PAID', price_usdc: '0.001', description: 'Create new memecoin with bonding curve — supply, price curve, metadata' },
         { name: 'launchpad_buy',    type: 'PAID', price_usdc: '0.001', description: 'Buy tokens on memecoin bonding curve — returns executed price and tx' },
       ],
     },
@@ -144,7 +144,7 @@ const CATALOG = {
       description: 'MCP signal intelligence server with alpha-provider billing',
       backend: 'https://shadow-desk.onrender.com',
       tools: [
-        { name: 'shadow_query',  type: 'PAID', price_usdc: '0.002', description: 'Query signal intelligence from Shadow Desk alpha feed' },
+        { name: 'shadow_query',  type: 'PAID', price_usdc: '0.001', description: 'Query signal intelligence from Shadow Desk alpha feed' },
         { name: 'shadow_ingest', type: 'PAID', price_usdc: '0.001', description: 'Ingest alpha signal data into Shadow Desk for distribution' },
       ],
     },
@@ -154,7 +154,7 @@ const CATALOG = {
       backend: 'https://forge-gateway-a822.onrender.com',
       tools: [
         { name: 'forge_status', type: 'FREE', description: 'Forge Gateway health and supported models' },
-        { name: 'forge_llm',    type: 'PAID', price_usdc: '0.002', description: 'BYOK LLM proxy — call any AI model, pay per request via x402' },
+        { name: 'forge_llm',    type: 'PAID', price_usdc: '0.001', description: 'BYOK LLM proxy — call any AI model, pay per request via x402' },
       ],
     },
     {
@@ -172,7 +172,7 @@ const CATALOG = {
       description: 'Ask, don’t guess. Declare what you NEED (capability, budget, chain, freshness) and get the exact LIVE tool(s) that match — saving the tokens and failed payments of trial-and-error across the catalog.',
       backend: 'https://squeezeos-api.onrender.com',
       tools: [
-        { name: 'apm_negotiate', type: 'FREE|PAID', price_usdc: '0.002', description: 'FREE preview returns match count + best category. PAID contract ($0.02) returns the full ranked plan with prices, live-status, brokerage terms, and a price-locked signed quote.' },
+        { name: 'apm_negotiate', type: 'FREE|PAID', price_usdc: '0.001', description: 'FREE preview returns match count + best category. PAID contract ($0.02) returns the full ranked plan with prices, live-status, brokerage terms, and a price-locked signed quote.' },
         { name: 'apm_execute', type: 'PAID', price_usdc: 'locked price + 5% brokerage', description: 'Execute a tool recommended by apm_negotiate under its signed price-locked quote. Charges the locked price + 5% brokerage, runs the tool, returns the result. Brokers the live SqueezeOS family today.' },
       ],
     },
@@ -181,19 +181,19 @@ const CATALOG = {
       description: 'Historical equity pattern similarity engine — ML cosine similarity on Polygon.io data',
       backend: 'coming_soon',
       tools: [
-        { name: 'echo_pattern_match', type: 'PAID', price_usdc: '0.005', status: 'coming_soon', description: '[COMING SOON] Find historical equity patterns similar to current price action' },
+        { name: 'echo_pattern_match', type: 'PAID', price_usdc: '0.001', status: 'coming_soon', description: '[COMING SOON] Find historical equity patterns similar to current price action' },
       ],
     },
     {
       product: 'Core SML Intelligence',
       description: 'Original 6 SML tools — squeeze signals, EDGAR parsing, earnings oracle, FTD data, agent hiring, web scraping',
       tools: [
-        { name: 'leviathan_signal',     type: 'PAID',      price_usdc: '0.005',        description: 'Institutional squeeze signals — proprietary multi-engine verdict for any ticker' },
-        { name: 'xmit_edgar_decode',    type: 'PAID',      price_usdc: '0.002',        description: 'Parse SEC DEF 14A / 13F / 13D filings — raw text never leaves SML servers' },
-        { name: 'xdeo_earnings_estimate',type:'PAID',      price_usdc: '0.002',        description: 'Decentralized earnings oracle — consensus estimate across data sources' },
-        { name: 'ftd_threshold_scan',   type: 'FREE|PAID', price_usdc: '0.005',        description: 'SEC Reg SHO FTD data — threshold alerts free, full scanner $0.05' },
+        { name: 'leviathan_signal',     type: 'PAID',      price_usdc: '0.001',        description: 'Institutional squeeze signals — proprietary multi-engine verdict for any ticker' },
+        { name: 'xmit_edgar_decode',    type: 'PAID',      price_usdc: '0.001',        description: 'Parse SEC DEF 14A / 13F / 13D filings — raw text never leaves SML servers' },
+        { name: 'xdeo_earnings_estimate',type:'PAID',      price_usdc: '0.001',        description: 'Decentralized earnings oracle — consensus estimate across data sources' },
+        { name: 'ftd_threshold_scan',   type: 'FREE|PAID', price_usdc: '0.001',        description: 'SEC Reg SHO FTD data — threshold alerts free, full scanner $0.05' },
         { name: 'nexus_agent_hire',     type: 'FREE|PAID', price_usdc: '5% commission', description: 'Agent job marketplace — browse free, hire charges 5% of contract value' },
-        { name: 'crawl_paid_fetch',     type: 'PAID',      price_usdc: '0.005',       description: 'Pay-per-fetch web scraping — humans bypass free, AI agents pay $0.005/fetch' },
+        { name: 'crawl_paid_fetch',     type: 'PAID',      price_usdc: '0.001',       description: 'Pay-per-fetch web scraping — humans bypass free, AI agents pay $0.005/fetch' },
       ],
     },
   ],
