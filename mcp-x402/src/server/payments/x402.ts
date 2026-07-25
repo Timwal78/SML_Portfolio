@@ -16,6 +16,9 @@ export const PaymentConfigSchema = z.object({
   paymentTxHash: z.string().optional(),
   /** Rail A (standard): a base64 X-PAYMENT-style EIP-3009 payload, verified + settled via the facilitator chain. */
   paymentHeader: z.string().optional(),
+  /** Operator-only bypass secret — must match SML_API_KEY. Skips payment verification entirely when valid.
+   *  Same secret and semantics as the X-Operator-Key check on the REST /x402/* endpoints (server/index.ts). */
+  operatorKey: z.string().optional(),
 });
 
 export type PaymentConfig = z.infer<typeof PaymentConfigSchema>;
@@ -98,6 +101,14 @@ interface VerifiedPayment {
  */
 async function verifyPayment(config: PaymentConfig, priceUnits: bigint): Promise<VerifiedPayment> {
   const payTo = getPaymentReceiver();
+
+  // Operator bypass — mirrors the X-Operator-Key check on the REST /x402/* endpoints
+  // (server/index.ts). Reuses SML_API_KEY so there's only one operator secret to manage
+  // instead of a separate one per surface (REST vs MCP tool calls).
+  const operatorSecret = process.env['SML_API_KEY'];
+  if (operatorSecret && config.operatorKey && config.operatorKey === operatorSecret) {
+    return { payer: 'did:sml:operator', txHash: '', rail: 'operator' };
+  }
 
   if (config.paymentTxHash) {
     if (alreadyRedeemed(config.paymentTxHash)) {
