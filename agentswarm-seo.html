@@ -991,10 +991,6 @@ html, body {
       <div class="section-pad" style="padding-bottom:0">
         <div class="live-stats card" style="border-radius:8px;grid-template-columns:repeat(6,1fr)">
           <div class="stat-block">
-            <span class="stat-val">Base</span>
-            <span class="stat-label">CHAIN</span>
-          </div>
-          <div class="stat-block">
             <span class="stat-val" data-live-count>139+</span>
             <span class="stat-label">PAID ROUTES</span>
           </div>
@@ -1005,6 +1001,10 @@ html, body {
           <div class="stat-block">
             <span class="stat-val" id="stat-hosts">3</span>
             <span class="stat-label">HOSTS LIVE</span>
+          </div>
+          <div class="stat-block">
+            <span class="stat-val" id="stat-agents-today">—</span>
+            <span class="stat-label">AI AGENTS TODAY</span>
           </div>
           <div class="stat-block">
             <span class="stat-val" id="stat-ping">—</span>
@@ -2261,21 +2261,36 @@ let lastPingAge = 0;
 async function loadAgentStats() {
   try {
     const res = await fetch('https://mcp-x402.onrender.com/api/stats', {
+      mode: 'cors',
+      credentials: 'omit',
+      cache: 'no-store',
       signal: AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined
     });
     if (!res.ok) return;
     const data = await res.json();
-    const today = data.aiAgentsToday ?? 0;
-    const total = data.aiAgentsAllTime ?? 0;
+    const today = Number(data.aiAgentsToday ?? 0);
+    const total = Number(data.aiAgentsAllTime ?? 0);
+    const paidToday = Number(data.paidAgentsToday ?? 0);
 
-    const fmt = n => n >= 1000 ? (n / 1000).toFixed(1) + 'k' : String(n);
+    const fmt = n => {
+      if (!Number.isFinite(n)) return '0';
+      if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+      return String(Math.floor(n));
+    };
 
     ['metric-agents-today', 'stat-agents-today'].forEach(id => {
       const el = document.getElementById(id);
-      if (el) el.textContent = fmt(today);
+      if (el) {
+        el.textContent = fmt(today);
+        el.style.color = today > 0 ? 'var(--green)' : '';
+        el.title = paidToday ? (paidToday + ' paid x402 hits today') : 'AI/agent hits today (UA + paid + MCP)';
+      }
     });
     const totalEl = document.getElementById('metric-agents-total');
-    if (totalEl) totalEl.textContent = fmt(total);
+    if (totalEl) {
+      totalEl.textContent = fmt(total);
+      totalEl.title = 'All-time agent hits (persisted)';
+    }
   } catch (_) { /* non-critical */ }
 }
 
