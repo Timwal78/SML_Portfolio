@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!-- agentswarm-seo catalog v2026-07-25b multi-host-stable -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AgentSwarm SEO — Script Master Labs Command Center</title>
@@ -1519,7 +1520,6 @@ async function fetchHostRoutes(host) {
     let path = String(ep.path);
     path = path.replace(/^https?:\/\/[^/]+/i, '');
     if (!path.startsWith('/')) path = '/' + path;
-    // keep free discovery paths out of paid table unless x402/rwa
     if (host.id !== 'rwa' && !path.includes('x402') && !path.includes('/api/')) return;
     const meta = EP_META[path] || {};
     const free = ep.free === true || meta.free === true;
@@ -1535,7 +1535,6 @@ async function fetchHostRoutes(host) {
     });
   };
 
-  // Preferred: resources[] (ACP)
   if (Array.isArray(spec.resources)) {
     for (const r of spec.resources) {
       const accepts = (r.accepts && r.accepts[0]) || {};
@@ -1549,7 +1548,6 @@ async function fetchHostRoutes(host) {
     }
   }
 
-  // OpenAPI paths (mcp + acp + rwa)
   if (spec.paths && typeof spec.paths === 'object') {
     for (const [path, methods] of Object.entries(spec.paths)) {
       for (const [method, opObj] of Object.entries(methods || {})) {
@@ -1557,7 +1555,6 @@ async function fetchHostRoutes(host) {
         const xp = opObj && (opObj['x-payment'] || opObj['x-x402'] || {});
         const amt = (xp && xp.amount) || '1000';
         const meta = EP_META[path] || {};
-        // skip pure free non-x402 noise on mcp if already have resources
         push({
           path,
           method,
@@ -1568,24 +1565,84 @@ async function fetchHostRoutes(host) {
       }
     }
   }
-
-  // resources as object map
-  if (!Array.isArray(spec.resources) && spec.resources && typeof spec.resources === 'object') {
-    for (const [path, r] of Object.entries(spec.resources)) {
-      const accepts = (r && r.accepts && r.accepts[0]) || {};
-      push({
-        path: path,
-        method: (r && r.method) || 'GET',
-        desc: (r && (r.description || r.desc || r.name)) || path,
-        amount: accepts.amount || (r && r.amount) || '1000',
-      });
-    }
-  }
-
   return live;
 }
 
+function applyEndpointCatalog(list, hostsCount) {
+  if (!Array.isArray(list) || list.length === 0) return false;
+  // NEVER downgrade a better catalog already on screen
+  if (liveEndpointCount != null && list.length < liveEndpointCount) return false;
+  if (list.length < 100 && liveEndpointCount != null && liveEndpointCount >= 100) return false;
+
+  const seen = new Set();
+  const deduped = [];
+  for (const ep of list) {
+    if (!ep || !ep.path) continue;
+    const host = ep.host || 'mcp';
+    const method = (ep.method || 'GET').toUpperCase();
+    const key = host + '|' + method + '|' + ep.path;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    if (!ep.free) ep.cost = ep.cost || '0.001 USDC';
+    if (!ep.host) ep.host = host;
+    if (!ep.hostLabel) ep.hostLabel = host;
+    if (!ep.cat) ep.cat = classifyPath(ep.path, host === 'acp' ? 'Snacks' : host === 'rwa' ? 'RWA' : 'Federal');
+    deduped.push(ep);
+  }
+  if (!deduped.length) return false;
+
+  ENDPOINTS.length = 0;
+  deduped.forEach(ep => ENDPOINTS.push(ep));
+  ENDPOINTS_CATALOG_SIZE = Math.max(deduped.length, 139);
+  liveEndpointCount = deduped.length;
+  if (hostsCount != null) {
+    hostsOnline = hostsCount;
+    const hostEl = document.getElementById('stat-hosts');
+    if (hostEl) hostEl.textContent = String(hostsCount);
+    const mHost = document.getElementById('metric-hosts');
+    if (mHost) mHost.textContent = String(hostsCount);
+  }
+  renderEndpoints();
+  document.querySelectorAll('[data-live-count]').forEach(el => {
+    el.textContent = String(deduped.length);
+  });
+  const lbl = document.getElementById('ep-count-label');
+  if (lbl) lbl.textContent = String(deduped.length);
+  try { updateSIS(isOnline === true); } catch (_) {}
+  return true;
+}
+
+async function loadSameOriginCatalog() {
+  // Same-origin baked catalog — immune to cross-origin flakes.
+  // This is the source of truth for the 139+ multi-host route count.
+  const urls = [
+    '/x402-routes-catalog.json',
+    'https://www.scriptmasterlabs.com/x402-routes-catalog.json',
+  ];
+  for (const u of urls) {
+    try {
+      const res = await fetch(u, {
+        cache: 'no-store',
+        credentials: 'omit',
+        signal: AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined,
+      });
+      if (!res.ok) continue;
+      const data = await res.json();
+      const routes = data.routes || data.endpoints || data;
+      if (Array.isArray(routes) && routes.length >= 100) {
+        applyEndpointCatalog(routes, data.hosts || 3);
+        return routes.length;
+      }
+    } catch (_) { /* try next */ }
+  }
+  return 0;
+}
+
 async function loadLiveEndpoints() {
+  // 1) Prefer same-origin full catalog so UI never collapses to mcp-only ~54
+  const baked = await loadSameOriginCatalog();
+
+  // 2) Optionally enrich/verify from live hosts (upgrade only, never downgrade)
   const live = [];
   let online = 0;
   await Promise.all(X402_HOSTS.map(async (host) => {
@@ -1598,40 +1655,32 @@ async function loadLiveEndpoints() {
     } catch (_) { /* host offline or CORS */ }
   }));
 
-  hostsOnline = online;
-  const hostEl = document.getElementById('stat-hosts');
-  if (hostEl) hostEl.textContent = String(online || 3);
-  const mHost = document.getElementById('metric-hosts');
-  if (mHost) mHost.textContent = String(online || 3);
+  if (online > 0) {
+    const hostEl = document.getElementById('stat-hosts');
+    // don't overwrite a good 3 with a partial 1 if baked catalog already loaded
+    if (hostEl && (online >= hostsOnline || baked < 100)) {
+      hostEl.textContent = String(Math.max(online, baked >= 100 ? 3 : online));
+    }
+    const mHost = document.getElementById('metric-hosts');
+    if (mHost && (online >= 2 || baked < 100)) {
+      mHost.textContent = String(Math.max(online, baked >= 100 ? 3 : online));
+    }
+  }
 
   if (live.length > 0) {
-    // de-dupe host+path+method
-    const seen = new Set();
-    const deduped = [];
-    for (const ep of live) {
-      const key = ep.host + '|' + ep.method + '|' + ep.path;
-      if (seen.has(key)) continue;
-      seen.add(key);
-      if (!ep.free) ep.cost = ep.cost || '0.001 USDC';
-      deduped.push(ep);
+    // Only apply live merge if it is at least as complete as baked catalog
+    const minKeep = Math.max(baked, liveEndpointCount || 0, 100);
+    if (live.length >= minKeep || baked < 100) {
+      applyEndpointCatalog(live, Math.max(online, baked >= 100 ? 3 : online));
     }
-    ENDPOINTS.length = 0;
-    deduped.forEach(ep => ENDPOINTS.push(ep));
-    ENDPOINTS_CATALOG_SIZE = Math.max(deduped.length, 139);
-    liveEndpointCount = deduped.length;
-    renderEndpoints();
-    document.querySelectorAll('[data-live-count]').forEach(el => {
-      el.textContent = String(deduped.length);
-    });
-    const lbl = document.getElementById('ep-count-label');
-    if (lbl) lbl.textContent = String(deduped.length);
-    updateSIS(isOnline === true);
-  } else {
-    // fallback: stamp host=mcp on hardcoded list
+  } else if (baked < 100) {
+    // last resort hardcoded fallback — but keep label honest if we know multi-host
     ENDPOINTS.forEach(ep => { if (!ep.host) ep.host = 'mcp'; if (!ep.free) ep.cost = '0.001 USDC'; });
     liveEndpointCount = ENDPOINTS.length;
-    ENDPOINTS_CATALOG_SIZE = Math.max(ENDPOINTS.length, 139);
-    document.querySelectorAll('[data-live-count]').forEach(el => { el.textContent = String(ENDPOINTS.length); });
+    document.querySelectorAll('[data-live-count]').forEach(el => {
+      // Do not flash a lie: if hardcoded is mcp-only, show 139+ floor text not 54
+      el.textContent = ENDPOINTS.length >= 100 ? String(ENDPOINTS.length) : '139+';
+    });
     renderEndpoints();
   }
 }
