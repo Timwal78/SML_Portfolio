@@ -52,7 +52,7 @@ export const CAPABILITIES: Capability[] = [
     summary: 'Institutional options flow analysis — dark pool and sweep detection.',
   },
   {
-    tool: 'squeezeos_iwm', product: 'SqueezeOS', paid: true, basePrice: '0.03',
+    tool: 'squeezeos_iwm', product: 'SqueezeOS', paid: true, basePrice: '0.003',
     paymentChains: ALL_CHAINS, freshnessSec: 5, attribution: false,
     tags: ['iwm', '0dte', 'options', 'greeks', 'realtime', 'index', 'russell', 'probability'],
     summary: 'IWM 0DTE contract scorer — real-time Greeks and probability.',
@@ -110,7 +110,7 @@ export const CAPABILITIES: Capability[] = [
 
   // ── Ghost Layer (cross-chain settlement) ──────────────────────────────────
   {
-    tool: 'ghost_route', product: 'Ghost Layer', paid: true, basePrice: '0.01',
+    tool: 'ghost_route', product: 'Ghost Layer', paid: true, basePrice: '0.001',
     paymentChains: ['xrpl', 'base'], freshnessSec: 0, attribution: false,
     tags: ['route', 'cross-chain', 'crosschain', 'bridge', 'settlement', 'xrpl', 'base', 'toll', 'transfer', 'private'],
     summary: 'Route a transaction through the dual-chain XRPL+Base gateway with toll collection.',
@@ -138,7 +138,7 @@ export const CAPABILITIES: Capability[] = [
 
   // ── RLUSD Rails (XRPL/Xahau settlement) ───────────────────────────────────
   {
-    tool: 'rails_transfer', product: 'RLUSD Rails', paid: true, basePrice: '0.01',
+    tool: 'rails_transfer', product: 'RLUSD Rails', paid: true, basePrice: '0.001',
     paymentChains: ['xrpl'], freshnessSec: 0, attribution: false,
     tags: ['rlusd', 'xrp', 'transfer', 'remittance', 'payment', 'settlement', 'xrpl', 'xahau', 'send'],
     summary: 'Initiate an RLUSD or XRP transfer via SML Rails — returns tx_hash.',
@@ -160,7 +160,7 @@ export const CAPABILITIES: Capability[] = [
     summary: 'Create a new memecoin with a bonding curve — supply, curve, metadata.',
   },
   {
-    tool: 'launchpad_buy', product: 'Launchpad', paid: true, basePrice: '0.01',
+    tool: 'launchpad_buy', product: 'Launchpad', paid: true, basePrice: '0.001',
     paymentChains: ['xrpl'], freshnessSec: 5, attribution: false,
     tags: ['memecoin', 'token', 'buy', 'bonding', 'curve', 'xrpl', 'trade'],
     summary: 'Buy tokens on a memecoin bonding curve — returns executed price and tx.',
