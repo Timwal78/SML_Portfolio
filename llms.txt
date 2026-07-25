@@ -408,3 +408,15 @@ Static, answer-first pages with FAQPage JSON-LD, written for direct citation by 
 | https://www.scriptmasterlabs.com/pine-script-squeeze-indicator.html | SML's Pine Script TradingView indicators |
 | https://www.scriptmasterlabs.com/no-fake-trading-data-policy.html | SqueezeOS's enforced no-fake-data policy |
 - RWA Agent Snack (10-line x402): https://www.scriptmasterlabs.com/rwa-agent-snack.html
+
+
+## Section 8 / PHA Housing API (mcp-x402) — $0.001 USDC
+Host: https://mcp-x402.onrender.com
+Personal toolkit: https://www.scriptmasterlabs.com/housing-landlord.html
+- GET /x402/pha-lookup?zip=28504 — Public Housing Authority landlord contacts
+- GET /x402/hcv-fmr?zip=28504&bedrooms=4 — HUD FMR + 90-110% payment-standard estimate (Lenoir FY2025 4BR = $1497)
+- GET /x402/hud-vash-contacts?state=NC&county=Lenoir — HUD-VASH guidance
+- GET /x402/housing-landlord-checklist?zip=28504&bedrooms=4 — HCV landlord + HQS checklist
+- GET /x402/housing-windsor — Kinston 4BR bundle (1607 Windsor Rd profile)
+MCP tools: pha_lookup, hcv_fmr, housing_landlord_checklist, hud_vash_contacts
+Disclaimer: FMR is HUD baseline; PHA payment standard controls HAP. Not legal/tax advice.

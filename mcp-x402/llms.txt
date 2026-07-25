@@ -64,3 +64,7 @@ npx @scriptmasterlabs/mcp-x402
 
 
 <!-- see README.md for full tool list and payment flow -->
+
+## Housing / Section 8 ($0.001)
+- /x402/pha-lookup · /x402/hcv-fmr · /x402/hud-vash-contacts
+- /x402/housing-landlord-checklist · /x402/housing-windsor

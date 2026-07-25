@@ -15,7 +15,7 @@ COPY package*.json ./
 RUN npm install --ignore-scripts --omit=optional
 COPY tsconfig.json ./
 COPY src/ ./src/
-RUN npm run build
+RUN NODE_OPTIONS=--max-old-space-size=4096 npm run build
 
 FROM node:22-alpine AS runner
 WORKDIR /app

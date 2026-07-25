@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Section 8 Landlord Toolkit — 1607 Windsor Rd | ScriptMasterLabs</title>
+<meta name="description" content="Personal + income toolkit for HCV/Section 8 landlords. Kinston Housing Authority contacts, Lenoir County FY2025 4BR FMR $1,497, call script, income worksheet, x402 API."/>
+<link rel="canonical" href="https://www.scriptmasterlabs.com/housing-landlord-toolkit.html"/>
+<meta property="og:title" content="Section 8 Landlord Toolkit — Kinston NC 4BR"/>
+<meta property="og:description" content="PHA contacts, FMR $1,497 4BR, call script, income math, paid API $0.001."/>
+<style>
+:root{--bg:#070a0f;--card:#121a26;--line:#2a3544;--text:#eef3fb;--muted:#93a0b4;--green:#3dd68c;--blue:#5b8cff;--gold:#e6c35c;--red:#ff6b7a}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,sans-serif;background:radial-gradient(1000px 500px at 50% -10%,#1a2740,var(--bg) 55%);color:var(--text);line-height:1.55}
+.wrap{max-width:920px;margin:0 auto;padding:28px 16px 72px}
+.badge{display:inline-block;border:1px solid var(--line);color:var(--gold);font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:6px 10px;border-radius:999px;margin:0 6px 6px 0}
+h1{font-size:clamp(1.7rem,4.5vw,2.4rem);line-height:1.12;letter-spacing:-.03em;margin:12px 0 8px}
+.sub{color:var(--muted);font-size:1.05rem;max-width:52ch}
+.hero{border:1px solid var(--line);background:linear-gradient(180deg,#151c27,var(--card));border-radius:20px;padding:26px 22px;box-shadow:0 24px 60px rgba(0,0,0,.35)}
+.grid{display:grid;gap:12px;margin-top:18px}@media(min-width:720px){.grid.3{grid-template-columns:repeat(3,1fr)}.grid.2{grid-template-columns:1fr 1fr}}
+.card{border:1px solid var(--line);background:rgba(18,26,38,.92);border-radius:16px;padding:16px}
+.card h3{margin:0 0 8px;font-size:1rem}.card p,.card li{color:var(--muted);font-size:.95rem}
+.card ul{margin:8px 0 0 18px;padding:0}
+.big{font-size:1.8rem;font-weight:800;color:var(--green);letter-spacing:-.02em}
+.muted{color:var(--muted)}
+.cta{display:inline-block;background:var(--blue);color:#fff;text-decoration:none;font-weight:700;padding:11px 14px;border-radius:12px;margin:6px 6px 0 0}
+.cta2{background:transparent;border:1px solid var(--line);color:var(--text)}
+pre,textarea{width:100%;background:#05080d;border:1px solid var(--line);border-radius:12px;padding:14px;color:var(--text);font:13px ui-monospace,Menlo,Consolas,monospace}
+textarea{min-height:120px;resize:vertical}
+label{display:block;font-size:12px;color:var(--muted);margin:10px 0 4px;text-transform:uppercase;letter-spacing:.06em}
+input{width:100%;background:#05080d;border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--text);font-size:15px}
+table{width:100%;border-collapse:collapse;font-size:.92rem}
+th,td{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left}
+th{color:var(--muted);font-weight:600}
+.ok{color:var(--green)}.warn{color:var(--gold)}.bad{color:var(--red)}
+.foot{margin-top:36px;color:var(--muted);font-size:13px;border-top:1px solid var(--line);padding-top:14px}
+.script{white-space:pre-wrap}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.pill{border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:12px;color:var(--muted)}
+#netOut{font-size:1.4rem;font-weight:800;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="badge">Personal use · 1607 Windsor Rd</span>
+  <span class="badge">Income API · $0.001 x402</span>
+  <span class="badge">Lenoir · Kinston NC 28504</span>
+
+  <div class="hero" style="margin-top:12px">
+    <h1>Section 8 / veteran landlord toolkit</h1>
+    <p class="sub">Keep the 4BR as income while you move to Florida. Talk to <b style="color:var(--text)">Kinston Housing Authority</b>, price off HUD FMR, run the net sheet, hit the API.</p>
+    <div class="row">
+      <a class="cta" href="tel:2525231195">Call KHA 252-523-1195</a>
+      <a class="cta cta2" href="mailto:asanders@khanc.org?subject=Landlord%20packet%20-%201607%20Windsor%20Rd%204BR">Email landlord desk</a>
+      <a class="cta cta2" href="https://www.khanc.org/landlords" target="_blank" rel="noopener">KHA landlords page</a>
+      <a class="cta cta2" href="#api">API ($0.001)</a>
+    </div>
+  </div>
+
+  <div class="grid 3">
+    <div class="card">
+      <h3>FY2025 4BR FMR</h3>
+      <div class="big">$1,497<span style="font-size:.9rem;color:var(--muted)">/mo</span></div>
+      <p>Lenoir County HUD Fair Market Rent. Planning baseline for 1607 Windsor.</p>
+    </div>
+    <div class="card">
+      <h3>Payment standard band</h3>
+      <div class="big" style="font-size:1.25rem">$1,347 – $1,647</div>
+      <p>~90–110% of FMR. <b class="warn">KHA’s official 4BR standard wins</b> — ask on the call.</p>
+    </div>
+    <div class="card">
+      <h3>Your PHA</h3>
+      <p><b style="color:var(--text)">Kinston Housing Authority (NC004)</b><br/>608 N. Queen St, Kinston 28501<br/>HCV / Section 8 · direct-deposit HAP</p>
+    </div>
+  </div>
+
+  <div class="grid 2" style="margin-top:12px">
+    <div class="card">
+      <h3>Property</h3>
+      <table>
+        <tr><th>Address</th><td>1607 Windsor Rd, Kinston NC 28504</td></tr>
+        <tr><th>Type</th><td>4BR single-family · Country Club Estates</td></tr>
+        <tr><th>Programs</th><td>HCV / Section 8 · HUD-VASH if available</td></tr>
+        <tr><th>Goal</th><td>Remote landlord from Florida · prefer veterans</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h3>Lenoir FMR schedule (FY2025)</h3>
+      <table>
+        <tr><th>0BR</th><th>1BR</th><th>2BR</th><th>3BR</th><th>4BR</th></tr>
+        <tr><td>$735</td><td>$740</td><td>$930</td><td>$1,300</td><td><b class="ok">$1,497</b></td></tr>
+      </table>
+      <p style="margin-top:10px">FY2024 4BR was $1,376. Confirm payment standard + rent reasonableness with KHA.</p>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:12px">
+    <h3>Call script (copy/paste)</h3>
+    <pre class="script" id="callScript">I own a 4-bedroom single-family home at 1607 Windsor Road, Kinston 28504.
+We're relocating to Florida and want to keep it as a rental — preferably veterans / HCV.
+
+1) What is the current payment standard for a 4BR in 28504 / Kinston?
+2) How do I join the landlord list and get the owner packet (W-9, direct deposit, RFTA/HAP)?
+3) Do you administer HUD-VASH, or which VA/PHA should I call for veteran vouchers?
+4) What are the most common HQS fail items on houses like mine?
+5) When is the next owner orientation?
+6) Do you need 4BR units right now?</pre>
+    <div class="row">
+      <span class="pill">Main: 252-523-1195</span>
+      <span class="pill">Landlord: 252-527-9160 ext. 256</span>
+      <span class="pill">asanders@khanc.org</span>
+      <span class="pill">Hours: Mon–Thu 8–5:30</span>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:12px">
+    <h3>Income worksheet (monthly)</h3>
+    <p class="muted">Edit numbers. Net is before vacancy shock — keep a reserve.</p>
+    <div class="grid 2">
+      <div>
+        <label>Gross rent target</label>
+        <input id="gross" type="number" value="1497"/>
+        <label>Mortgage</label>
+        <input id="mortgage" type="number" value="0"/>
+        <label>Taxes (monthly)</label>
+        <input id="taxes" type="number" value="0"/>
+        <label>Insurance (monthly)</label>
+        <input id="ins" type="number" value="0"/>
+      </div>
+      <div>
+        <label>PM fee %</label>
+        <input id="pm" type="number" value="10"/>
+        <label>Maintenance reserve</label>
+        <input id="maint" type="number" value="150"/>
+        <label>Vacancy reserve</label>
+        <input id="vac" type="number" value="125"/>
+        <label>Other</label>
+        <input id="other" type="number" value="0"/>
+      </div>
+    </div>
+    <div id="netOut" class="ok">Net: —</div>
+    <p class="muted" id="netDetail"></p>
+  </div>
+
+  <div class="grid 2" style="margin-top:12px">
+    <div class="card">
+      <h3>Before Florida checklist</h3>
+      <ul>
+        <li>Mortgage/HOA allows rental + voucher tenants</li>
+        <li>Landlord insurance (loss of rents if possible)</li>
+        <li>Section-8-friendly local PM locked</li>
+        <li>Smoke/CO, locks, heat, electric, handrails</li>
+        <li>Lead disclosure if pre-1978</li>
+        <li>W-9, DD, ID, ownership proof ready</li>
+        <li>List at/under KHA 4BR payment standard + comps</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>HQS hotspots</h3>
+      <ul>
+        <li>Smoke / CO detectors</li>
+        <li>Heat + no active leaks</li>
+        <li>Secure exterior locks</li>
+        <li>Electrical covers / hazards</li>
+        <li>Stair handrails</li>
+        <li>Peeling paint (pre-1978)</li>
+        <li>Infestation / sewage / garbage</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:12px" id="api">
+    <h3>Income API — $0.001 USDC on Base</h3>
+    <p>Host: <code>https://mcp-x402.onrender.com</code> · pay with <code>X-PAYMENT</code> or sovereign <code>X-PAYMENT-TX</code></p>
+    <table>
+      <tr><th>Route</th><th>Use</th></tr>
+      <tr><td><code>/x402/pha-lookup?zip=28504</code></td><td>PHA + landlord contacts</td></tr>
+      <tr><td><code>/x402/hcv-fmr?zip=28504&amp;bedrooms=4</code></td><td>FMR + 90–110% band</td></tr>
+      <tr><td><code>/x402/hud-vash-contacts?state=NC&amp;county=Lenoir</code></td><td>Veteran voucher path</td></tr>
+      <tr><td><code>/x402/housing-landlord-checklist?zip=28504&amp;bedrooms=4</code></td><td>Full checklist</td></tr>
+      <tr><td><code>/x402/housing-windsor</code></td><td>This property bundle</td></tr>
+    </table>
+    <pre style="margin-top:12px"># unpaid → HTTP 402 challenge
+curl -sS "https://mcp-x402.onrender.com/x402/hcv-fmr?zip=28504&bedrooms=4"
+
+# after USDC pay on Base:
+curl -sS -H "X-PAYMENT-TX: &lt;txHash&gt;" \
+  "https://mcp-x402.onrender.com/x402/housing-windsor"</pre>
+    <div class="row">
+      <a class="cta cta2" href="https://mcp-x402.onrender.com/.well-known/x402" target="_blank" rel="noopener">OpenAPI / x402</a>
+      <a class="cta cta2" href="https://www.scriptmasterlabs.com/agent-start.html">Agent start</a>
+      <a class="cta cta2" href="https://www.khanc.org/" target="_blank" rel="noopener">khanc.org</a>
+    </div>
+  </div>
+
+  <div class="foot">
+    <p><b>Not legal, tax, or housing-authority advice.</b> KHA written payment standards, HQS, and HAP contract govern. HUD FMR is a baseline — confirm the live 4BR payment standard before listing. Built for personal use on 1607 Windsor Rd and as a $0.001 agent data product.</p>
+    <p>Script Master Labs · <a href="https://www.scriptmasterlabs.com/" style="color:var(--blue)">scriptmasterlabs.com</a></p>
+  </div>
+</div>
+<script>
+function n(id){return parseFloat(document.getElementById(id).value)||0}
+function calc(){
+  const g=n('gross'), m=n('mortgage'), t=n('taxes'), i=n('ins'), pm=n('pm')/100, maint=n('maint'), vac=n('vac'), o=n('other');
+  const pmFee=g*pm;
+  const net=g - m - t - i - pmFee - maint - vac - o;
+  const el=document.getElementById('netOut');
+  el.textContent='Net: $'+net.toFixed(0)+'/mo';
+  el.className=net>=0?'ok':'bad';
+  document.getElementById('netDetail').textContent=
+    'PM fee $'+pmFee.toFixed(0)+' · fixed outflow $'+(m+t+i+maint+vac+o).toFixed(0)+
+    ' · vs FMR band $1347–$1647';
+}
+['gross','mortgage','taxes','ins','pm','maint','vac','other'].forEach(id=>{
+  document.getElementById(id).addEventListener('input', calc);
+});
+calc();
+</script>
+</body>
+</html>
