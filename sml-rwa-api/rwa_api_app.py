@@ -35,7 +35,7 @@ MAX_TIMEOUT = int(os.getenv("X402_MAX_TIMEOUT", "300"))
 X402_VERSION = 2
 DEPLOY_STAMP = "2026-07-23T16:10Z-live-engine-v2-no-demo"
 
-PRICES = {
+PRICES = {  # ALL-OUT 0.001 volume war
     "rwa-valuation": "0.001",
     "proof-of-reserves": "0.001",
     "rwa-intelligence": "0.001",
