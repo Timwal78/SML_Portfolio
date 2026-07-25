@@ -288,6 +288,7 @@ Institutional systematic position-building engine (ScriptMaster Labs). Uses a 5-
 - [SqueezeOS](https://squeezeos-api.onrender.com): Institutional-grade AI trading intelligence — council verdicts, squeeze scanner, FTD oracle, options flow, IWM 0DTE, gamma flow, whale stalker, battle computer
 - [CRAWLTOLL](https://www.scriptmasterlabs.com/crawltoll.html): Turn AI crawler traffic into revenue. GPTBot, ClaudeBot, PerplexityBot pay USDC per fetch; humans free. `npx crawltoll init`. npm: `@relayos/mcp-paywall`
 - ShortSqueeze Swarm: Autonomous FTD/Reg SHO anomaly feed — free alerts at `https://squeezeos-api.onrender.com/api/ftd/alerts`; full settlement-cycle detail (0.05 RLUSD) at `/api/ftd/cycle/{symbol}`
+- [Gamma Pin Watch](https://www.scriptmasterlabs.com/gamma-pin.html): Free live dashboard for a user-supplied symbol watchlist, polling SqueezeOS's real `/api/gamma-pin/{symbol}` endpoint (Tradier options chain, GEX profile, 0-2 DTE / 0.5% max-OI-strike pin-risk detection). Companion to the SML Gamma Pin v6 TradingView Pine script (`indicators/SML_Gamma_Pin_v6.pine` in `timwal78/squeezeos`), which cannot access real option open interest directly — this page shows the real number instead of the script's round-number grid proxy. No backtest exists for the pin-risk constraint; disclosed as a reference tool, not a trade signal
 
 ---
 
