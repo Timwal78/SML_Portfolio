@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gamma Pin Watch — ScriptMaster Labs</title>
+<meta name="description" content="Live companion dashboard for the SML Gamma Pin Pine script. Polls the real Tradier-chain-derived gamma-pin signal server-side — no proxy, no fabricated data.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Gamma Pin Watch",
+      "url": "https://www.scriptmasterlabs.com/gamma-pin.html",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Web",
+      "description": "Free live dashboard that polls SqueezeOS's real, Tradier-chain-derived gamma pin risk endpoint for a user-supplied watchlist. Companion to the SML Gamma Pin v6 TradingView Pine script, which cannot access real options open interest directly.",
+      "isAccessibleForFree": true,
+      "provider": {
+        "@type": "Organization",
+        "name": "ScriptMaster Labs",
+        "url": "https://www.scriptmasterlabs.com"
+      }
+    },
+    {
+      "@type": "Dataset",
+      "name": "SML Gamma Pin real-time signal",
+      "description": "Real Tradier options chain, GEX profile, and 0-2 DTE / 0.5% max-OI-strike proximity pin-risk detection, computed server-side by gamma_pin_scanner.py / gamma_flow_engine.py.",
+      "url": "https://squeezeos-api.onrender.com/api/gamma-pin/status",
+      "creator": {"@type": "Organization", "name": "ScriptMaster Labs"}
+    }
+  ]
+}
+</script>
+<style>
+  :root {
+    --bg: #050505;
+    --surface: rgba(20,20,20,0.65);
+    --border: rgba(255,255,255,0.10);
+    --accent: #00FF88;
+    --accent-glow: rgba(0,255,136,0.35);
+    --red: #FF4444;
+    --amber: #FFB300;
+    --text: #FFFFFF;
+    --text-dim: #8A8A8A;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    background-image: radial-gradient(circle at 50% 0%, rgba(0,255,136,0.06) 0%, transparent 55%);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 60px 24px 100px; }
+  header { text-align: center; margin-bottom: 40px; }
+  .badge {
+    display: inline-block; color: var(--accent); font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem; letter-spacing: 3px; text-transform: uppercase;
+    border: 1px solid rgba(0,255,136,0.35); border-radius: 999px; padding: 6px 16px;
+    margin-bottom: 24px;
+  }
+  h1 {
+    font-size: clamp(2.2rem, 5.5vw, 3.6rem); font-weight: 800; margin: 0 0 12px;
+    letter-spacing: -1.5px; line-height: 1.05;
+    background: linear-gradient(to bottom, #fff, #999);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .tagline { font-size: 1.05rem; color: var(--text-dim); max-width: 700px; margin: 0 auto; line-height: 1.6; }
+  .tagline b { color: var(--accent); font-weight: 600; }
+
+  section { margin: 40px 0; }
+  h2 {
+    font-size: 1.3rem; font-weight: 700; margin-bottom: 18px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  h2::before { content: ''; width: 4px; height: 20px; background: var(--accent); border-radius: 2px; display: inline-block; }
+
+  .watchlist-bar {
+    display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 16px 18px; margin-bottom: 20px;
+  }
+  .watchlist-bar input[type=text] {
+    flex: 1; min-width: 220px; background: #0a0a0a; border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 12px; color: var(--text); font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+  }
+  .watchlist-bar button {
+    background: var(--accent); color: #000; border: none; border-radius: 8px;
+    padding: 10px 18px; font-weight: 700; cursor: pointer; font-family: inherit; font-size: 0.9rem;
+  }
+  .watchlist-bar button:hover { box-shadow: 0 0 20px var(--accent-glow); }
+  .watchlist-hint { width: 100%; font-size: 0.78rem; color: var(--text-dim); }
+
+  .table-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); }
+  table { width: 100%; border-collapse: collapse; font-family: 'JetBrains Mono', monospace; font-size: 0.86rem; min-width: 760px; }
+  th, td { padding: 12px 10px; text-align: right; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  th:first-child, td:first-child { text-align: left; }
+  th { color: var(--text-dim); font-weight: 500; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; }
+  tr:last-child td { border-bottom: none; }
+  td.up { color: var(--accent); font-weight: 700; }
+  td.down { color: var(--red); font-weight: 700; }
+  td.dim { color: var(--text-dim); }
+  td.warn { color: var(--amber); }
+  .empty-row td { text-align: center; color: var(--text-dim); padding: 30px; }
+
+  .callout {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 20px 22px; font-size: 0.92rem; color: var(--text-dim); line-height: 1.65;
+  }
+  .callout b { color: var(--text); }
+  .callout code { color: var(--accent); background: rgba(0,255,136,0.08); padding: 1px 6px; border-radius: 4px; }
+
+  .disclaimer {
+    font-size: 0.78rem; color: #666; line-height: 1.6; border-top: 1px solid var(--border);
+    padding-top: 20px; margin-top: 30px;
+  }
+
+  footer { text-align: center; margin-top: 60px; color: var(--text-dim); font-size: 0.85rem; }
+  footer a { color: var(--accent); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="badge">ScriptMaster Labs · Free Live Tool</div>
+    <h1>GAMMA PIN WATCH</h1>
+    <p class="tagline">The real signal behind <b>SML Gamma Pin v6</b> (TradingView Pine script). Pine can't see
+      option chains, so this page polls SqueezeOS's live <code style="color:var(--accent)">/api/gamma-pin/&lt;symbol&gt;</code>
+      endpoint directly — real Tradier chain, real max-OI strike, real GEX profile. Keep this open next to your
+      chart instead of typing numbers in by hand.</p>
+  </header>
+
+  <section>
+    <div class="watchlist-bar">
+      <input type="text" id="watchlist-input" placeholder="e.g. SPY,IWM,QQQ,NVDA (your own watchlist — not a recommendation)">
+      <button id="watch-btn">Watch</button>
+      <span class="watchlist-hint">Symbols must have a real, Tradier-covered options chain — crypto pairs (BTCUSD etc.) will show "no chain data."</span>
+    </div>
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Symbol</th><th>Spot</th><th>Regime</th><th>Zero Gamma Line</th>
+            <th>Max-OI Strike</th><th>Nearest Expiry</th><th>Pin Risk</th><th>Dist to Strike</th><th>Updated</th>
+          </tr>
+        </thead>
+        <tbody id="rows">
+          <tr class="empty-row"><td colspan="9">Type symbols above and click Watch — no data shown until it's real.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <p class="callout">
+      <b>What "Pin Risk" means here:</b> the server found a real expiry 0-2 days out AND spot within 0.5% of the
+      real max-open-interest strike (<code>gamma_pin_scanner.py</code> / <code>detect_pin_risk()</code>, same
+      thresholds <code>gamma_flow_engine.py</code>'s live GEX engine already uses). Direction (UP/DOWN) is
+      <code>sign(max_oi_strike - spot)</code> — a disclosed mechanical proxy for "dealers hedging into expiry
+      pull price toward the concentrated strike," <b>not a backtested or proven edge</b>. No historical
+      options-chain archive exists anywhere to test this constraint against, so none was fabricated to fill
+      the gap — this page shows the same real-or-nothing data the API actually returns, including its honest
+      "unavailable" states.
+    </p>
+  </section>
+
+  <p class="disclaimer">
+    This page fetches live data client-side from squeezeos-api.onrender.com on a timer — it does not store,
+    cache, or invent any values, and shows the real HTTP error when a symbol's chain is unavailable (no
+    TRADIER_API_KEY configured server-side, no chain for that symbol, market closed, etc.) rather than a blank
+    or fabricated row. Not investment advice. No backtest exists for the pin-risk constraint shown here —
+    treat it as a reference to go check further, not a trade signal. Your watchlist is stored only in your own
+    browser (localStorage) and is never sent anywhere except as symbols in the API request itself.
+  </p>
+
+  <footer>
+    Real signal: <a href="https://squeezeos-api.onrender.com/api/gamma-pin/status" target="_blank" rel="noopener">/api/gamma-pin/status</a>
+    · Pine script: <a href="https://github.com/timwal78/squeezeos/blob/main/indicators/SML_Gamma_Pin_v6.pine" target="_blank" rel="noopener">SML_Gamma_Pin_v6.pine</a>
+    · Powered by <a href="https://squeezeos-api.onrender.com/api/status" target="_blank" rel="noopener">SqueezeOS</a>
+    · ScriptMaster Labs
+  </footer>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var API_BASE = 'https://squeezeos-api.onrender.com';
+  var POLL_MS = 30000;
+  var STAGGER_MS = 400; // spread requests instead of firing a burst
+  var STORAGE_KEY = 'sml_gamma_pin_watchlist';
+
+  var rowsEl = document.getElementById('rows');
+  var inputEl = document.getElementById('watchlist-input');
+  var watchBtn = document.getElementById('watch-btn');
+
+  var timers = {}; // symbol -> interval id
+  var known = [];  // current watchlist, in display order
+
+  function escapeHtml(s) {
+    var d = document.createElement('div');
+    d.textContent = String(s);
+    return d.innerHTML;
+  }
+
+  function parseSymbols(raw) {
+    var seen = {};
+    var out = [];
+    (raw || '').split(',').forEach(function (s) {
+      var sym = s.trim().toUpperCase();
+      if (sym && !seen[sym]) { seen[sym] = true; out.push(sym); }
+    });
+    return out;
+  }
+
+  function rowId(sym) { return 'row-' + sym; }
+
+  function renderEmpty() {
+    rowsEl.innerHTML = '<tr class="empty-row"><td colspan="9">Type symbols above and click Watch — no data shown until it\'s real.</td></tr>';
+  }
+
+  function ensureRow(sym) {
+    var existing = document.getElementById(rowId(sym));
+    if (existing) return existing;
+    var tr = document.createElement('tr');
+    tr.id = rowId(sym);
+    tr.innerHTML =
+      '<td>' + escapeHtml(sym) + '</td>' +
+      '<td class="dim" colspan="8">loading…</td>';
+    return tr;
+  }
+
+  function setRow(sym, html) {
+    var tr = document.getElementById(rowId(sym));
+    if (!tr) return;
+    tr.innerHTML = html;
+  }
+
+  async function pollOne(sym) {
+    try {
+      var res = await fetch(API_BASE + '/api/gamma-pin/' + encodeURIComponent(sym), {
+        signal: AbortSignal.timeout ? AbortSignal.timeout(9000) : undefined
+      });
+      var ts = new Date().toLocaleTimeString();
+      if (!res.ok) {
+        var errBody = null;
+        try { errBody = await res.json(); } catch (_) {}
+        var msg = (errBody && errBody.message) ? errBody.message : ('HTTP ' + res.status);
+        setRow(sym, '<td>' + escapeHtml(sym) + '</td>' +
+          '<td class="warn" colspan="7">unavailable — ' + escapeHtml(msg) + '</td>' +
+          '<td class="dim">' + ts + '</td>');
+        return;
+      }
+      var data = await res.json();
+      var pin = data.pin_risk;
+      var pinCell, distCell;
+      if (pin && pin.direction) {
+        var cls = pin.direction === 'BUY' ? 'up' : (pin.direction === 'SELL' ? 'down' : 'dim');
+        pinCell = '<td class="' + cls + '">YES — ' + escapeHtml(pin.direction) + ' (' + escapeHtml(String(pin.dte)) + 'DTE)</td>';
+        var distPct = data.spot ? (Math.abs(data.spot - pin.max_oi_strike) / data.spot * 100).toFixed(2) + '%' : '—';
+        distCell = '<td>' + distPct + '</td>';
+      } else {
+        pinCell = '<td class="dim">no</td>';
+        distCell = '<td class="dim">—</td>';
+      }
+      setRow(sym,
+        '<td>' + escapeHtml(sym) + '</td>' +
+        '<td>' + (data.spot != null ? data.spot.toFixed(2) : '—') + '</td>' +
+        '<td class="dim">' + escapeHtml(data.profile_shape || '—') + '</td>' +
+        '<td class="dim">' + (data.zero_gamma_line != null ? data.zero_gamma_line.toFixed(2) : '—') + '</td>' +
+        '<td>' + (data.max_oi_strike != null ? data.max_oi_strike.toFixed(2) : '—') + '</td>' +
+        '<td class="dim">' + (pin ? (pin.dte + ' DTE') : '—') + '</td>' +
+        pinCell +
+        distCell +
+        '<td class="dim">' + ts + '</td>'
+      );
+    } catch (e) {
+      var ts2 = new Date().toLocaleTimeString();
+      setRow(sym, '<td>' + escapeHtml(sym) + '</td>' +
+        '<td class="warn" colspan="7">unreachable — ' + escapeHtml(e.message || 'network error') + '</td>' +
+        '<td class="dim">' + ts2 + '</td>');
+    }
+  }
+
+  function stopAll() {
+    Object.keys(timers).forEach(function (sym) { clearInterval(timers[sym]); });
+    timers = {};
+  }
+
+  function startWatching(symbols) {
+    stopAll();
+    known = symbols;
+    if (!symbols.length) { renderEmpty(); return; }
+    rowsEl.innerHTML = '';
+    symbols.forEach(function (sym, i) {
+      rowsEl.appendChild(ensureRow(sym));
+      setTimeout(function () {
+        pollOne(sym);
+        timers[sym] = setInterval(function () { pollOne(sym); }, POLL_MS);
+      }, i * STAGGER_MS);
+    });
+    try { localStorage.setItem(STORAGE_KEY, symbols.join(',')); } catch (_) {}
+  }
+
+  watchBtn.addEventListener('click', function () {
+    startWatching(parseSymbols(inputEl.value));
+  });
+  inputEl.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') watchBtn.click();
+  });
+
+  // Restore the user's own last watchlist -- their own prior input, not a
+  // hardcoded default list (never asserted as a recommendation).
+  try {
+    var saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      inputEl.value = saved;
+      startWatching(parseSymbols(saved));
+    }
+  } catch (_) {}
+})();
+</script>
+
+</body>
+</html>
