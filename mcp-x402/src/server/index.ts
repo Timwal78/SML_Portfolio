@@ -21,6 +21,7 @@ import { handleSnsMessage } from './aws/sns-entitlement.js';
 import { handleStripeWebhookEvent, getApiKeyForCheckoutSession, isEntitledStripeKey } from './stripe/entitlement.js';
 import { runCommunityScan } from './marketing/community.js';
 import { registerTools } from './tools/index.js';
+import { lookupPha, lookupFmr, landlordChecklist, windsorBundle, VASH_CONTACTS } from './tools/housing.js';
 import { AuditLogger } from './security/audit.js';
 import { RateLimiter } from './security/rate-limit.js';
 import { rapidApiGuard } from './security/rapidapi.js';
@@ -2082,13 +2083,109 @@ async function runSSE(): Promise<void> {
     } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'fx_fetch_failed', message: String(err) }); }
   });
 
+
+  // ── Housing / Section 8 / PHA (income + personal landlord toolkit) ─────────
+  const HOUSING_PRICE = 1000n; // $0.001 USDC
+  app.get('/x402/pha-lookup', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/pha-lookup`;
+    const zip = typeof req.query['zip'] === 'string' ? req.query['zip'] : '';
+    const city = typeof req.query['city'] === 'string' ? req.query['city'] : '';
+    const county = typeof req.query['county'] === 'string' ? req.query['county'] : '';
+    const state = typeof req.query['state'] === 'string' ? req.query['state'] : '';
+    const inputSchema = { type: 'object', properties: { zip: { type: 'string' }, city: { type: 'string' }, county: { type: 'string' }, state: { type: 'string' } }, required: [] };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { zip: { type: 'string', required: false }, city: { type: 'string', required: false }, county: { type: 'string', required: false }, state: { type: 'string', required: false } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: HOUSING_PRICE, description: 'Public Housing Authority (PHA) lookup by ZIP/city/county — landlord contacts, HCV/Section 8 links. Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    try {
+      const data = lookupPha({ zip, city, county, state });
+      return res.set('Access-Control-Allow-Origin', '*').json({ ...data, _paid: pay.payer });
+    } catch (err) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'pha_lookup_failed', message: String(err) });
+    }
+  });
+
+  app.get('/x402/hcv-fmr', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/hcv-fmr`;
+    const zip = typeof req.query['zip'] === 'string' ? req.query['zip'] : '';
+    const county = typeof req.query['county'] === 'string' ? req.query['county'] : '';
+    const state = typeof req.query['state'] === 'string' ? req.query['state'] : '';
+    const year = parseInt(String(req.query['year'] ?? '2025'), 10) || 2025;
+    const bedrooms = Math.min(4, Math.max(0, parseInt(String(req.query['bedrooms'] ?? req.query['br'] ?? '4'), 10) || 4));
+    const inputSchema = { type: 'object', properties: { zip: { type: 'string' }, county: { type: 'string' }, state: { type: 'string' }, year: { type: 'integer' }, bedrooms: { type: 'integer', minimum: 0, maximum: 4 } }, required: [] };
+    const outputSchema = { input: { type: 'http', method: 'GET' }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: HOUSING_PRICE, description: 'HUD Fair Market Rent + estimated payment-standard band by ZIP/county and bedroom count (Section 8 / HCV). Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    try {
+      const data = lookupFmr({ zip, county, state, year, bedrooms });
+      return res.set('Access-Control-Allow-Origin', '*').json({ ...data, _paid: pay.payer, _disclaimer: 'FMR is HUD baseline. PHA payment standard (often 90-110% of FMR) controls HAP. Confirm with local PHA.' });
+    } catch (err) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'hcv_fmr_failed', message: String(err) });
+    }
+  });
+
+  app.get('/x402/hud-vash-contacts', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/hud-vash-contacts`;
+    const state = typeof req.query['state'] === 'string' ? req.query['state'] : 'NC';
+    const county = typeof req.query['county'] === 'string' ? req.query['county'] : '';
+    const inputSchema = { type: 'object', properties: { state: { type: 'string' }, county: { type: 'string' } }, required: [] };
+    const outputSchema = { input: { type: 'http', method: 'GET' }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: HOUSING_PRICE, description: 'HUD-VASH (veteran supportive housing) contact guidance by state/county + partner PHA hints. Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    try {
+      const pha = lookupPha({ state, county, zip: '28504' });
+      return res.set('Access-Control-Allow-Origin', '*').json({ query: { state, county }, contacts: VASH_CONTACTS, pha_hint: pha.matches, _paid: pay.payer });
+    } catch (err) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'vash_failed', message: String(err) });
+    }
+  });
+
+  app.get('/x402/housing-landlord-checklist', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/housing-landlord-checklist`;
+    const zip = typeof req.query['zip'] === 'string' ? req.query['zip'] : '28504';
+    const bedrooms = Math.min(4, Math.max(0, parseInt(String(req.query['bedrooms'] ?? '4'), 10) || 4));
+    const inputSchema = { type: 'object', properties: { zip: { type: 'string' }, bedrooms: { type: 'integer' } }, required: [] };
+    const outputSchema = { input: { type: 'http', method: 'GET' }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: HOUSING_PRICE, description: 'Section 8 / HCV landlord checklist: PHA steps, HQS hotspots, remote-owner list, FMR band. Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    try {
+      const data = landlordChecklist({ zip, bedrooms });
+      return res.set('Access-Control-Allow-Origin', '*').json({ ...data, _paid: pay.payer });
+    } catch (err) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'checklist_failed', message: String(err) });
+    }
+  });
+
+  app.get('/x402/housing-windsor', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/housing-windsor`;
+    const inputSchema = { type: 'object', properties: {}, required: [] };
+    const outputSchema = { input: { type: 'http', method: 'GET' }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: HOUSING_PRICE, description: 'Kinston NC 4BR landlord bundle: PHA contacts, FY2025 FMR, call script, income worksheet (1607 Windsor Rd profile). Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    try {
+      return res.set('Access-Control-Allow-Origin', '*').json({ ...windsorBundle(), _paid: pay.payer });
+    } catch (err) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'windsor_failed', message: String(err) });
+    }
+  });
+
+
   // ── x402 discovery document (OpenAPI 3.1 + x-service-info / x-payment-info) ─
   // x402scan's canonical signal; served at /.well-known/x402 and /openapi.json.
   const OPENAPI_DOC = {
     openapi: '3.1.0',
     info: { title: 'Script Master Labs — x402 Data API', version: VERSION, description: 'Pay-per-call U.S. federal data, settled in USDC on Base via x402.', contact: { name: 'Script Master Labs', email: 'ScriptMasterLabs@gmail.com', url: 'https://scriptmasterlabs.com' } },
     servers: [{ url: 'https://mcp-x402.onrender.com' }],
-    'x-service-info': { categories: ['government-data', 'grants', 'federal-contracts', 'market-intelligence', 'medical-reference', 'drug-data', 'healthcare-providers', 'clinical-trials', 'sec-filings', 'insider-trading', 'finance', 'drug-safety', 'treasury', 'yield-curve', 'compliance', 'entity-verification', 'agent-reputation', 'fact-checking', 'veteran-services', 'federal-procurement', 'institutional-holdings', 'lobbying', 'patent-data', 'economic-indicators', 'labor-safety', 'medical-devices', 'campaign-finance', 'environmental-compliance', 'innovation-grants', 'congressional-legislation', 'regulatory-enforcement', 'medicare-data', 'research-grants', 'broker-verification', 'activist-investing', 'fails-to-deliver', 'short-squeeze-data', 'reg-sho', 'options-flow', 'dark-pool-data', 'position-sizing', 'trading-signals', 'aml-compliance', 'bank-audit', 'financial-crime-detection', 'content-moderation', 'misinformation-detection', 'wallet-reputation', 'rsi-heatmap', 'options-delta', 'technical-indicators', 'market-screener', 'greeks-data'], payment: { protocol: 'x402', rails: [{ id: 'standard', scheme: 'exact', network: 'eip155:8453', settlement: 'facilitator', note: 'EIP-3009 via X-PAYMENT — settled through a hybrid facilitator chain.' }, { id: 'sovereign', scheme: 'exact', network: 'eip155:8453', settlement: 'onchain-tx', note: 'Pay USDC then send X-PAYMENT-TX — verified directly on-chain, no facilitator.' }], facilitators: '/x402/facilitators' }, docs: { homepage: 'https://scriptmasterlabs.com', llms: 'https://mcp-x402.onrender.com/llms.txt', apiReference: 'https://github.com/Timwal78/SML_Portfolio/tree/main/mcp-x402' } },
+    'x-service-info': { categories: ['government-data', 'grants', 'federal-contracts', 'market-intelligence', 'medical-reference', 'drug-data', 'healthcare-providers', 'clinical-trials', 'sec-filings', 'insider-trading', 'finance', 'drug-safety', 'treasury', 'yield-curve', 'compliance', 'entity-verification', 'agent-reputation', 'fact-checking', 'veteran-services', 'section-8', 'housing-authority', 'fair-market-rent', 'hud-vash', 'federal-procurement', 'institutional-holdings', 'lobbying', 'patent-data', 'economic-indicators', 'labor-safety', 'medical-devices', 'campaign-finance', 'environmental-compliance', 'innovation-grants', 'congressional-legislation', 'regulatory-enforcement', 'medicare-data', 'research-grants', 'broker-verification', 'activist-investing', 'fails-to-deliver', 'short-squeeze-data', 'reg-sho', 'options-flow', 'dark-pool-data', 'position-sizing', 'trading-signals', 'aml-compliance', 'bank-audit', 'financial-crime-detection', 'content-moderation', 'misinformation-detection', 'wallet-reputation', 'rsi-heatmap', 'options-delta', 'technical-indicators', 'market-screener', 'greeks-data'], payment: { protocol: 'x402', rails: [{ id: 'standard', scheme: 'exact', network: 'eip155:8453', settlement: 'facilitator', note: 'EIP-3009 via X-PAYMENT — settled through a hybrid facilitator chain.' }, { id: 'sovereign', scheme: 'exact', network: 'eip155:8453', settlement: 'onchain-tx', note: 'Pay USDC then send X-PAYMENT-TX — verified directly on-chain, no facilitator.' }], facilitators: '/x402/facilitators' }, docs: { homepage: 'https://scriptmasterlabs.com', llms: 'https://mcp-x402.onrender.com/llms.txt', apiReference: 'https://github.com/Timwal78/SML_Portfolio/tree/main/mcp-x402' } },
     paths: { '/x402/grants': { get: {
       operationId: 'searchGrants',
       summary: 'Search live U.S. federal grant opportunities (Grants.gov Search2).',
@@ -2464,6 +2561,40 @@ async function runSSE(): Promise<void> {
       parameters: [{ name: 'base', in: 'query', required: false, schema: { type: 'string', default: 'USD' }, example: 'USD' }, { name: 'quotes', in: 'query', required: false, schema: { type: 'string' }, description: 'Comma-separated 3-letter target currency codes.', example: 'EUR,GBP,JPY' }, { name: 'date', in: 'query', required: false, schema: { type: 'string' }, description: 'YYYY-MM-DD for a historical rate. Omit for latest.' }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'eip155:8453', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.001', amountUnits: '1000', payTo: X402_PAY_TO },
       responses: { '200': { description: 'Exchange rate data' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/pha-lookup': { get: {
+      operationId: 'phaLookup',
+      summary: 'Public Housing Authority (PHA) lookup by ZIP/city/county.',
+      description: 'Landlord contacts, HCV/Section 8 links, hours. Seed includes Kinston Housing Authority (Lenoir County NC). Pay 0.001 USDC on Base.',
+      parameters: [{ name: 'zip', in: 'query', required: false, schema: { type: 'string' }, example: '28504' }, { name: 'city', in: 'query', required: false, schema: { type: 'string' }, example: 'Kinston' }, { name: 'county', in: 'query', required: false, schema: { type: 'string' }, example: 'Lenoir' }, { name: 'state', in: 'query', required: false, schema: { type: 'string' }, example: 'NC' }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'eip155:8453', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.001', amountUnits: '1000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'PHA matches' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/hcv-fmr': { get: {
+      operationId: 'hcvFmr',
+      summary: 'HUD Fair Market Rent + estimated payment-standard band.',
+      description: 'FMR by bedroom for seeded areas (Lenoir County NC FY2025 4BR = $1497). Pay 0.001 USDC on Base.',
+      parameters: [{ name: 'zip', in: 'query', required: false, schema: { type: 'string' }, example: '28504' }, { name: 'county', in: 'query', required: false, schema: { type: 'string' } }, { name: 'state', in: 'query', required: false, schema: { type: 'string' } }, { name: 'year', in: 'query', required: false, schema: { type: 'integer', default: 2025 } }, { name: 'bedrooms', in: 'query', required: false, schema: { type: 'integer', minimum: 0, maximum: 4, default: 4 }, example: 4 }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'eip155:8453', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.001', amountUnits: '1000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'FMR schedule + estimates' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/hud-vash-contacts': { get: {
+      operationId: 'hudVashContacts',
+      summary: 'HUD-VASH veteran housing contact guidance.',
+      description: 'VA HUD-VASH entry points + partner PHA hints. Pay 0.001 USDC on Base.',
+      parameters: [{ name: 'state', in: 'query', required: false, schema: { type: 'string' }, example: 'NC' }, { name: 'county', in: 'query', required: false, schema: { type: 'string' }, example: 'Lenoir' }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'eip155:8453', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.001', amountUnits: '1000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'VASH contacts' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/housing-landlord-checklist': { get: {
+      operationId: 'housingLandlordChecklist',
+      summary: 'Section 8 / HCV landlord checklist + HQS hotspots.',
+      description: 'PHA steps, inspection hotspots, remote-owner list, FMR band. Pay 0.001 USDC on Base.',
+      parameters: [{ name: 'zip', in: 'query', required: false, schema: { type: 'string' }, example: '28504' }, { name: 'bedrooms', in: 'query', required: false, schema: { type: 'integer', default: 4 } }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'eip155:8453', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.001', amountUnits: '1000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'Checklist' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/housing-windsor': { get: {
+      operationId: 'housingWindsor',
+      summary: 'Kinston 4BR landlord bundle (PHA + FMR + call script + income worksheet).',
+      description: 'Personal/demo profile for 1607 Windsor Rd, Kinston NC 28504 — FY2025 4BR FMR $1497, KHA contacts. Pay 0.001 USDC on Base.',
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'eip155:8453', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.001', amountUnits: '1000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'Windsor landlord bundle' }, '402': { description: 'Payment required.' } },
     } }, '/.well-known/x402': { get: { operationId: 'openApiDiscovery', summary: 'OpenAPI/x402 discovery document (free).', security: [], responses: { '200': { description: 'OpenAPI spec.' } } } },
     '/openapi.json': { get: { operationId: 'openApiJson', summary: 'OpenAPI spec (free).', security: [], responses: { '200': { description: 'OpenAPI spec.' } } } },
     '/x402/.well-known/x402': { get: { operationId: 'openApiDiscoveryAlias', summary: 'OpenAPI/x402 discovery document (free).', security: [], responses: { '200': { description: 'OpenAPI spec.' } } } },

@@ -14,6 +14,7 @@ import { registerForge } from './forge.js';
 import { registerFtd } from './ftd.js';
 import { registerFxRates } from './fx-rates.js';
 import { registerGhost } from './ghost.js';
+import { registerHousing } from './housing.js';
 import { registerLaunchpad } from './launchpad.js';
 import { registerLeviathan } from './leviathan.js';
 import { registerNexus } from './nexus.js';
@@ -42,6 +43,7 @@ export async function registerTools(server: McpServer): Promise<void> {
   registerFtd(server);
   registerFxRates(server);
   registerGhost(server);
+  registerHousing(server);
   registerLaunchpad(server);
   await registerLeviathan(server);
   registerNexus(server);

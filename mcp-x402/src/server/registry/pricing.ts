@@ -89,6 +89,11 @@ const BASE_PRICES: Record<string, string> = {
   crypto_trending: '0.001',
   // FX rates (Frankfurter / ECB)
   fx_exchange_rate: '0.001',
+  // Housing / Section 8 / PHA
+  pha_lookup: '0.001',
+  hcv_fmr: '0.001',
+  housing_landlord_checklist: '0.001',
+  hud_vash_contacts: '0.001',
 };
 
 interface CachedPrice {
