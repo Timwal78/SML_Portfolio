@@ -52,6 +52,7 @@ async function proxyPost(url: string, body: unknown): Promise<unknown> {
 async function runPaidTool(
   toolName: string,
   walletAddress: string | undefined,
+  operatorKey: string | undefined,
   fn: () => Promise<unknown>,
 ): Promise<{ content: Array<{ type: 'text'; text: string }>; isError?: boolean }> {
   const audit = AuditLogger.getInstance();
@@ -65,7 +66,7 @@ async function runPaidTool(
   }
   let payment;
   try {
-    payment = await executeX402Payment({ price, currency: 'USDC', toolName, walletAddress });
+    payment = await executeX402Payment({ price, currency: 'USDC', toolName, walletAddress, operatorKey });
   } catch (err) {
     return { content: [{ type: 'text', text: JSON.stringify({ error: 'payment_failed', message: String(err) }) }], isError: true };
   }
@@ -94,7 +95,8 @@ export function registerFederal(server: McpServer): void {
     agency: z.string().optional().describe('Awarding agency name (e.g. "Department of Defense")'),
     limit: z.string().optional().describe('Number of results (max 50). Default: 10'),
     wallet_address: z.string().optional().describe('Agent wallet address for USDC payment'),
-  }, async (args) => runPaidTool('federal_grants', args.wallet_address, () =>
+    operator_key: z.string().optional().describe('Operator bypass key (internal use only) — skips payment when it matches the deployment\'s SML_API_KEY'),
+  }, async (args) => runPaidTool('federal_grants', args.wallet_address, args.operator_key, () =>
     proxyPost('https://api.usaspending.gov/api/v2/search/spending_by_award/', {
       filters: { award_type_codes: ['02', '03', '04', '05'], ...(args.keyword ? { keywords: [args.keyword] } : {}), ...(args.agency ? { agencies: [{ type: 'awarding', tier: 'toptier', name: args.agency }] } : {}) },
       fields: ['Award ID', 'Recipient Name', 'Award Amount', 'Awarding Agency', 'Award Date', 'Description'],
@@ -110,7 +112,8 @@ export function registerFederal(server: McpServer): void {
     state: z.string().optional().describe('State abbreviation (e.g. "TX")'),
     limit: z.string().optional().describe('Number of results. Default: 10'),
     wallet_address: z.string().optional().describe('Agent wallet address for USDC payment'),
-  }, async (args) => runPaidTool('federal_npi_lookup', args.wallet_address, () =>
+    operator_key: z.string().optional().describe('Operator bypass key (internal use only) — skips payment when it matches the deployment\'s SML_API_KEY'),
+  }, async (args) => runPaidTool('federal_npi_lookup', args.wallet_address, args.operator_key, () =>
     proxyGet(`https://npiregistry.cms.hhs.gov/api/${buildQuery({ number: args.number, first_name: args.first_name, last_name: args.last_name, organization_name: args.organization_name, state: args.state, limit: args.limit ?? '10', version: '2.1' })}`)
   ));
 
@@ -121,7 +124,8 @@ export function registerFederal(server: McpServer): void {
     year: z.string().optional().describe('Award year'),
     rows: z.string().optional().describe('Number of results. Default: 25'),
     wallet_address: z.string().optional().describe('Agent wallet address for USDC payment'),
-  }, async (args) => runPaidTool('federal_sbir_grants', args.wallet_address, () =>
+    operator_key: z.string().optional().describe('Operator bypass key (internal use only) — skips payment when it matches the deployment\'s SML_API_KEY'),
+  }, async (args) => runPaidTool('federal_sbir_grants', args.wallet_address, args.operator_key, () =>
     proxyGet(`https://api.sbir.gov/public/awards${buildQuery({ keyword: args.keyword, agency: args.agency, firm: args.firm, year: args.year, rows: args.rows ?? '25', start: '0' })}`)
   ));
 
@@ -131,7 +135,8 @@ export function registerFederal(server: McpServer): void {
     naics_code: z.string().optional().describe('NAICS industry code'),
     limit: z.string().optional().describe('Number of results. Default: 25'),
     wallet_address: z.string().optional().describe('Agent wallet address for USDC payment'),
-  }, async (args) => runPaidTool('federal_osha', args.wallet_address, () =>
+    operator_key: z.string().optional().describe('Operator bypass key (internal use only) — skips payment when it matches the deployment\'s SML_API_KEY'),
+  }, async (args) => runPaidTool('federal_osha', args.wallet_address, args.operator_key, () =>
     proxyGet(`https://data.dol.gov/get/full_inspection${buildQuery({ establishment_name: args.establishment_name, state: args.state, naics_code: args.naics_code, p_start: '1', p_finish: args.limit ?? '25' })}`)
   ));
 
@@ -140,7 +145,8 @@ export function registerFederal(server: McpServer): void {
     state: z.string().optional().describe('State abbreviation'),
     limit: z.string().optional().describe('Number of results. Default: 25'),
     wallet_address: z.string().optional().describe('Agent wallet address for USDC payment'),
-  }, async (args) => runPaidTool('federal_epa_violations', args.wallet_address, () =>
+    operator_key: z.string().optional().describe('Operator bypass key (internal use only) — skips payment when it matches the deployment\'s SML_API_KEY'),
+  }, async (args) => runPaidTool('federal_epa_violations', args.wallet_address, args.operator_key, () =>
     proxyGet(`https://echo.epa.gov/rest/services/cwa/CWAFacilitiesSearch${buildQuery({ p_fn: args.facility_name, p_st: args.state, p_per: args.limit ?? '25', output: 'JSON' })}`)
   ));
 
@@ -150,7 +156,8 @@ export function registerFederal(server: McpServer): void {
     drug: z.string().describe('Drug brand name (e.g. "Lipitor")'),
     limit: z.string().optional().describe('Number of results. Default: 5'),
     wallet_address: z.string().optional().describe('Agent wallet address for USDC payment'),
-  }, async (args) => runPaidTool('federal_drug_label', args.wallet_address, () =>
+    operator_key: z.string().optional().describe('Operator bypass key (internal use only) — skips payment when it matches the deployment\'s SML_API_KEY'),
+  }, async (args) => runPaidTool('federal_drug_label', args.wallet_address, args.operator_key, () =>
     proxyGet(`https://api.fda.gov/drug/label.json${buildQuery({ search: `openfda.brand_name:"${args.drug}"`, limit: args.limit ?? '5' })}`)
   ));
 
@@ -158,7 +165,8 @@ export function registerFederal(server: McpServer): void {
     drug: z.string().optional().describe('Drug product name to filter by'),
     limit: z.string().optional().describe('Number of results. Default: 10'),
     wallet_address: z.string().optional().describe('Agent wallet address for USDC payment'),
-  }, async (args) => runPaidTool('federal_drug_recall', args.wallet_address, () =>
+    operator_key: z.string().optional().describe('Operator bypass key (internal use only) — skips payment when it matches the deployment\'s SML_API_KEY'),
+  }, async (args) => runPaidTool('federal_drug_recall', args.wallet_address, args.operator_key, () =>
     proxyGet(`https://api.fda.gov/drug/enforcement.json${buildQuery({ search: args.drug ? `product_description:"${args.drug}"` : 'status:Ongoing', limit: args.limit ?? '10', sort: 'recall_initiation_date:desc' })}`)
   ));
 
@@ -166,7 +174,8 @@ export function registerFederal(server: McpServer): void {
     drug: z.string().describe('Drug medicinal name (e.g. "aspirin")'),
     limit: z.string().optional().describe('Number of results. Default: 10'),
     wallet_address: z.string().optional().describe('Agent wallet address for USDC payment'),
-  }, async (args) => runPaidTool('federal_drug_adverse_events', args.wallet_address, () =>
+    operator_key: z.string().optional().describe('Operator bypass key (internal use only) — skips payment when it matches the deployment\'s SML_API_KEY'),
+  }, async (args) => runPaidTool('federal_drug_adverse_events', args.wallet_address, args.operator_key, () =>
     proxyGet(`https://api.fda.gov/drug/event.json${buildQuery({ search: `patient.drug.medicinalproduct:"${args.drug}"`, limit: args.limit ?? '10', sort: 'receivedate:desc' })}`)
   ));
 
@@ -176,14 +185,16 @@ export function registerFederal(server: McpServer): void {
     status: z.string().optional().describe('Trial status (e.g. "RECRUITING")'),
     limit: z.string().optional().describe('Number of results. Default: 10'),
     wallet_address: z.string().optional().describe('Agent wallet address for USDC payment'),
-  }, async (args) => runPaidTool('federal_clinical_trials', args.wallet_address, () =>
+    operator_key: z.string().optional().describe('Operator bypass key (internal use only) — skips payment when it matches the deployment\'s SML_API_KEY'),
+  }, async (args) => runPaidTool('federal_clinical_trials', args.wallet_address, args.operator_key, () =>
     proxyGet(`https://clinicaltrials.gov/api/v2/studies${buildQuery({ 'query.cond': args.condition, 'query.intr': args.intervention, 'filter.overallStatus': args.status, pageSize: args.limit ?? '10', format: 'json' })}`)
   ));
 
   server.tool('federal_sec_filings', {
     cik: z.string().describe('SEC CIK number (e.g. "0000320193" for Apple)'),
     wallet_address: z.string().optional().describe('Agent wallet address for USDC payment'),
-  }, async (args) => runPaidTool('federal_sec_filings', args.wallet_address, () =>
+    operator_key: z.string().optional().describe('Operator bypass key (internal use only) — skips payment when it matches the deployment\'s SML_API_KEY'),
+  }, async (args) => runPaidTool('federal_sec_filings', args.wallet_address, args.operator_key, () =>
     proxyGet(`https://data.sec.gov/submissions/CIK${args.cik.padStart(10, '0')}.json`)
   ));
 
@@ -191,7 +202,8 @@ export function registerFederal(server: McpServer): void {
     ticker: z.string().describe('Stock ticker symbol (e.g. "AAPL")'),
     limit: z.string().optional().describe('Number of results. Default: 20'),
     wallet_address: z.string().optional().describe('Agent wallet address for USDC payment'),
-  }, async (args) => runPaidTool('federal_insider_trades', args.wallet_address, () =>
+    operator_key: z.string().optional().describe('Operator bypass key (internal use only) — skips payment when it matches the deployment\'s SML_API_KEY'),
+  }, async (args) => runPaidTool('federal_insider_trades', args.wallet_address, args.operator_key, () =>
     proxyGet(`https://openinsider.com/screener${buildQuery({ q: args.ticker, cnt: args.limit ?? '20', action: 'getInsiderTrades' })}`)
   ));
 
@@ -201,7 +213,8 @@ export function registerFederal(server: McpServer): void {
     year: z.string().optional().describe('Filing year. Default: current year'),
     limit: z.string().optional().describe('Number of results. Default: 20'),
     wallet_address: z.string().optional().describe('Agent wallet address for USDC payment'),
-  }, async (args) => runPaidTool('federal_lobbying', args.wallet_address, () =>
+    operator_key: z.string().optional().describe('Operator bypass key (internal use only) — skips payment when it matches the deployment\'s SML_API_KEY'),
+  }, async (args) => runPaidTool('federal_lobbying', args.wallet_address, args.operator_key, () =>
     proxyGet(`https://lda.senate.gov/api/v1/filings/${buildQuery({ client_name: args.client, specific_issue: args.issue, filing_year: args.year ?? String(new Date().getFullYear()), limit: args.limit ?? '20' })}`)
   ));
 
@@ -211,7 +224,8 @@ export function registerFederal(server: McpServer): void {
     keyword: z.string().optional().describe('Keyword in patent abstract'),
     limit: z.string().optional().describe('Number of results. Default: 25'),
     wallet_address: z.string().optional().describe('Agent wallet address for USDC payment'),
-  }, async (args) => runPaidTool('federal_patents', args.wallet_address, () => {
+    operator_key: z.string().optional().describe('Operator bypass key (internal use only) — skips payment when it matches the deployment\'s SML_API_KEY'),
+  }, async (args) => runPaidTool('federal_patents', args.wallet_address, args.operator_key, () => {
     const q: Record<string, string> = {};
     if (args.assignee) q['assignee_organization'] = args.assignee;
     if (args.inventor) q['inventor_last_name'] = args.inventor;
@@ -226,7 +240,8 @@ export function registerFederal(server: McpServer): void {
     name: z.string().optional().describe('Broker or firm name'),
     crd: z.string().optional().describe('CRD number'),
     wallet_address: z.string().optional().describe('Agent wallet address for USDC payment'),
-  }, async (args) => runPaidTool('federal_finra_broker', args.wallet_address, () =>
+    operator_key: z.string().optional().describe('Operator bypass key (internal use only) — skips payment when it matches the deployment\'s SML_API_KEY'),
+  }, async (args) => runPaidTool('federal_finra_broker', args.wallet_address, args.operator_key, () =>
     proxyGet(`https://api.brokercheck.finra.org/search/individual${buildQuery({ query: args.name, crd_number: args.crd })}`)
   ));
 
@@ -238,7 +253,8 @@ export function registerFederal(server: McpServer): void {
     cycle: z.string().optional().describe('Election cycle year. Default: 2024'),
     limit: z.string().optional().describe('Number of results. Default: 20'),
     wallet_address: z.string().optional().describe('Agent wallet address for USDC payment'),
-  }, async (args) => runPaidTool('federal_fec_finance', args.wallet_address, () =>
+    operator_key: z.string().optional().describe('Operator bypass key (internal use only) — skips payment when it matches the deployment\'s SML_API_KEY'),
+  }, async (args) => runPaidTool('federal_fec_finance', args.wallet_address, args.operator_key, () =>
     proxyGet(`https://api.open.fec.gov/v1/candidates/${buildQuery({ q: args.name, office: args.office, party: args.party, state: args.state, election_year: args.cycle ?? '2024', per_page: args.limit ?? '20', api_key: process.env['FEC_API_KEY'] ?? 'DEMO_KEY' })}`)
   ));
 
@@ -247,13 +263,15 @@ export function registerFederal(server: McpServer): void {
     congress: z.string().optional().describe('Congress number (e.g. "119"). Default: 119'),
     limit: z.string().optional().describe('Number of results. Default: 20'),
     wallet_address: z.string().optional().describe('Agent wallet address for USDC payment'),
-  }, async (args) => runPaidTool('federal_congress_bills', args.wallet_address, () =>
+    operator_key: z.string().optional().describe('Operator bypass key (internal use only) — skips payment when it matches the deployment\'s SML_API_KEY'),
+  }, async (args) => runPaidTool('federal_congress_bills', args.wallet_address, args.operator_key, () =>
     proxyGet(`https://api.congress.gov/v3/bill${buildQuery({ query: args.keyword, congress: args.congress ?? '119', limit: args.limit ?? '20', api_key: process.env['CONGRESS_GOV_API_KEY'] ?? 'DEMO_KEY', format: 'json' })}`)
   ));
 
   server.tool('federal_treasury_yields', {
     wallet_address: z.string().optional().describe('Agent wallet address for USDC payment'),
-  }, async (args) => runPaidTool('federal_treasury_yields', args.wallet_address, async () => {
+    operator_key: z.string().optional().describe('Operator bypass key (internal use only) — skips payment when it matches the deployment\'s SML_API_KEY'),
+  }, async (args) => runPaidTool('federal_treasury_yields', args.wallet_address, args.operator_key, async () => {
     const FRED_KEY = process.env['FRED_API_KEY'] ?? 'DEMO_KEY';
     const seriesIds = ['DGS1MO', 'DGS3MO', 'DGS6MO', 'DGS1', 'DGS2', 'DGS5', 'DGS10', 'DGS20', 'DGS30'];
     const results = await Promise.all(seriesIds.map(async (id) => {
@@ -269,7 +287,8 @@ export function registerFederal(server: McpServer): void {
     cage: z.string().optional().describe('CAGE code'),
     name: z.string().optional().describe('Legal business name'),
     wallet_address: z.string().optional().describe('Agent wallet address for USDC payment'),
-  }, async (args) => runPaidTool('federal_entity_compliance', args.wallet_address, () =>
+    operator_key: z.string().optional().describe('Operator bypass key (internal use only) — skips payment when it matches the deployment\'s SML_API_KEY'),
+  }, async (args) => runPaidTool('federal_entity_compliance', args.wallet_address, args.operator_key, () =>
     proxyGet(`https://api.sam.gov/entity-information/v3/entities${buildQuery({ ueiSAM: args.uei, cageCode: args.cage, legalBusinessName: args.name, includeSections: 'entityRegistration,repsAndCerts', api_key: process.env['SAM_GOV_API_KEY'] ?? '' })}`)
   ));
 
@@ -283,7 +302,8 @@ export function registerFederal(server: McpServer): void {
     recipient: z.string().optional().describe('Recipient/company name'),
     limit: z.string().optional().describe('Number of results (max 100). Default: 25'),
     wallet_address: z.string().optional().describe('Agent wallet address for USDC payment'),
-  }, async (args) => runPaidTool('federal_usaspending_awards', args.wallet_address, () =>
+    operator_key: z.string().optional().describe('Operator bypass key (internal use only) — skips payment when it matches the deployment\'s SML_API_KEY'),
+  }, async (args) => runPaidTool('federal_usaspending_awards', args.wallet_address, args.operator_key, () =>
     proxyPost('https://api.usaspending.gov/api/v2/search/spending_by_award/', {
       filters: {
         award_type_codes: ['A', 'B', 'C', 'D'],
@@ -306,7 +326,8 @@ export function registerFederal(server: McpServer): void {
     eligibility: z.string().optional().describe('Eligibility category'),
     limit: z.string().optional().describe('Number of results (max 100). Default: 25'),
     wallet_address: z.string().optional().describe('Agent wallet address for USDC payment'),
-  }, async (args) => runPaidTool('federal_grants_gov', args.wallet_address, () =>
+    operator_key: z.string().optional().describe('Operator bypass key (internal use only) — skips payment when it matches the deployment\'s SML_API_KEY'),
+  }, async (args) => runPaidTool('federal_grants_gov', args.wallet_address, args.operator_key, () =>
     proxyPost('https://apply07.grants.gov/grantsws/rest/opportunities/search/', {
       keyword: args.keyword ?? '',
       oppStatuses: 'forecasted|posted',
@@ -325,7 +346,8 @@ export function registerFederal(server: McpServer): void {
     fiscal_year: z.string().optional().describe('Fiscal year. Default: 2024'),
     limit: z.string().optional().describe('Number of results (max 100). Default: 25'),
     wallet_address: z.string().optional().describe('Agent wallet address for USDC payment'),
-  }, async (args) => runPaidTool('federal_sba_awards', args.wallet_address, () =>
+    operator_key: z.string().optional().describe('Operator bypass key (internal use only) — skips payment when it matches the deployment\'s SML_API_KEY'),
+  }, async (args) => runPaidTool('federal_sba_awards', args.wallet_address, args.operator_key, () =>
     proxyPost('https://api.usaspending.gov/api/v2/search/spending_by_award/', {
       filters: {
         award_type_codes: ['A', 'B', 'C', 'D'],
@@ -346,7 +368,8 @@ export function registerFederal(server: McpServer): void {
     symbol: z.string().optional().describe('Ticker symbol (e.g. "SPY"). Default: SPY'),
     limit: z.string().optional().describe('Number of trades. Default: 50'),
     wallet_address: z.string().optional().describe('Agent wallet address for USDC payment'),
-  }, async (args) => runPaidTool('federal_options_flow', args.wallet_address, async () => {
+    operator_key: z.string().optional().describe('Operator bypass key (internal use only) — skips payment when it matches the deployment\'s SML_API_KEY'),
+  }, async (args) => runPaidTool('federal_options_flow', args.wallet_address, args.operator_key, async () => {
     const key = process.env['ALPACA_API_KEY'] ?? '';
     const secret = process.env['ALPACA_API_SECRET'] ?? '';
     if (!key) throw new Error('ALPACA_API_KEY not configured');
@@ -368,7 +391,8 @@ export function registerFederal(server: McpServer): void {
     days: z.string().optional().describe('Lookback days. Default 30'),
     limit: z.string().optional().describe('Max results (max 25). Default 10'),
     wallet_address: z.string().optional().describe('Agent wallet address for USDC payment'),
-  }, async (args) => runPaidTool('federal_sam_opportunities', args.wallet_address, async () => {
+    operator_key: z.string().optional().describe('Operator bypass key (internal use only) — skips payment when it matches the deployment\'s SML_API_KEY'),
+  }, async (args) => runPaidTool('federal_sam_opportunities', args.wallet_address, args.operator_key, async () => {
     const key = process.env['SAM_API_KEY'] ?? process.env['SAM_KEY'] ?? '';
     if (!key) throw new Error('SAM_API_KEY not configured on this host');
     const limit = Math.min(parseInt(args.limit ?? '10') || 10, 25);
@@ -422,7 +446,8 @@ export function registerFederal(server: McpServer): void {
     cage: z.string().optional().describe('CAGE code'),
     entity_name: z.string().optional().describe('Legal business name'),
     wallet_address: z.string().optional().describe('Agent wallet address for USDC payment'),
-  }, async (args) => runPaidTool('federal_sam_entity', args.wallet_address, async () => {
+    operator_key: z.string().optional().describe('Operator bypass key (internal use only) — skips payment when it matches the deployment\'s SML_API_KEY'),
+  }, async (args) => runPaidTool('federal_sam_entity', args.wallet_address, args.operator_key, async () => {
     const key = process.env['SAM_API_KEY'] ?? process.env['SAM_KEY'] ?? '';
     if (!key) throw new Error('SAM_API_KEY not configured on this host');
     if (!args.uei && !args.cage && !args.entity_name) throw new Error('uei or cage or entity_name required');
