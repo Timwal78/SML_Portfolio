@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AgentSwarm SEO — Script Master Labs Command Center</title>
-<meta name="description" content="Live command center for Script Master Labs' AI marketing swarm — Directory Ranger, Community Scout, and Federal Scout — plus the x402 pay-per-call data API (44 live endpoints, 52 MCP tools) settled in USDC on Base.">
+<meta name="description" content="Live command center for Script Master Labs' AI marketing swarm — Directory Ranger, Community Scout, Federal Scout — plus the x402 stack: 139+ paid routes across mcp-x402, ACP snacks, and RWA at $0.001 USDC on Base. No API key. Sovereign X-PAYMENT-TX.">
 <link rel="canonical" href="https://www.scriptmasterlabs.com/agentswarm-seo.html">
 <meta property="og:title" content="AgentSwarm SEO — Script Master Labs Command Center">
-<meta property="og:description" content="Live dashboard for the AI marketing swarm (Directory Ranger, Community Scout, Federal Scout) and the x402 pay-per-call data API — 44 live endpoints, 52 MCP tools, settled in USDC on Base.">
+<meta property="og:description" content="Live dashboard for the AI marketing swarm + x402 multi-host stack — 139+ routes @ $0.001 USDC on Base. Federal, snacks, RWA. No API key.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.scriptmasterlabs.com/agentswarm-seo.html">
     <meta property="og:image" content="https://www.scriptmasterlabs.com/og-image.png">
@@ -15,7 +15,7 @@
     <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="AgentSwarm SEO — Script Master Labs Command Center">
-<meta name="twitter:description" content="Live dashboard for the AI marketing swarm and the x402 pay-per-call data API — 44 live endpoints, 52 MCP tools, settled in USDC on Base.">
+<meta name="twitter:description" content="AI marketing swarm + x402 multi-host stack — 139+ routes @ $0.001 USDC on Base. Federal · snacks · RWA.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -840,6 +840,16 @@ html, body {
   padding-top: 10px;
   line-height: 1.6;
 }
+
+@media (max-width: 1100px) {
+  .live-stats { grid-template-columns: repeat(3, 1fr) !important; }
+}
+@media (max-width: 720px) {
+  .sidebar { display: none; }
+  .activity-bar { left: 0; }
+  .live-stats { grid-template-columns: repeat(2, 1fr) !important; }
+  .content-grid, .indexer-grid { grid-template-columns: 1fr !important; }
+}
 </style>
 <script src="https://analytics.ahrefs.com/analytics.js" data-key="eO57h84tnrmOGAsKKvyoyw" async></script>
 </head>
@@ -854,11 +864,11 @@ html, body {
 
   <div class="url-bar">
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-    <span>mcp-x402.onrender.com · scriptmasterlabs.com</span>
+    <span>mcp-x402 · acp-x402 · sml-rwa · $0.001 Base USDC</span>
   </div>
 
   <div class="topbar-right">
-    <span class="model-badge">claude-sonnet-5</span>
+    <span class="model-badge">x402 · $0.001 FLOOR</span>
     <div id="swarm-pill" class="swarm-pill checking">
       <span class="dot"></span>
       <span id="pill-text">CHECKING…</span>
@@ -917,12 +927,16 @@ html, body {
         <span class="metric-value live">Base (USDC)</span>
       </div>
       <div class="metric-row">
-        <span class="metric-label">API endpoints</span>
-        <span class="metric-value" data-live-count>44</span>
+        <span class="metric-label">Paid routes</span>
+        <span class="metric-value live" data-live-count>139+</span>
       </div>
       <div class="metric-row">
-        <span class="metric-label">MCP tools</span>
-        <span class="metric-value">52</span>
+        <span class="metric-label">Hosts live</span>
+        <span class="metric-value live" id="metric-hosts">3</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Price floor</span>
+        <span class="metric-value live">$0.001</span>
       </div>
       <div class="metric-row">
         <span class="metric-label">Last heartbeat</span>
@@ -968,29 +982,33 @@ html, body {
       <div class="panel-header">
         <div>
           <h1 class="panel-title">Swarm Center</h1>
-          <div class="panel-sub">Script Master Labs — x402 Data API · Pay-per-call U.S. federal data, settled in USDC on Base via x402 · 44 Live Endpoints</div>
+          <div class="panel-sub">x402 multi-host stack · Federal + Otto-style snacks + RWA · $0.001 USDC on Base · No API key · Sovereign X-PAYMENT-TX · 139+ live routes</div>
         </div>
         <div class="beastmode-badge"><span class="bm-dot"></span> BEASTMODE ACTIVE</div>
       </div>
 
       <!-- Live stats -->
       <div class="section-pad" style="padding-bottom:0">
-        <div class="live-stats card" style="border-radius:8px">
+        <div class="live-stats card" style="border-radius:8px;grid-template-columns:repeat(6,1fr)">
           <div class="stat-block">
             <span class="stat-val">Base</span>
             <span class="stat-label">CHAIN</span>
           </div>
           <div class="stat-block">
-            <span class="stat-val" data-live-count>44</span>
-            <span class="stat-label">API ENDPOINTS</span>
+            <span class="stat-val" data-live-count>139+</span>
+            <span class="stat-label">PAID ROUTES</span>
+          </div>
+          <div class="stat-block">
+            <span class="stat-val" style="color:var(--green)">$0.001</span>
+            <span class="stat-label">PRICE FLOOR</span>
+          </div>
+          <div class="stat-block">
+            <span class="stat-val" id="stat-hosts">3</span>
+            <span class="stat-label">HOSTS LIVE</span>
           </div>
           <div class="stat-block">
             <span class="stat-val" id="stat-ping">—</span>
             <span class="stat-label">PING (ms)</span>
-          </div>
-          <div class="stat-block">
-            <span class="stat-val" id="stat-agents-today">—</span>
-            <span class="stat-label">AI AGENTS TODAY</span>
           </div>
           <div class="stat-block">
             <span class="stat-val" id="stat-status">—</span>
@@ -1009,8 +1027,16 @@ html, body {
               <span class="config-val">scriptmasterlabs.com</span>
             </div>
             <div class="config-row">
-              <span class="config-key">API Base</span>
+              <span class="config-key">Federal / MCP</span>
               <span class="config-val">mcp-x402.onrender.com</span>
+            </div>
+            <div class="config-row">
+              <span class="config-key">Snacks / ACP</span>
+              <span class="config-val">acp-x402-scriptmasterlabs.onrender.com</span>
+            </div>
+            <div class="config-row">
+              <span class="config-key">RWA suite</span>
+              <span class="config-val">sml-rwa-api.onrender.com</span>
             </div>
             <div class="config-row">
               <span class="config-key">Brand</span>
@@ -1035,24 +1061,24 @@ html, body {
           <div class="card-header"><span class="card-title">LLM ENGINE</span></div>
           <div class="card-body">
             <div class="config-row">
-              <span class="config-key">Model</span>
-              <span class="config-val violet">claude-sonnet-5</span>
+              <span class="config-key">Price floor</span>
+              <span class="config-val green">$0.001 USDC</span>
             </div>
             <div class="config-row">
-              <span class="config-key">MCP endpoint</span>
-              <span class="config-val">/mcp</span>
+              <span class="config-key">Network</span>
+              <span class="config-val violet">eip155:8453 (Base)</span>
             </div>
             <div class="config-row">
-              <span class="config-key">Payment</span>
-              <span class="config-val">x402 / USDC (Base)</span>
+              <span class="config-key">Payment rails</span>
+              <span class="config-val">X-PAYMENT + X-PAYMENT-TX</span>
             </div>
             <div class="config-row">
-              <span class="config-key">Protocol</span>
-              <span class="config-val">JSON-RPC 2.0</span>
+              <span class="config-key">Auth</span>
+              <span class="config-val green">None — wallet pay only</span>
             </div>
             <div class="config-row">
-              <span class="config-key">MCP Tools</span>
-              <span class="config-val green">52 registered</span>
+              <span class="config-key">x402scan</span>
+              <span class="config-val green">Origins registered</span>
             </div>
             <div class="config-row">
               <span class="config-key">AI Indexer</span>
@@ -1068,7 +1094,7 @@ html, body {
         <div class="card">
           <div class="card-body" style="padding:16px">
             <div style="color:var(--text3,#94a3b8);font-size:13px;margin-bottom:14px">
-              Every endpoint above is pay-per-call via the x402 protocol (USDC on Base) — no signup needed. Prefer flat-rate unlimited access instead?
+              Every paid route is <strong style="color:var(--green)">$0.001 USDC</strong> on Base via x402 — no signup, no API key. Agents: hit route → 402 → pay → retry with <code style="color:var(--cyan)">X-PAYMENT-TX</code>. Prefer flat-rate human access instead?
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
               <button class="checkout-btn starter" onclick="startCheckout('starter', this)">
@@ -1081,9 +1107,14 @@ html, body {
               </button>
             </div>
             <div id="checkout-status" style="font-size:11px;min-height:14px;margin-bottom:14px"></div>
-            <div style="padding:12px;border-radius:6px;background:rgba(16,255,128,.06);border:1px solid rgba(16,255,128,.2);font-size:12px;color:var(--text3,#94a3b8)">
-              <strong style="color:var(--green)">x402 Autonomous Agent Payment (USDC / Base)</strong><br/>
-              AI agents pay per call directly against any endpoint above. Receiving wallet: <code style="color:var(--green)">0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700</code>
+            <div style="padding:12px;border-radius:6px;background:rgba(16,255,128,.06);border:1px solid rgba(16,255,128,.2);font-size:12px;color:var(--text3,#94a3b8);line-height:1.7">
+              <strong style="color:var(--green)">x402 Autonomous Agent Payment — $0.001 USDC / Base</strong><br/>
+              <strong>mcp-x402 payTo:</strong> <code style="color:var(--green)">0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700</code><br/>
+              <strong>ACP + RWA payTo:</strong> <code style="color:var(--green)">0x72330994f379A71542e7bd5a4CF99A9d9743F4aA</code><br/>
+              Rails: facilitator <code>X-PAYMENT</code> · sovereign on-chain <code>X-PAYMENT-TX</code><br/>
+              Scan: <a href="https://www.x402scan.com/recipient/0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700" style="color:var(--cyan)" target="_blank" rel="noopener">mcp recipient</a>
+              · <a href="https://www.x402scan.com/recipient/0x72330994f379A71542e7bd5a4CF99A9d9743F4aA" style="color:var(--cyan)" target="_blank" rel="noopener">ACP/RWA recipient</a>
+              · <a href="https://www.scriptmasterlabs.com/agent-start.html" style="color:var(--cyan)">agent quickstart</a>
             </div>
           </div>
         </div>
@@ -1128,21 +1159,23 @@ html, body {
 
       <!-- Endpoint table -->
       <div class="section-pad">
-        <div class="section-title">ALL 44 API ENDPOINTS</div>
+        <div class="section-title">ALL PAID ROUTES — MULTI-HOST · $0.001 FLOOR <span id="ep-count-label" style="color:var(--cyan);margin-left:8px">139+</span></div>
         <div class="card">
           <div class="ep-controls">
             <input class="ep-search" type="text" id="ep-search" placeholder="Search endpoints…" oninput="filterEndpoints()">
             <div class="filter-chips">
               <button class="chip active" onclick="filterCat('all', this)">All</button>
               <button class="chip" onclick="filterCat('Federal', this)">Federal</button>
+              <button class="chip" onclick="filterCat('Snacks', this)">Snacks</button>
+              <button class="chip" onclick="filterCat('RWA', this)">RWA</button>
+              <button class="chip" onclick="filterCat('Crypto', this)">Crypto</button>
               <button class="chip" onclick="filterCat('Healthcare', this)">Healthcare</button>
               <button class="chip" onclick="filterCat('SEC', this)">SEC</button>
               <button class="chip" onclick="filterCat('FTD', this)">FTD</button>
               <button class="chip" onclick="filterCat('Compliance', this)">Compliance</button>
               <button class="chip" onclick="filterCat('Signals', this)">Signals</button>
               <button class="chip" onclick="filterCat('Economic', this)">Economic</button>
-              <button class="chip" onclick="filterCat('Marketplace', this)">Marketplace</button>
-              <button class="chip" onclick="filterCat('Discovery', this)">Discovery</button>
+              <button class="chip" onclick="filterCat('Host', this)">By host</button>
             </div>
           </div>
           <div class="ep-table-wrap">
@@ -1150,6 +1183,7 @@ html, body {
               <thead>
                 <tr>
                   <th>METHOD</th>
+                  <th>HOST</th>
                   <th>PATH</th>
                   <th>DESCRIPTION</th>
                   <th>COST</th>
@@ -1319,11 +1353,11 @@ html, body {
           <div class="card-body">
             <div class="config-row">
               <span class="config-key">Custom endpoints</span>
-              <span class="config-val green">44 registered</span>
+              <span class="config-val green">139+ routes</span>
             </div>
             <div class="config-row">
               <span class="config-key">MCP tools</span>
-              <span class="config-val green">52 registered</span>
+              <span class="config-val green">multi-host live</span>
             </div>
             <div class="config-row">
               <span class="config-key">Auth required</span>
@@ -1365,56 +1399,56 @@ html, body {
 /* ── DATA ── */
 const ENDPOINTS = [
   // ── Federal ───────────────────────────────────────────────
-  {method:'GET',path:'/x402/grants',              desc:'Live federal grants data from USASpending.gov',                      cat:'Federal',    free:false, cost:'0.05 USDC'},
-  {method:'GET',path:'/x402/sbir-grants',         desc:'SBIR/STTR federal research & technology grants',                    cat:'Federal',    free:false, cost:'0.05 USDC'},
-  {method:'GET',path:'/x402/nih-grants',          desc:'NIH research grants via NIH Reporter',                               cat:'Federal',    free:false, cost:'0.05 USDC'},
-  {method:'GET',path:'/x402/congress-bills',      desc:'Congress.gov live bill tracker and legislative status',              cat:'Federal',    free:false, cost:'0.05 USDC'},
-  {method:'GET',path:'/x402/lobbying',            desc:'Federal lobbying disclosure reports (Senate LDA)',                   cat:'Federal',    free:false, cost:'0.05 USDC'},
-  {method:'GET',path:'/x402/fec-finance',         desc:'FEC campaign finance filings and donor data',                       cat:'Federal',    free:false, cost:'0.05 USDC'},
-  {method:'GET',path:'/x402/patents',             desc:'USPTO patent search and IP intelligence',                            cat:'Federal',    free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/grants',              desc:'Live federal grants data from USASpending.gov',                      cat:'Federal',    free:false, cost:'0.001 USDC'},
+  {method:'GET',path:'/x402/sbir-grants',         desc:'SBIR/STTR federal research & technology grants',                    cat:'Federal',    free:false, cost:'0.001 USDC'},
+  {method:'GET',path:'/x402/nih-grants',          desc:'NIH research grants via NIH Reporter',                               cat:'Federal',    free:false, cost:'0.001 USDC'},
+  {method:'GET',path:'/x402/congress-bills',      desc:'Congress.gov live bill tracker and legislative status',              cat:'Federal',    free:false, cost:'0.001 USDC'},
+  {method:'GET',path:'/x402/lobbying',            desc:'Federal lobbying disclosure reports (Senate LDA)',                   cat:'Federal',    free:false, cost:'0.001 USDC'},
+  {method:'GET',path:'/x402/fec-finance',         desc:'FEC campaign finance filings and donor data',                       cat:'Federal',    free:false, cost:'0.001 USDC'},
+  {method:'GET',path:'/x402/patents',             desc:'USPTO patent search and IP intelligence',                            cat:'Federal',    free:false, cost:'0.001 USDC'},
   // ── Healthcare / FDA ──────────────────────────────────────
-  {method:'GET',path:'/x402/drug-label',          desc:'FDA drug label information via OpenFDA',                             cat:'Healthcare', free:false, cost:'0.03 USDC'},
-  {method:'GET',path:'/x402/drug-recall',         desc:'FDA drug recall enforcement reports via OpenFDA',                   cat:'Healthcare', free:false, cost:'0.03 USDC'},
-  {method:'GET',path:'/x402/npi',                 desc:'National Provider Identifier (NPI) registry lookup',                cat:'Healthcare', free:false, cost:'0.03 USDC'},
-  {method:'GET',path:'/x402/clinical-trials',     desc:'ClinicalTrials.gov study search by condition or sponsor',           cat:'Healthcare', free:false, cost:'0.05 USDC'},
-  {method:'GET',path:'/x402/drug-adverse-events', desc:'FDA FAERS adverse event reports for any drug',                      cat:'Healthcare', free:false, cost:'0.03 USDC'},
-  {method:'GET',path:'/x402/fda-510k',            desc:'FDA 510(k) medical device clearance database',                      cat:'Healthcare', free:false, cost:'0.05 USDC'},
-  {method:'GET',path:'/x402/fda-warnings',        desc:'FDA warning letters issued to manufacturers',                       cat:'Healthcare', free:false, cost:'0.05 USDC'},
-  {method:'GET',path:'/x402/cms-providers',       desc:'CMS Medicare/Medicaid provider enrollment and data',                cat:'Healthcare', free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/drug-label',          desc:'FDA drug label information via OpenFDA',                             cat:'Healthcare', free:false, cost:'0.001 USDC'},
+  {method:'GET',path:'/x402/drug-recall',         desc:'FDA drug recall enforcement reports via OpenFDA',                   cat:'Healthcare', free:false, cost:'0.001 USDC'},
+  {method:'GET',path:'/x402/npi',                 desc:'National Provider Identifier (NPI) registry lookup',                cat:'Healthcare', free:false, cost:'0.001 USDC'},
+  {method:'GET',path:'/x402/clinical-trials',     desc:'ClinicalTrials.gov study search by condition or sponsor',           cat:'Healthcare', free:false, cost:'0.001 USDC'},
+  {method:'GET',path:'/x402/drug-adverse-events', desc:'FDA FAERS adverse event reports for any drug',                      cat:'Healthcare', free:false, cost:'0.001 USDC'},
+  {method:'GET',path:'/x402/fda-510k',            desc:'FDA 510(k) medical device clearance database',                      cat:'Healthcare', free:false, cost:'0.001 USDC'},
+  {method:'GET',path:'/x402/fda-warnings',        desc:'FDA warning letters issued to manufacturers',                       cat:'Healthcare', free:false, cost:'0.001 USDC'},
+  {method:'GET',path:'/x402/cms-providers',       desc:'CMS Medicare/Medicaid provider enrollment and data',                cat:'Healthcare', free:false, cost:'0.001 USDC'},
   // ── SEC / FINRA ───────────────────────────────────────────
-  {method:'GET',path:'/x402/sec-8k',              desc:'Real-time SEC 8-K material event filings for any ticker',           cat:'SEC',        free:false, cost:'0.10 USDC'},
-  {method:'GET',path:'/x402/sec-13f',             desc:'SEC 13F institutional holdings — quarterly snapshots',              cat:'SEC',        free:false, cost:'0.10 USDC'},
-  {method:'GET',path:'/x402/sec-10k',             desc:'SEC 10-K annual report filings via EDGAR',                          cat:'SEC',        free:false, cost:'0.10 USDC'},
-  {method:'GET',path:'/x402/sec-10q',             desc:'SEC 10-Q quarterly report filings via EDGAR',                       cat:'SEC',        free:false, cost:'0.10 USDC'},
-  {method:'GET',path:'/x402/sec-13dg',            desc:'SEC 13D/13G activist investor and large position filings',          cat:'SEC',        free:false, cost:'0.10 USDC'},
-  {method:'GET',path:'/x402/insider-trades',      desc:'SEC Form 4 insider trading activity for any ticker',                cat:'SEC',        free:false, cost:'0.10 USDC'},
-  {method:'GET',path:'/x402/finra-broker',        desc:'FINRA BrokerCheck registration and disciplinary records',           cat:'SEC',        free:false, cost:'0.05 USDC'},
-  {method:'GET',path:'/x402/firms',               desc:'SEC EDGAR corporate filings search',                                cat:'SEC',        free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/sec-8k',              desc:'Real-time SEC 8-K material event filings for any ticker',           cat:'SEC',        free:false, cost:'0.001 USDC'},
+  {method:'GET',path:'/x402/sec-13f',             desc:'SEC 13F institutional holdings — quarterly snapshots',              cat:'SEC',        free:false, cost:'0.001 USDC'},
+  {method:'GET',path:'/x402/sec-10k',             desc:'SEC 10-K annual report filings via EDGAR',                          cat:'SEC',        free:false, cost:'0.001 USDC'},
+  {method:'GET',path:'/x402/sec-10q',             desc:'SEC 10-Q quarterly report filings via EDGAR',                       cat:'SEC',        free:false, cost:'0.001 USDC'},
+  {method:'GET',path:'/x402/sec-13dg',            desc:'SEC 13D/13G activist investor and large position filings',          cat:'SEC',        free:false, cost:'0.001 USDC'},
+  {method:'GET',path:'/x402/insider-trades',      desc:'SEC Form 4 insider trading activity for any ticker',                cat:'SEC',        free:false, cost:'0.001 USDC'},
+  {method:'GET',path:'/x402/finra-broker',        desc:'FINRA BrokerCheck registration and disciplinary records',           cat:'SEC',        free:false, cost:'0.001 USDC'},
+  {method:'GET',path:'/x402/firms',               desc:'SEC EDGAR corporate filings search',                                cat:'SEC',        free:false, cost:'0.001 USDC'},
   // ── Economic ──────────────────────────────────────────────
-  {method:'GET',path:'/x402/treasury-yields',     desc:'Current US Treasury yield curve (1M through 30Y)',                  cat:'Economic',   free:false, cost:'0.05 USDC'},
-  {method:'GET',path:'/x402/fred',                desc:'St. Louis Fed FRED economic time-series data',                      cat:'Economic',   free:false, cost:'0.05 USDC'},
-  {method:'GET',path:'/x402/market',              desc:'Real-time market intelligence data feed',                            cat:'Economic',   free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/treasury-yields',     desc:'Current US Treasury yield curve (1M through 30Y)',                  cat:'Economic',   free:false, cost:'0.001 USDC'},
+  {method:'GET',path:'/x402/fred',                desc:'St. Louis Fed FRED economic time-series data',                      cat:'Economic',   free:false, cost:'0.001 USDC'},
+  {method:'GET',path:'/x402/market',              desc:'Real-time market intelligence data feed',                            cat:'Economic',   free:false, cost:'0.001 USDC'},
   // ── FTD Intelligence ──────────────────────────────────────
-  {method:'GET',path:'/x402/ftd-threshold-list',  desc:'SEC Regulation SHO threshold securities list',                     cat:'FTD',        free:false, cost:'0.05 USDC'},
-  {method:'GET',path:'/x402/ftd-time-series',     desc:'Failure-to-deliver time-series history by ticker',                  cat:'FTD',        free:false, cost:'0.05 USDC'},
-  {method:'GET',path:'/x402/ftd-ratio',           desc:'FTD ratio relative to float and daily volume',                     cat:'FTD',        free:false, cost:'0.05 USDC'},
-  {method:'GET',path:'/x402/ftd-etf-basket',      desc:'ETF component FTD basket — constituent-level data',               cat:'FTD',        free:false, cost:'0.05 USDC'},
-  {method:'GET',path:'/x402/ftd-settlement-cycle',desc:'T+1 settlement cycle FTD tracking and projections',                cat:'FTD',        free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/ftd-threshold-list',  desc:'SEC Regulation SHO threshold securities list',                     cat:'FTD',        free:false, cost:'0.001 USDC'},
+  {method:'GET',path:'/x402/ftd-time-series',     desc:'Failure-to-deliver time-series history by ticker',                  cat:'FTD',        free:false, cost:'0.001 USDC'},
+  {method:'GET',path:'/x402/ftd-ratio',           desc:'FTD ratio relative to float and daily volume',                     cat:'FTD',        free:false, cost:'0.001 USDC'},
+  {method:'GET',path:'/x402/ftd-etf-basket',      desc:'ETF component FTD basket — constituent-level data',               cat:'FTD',        free:false, cost:'0.001 USDC'},
+  {method:'GET',path:'/x402/ftd-settlement-cycle',desc:'T+1 settlement cycle FTD tracking and projections',                cat:'FTD',        free:false, cost:'0.001 USDC'},
   // ── Compliance ────────────────────────────────────────────
-  {method:'GET',path:'/x402/entity-compliance',   desc:'OFAC sanctions and entity compliance screening',                   cat:'Compliance', free:false, cost:'0.08 USDC'},
-  {method:'GET',path:'/x402/epa-violations',      desc:'EPA enforcement actions and environmental violations',              cat:'Compliance', free:false, cost:'0.05 USDC'},
-  {method:'GET',path:'/x402/osha',                desc:'OSHA workplace safety violations and citations',                    cat:'Compliance', free:false, cost:'0.05 USDC'},
-  {method:'GET',path:'/x402/compliance-anomaly',  desc:'AI-detected compliance anomaly signals across entities',            cat:'Compliance', free:false, cost:'0.08 USDC'},
-  {method:'GET',path:'/x402/compliance-audit',    desc:'Structured compliance audit trail for any entity',                 cat:'Compliance', free:false, cost:'0.08 USDC'},
-  {method:'GET',path:'/x402/compliance-regulator-query', desc:'Regulatory body query interface — SEC, FINRA, CFTC, FDA',  cat:'Compliance', free:false, cost:'0.08 USDC'},
+  {method:'GET',path:'/x402/entity-compliance',   desc:'OFAC sanctions and entity compliance screening',                   cat:'Compliance', free:false, cost:'0.001 USDC'},
+  {method:'GET',path:'/x402/epa-violations',      desc:'EPA enforcement actions and environmental violations',              cat:'Compliance', free:false, cost:'0.001 USDC'},
+  {method:'GET',path:'/x402/osha',                desc:'OSHA workplace safety violations and citations',                    cat:'Compliance', free:false, cost:'0.001 USDC'},
+  {method:'GET',path:'/x402/compliance-anomaly',  desc:'AI-detected compliance anomaly signals across entities',            cat:'Compliance', free:false, cost:'0.001 USDC'},
+  {method:'GET',path:'/x402/compliance-audit',    desc:'Structured compliance audit trail for any entity',                 cat:'Compliance', free:false, cost:'0.001 USDC'},
+  {method:'GET',path:'/x402/compliance-regulator-query', desc:'Regulatory body query interface — SEC, FINRA, CFTC, FDA',  cat:'Compliance', free:false, cost:'0.001 USDC'},
   // ── Intelligence / Signals ────────────────────────────────
-  {method:'GET',path:'/x402/options-flow',        desc:'Institutional options flow — unusual activity and sweeps',         cat:'Signals',    free:false, cost:'0.10 USDC'},
-  {method:'GET',path:'/x402/cascade-signal',      desc:'SML Cascade Accumulator directional signal',                       cat:'Signals',    free:false, cost:'0.10 USDC'},
-  {method:'GET',path:'/x402/max-conviction-signal',desc:'Maximum conviction composite trading signal',                    cat:'Signals',    free:false, cost:'0.10 USDC'},
-  {method:'GET',path:'/x402/iam-model',           desc:'IAM institutional accumulation model output',                      cat:'Signals',    free:false, cost:'0.10 USDC'},
-  {method:'GET',path:'/x402/agent-score',         desc:'ARGUS agent credit score (300–850) and tier',                     cat:'Signals',    free:false, cost:'0.01 USDC'},
-  {method:'GET',path:'/x402/fact-check',          desc:'AI-powered fact verification against live sources',                cat:'Signals',    free:false, cost:'0.05 USDC'},
-  {method:'GET',path:'/x402/content-trust-score', desc:'Content authenticity and trust scoring',                           cat:'Signals',    free:false, cost:'0.05 USDC'},
+  {method:'GET',path:'/x402/options-flow',        desc:'Institutional options flow — unusual activity and sweeps',         cat:'Signals',    free:false, cost:'0.001 USDC'},
+  {method:'GET',path:'/x402/cascade-signal',      desc:'SML Cascade Accumulator directional signal',                       cat:'Signals',    free:false, cost:'0.001 USDC'},
+  {method:'GET',path:'/x402/max-conviction-signal',desc:'Maximum conviction composite trading signal',                    cat:'Signals',    free:false, cost:'0.001 USDC'},
+  {method:'GET',path:'/x402/iam-model',           desc:'IAM institutional accumulation model output',                      cat:'Signals',    free:false, cost:'0.001 USDC'},
+  {method:'GET',path:'/x402/agent-score',         desc:'ARGUS agent credit score (300–850) and tier',                     cat:'Signals',    free:false, cost:'0.001 USDC'},
+  {method:'GET',path:'/x402/fact-check',          desc:'AI-powered fact verification against live sources',                cat:'Signals',    free:false, cost:'0.001 USDC'},
+  {method:'GET',path:'/x402/content-trust-score', desc:'Content authenticity and trust scoring',                           cat:'Signals',    free:false, cost:'0.001 USDC'},
   // ── AEO / GEO Intelligence Suite (SqueezeOS) ─────────────────
   {method:'GET',path:'/api/citation-score/',        desc:'AgentRank™ — citation authority scores for SML APIs on Reddit/HN', cat:'AEO',         free:true,  cost:null},
   {method:'POST',path:'/api/citation-score/probe',  desc:'Trigger on-demand AgentRank citation probe (async)',               cat:'AEO',         free:true,  cost:null},
@@ -1423,66 +1457,193 @@ const ENDPOINTS = [
   {method:'GET',path:'/api/graph/gaps/',            desc:'Semantic Gap Detector™ — unmet API demand leaderboard from forums','cat':'AEO',       free:true,  cost:null},
   {method:'POST',path:'/api/graph/gaps/scan',       desc:'Trigger semantic gap scan (async)',                                 cat:'AEO',         free:true,  cost:null},
   {method:'GET',path:'/x402/agent-economy/',        desc:'AEIN™ — AI agent commerce summary: which AI systems call us and why', cat:'AEO',      free:true,  cost:null},
-  {method:'GET',path:'/x402/agent-economy/report',  desc:'AEIN™ full report — heatmap, wallet analytics, anomaly flags',     cat:'AEO',         free:false, cost:'0.25 RLUSD'},
+  {method:'GET',path:'/x402/agent-economy/report',  desc:'AEIN™ full report — heatmap, wallet analytics, anomaly flags',     cat:'AEO',         free:false, cost:'0.001 USDC'},
 ];
 
-/* ── LIVE ENDPOINT PRELOAD ──────────────────────────────────
-   Fetches openapi.json from mcp-x402.onrender.com at load time
-   and merges live paths with local cost/category metadata.
-   Falls back to the hardcoded 44 above if CORS blocks the fetch. */
+/* ── LIVE ENDPOINT PRELOAD (multi-host x402, 2026-07-25) ────
+   Pulls /.well-known/x402 from all three live hosts + RWA openapi.
+   Floor is $0.001 USDC. Falls back to hardcoded catalog if CORS blocks. */
 const EP_META = {};
 ENDPOINTS.forEach(ep => {
-  EP_META[ep.path] = { cat: ep.cat, free: ep.free, cost: ep.cost || null, desc: ep.desc };
+  EP_META[ep.path] = { cat: ep.cat, free: ep.free, cost: ep.cost || '0.001 USDC', desc: ep.desc };
+  if (!ep.host) ep.host = 'mcp';
+  if (!ep.free) ep.cost = '0.001 USDC';
 });
 
-/* Real endpoint catalog size, captured before ENDPOINTS gets overwritten by
-   the live fetch below. Used as the SIS coverage denominator — this is a
-   project constant (how many endpoints exist to find), not a live claim. */
-const ENDPOINTS_CATALOG_SIZE = ENDPOINTS.length;
-/* null until loadLiveEndpoints() actually succeeds — SIS coverage stays at 0
-   until then, it never guesses. */
+const X402_HOSTS = [
+  { id: 'mcp', label: 'mcp-x402', base: 'https://mcp-x402.onrender.com', manifest: 'https://mcp-x402.onrender.com/.well-known/x402', defaultCat: 'Federal' },
+  { id: 'acp', label: 'acp-x402', base: 'https://acp-x402-scriptmasterlabs.onrender.com', manifest: 'https://acp-x402-scriptmasterlabs.onrender.com/.well-known/x402', defaultCat: 'Snacks' },
+  { id: 'rwa', label: 'sml-rwa', base: 'https://sml-rwa-api.onrender.com', manifest: 'https://sml-rwa-api.onrender.com/openapi.json', defaultCat: 'RWA' },
+];
+
+const SNACK_HINTS = /news|funding|gas|trending|defi|stablecoin|web-fetch|token|crypto-price|fx-rate|fear-greed|altcoin/i;
+const RWA_HINTS = /rwa|reserves|aggregates/i;
+const CRYPTO_HINTS = /crypto|token|btc|eth|funding|defi|stablecoin/i;
+const FED_HINTS = /grant|fred|sec|ftd|congress|sam|patent|fec|lobby|ofac|osha|epa|fda|nih|sbir/i;
+
+function classifyPath(path, hostDefault) {
+  const meta = EP_META[path];
+  if (meta && meta.cat) return meta.cat;
+  if (RWA_HINTS.test(path)) return 'RWA';
+  if (FED_HINTS.test(path)) return 'Federal';
+  if (SNACK_HINTS.test(path) || CRYPTO_HINTS.test(path)) return hostDefault === 'RWA' ? 'RWA' : (CRYPTO_HINTS.test(path) ? 'Crypto' : 'Snacks');
+  return hostDefault || 'Other';
+}
+
+function amountToCost(amt) {
+  if (amt == null) return '0.001 USDC';
+  const n = Number(amt);
+  if (!Number.isFinite(n)) return '0.001 USDC';
+  // x402 amounts are USDC base units (6 decimals)
+  const usd = n >= 100 ? n / 1e6 : n;
+  if (usd <= 0.0015) return '0.001 USDC';
+  return usd.toFixed(3).replace(/0+$/,'').replace(/\.$/,'') + ' USDC';
+}
+
+/* Catalog size = multi-host paid target (~139). Updated when live load succeeds. */
+let ENDPOINTS_CATALOG_SIZE = 139;
 let liveEndpointCount = null;
+let hostsOnline = 0;
 
-async function loadLiveEndpoints() {
-  try {
-    const res = await fetch('https://mcp-x402.onrender.com/.well-known/openapi.json', {
-      signal: AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined
-    });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const spec = await res.json();
-    const paths = spec.paths || {};
+async function fetchHostRoutes(host) {
+  const res = await fetch(host.manifest, {
+    signal: AbortSignal.timeout ? AbortSignal.timeout(10000) : undefined
+  });
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  const spec = await res.json();
+  const live = [];
 
-    const live = [];
-    for (const [path, methods] of Object.entries(paths)) {
-      for (const [method, opObj] of Object.entries(methods)) {
+  // Shape A: OpenAPI paths
+  if (spec.paths && typeof spec.paths === 'object') {
+    for (const [path, methods] of Object.entries(spec.paths)) {
+      if (!String(path).includes('x402') && host.id !== 'rwa') continue;
+      for (const [method, opObj] of Object.entries(methods || {})) {
         if (!['get','post','put','delete','patch'].includes(method)) continue;
         const meta = EP_META[path] || {};
+        const free = meta.free === true;
         live.push({
           method: method.toUpperCase(),
+          host: host.id,
+          hostLabel: host.label,
           path,
-          desc:  opObj.summary || opObj.description || meta.desc || '',
-          cat:   meta.cat  || 'Other',
-          free:  meta.free !== undefined ? meta.free : true,
-          cost:  meta.cost || null
+          desc: (opObj && (opObj.summary || opObj.description)) || meta.desc || path,
+          cat: classifyPath(path, host.defaultCat),
+          free,
+          cost: free ? null : amountToCost(opObj && opObj['x-payment'] && opObj['x-payment'].amount) || '0.001 USDC',
         });
       }
     }
+  }
 
-    if (live.length > 0) {
-      ENDPOINTS.length = 0;
-      live.forEach(ep => ENDPOINTS.push(ep));
-      renderEndpoints();
-      // Sync the count chips to the live number
-      const liveCount = live.length;
-      document.querySelectorAll('[data-live-count]').forEach(el => {
-        el.textContent = liveCount;
+  // Shape B: x402 resources / accepts map
+  const resources = spec.resources || spec.routes || spec.endpoints || null;
+  if (Array.isArray(resources)) {
+    for (const r of resources) {
+      const path = r.path || r.url || r.resource || '';
+      const p = String(path).replace(/^https?:\/\/[^/]+/, '') || path;
+      if (!p) continue;
+      const meta = EP_META[p] || {};
+      const accepts = (r.accepts && r.accepts[0]) || {};
+      const amt = accepts.amount || r.amount || '1000';
+      live.push({
+        method: (r.method || 'GET').toUpperCase(),
+        host: host.id,
+        hostLabel: host.label,
+        path: p.startsWith('/') ? p : '/' + p,
+        desc: r.description || r.desc || meta.desc || p,
+        cat: classifyPath(p, host.defaultCat),
+        free: false,
+        cost: amountToCost(amt),
       });
-      liveEndpointCount = liveCount;
-      updateSIS(isOnline === true); // recompute SIS coverage now that it's real
     }
-  } catch (_) {
-    // CORS or network error — hardcoded fallback already rendered.
-    // liveEndpointCount stays null, so SIS coverage stays 0 (not faked).
+  } else if (resources && typeof resources === 'object') {
+    for (const [path, r] of Object.entries(resources)) {
+      const p = path.startsWith('/') ? path : '/' + path;
+      const meta = EP_META[p] || {};
+      const accepts = (r && r.accepts && r.accepts[0]) || {};
+      const amt = accepts.amount || (r && r.amount) || '1000';
+      live.push({
+        method: ((r && r.method) || 'GET').toUpperCase(),
+        host: host.id,
+        hostLabel: host.label,
+        path: p,
+        desc: (r && (r.description || r.desc)) || meta.desc || p,
+        cat: classifyPath(p, host.defaultCat),
+        free: false,
+        cost: amountToCost(amt),
+      });
+    }
+  }
+
+  // Shape C: top-level keys that look like paths
+  if (!live.length && spec && typeof spec === 'object') {
+    for (const [k, v] of Object.entries(spec)) {
+      if (!String(k).startsWith('/')) continue;
+      const meta = EP_META[k] || {};
+      const accepts = (v && v.accepts && v.accepts[0]) || {};
+      live.push({
+        method: 'GET',
+        host: host.id,
+        hostLabel: host.label,
+        path: k,
+        desc: (v && (v.description || v.desc)) || meta.desc || k,
+        cat: classifyPath(k, host.defaultCat),
+        free: false,
+        cost: amountToCost(accepts.amount || '1000'),
+      });
+    }
+  }
+  return live;
+}
+
+async function loadLiveEndpoints() {
+  const live = [];
+  let online = 0;
+  await Promise.all(X402_HOSTS.map(async (host) => {
+    try {
+      const routes = await fetchHostRoutes(host);
+      if (routes.length) {
+        online += 1;
+        routes.forEach(r => live.push(r));
+      }
+    } catch (_) { /* host offline or CORS */ }
+  }));
+
+  hostsOnline = online;
+  const hostEl = document.getElementById('stat-hosts');
+  if (hostEl) hostEl.textContent = String(online || 3);
+  const mHost = document.getElementById('metric-hosts');
+  if (mHost) mHost.textContent = String(online || 3);
+
+  if (live.length > 0) {
+    // de-dupe host+path+method
+    const seen = new Set();
+    const deduped = [];
+    for (const ep of live) {
+      const key = ep.host + '|' + ep.method + '|' + ep.path;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      if (!ep.free) ep.cost = ep.cost || '0.001 USDC';
+      deduped.push(ep);
+    }
+    ENDPOINTS.length = 0;
+    deduped.forEach(ep => ENDPOINTS.push(ep));
+    ENDPOINTS_CATALOG_SIZE = Math.max(deduped.length, 139);
+    liveEndpointCount = deduped.length;
+    renderEndpoints();
+    document.querySelectorAll('[data-live-count]').forEach(el => {
+      el.textContent = String(deduped.length);
+    });
+    const lbl = document.getElementById('ep-count-label');
+    if (lbl) lbl.textContent = String(deduped.length);
+    updateSIS(isOnline === true);
+  } else {
+    // fallback: stamp host=mcp on hardcoded list
+    ENDPOINTS.forEach(ep => { if (!ep.host) ep.host = 'mcp'; if (!ep.free) ep.cost = '0.001 USDC'; });
+    liveEndpointCount = ENDPOINTS.length;
+    ENDPOINTS_CATALOG_SIZE = Math.max(ENDPOINTS.length, 139);
+    document.querySelectorAll('[data-live-count]').forEach(el => { el.textContent = String(ENDPOINTS.length); });
+    renderEndpoints();
   }
 }
 
@@ -1490,6 +1651,7 @@ async function loadLiveEndpoints() {
    exactly — that's the real agent that actually checks these, so its name
    is the join key for real status. name is just the display label. */
 const DIRECTORIES = [
+  {name:'x402scan',             rangerName:'x402scan',             url:'x402scan.com',              cat:'x402 Marketplace'},
   {name:'Smithery.ai',          rangerName:'Smithery.ai',          url:'smithery.ai',               cat:'MCP Registry'},
   {name:'Glama.ai',             rangerName:'Glama.ai MCP',         url:'glama.ai',                  cat:'MCP Registry'},
   {name:'mcp.run',              rangerName:'mcp.run',              url:'mcp.run',                   cat:'MCP Registry'},
@@ -1541,6 +1703,11 @@ const SEARCH_QUERIES = [
   'squeeze momentum indicator',
   'XRPL autonomous agent',
   'RLUSD payment',
+  'x402 USDC Base',
+  '$0.001 agent API',
+  'federal grants x402',
+  'RWA valuation API',
+  'agent gas tracker API',
   'AI agent market data API',
   'institutional signals API',
   'MCP server finance',
@@ -1555,20 +1722,22 @@ const SEARCH_QUERIES = [
 
 const DISCOVERY_ENDPOINTS = [
   {path:'/.well-known/mcp.json',       desc:'MCP server manifest'},
+  {path:'/.well-known/x402',           desc:'x402 payment manifest (hosts)'},
   {path:'/.well-known/ai-plugin.json', desc:'ChatGPT/LLM plugin'},
-  {path:'/.well-known/openapi.json',   desc:'OpenAPI 3.1.0 spec'},
+  {path:'/.well-known/openapi.json',   desc:'OpenAPI spec'},
   {path:'/.well-known/agents.json',    desc:'Agent discovery'},
   {path:'/.well-known/server.json',    desc:'Server metadata'},
-  {path:'/llms.txt',                   desc:'LLM context file'},
+  {path:'/llms.txt',                   desc:'LLM context — $0.001 floor'},
+  {path:'/agent-start.html',           desc:'Agent quickstart (Base USDC)'},
   {path:'/.well-known/security.txt',   desc:'Security contact'},
 ];
 
 const WELLKNOWN = [
-  {file:'mcp.json',       status:'active', desc:'52 MCP tools registered'},
+  {file:'mcp.json',       status:'active', desc:'MCP tools + x402 manifests'},
   {file:'ai-plugin.json', status:'active', desc:'ChatGPT plugin descriptor'},
-  {file:'openapi.json',   status:'active', desc:'OpenAPI 3.1.0 / 44 paths'},
+  {file:'openapi.json',   status:'active', desc:'OpenAPI / multi-host routes'},
   {file:'agents.json',    status:'active', desc:'Agent capability manifest'},
-  {file:'server.json',    status:'active', desc:'Server info + pricing'},
+  {file:'server.json',    status:'active', desc:'Server info + $0.001 floor'},
 ];
 
 /* Real agent activity only — see loadActivity() below. This used to be a
@@ -1583,20 +1752,43 @@ let searchText = '';
 function renderEndpoints() {
   const tbody = document.getElementById('ep-tbody');
   tbody.innerHTML = '';
-  ENDPOINTS.forEach((ep, i) => {
-    const catMatch = activeCat === 'all' || ep.cat === activeCat;
-    const searchMatch = !searchText || ep.path.toLowerCase().includes(searchText) || ep.desc.toLowerCase().includes(searchText);
+  const hostColors = { mcp: 'var(--cyan)', acp: 'var(--violet2)', rwa: 'var(--green)' };
+  ENDPOINTS.forEach((ep) => {
+    const host = ep.host || 'mcp';
+    const catMatch = activeCat === 'all'
+      || ep.cat === activeCat
+      || (activeCat === 'Host' && true)
+      || (activeCat === 'Snacks' && (ep.cat === 'Snacks' || host === 'acp'))
+      || (activeCat === 'RWA' && (ep.cat === 'RWA' || host === 'rwa'))
+      || (activeCat === 'Crypto' && (ep.cat === 'Crypto' || /crypto|token|funding|defi|btc|eth/i.test(ep.path)));
+    const hay = ((ep.path||'') + ' ' + (ep.desc||'') + ' ' + host).toLowerCase();
+    const searchMatch = !searchText || hay.includes(searchText);
     const tr = document.createElement('tr');
     if (!catMatch || !searchMatch) tr.className = 'ep-row-hidden';
+    const costHtml = ep.free
+      ? '<span class="ep-cost-free">FREE</span>'
+      : '<span class="ep-cost-paid">' + (ep.cost || '0.001 USDC') + '</span>';
     tr.innerHTML = `
       <td><span class="method-badge method-${ep.path === '/api/events' ? 'SSE' : ep.method}">${ep.path === '/api/events' ? 'SSE' : ep.method}</span></td>
+      <td><span class="cat-pill" style="color:${hostColors[host]||'var(--text2)'};border-color:rgba(255,255,255,.12)">${ep.hostLabel || host}</span></td>
       <td><span class="ep-path">${ep.path}</span></td>
-      <td><span class="ep-desc">${ep.desc}</span></td>
-      <td>${ep.free ? '<span class="ep-cost-free">FREE</span>' : `<span class="ep-cost-paid">${ep.cost}</span>`}</td>
-      <td><span class="cat-pill">${ep.cat}</span></td>
+      <td><span class="ep-desc">${ep.desc || ''}</span></td>
+      <td>${costHtml}</td>
+      <td><span class="cat-pill">${ep.cat || 'Other'}</span></td>
     `;
     tbody.appendChild(tr);
   });
+  const visible = ENDPOINTS.filter(ep => {
+    const host = ep.host || 'mcp';
+    const catMatch = activeCat === 'all' || ep.cat === activeCat
+      || (activeCat === 'Snacks' && (ep.cat === 'Snacks' || host === 'acp'))
+      || (activeCat === 'RWA' && (ep.cat === 'RWA' || host === 'rwa'))
+      || (activeCat === 'Crypto' && (ep.cat === 'Crypto' || /crypto|token|funding|defi|btc|eth/i.test(ep.path)));
+    const hay = ((ep.path||'') + ' ' + (ep.desc||'') + ' ' + host).toLowerCase();
+    return catMatch && (!searchText || hay.includes(searchText));
+  }).length;
+  const lbl = document.getElementById('ep-count-label');
+  if (lbl) lbl.textContent = String(ENDPOINTS.length) + (activeCat !== 'all' || searchText ? ` · showing ${visible}` : '');
 }
 
 function filterCat(cat, btn) {
@@ -1797,7 +1989,7 @@ function renderIndexer() {
     schema_version: 'v1',
     name_for_model: 'SqueezeOS',
     name_for_human: 'Script Master Labs — SqueezeOS',
-    description_for_model: 'Institutional-grade AI trading intelligence. 44 endpoints, 52 MCP tools, x402 RLUSD micropayments.',
+    description_for_model: 'Script Master Labs x402 multi-host stack: 139+ paid routes @ $0.001 USDC on Base. Federal grants/FTD/SEC, Otto-style snacks, RWA. No API key. X-PAYMENT-TX sovereign rail.',
     auth: { type: 'none' },
     api: { type: 'openapi', url: 'https://www.scriptmasterlabs.com/.well-known/openapi.json' },
     logo_url: 'https://www.scriptmasterlabs.com/favicon.ico',
@@ -2100,17 +2292,32 @@ async function loadAgentStats() {
 
 async function checkStatus() {
   const start = Date.now();
-  try {
-    const res = await fetch('https://mcp-x402.onrender.com/health', {
-      signal: AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined
-    });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    const ms = Date.now() - start;
-    const engines = data.engines_active ?? data.active_engines ?? data.engines ?? '—';
-    setSwarmStatus(true, ms, engines);
+  const probes = [
+    'https://mcp-x402.onrender.com/health',
+    'https://mcp-x402.onrender.com/',
+    'https://acp-x402-scriptmasterlabs.onrender.com/',
+    'https://sml-rwa-api.onrender.com/health',
+  ];
+  let ok = 0;
+  let ms = null;
+  await Promise.all(probes.map(async (u) => {
+    try {
+      const t0 = Date.now();
+      const res = await fetch(u, { signal: AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined });
+      if (res.ok) {
+        ok += 1;
+        const dt = Date.now() - t0;
+        if (ms == null || dt < ms) ms = dt;
+      }
+    } catch (_) {}
+  }));
+  if (ok > 0) {
+    setSwarmStatus(true, ms != null ? ms : (Date.now() - start), ok);
     lastPingAge = 0;
-  } catch (e) {
+    const hostEl = document.getElementById('stat-hosts');
+    // keep host count from endpoint loader if better; else show probe hits (dedupe-ish)
+    if (hostEl && (!hostsOnline || hostsOnline < 1)) hostEl.textContent = String(Math.min(ok, 3));
+  } else {
     setSwarmStatus(false, null, null);
   }
 }
@@ -2286,7 +2493,7 @@ function updateSIS(networkUp) {
 }
 
 /* ── BOOT ── */
-renderEndpoints();   // draw hardcoded 44 immediately
+renderEndpoints();   // draw fallback catalog immediately
 loadLiveEndpoints(); // async: overwrite with live spec if CORS allows
 renderDirectories();
 setInterval(renderDirectories, 300000); // real audit runs every 4h — 5-min poll is plenty
@@ -2315,7 +2522,7 @@ setInterval(loadAgentStats, 60000);
   "@context": "https://schema.org",
   "@type": "WebApplication",
   "name": "AgentSwarm SEO — Script Master Labs Command Center",
-  "description": "Live command center for Script Master Labs' AI marketing swarm — Directory Ranger, Community Scout, and Federal Scout — plus the x402 pay-per-call data API (44 live endpoints, 52 MCP tools) settled in USDC on Base.",
+  "description": "Live command center for Script Master Labs' AI marketing swarm — Directory Ranger, Community Scout, Federal Scout — plus the x402 stack: 139+ paid routes across mcp-x402, ACP snacks, and RWA at $0.001 USDC on Base. No API key. Sovereign X-PAYMENT-TX.",
   "url": "https://www.scriptmasterlabs.com/agentswarm-seo.html",
   "applicationCategory": "BusinessApplication",
   "operatingSystem": "Any",
