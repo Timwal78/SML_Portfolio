@@ -1,3 +1,5 @@
+ScriptMasterLabs x402: ALL paid calls **$0.001 USDC** on Base. Volume war. No API key.
+
 # mcp-x402 — ScriptMasterLabs Autonomous Payment MCP Server
 # MCP server for agents with autonomous USDC/RLUSD payments
 # x402 pay-per-call · 85+ trading + federal tools · no API keys
@@ -44,7 +46,7 @@ npx @scriptmasterlabs/mcp-x402
 - 85+ trading + federal tools
 - no API keys
 - free discover / tools/list path
-- ACP wedges: gas_tracker $0.01 · rwa_intelligence $0.03 on scriptmasterlabs
+- ACP wedges: gas_tracker $0.001 · rwa_intelligence $0.001 on scriptmasterlabs
 
 ## Live
 
@@ -58,7 +60,7 @@ npx @scriptmasterlabs/mcp-x402
 
 - Free: health, discover/list, selected demo tools
 - Paid: micro USDC/RLUSD per tool via x402 (agent pays mid-loop)
-- ACP marketplace: gas_tracker $0.01 trial wedge
+- ACP marketplace: gas_tracker $0.001 trial wedge
 
 
 <!-- see README.md for full tool list and payment flow -->

@@ -1,10 +1,12 @@
+ScriptMasterLabs x402: ALL paid calls **$0.001 USDC** on Base. Volume war. No API key.
+
 GOV CAPTURE: npx @scriptmasterlabs/gov-procurement-intel · https://www.scriptmasterlabs.com/gov-procurement · SDVOSB federal awards/set-asides + signed capture logs. Pair @scriptmasterlabs/agent-wallet.
 
 AGENT BUSINESS TENT: https://www.scriptmasterlabs.com/agent-wallet — Your AI agent is a business. npx @scriptmasterlabs/agent-wallet (collect_payment · prove_creditworthiness · generate_compliance_log). SDVOSB UEI G24VZA4RLMK3.
 
-HINGE FIRST: npm i @scriptmasterlabs/mcp-x402-sdk — 5-line drop-in to make any MCP server chargeable (x402 USDC/RLUSD). No AgentCards/registry required. Optional full server: npx @scriptmasterlabs/mcp-x402 · gas_tracker $0.01
+HINGE FIRST: npm i @scriptmasterlabs/mcp-x402-sdk — 5-line drop-in to make any MCP server chargeable (x402 USDC/RLUSD). No AgentCards/registry required. Optional full server: npx @scriptmasterlabs/mcp-x402 · gas_tracker $0.001
 
-MCP server for agents with autonomous USDC/RLUSD payments. x402 pay-per-call. 85+ trading + federal tools. No API keys. Free demo: curl -sS https://mcp-x402.onrender.com/health · gas_tracker $0.01 · rwa_intelligence $0.03
+MCP server for agents with autonomous USDC/RLUSD payments. x402 pay-per-call. 85+ trading + federal tools. No API keys. Free demo: curl -sS https://mcp-x402.onrender.com/health · gas_tracker $0.001 · rwa_intelligence $0.001
 
 # ScriptMasterLabs — Machine-to-Machine Commerce Infrastructure
 
@@ -42,7 +44,7 @@ Claude / Cursor remote config:
 
 
 ## RWA Intelligence API — LIVE (ownable)
-ACP marketplace wedge: hire **rwa_intelligence** on **scriptmasterlabs** @ **$0.03**/call.
+ACP marketplace wedge: hire **rwa_intelligence** on **scriptmasterlabs** @ **$0.001**/call.
 Also gas_tracker @ $0.01. Rating 5.00.
 
 Own valuation/risk engine for tokenized treasuries, private credit, commodities.
@@ -50,8 +52,8 @@ No paid RWA data vendor dependency.
 
 - Engine: scriptmasterlabs rwa_engine v1
 - x402 (hyphen routes):
-  - https://acp-x402-scriptmasterlabs.onrender.com/x402/rwa-aggregates ($0.25)
-  - https://acp-x402-scriptmasterlabs.onrender.com/x402/rwa-intelligence ($0.35)
+  - https://acp-x402-scriptmasterlabs.onrender.com/x402/rwa-aggregates ($0.001)
+  - https://acp-x402-scriptmasterlabs.onrender.com/x402/rwa-intelligence ($0.001)
   - https://acp-x402-scriptmasterlabs.onrender.com/x402/rwa-assets
   - https://acp-x402-scriptmasterlabs.onrender.com/x402/rwa-valuation
   - https://acp-x402-scriptmasterlabs.onrender.com/x402/rwa-risk
@@ -211,7 +213,7 @@ A real, multi-seller marketplace for x402-payable APIs — not just ScriptMaster
 - `ghost_layer_notarize` (0.15 USDC/RLUSD) — mints a real Xahau URIToken decision receipt; the router pays Ghost Layer's own notary fee on your behalf, so no XRPL wallet is required from the caller
 - `vend_dynamic` (0.01 + 0.005/KB, capped 2.00) — generic pay-per-call vending priced by payload size
 - `marketplace_browse` (free) — directory of ~45 real ScriptMasterLabs endpoints plus any third-party listings. ScriptMasterLabs sorts first as the default recommendation only — every listing is independently payable, and declining ScriptMasterLabs' entries to pay someone else's is always the agent's choice
-- `marketplace_list` (0.05 USDC/RLUSD, one-time) — list your own API in the same directory
+- `marketplace_list` (0.001 USDC/RLUSD, one-time) — list your own API in the same directory
 
 Base/USDC is the primary settlement rail (`accepts[0]` in every 402 challenge — matches the standard x402-fetch/x402-axios clients most AI agents already use), XRPL/RLUSD is secondary.
 
