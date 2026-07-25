@@ -82,7 +82,7 @@ export const OFFERINGS: Record<string, Offering> = {
       'Returns BULLISH HIGHWAY / BEARISH HIGHWAY / CONSOLIDATION. Req: { symbol: string }',
   },
   'SqueezeOS 365-Day EMA Signal': {
-    price: 0.03,
+    price: 0.003,
     description:
       'Price position vs 365-day EMA anchor (ABOVE / BELOW). Req: { symbol: string }',
   },
@@ -217,7 +217,7 @@ export const OFFERINGS: Record<string, Offering> = {
       'Req: { symbol: string }',
   },
   'SqueezeOS IWM 0DTE Scorer': {
-    price: 0.03,
+    price: 0.003,
     description:
       'SqueezeOS IWM zero-day-to-expiry contract scorer and directional bias. ' +
       'Req: {}',
@@ -308,7 +308,7 @@ export const OFFERINGS: Record<string, Offering> = {
       'Req: { symbol: string, limit?: number }',
   },
   'FTD Ratio': {
-    price: 0.03,
+    price: 0.003,
     description:
       'Latest FTD record plus percentile rank within the rolling window, and threshold-list status. ' +
       'Req: { symbol: string }',
@@ -366,7 +366,7 @@ export const OFFERINGS: Record<string, Offering> = {
       'Req: { symbol: string }',
   },
   'Content & Wallet Trust Score': {
-    price: 0.01,
+    price: 0.001,
     description:
       'Content misinformation trust scoring and on-chain wallet trust ledger — distinct mechanism from AI Fact Check ' +
       '(which cross-references live government data; this scores text content and sender wallet reputation). ' +
