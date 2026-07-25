@@ -1507,96 +1507,85 @@ let hostsOnline = 0;
 
 async function fetchHostRoutes(host) {
   const res = await fetch(host.manifest, {
-    signal: AbortSignal.timeout ? AbortSignal.timeout(10000) : undefined
+    mode: 'cors',
+    credentials: 'omit',
+    signal: AbortSignal.timeout ? AbortSignal.timeout(12000) : undefined
   });
   if (!res.ok) throw new Error('HTTP ' + res.status);
   const spec = await res.json();
   const live = [];
+  const push = (ep) => {
+    if (!ep || !ep.path) return;
+    let path = String(ep.path);
+    path = path.replace(/^https?:\/\/[^/]+/i, '');
+    if (!path.startsWith('/')) path = '/' + path;
+    // keep free discovery paths out of paid table unless x402/rwa
+    if (host.id !== 'rwa' && !path.includes('x402') && !path.includes('/api/')) return;
+    const meta = EP_META[path] || {};
+    const free = ep.free === true || meta.free === true;
+    live.push({
+      method: (ep.method || 'GET').toUpperCase(),
+      host: host.id,
+      hostLabel: host.label,
+      path,
+      desc: ep.desc || meta.desc || path,
+      cat: classifyPath(path, host.defaultCat),
+      free,
+      cost: free ? null : (ep.cost || amountToCost(ep.amount) || '0.001 USDC'),
+    });
+  };
 
-  // Shape A: OpenAPI paths
+  // Preferred: resources[] (ACP)
+  if (Array.isArray(spec.resources)) {
+    for (const r of spec.resources) {
+      const accepts = (r.accepts && r.accepts[0]) || {};
+      push({
+        path: r.path || r.url || r.resource,
+        method: r.method || 'GET',
+        desc: r.description || r.desc || r.name,
+        amount: accepts.amount || r.amount || r.price || '1000',
+        free: false,
+      });
+    }
+  }
+
+  // OpenAPI paths (mcp + acp + rwa)
   if (spec.paths && typeof spec.paths === 'object') {
     for (const [path, methods] of Object.entries(spec.paths)) {
-      if (!String(path).includes('x402') && host.id !== 'rwa') continue;
       for (const [method, opObj] of Object.entries(methods || {})) {
         if (!['get','post','put','delete','patch'].includes(method)) continue;
+        const xp = opObj && (opObj['x-payment'] || opObj['x-x402'] || {});
+        const amt = (xp && xp.amount) || '1000';
         const meta = EP_META[path] || {};
-        const free = meta.free === true;
-        live.push({
-          method: method.toUpperCase(),
-          host: host.id,
-          hostLabel: host.label,
+        // skip pure free non-x402 noise on mcp if already have resources
+        push({
           path,
+          method,
           desc: (opObj && (opObj.summary || opObj.description)) || meta.desc || path,
-          cat: classifyPath(path, host.defaultCat),
-          free,
-          cost: free ? null : amountToCost(opObj && opObj['x-payment'] && opObj['x-payment'].amount) || '0.001 USDC',
+          amount: amt,
+          free: meta.free === true,
         });
       }
     }
   }
 
-  // Shape B: x402 resources / accepts map
-  const resources = spec.resources || spec.routes || spec.endpoints || null;
-  if (Array.isArray(resources)) {
-    for (const r of resources) {
-      const path = r.path || r.url || r.resource || '';
-      const p = String(path).replace(/^https?:\/\/[^/]+/, '') || path;
-      if (!p) continue;
-      const meta = EP_META[p] || {};
-      const accepts = (r.accepts && r.accepts[0]) || {};
-      const amt = accepts.amount || r.amount || '1000';
-      live.push({
-        method: (r.method || 'GET').toUpperCase(),
-        host: host.id,
-        hostLabel: host.label,
-        path: p.startsWith('/') ? p : '/' + p,
-        desc: r.description || r.desc || meta.desc || p,
-        cat: classifyPath(p, host.defaultCat),
-        free: false,
-        cost: amountToCost(amt),
-      });
-    }
-  } else if (resources && typeof resources === 'object') {
-    for (const [path, r] of Object.entries(resources)) {
-      const p = path.startsWith('/') ? path : '/' + path;
-      const meta = EP_META[p] || {};
+  // resources as object map
+  if (!Array.isArray(spec.resources) && spec.resources && typeof spec.resources === 'object') {
+    for (const [path, r] of Object.entries(spec.resources)) {
       const accepts = (r && r.accepts && r.accepts[0]) || {};
-      const amt = accepts.amount || (r && r.amount) || '1000';
-      live.push({
-        method: ((r && r.method) || 'GET').toUpperCase(),
-        host: host.id,
-        hostLabel: host.label,
-        path: p,
-        desc: (r && (r.description || r.desc)) || meta.desc || p,
-        cat: classifyPath(p, host.defaultCat),
-        free: false,
-        cost: amountToCost(amt),
+      push({
+        path: path,
+        method: (r && r.method) || 'GET',
+        desc: (r && (r.description || r.desc || r.name)) || path,
+        amount: accepts.amount || (r && r.amount) || '1000',
       });
     }
   }
 
-  // Shape C: top-level keys that look like paths
-  if (!live.length && spec && typeof spec === 'object') {
-    for (const [k, v] of Object.entries(spec)) {
-      if (!String(k).startsWith('/')) continue;
-      const meta = EP_META[k] || {};
-      const accepts = (v && v.accepts && v.accepts[0]) || {};
-      live.push({
-        method: 'GET',
-        host: host.id,
-        hostLabel: host.label,
-        path: k,
-        desc: (v && (v.description || v.desc)) || meta.desc || k,
-        cat: classifyPath(k, host.defaultCat),
-        free: false,
-        cost: amountToCost(accepts.amount || '1000'),
-      });
-    }
-  }
   return live;
 }
 
-async function loadLiveEndpoints() {
+async function loadLiveEndpointsasync function loadLiveEndpoints() {
   const live = [];
   let online = 0;
   await Promise.all(X402_HOSTS.map(async (host) => {
