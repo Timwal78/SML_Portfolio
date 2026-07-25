@@ -45,6 +45,33 @@ PRICES = {  # ALL-OUT 0.001 volume war
 
 app = Flask(__name__)
 
+@app.before_request
+def _cors_before():
+    from flask import request, make_response
+    if request.method == "OPTIONS":
+        r = make_response("", 204)
+        r.headers["Access-Control-Allow-Origin"] = "*"
+        r.headers["Access-Control-Allow-Methods"] = "GET,HEAD,POST,OPTIONS"
+        r.headers["Access-Control-Allow-Headers"] = "Content-Type, X-PAYMENT, X-PAYMENT-TX, PAYMENT-SIGNATURE, Accept"
+        return r
+
+@app.after_request
+def _cors_after_request(resp):
+    resp.headers.setdefault("Access-Control-Allow-Origin", "*")
+    resp.headers.setdefault("Access-Control-Allow-Methods", "GET,HEAD,POST,OPTIONS")
+    resp.headers.setdefault(
+        "Access-Control-Allow-Headers",
+        "Content-Type, X-PAYMENT, X-PAYMENT-TX, PAYMENT-SIGNATURE, Accept",
+    )
+    resp.headers.setdefault(
+        "Access-Control-Expose-Headers",
+        "PAYMENT-REQUIRED, X-PAYMENT-REQUIRED, X-PAYMENT-RESPONSE",
+    )
+    return resp
+
+
+
+
 # ── Sovereign rail: X-PAYMENT-TX = on-chain Base USDC Transfer ──
 _TRANSFER_TOPIC = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
 _REDEEMED_TXS: set[str] = set()
