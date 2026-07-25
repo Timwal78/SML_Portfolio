@@ -27,7 +27,7 @@ logger = logging.getLogger("sml-rwa-api")
 APP_NAME = "SML RWA Intelligence Suite"
 VERSION = "2.0.0"
 BASE_URL = os.getenv("PUBLIC_BASE_URL", "https://sml-rwa-api.onrender.com").rstrip("/")
-NETWORK = os.getenv("X402_NETWORK", "base")
+NETWORK = os.getenv("X402_NETWORK", "eip155:8453")
 PAY_TO = os.getenv("X402_PAY_TO", "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa")
 USDC = os.getenv("X402_USDC", "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913")
 FACILITATOR = os.getenv("X402_FACILITATOR", "https://x402.org/facilitator").rstrip("/")
@@ -44,6 +44,78 @@ PRICES = {  # ALL-OUT 0.001 volume war
 }
 
 app = Flask(__name__)
+
+# ── Sovereign rail: X-PAYMENT-TX = on-chain Base USDC Transfer ──
+_TRANSFER_TOPIC = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
+_REDEEMED_TXS: set[str] = set()
+_BASE_RPCS = [u for u in [
+    (os.getenv("BASE_RPC_URL") or "").strip(),
+    "https://mainnet.base.org",
+    "https://base-rpc.publicnode.com",
+    "https://base.drpc.org",
+    "https://base.gateway.tenderly.co",
+    "https://base.meowrpc.com",
+] if u]
+
+
+def _rpc_call(method: str, params: list):
+    body = json.dumps({"jsonrpc": "2.0", "id": 1, "method": method, "params": params}).encode()
+    headers = {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "User-Agent": f"sml-rwa-api/{VERSION} sovereign",
+    }
+    for rpc in _BASE_RPCS:
+        try:
+            req = urllib.request.Request(rpc, data=body, headers=headers)
+            with urllib.request.urlopen(req, timeout=15) as r:
+                d = json.loads(r.read().decode())
+            if d.get("result") is not None:
+                return d["result"]
+        except Exception:
+            continue
+    return None
+
+
+def _topic_to_addr(topic: str) -> str:
+    return "0x" + topic[-40:].lower()
+
+
+def _verify_base_usdc_tx(tx_hash: str, pay_to: str, min_units: int) -> dict:
+    if not isinstance(tx_hash, str) or not tx_hash.startswith("0x") or len(tx_hash) != 66:
+        return {"ok": False, "error": "invalid_tx_hash_format"}
+    h = tx_hash.lower()
+    if h in _REDEEMED_TXS:
+        return {"ok": False, "error": "payment_already_redeemed"}
+    receipt = _rpc_call("eth_getTransactionReceipt", [tx_hash])
+    if not receipt:
+        return {"ok": False, "error": "tx_not_found_or_pending_or_rpc_blocked"}
+    if receipt.get("status") not in ("0x1", 1, "0x01"):
+        return {"ok": False, "error": "tx_reverted"}
+    usdc = (USDC or "").lower()
+    pay = (pay_to or PAY_TO).lower()
+    for log in receipt.get("logs") or []:
+        if (log.get("address") or "").lower() != usdc:
+            continue
+        topics = log.get("topics") or []
+        if len(topics) < 3:
+            continue
+        if (topics[0] or "").lower() != _TRANSFER_TOPIC:
+            continue
+        to_addr = _topic_to_addr(topics[2])
+        if to_addr != pay:
+            continue
+        try:
+            value = int(log.get("data") or "0x0", 16)
+        except Exception:
+            continue
+        if value < int(min_units):
+            continue
+        frm = _topic_to_addr(topics[1]) if topics[1] else ""
+        return {"ok": True, "from": frm, "amount": value}
+    return {"ok": False, "error": "no_matching_usdc_transfer"}
+
+
 
 
 def _now() -> str:
@@ -178,6 +250,30 @@ def require_payment(
 ) -> Optional[Response]:
     resource = f"{BASE_URL}{path}"
     requirements = _accept(resource, price, description)
+
+    # Rail B (sovereign): on-chain USDC tx hash
+    tx_hash = (
+        request.headers.get("X-PAYMENT-TX")
+        or request.headers.get("x-payment-tx")
+        or ""
+    ).strip()
+    if tx_hash:
+        min_units = int(requirements.get("amount") or requirements.get("maxAmountRequired") or 0)
+        v = _verify_base_usdc_tx(tx_hash, requirements.get("payTo") or PAY_TO, min_units)
+        if not v.get("ok"):
+            return payment_required(
+                path, price, description, query_params,
+                reason=f"invalid_sovereign_payment:{v.get('error')}",
+            )
+        _REDEEMED_TXS.add(tx_hash.lower())
+        # stash receipt for route handlers via flask g if needed
+        try:
+            from flask import g
+            g.x402_sovereign = {"tx": tx_hash, "from": v.get("from"), "amount": v.get("amount")}
+        except Exception:
+            pass
+        return None
+
     raw = _payment_header()
     if not raw:
         return payment_required(path, price, description, query_params)
@@ -201,6 +297,7 @@ def require_payment(
     return None
 
 
+
 def _payinfo(price: str) -> dict:
     return {
         "method": "x402",
@@ -213,6 +310,7 @@ def _payinfo(price: str) -> dict:
         "payTo": PAY_TO,
         "facilitator": FACILITATOR,
         "paymentHeader": "X-PAYMENT",
+        "paymentHeaderSovereign": "X-PAYMENT-TX",
         "protocols": ["x402"],
         "price": {"amount": price, "currency": "USD", "mode": "fixed"},
         "settlement": "facilitator",
@@ -319,6 +417,7 @@ def openapi_doc() -> dict:
                         "assetSymbol": "USDC",
                         "payTo": PAY_TO,
                         "paymentHeader": "X-PAYMENT",
+        "paymentHeaderSovereign": "X-PAYMENT-TX",
                         "facilitator": FACILITATOR,
                         "settlement": "facilitator",
                     }
@@ -396,7 +495,8 @@ def root():
                     f"/x402/rwa-risk — {PRICES['rwa-risk']} USDC",
                 ],
             },
-            "x402": {"network": NETWORK, "payTo": PAY_TO, "asset": USDC, "paymentHeader": "X-PAYMENT"},
+            "x402": {"network": NETWORK, "payTo": PAY_TO, "asset": USDC, "paymentHeader": "X-PAYMENT",
+        "paymentHeaderSovereign": "X-PAYMENT-TX"},
             "disclaimer": (
                 "Live public-feed composites + source-integrity hashes. "
                 "Not a custodian legal PoR letter. Not investment advice."
