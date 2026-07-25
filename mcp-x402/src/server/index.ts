@@ -447,15 +447,15 @@ async function runSSE(): Promise<void> {
   const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v);
   const buildAccepts = (resource: string, priceUnits: bigint, description: string, maxTimeoutSeconds = 300): unknown[] => {
     const units = priceUnits.toString();
-    // Dual network labels: plain 'base' for x402-fetch / CDP clients; CAIP-2 for x402scan registry.
-    const mk = (network: string) => ({
-      scheme: 'exact', network,
+    // CAIP-2 only — x402scan rejects any accepts[] entry with plain 'base' (2026-07-25).
+    // RWA host (eip155:8453 only) registers cleanly; dual [base, caip2] fails parse on the base twin.
+    return [{
+      scheme: 'exact', network: 'eip155:8453',
       amount: units, maxAmountRequired: units,
       asset: USDC_BASE_ASSET, payTo: X402_PAY_TO, maxTimeoutSeconds,
       resource, description, mimeType: 'application/json',
       extra: { name: 'USD Coin', version: '2' },
-    });
-    return [mk('base'), mk('eip155:8453')];
+    }];
   };
   // extensions.bazaar.schema — the v2 location the crawler reads input/output from.
   // `discoverable: true` is what actually opts a route into CDP's Bazaar index —
