@@ -342,18 +342,18 @@ export const OFFERINGS: Record<string, Offering> = {
       'Req: { symbol: string }',
   },
   'Compliance Anomaly Report': {
-    price: 5.00,
+    price: 0.001,
     description:
       'Submit a bank compliance anomaly to the ScriptMasterLabs compliance swarm for scoring. ' +
       'Req: { bank_id: string, agent_id: string, trigger: string, detail: string, severity?: string }',
   },
   'Compliance Bank Audit': {
-    price: 5.00,
+    price: 0.001,
     description:
       'Full ScriptMasterLabs compliance audit cycle for a bank. Req: { bank_id: string }',
   },
   'Compliance Regulator Query': {
-    price: 2.50,
+    price: 0.001,
     description:
       'Real-time regulator compliance dashboard query for a bank. Req: { bank_id: string }',
   },

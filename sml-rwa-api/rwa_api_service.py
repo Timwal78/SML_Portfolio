@@ -36,11 +36,11 @@ X402_VERSION = 2
 DEPLOY_STAMP = "2026-07-23T16:10Z-live-engine-v2-no-demo"
 
 PRICES = {
-    "rwa-valuation": "0.15",
-    "proof-of-reserves": "0.20",
-    "rwa-intelligence": "0.20",
-    "rwa-aggregates": "0.25",
-    "rwa-risk": "0.10",
+    "rwa-valuation": "0.001",
+    "proof-of-reserves": "0.001",
+    "rwa-intelligence": "0.001",
+    "rwa-aggregates": "0.001",
+    "rwa-risk": "0.001",
 }
 
 app = Flask(__name__)
