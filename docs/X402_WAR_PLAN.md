@@ -83,3 +83,63 @@ Price cuts mean nothing if x402scan / agents never hit us.
 
 ## One-liner for agents
 > ScriptMaster Labs: live federal + trading data on x402. From **$0.001 USDC**. No API key. Base.
+
+---
+
+## GTM LOCK (2026-07-25) — EXECUTE THIS
+
+### Positioning (one line)
+**Live agent data on Base. $0.001 USDC. No API key. Sovereign rail.**
+
+### ICP (who buys)
+1. **Autonomous agents** crawling x402scan for cheap must-have snacks (price, FX, gas, news, funding, web fetch)
+2. **Trading/research agents** needing FTD, options, FRED, grants, SEC
+3. **RWA/DeFi agents** needing TVL, valuation, risk, stables
+4. **Human builders** wiring agents (Stripe Cascade is separate human funnel @ $149)
+
+### Wedge (lead with these 6)
+| Call | Host | Why |
+|------|------|-----|
+| `/x402/crypto-price` | mcp | habit / every session |
+| `/x402/fx-rate` | mcp | habit |
+| `/x402/funding-rates` | acp | Otto-shaped |
+| `/x402/crypto-news` | acp | Otto-shaped |
+| `/x402/gas-tracker` | acp | infra snack |
+| `/x402/rwa-valuation` | rwa | niche moat |
+
+### Offer
+- **Price:** $0.001 USDC exact on Base (`eip155:8453`)
+- **Auth:** none — wallet pay only
+- **Rails:** `X-PAYMENT` (facilitator) **or** `X-PAYMENT-TX` (sovereign on-chain USDC transfer)
+- **Catalog:** mcp ~51 · acp 83 · rwa 5
+
+### Channels (priority order)
+1. **x402scan** recipient pages + origin register (already done)
+2. **X / @TimmyCrypto78** — daily demo posts with live paid proof
+3. **llms.txt + agent-start** — agent crawlers
+4. **A2A broadcast** after every meaningful deploy
+5. **ACP marketplace** wedges (gas/RWA) as second door
+
+### 7-day scoreboard
+| Metric | Target |
+|--------|--------|
+| x402scan mcp payTo txs | **>100** (from ~45) |
+| x402scan ACP payTo txs | **>25** (from ~0) |
+| Unique buyers | **≥5** |
+| External (non-seed) paid call | **≥1** |
+| X posts with product demo | **≥7** |
+
+### Do / Don't
+- DO keep seeding tiny pays so counters move (daily bot)
+- DO lead with snacks, close with federal/RWA moat
+- DO one killer curl/demo per post
+- DON'T pitch 139 routes at once
+- DON'T lead with Cascade $149 in agent channels
+- DON'T wait for facilitator EIP-3009 — sovereign works
+
+### CTAs (copy/paste)
+- Agents: `https://acp-x402-scriptmasterlabs.onrender.com`
+- Federal: `https://mcp-x402.onrender.com`
+- RWA: `https://sml-rwa-api.onrender.com`
+- Scan: `https://www.x402scan.com/recipient/0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700`
+- Quickstart: `https://www.scriptmasterlabs.com/agent-start.html`

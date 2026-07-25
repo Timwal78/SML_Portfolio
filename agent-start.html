@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Agent Quickstart — ScriptMasterLabs x402</title>
   <link rel="canonical" href="https://www.scriptmasterlabs.com/agent-start.html">
-  <meta name="description" content="5-step guide for AI agents to connect to SqueezeOS, pay RLUSD via x402, and earn ARGUS credit score. MCP config, curl examples, tier table." />
+  <meta name="description" content="AI agents: pay $0.001 USDC on Base via x402. No API key. Crypto, FX, FTD, grants, RWA. X-PAYMENT-TX sovereign rail + MCP quickstart." />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
@@ -218,6 +218,22 @@
 <script src="https://analytics.ahrefs.com/analytics.js" data-key="eO57h84tnrmOGAsKKvyoyw" async></script>
 </head>
 <body>
+
+<section id="base-usdc-floor" style="max-width:880px;margin:1.5rem auto;padding:1.25rem 1.5rem;border:1px solid #39FF14;border-radius:12px;background:#0a0f0a;color:#e8ffe8;font-family:ui-sans-serif,system-ui,sans-serif">
+  <h2 style="margin:0 0 .5rem;color:#39FF14;font-size:1.25rem">Base USDC floor — $0.001 · no API key</h2>
+  <p style="margin:.25rem 0;line-height:1.5">Live x402 on <strong>Base</strong> (not only RLUSD). Pay per call with wallet USDC. Sovereign rail: send USDC on-chain, retry with <code>X-PAYMENT-TX</code>.</p>
+  <ul style="margin:.5rem 0;padding-left:1.2rem;line-height:1.6">
+    <li><a style="color:#7CFFB2" href="https://acp-x402-scriptmasterlabs.onrender.com">ACP snacks (83)</a> — news, funding, gas, defi, web-fetch</li>
+    <li><a style="color:#7CFFB2" href="https://mcp-x402.onrender.com">mcp-x402 (51)</a> — crypto, FX, FTD, grants, SEC, FRED</li>
+    <li><a style="color:#7CFFB2" href="https://sml-rwa-api.onrender.com/health">RWA suite (5)</a> — valuation, risk, aggregates</li>
+  </ul>
+  <pre style="overflow:auto;background:#000;padding:.75rem;border-radius:8px;font-size:.8rem;color:#9f9"># 1) Pay 0.001 USDC on Base to payTo from 402 challenge
+# 2) Retry with header:
+curl -sS -H "X-PAYMENT-TX: 0xYOUR_TX_HASH" \
+  "https://mcp-x402.onrender.com/x402/crypto-price?ids=bitcoin"</pre>
+  <p style="margin:.5rem 0 0;font-size:.9rem">x402scan: <a style="color:#7CFFB2" href="https://www.x402scan.com/recipient/0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700">mcp payTo</a> · <a style="color:#7CFFB2" href="https://www.x402scan.com/recipient/0x72330994f379A71542e7bd5a4CF99A9d9743F4aA">ACP/RWA payTo</a></p>
+</section>
+
 
 <header>
   <span class="logo">ScriptMasterLabs</span>
