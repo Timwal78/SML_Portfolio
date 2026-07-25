@@ -64,279 +64,279 @@ interface Offering {
 export const OFFERINGS: Record<string, Offering> = {
   // ── SqueezeOS Intelligence (SqueezeOS backend) ─────────────────────────────
   'SqueezeOS Council (7-Agent AI)': {
-    price: 0.10,
+    price: 0.001,
     description:
       'Full 7-agent AI council verdict for any equity symbol via SqueezeOS. ' +
       'Req: { symbol: string }',
   },
   'SqueezeOS BeastMode Full Scan': {
-    price: 0.10,
+    price: 0.001,
     description:
       'SqueezeOS full multi-engine scan — 741-EMA stack + 365-EMA + TripleLock composite. ' +
       'Req: { symbol: string }',
   },
   'SqueezeOS Squeeze Signal (741-EMA)': {
-    price: 0.02,
+    price: 0.001,
     description:
       'SqueezeOS 741-EMA stack alignment signal with squeeze_alert flag. ' +
       'Returns BULLISH HIGHWAY / BEARISH HIGHWAY / CONSOLIDATION. Req: { symbol: string }',
   },
   'SqueezeOS 365-Day EMA Signal': {
-    price: 0.003,
+    price: 0.001,
     description:
       'Price position vs 365-day EMA anchor (ABOVE / BELOW). Req: { symbol: string }',
   },
   'SqueezeOS Triple Lock Signal': {
-    price: 0.05,
+    price: 0.001,
     description:
       'SML Triple Lock three-engine consensus (LOCKED BULL / LOCKED BEAR / FORMING / UNLOCKED). ' +
       'Req: { symbol: string }',
   },
   'SqueezeOS Full Signal (Composite)': {
-    price: 0.10,
+    price: 0.001,
     description:
       'All three SqueezeOS engines in one sovereign verdict (741 + 365 + TripleLock). ' +
       'Req: { symbol: string }',
   },
   // ── Federal Data Intelligence (this server's x402 routes) ─────────────────
   'Federal Grants Intel': {
-    price: 0.02,
+    price: 0.001,
     description:
       'Live federal grants data from Grants.gov. Req: { query: string, limit?: number }',
   },
   'Corporate Filings Search': {
-    price: 0.08,
+    price: 0.001,
     description:
       'SAM.gov federal contract awards and corporate filings search. ' +
       'Req: { query: string, type?: string }',
   },
   'Market Intelligence Feed': {
-    price: 0.30,
+    price: 0.001,
     description:
       'Real-time market intelligence data feed via USAspending.gov. Req: { symbol: string }',
   },
   'FDA Drug Label Lookup': {
-    price: 0.05,
+    price: 0.001,
     description: 'FDA drug label information via openFDA. Req: { drug: string }',
   },
   'FDA Drug Recall Alert': {
-    price: 0.08,
+    price: 0.001,
     description:
       'FDA drug recall enforcement reports via openFDA. Req: { drug?: string, limit?: number }',
   },
   'NPI Provider Lookup': {
-    price: 0.05,
+    price: 0.001,
     description: 'National Provider Identifier registry lookup. Req: { query: string }',
   },
   'Clinical Trials Search': {
-    price: 0.08,
+    price: 0.001,
     description: 'ClinicalTrials.gov study search. Req: { query: string, status?: string }',
   },
   'SEC Insider Trade Intel': {
-    price: 0.20,
+    price: 0.001,
     description: 'SEC Form 4 insider trading activity for any ticker. Req: { ticker: string }',
   },
   'FDA Adverse Events Report': {
-    price: 0.08,
+    price: 0.001,
     description: 'FDA FAERS adverse events for a drug. Req: { drug: string }',
   },
   'SEC 8-K Real-Time Filings': {
-    price: 0.25,
+    price: 0.001,
     description: 'Real-time SEC 8-K material event filings for any ticker. Req: { ticker: string }',
   },
   'Treasury Yield Curve Data': {
-    price: 0.05,
+    price: 0.001,
     description: 'Current US Treasury yield curve (1M through 30Y). Req: {}',
   },
   'Entity Compliance Check': {
-    price: 0.35,
+    price: 0.001,
     description:
       'SAM.gov registration status + exclusion flag + set-aside types + NAICS codes. ' +
       'Req: { uei: string } or { cage: string }',
   },
   'Agent Credit Score': {
-    price: 0.20,
+    price: 0.001,
     description:
       'AI agent FICO-style reputation score (300–850). Submit behavioral signals or retrieve score. ' +
       'Req: { agent_id: string, action?: "get"|"report", tasks?: number, successes?: number, errors?: number, payments?: number }',
   },
   'AI Fact Check': {
-    price: 0.15,
+    price: 0.001,
     description:
       'Grounding oracle — fact-checks a claim against live government/FDA/SEC/Treasury data. ' +
       'Req: { claim: string, domain?: string }',
   },
   // ── Existing x402 routes (SEC/Finance/Patent/Economic/Labor) ──────────────────
   'SEC 13F Institutional Holdings': {
-    price: 0.25,
+    price: 0.001,
     description:
       'SEC EDGAR 13F-HR hedge fund and institutional quarterly position filings. ' +
       'Req: { cik?: string, name?: string }',
   },
   'Lobbying Disclosures': {
-    price: 0.15,
+    price: 0.001,
     description:
       'Senate LDA lobbying disclosure filings — client, registrant, issue codes, and amounts. ' +
       'Req: { client?: string, registrant?: string, issue?: string, limit?: number }',
   },
   'Patent Search': {
-    price: 0.10,
+    price: 0.001,
     description:
       'USPTO PatentsView patent search by keyword title or assignee company. ' +
       'Req: { query?: string, assignee?: string, limit?: number }',
   },
   'FRED Economic Indicators': {
-    price: 0.08,
+    price: 0.001,
     description:
       'FRED economic indicator series (Federal Reserve Bank of St. Louis) — GDP, CPI, UNRATE, FEDFUNDS, and 800k+ others. ' +
       'Req: { series_id: string, limit?: number }',
   },
   'OSHA Inspection Records': {
-    price: 0.10,
+    price: 0.001,
     description:
       'OSHA workplace inspection and violation records (DOL enforcement data). ' +
       'Req: { establishment?: string, naics?: string, state?: string, limit?: number }',
   },
   'FDA 510k Device Clearances': {
-    price: 0.08,
+    price: 0.001,
     description:
       'FDA 510(k) medical device premarket clearances (openFDA). ' +
       'Req: { device?: string, applicant?: string, limit?: number }',
   },
   // ── SqueezeOS extended intelligence routes ────────────────────────────────────
   'SqueezeOS Oracle Directive': {
-    price: 0.15,
+    price: 0.001,
     description:
       'SqueezeOS OracleEngine sovereign directive for any symbol (BUY/HOLD/SELL/SHIELD + regime). ' +
       'Req: { symbol: string }',
   },
   'SqueezeOS Signal History': {
-    price: 0.05,
+    price: 0.001,
     description:
       'SqueezeOS in-memory signal history ring buffer (last 200 signals for a symbol). ' +
       'Req: { symbol: string }',
   },
   'SqueezeOS IWM 0DTE Scorer': {
-    price: 0.003,
+    price: 0.001,
     description:
       'SqueezeOS IWM zero-day-to-expiry contract scorer and directional bias. ' +
       'Req: {}',
   },
   'SqueezeOS Full Scanner': {
-    price: 0.05,
+    price: 0.001,
     description:
       'SqueezeOS full $1–$50 squeeze scanner — 741-EMA, gamma walls, and pressure index. ' +
       'Req: {}',
   },
   // ── New x402 routes ───────────────────────────────────────────────────────────
   'SEC 10-K Annual Filing': {
-    price: 0.20,
+    price: 0.001,
     description:
       'SEC EDGAR 10-K annual report filing history by ticker. Links to full 10-K documents on sec.gov. ' +
       'Req: { ticker: string, limit?: number }',
   },
   'SEC 10-Q Quarterly Filing': {
-    price: 0.15,
+    price: 0.001,
     description:
       'SEC EDGAR 10-Q quarterly report filing history by ticker. Links to full 10-Q documents on sec.gov. ' +
       'Req: { ticker: string, limit?: number }',
   },
   'SEC 13D/13G Activist Filings': {
-    price: 0.20,
+    price: 0.001,
     description:
       'SEC EDGAR 13D and 13G activist investor filings — who holds 5%+ stakes in a company. ' +
       'Req: { ticker: string, limit?: number }',
   },
   'FINRA BrokerCheck': {
-    price: 0.15,
+    price: 0.001,
     description:
       'FINRA BrokerCheck broker/advisor registration status and disclosure history. ' +
       'Req: { name: string, type?: "individual"|"firm" }',
   },
   'FEC Campaign Finance': {
-    price: 0.10,
+    price: 0.001,
     description:
       'FEC campaign finance — candidates, committees, and contribution totals by election cycle. ' +
       'Req: { name?: string, committee?: string, cycle?: string }',
   },
   'EPA Environmental Violations': {
-    price: 0.12,
+    price: 0.001,
     description:
       'EPA ECHO enforcement and environmental violation records — facility inspections and penalties. ' +
       'Req: { facility?: string, state?: string, naics?: string }',
   },
   'SBIR/STTR Innovation Grants': {
-    price: 0.05,
+    price: 0.001,
     description:
       'SBIR/STTR small business innovation research grants from SBA. ' +
       'Req: { keyword: string, agency?: string, phase?: "1"|"2", limit?: number }',
   },
   'Congressional Bills Search': {
-    price: 0.08,
+    price: 0.001,
     description:
       'Congress.gov bill search — legislation by keyword, congress number, and status. ' +
       'Req: { query: string, congress?: string, limit?: number }',
   },
   'FDA Warning Letters': {
-    price: 0.10,
+    price: 0.001,
     description:
       'FDA warning letters — regulatory enforcement actions for violations of FDA regulations. ' +
       'Req: { company?: string, product?: string, limit?: number }',
   },
   'CMS Medicare Provider Data': {
-    price: 0.10,
+    price: 0.001,
     description:
       'CMS Medicare hospital quality data (ratings, emergency services) or physician provider information. ' +
       'Req: { name?: string, state?: string, type?: "hospital"|"physician", limit?: number }',
   },
   'NIH Research Grants': {
-    price: 0.05,
+    price: 0.001,
     description:
       'NIH Reporter research grant database — active NIH grants by keyword and institute (NCI, NHLBI, NIAID, etc). ' +
       'Req: { query: string, agency?: string, fiscal_year?: number, limit?: number }',
   },
   // ── New SqueezeOS routes (require operator-key bypass fix — SqueezeOS PR #249/#250) ──
   'FTD Threshold List': {
-    price: 0.02,
+    price: 0.001,
     description:
       'Current SEC Reg SHO Threshold Securities List (persistent fails-to-deliver). Req: {}',
   },
   'FTD Time Series': {
-    price: 0.02,
+    price: 0.001,
     description:
       'Historical SEC Reg SHO fails-to-deliver time series for a symbol (default 90 days, max 180). ' +
       'Req: { symbol: string, limit?: number }',
   },
   'FTD Ratio': {
-    price: 0.003,
+    price: 0.001,
     description:
       'Latest FTD record plus percentile rank within the rolling window, and threshold-list status. ' +
       'Req: { symbol: string }',
   },
   'FTD ETF Basket Concentration': {
-    price: 0.05,
+    price: 0.001,
     description:
       'ETF constituents ranked by current FTD notional (supported: XRT, IWM, IJR, KRE). Req: { etf: string }',
   },
   'FTD Settlement Cycle': {
-    price: 0.05,
+    price: 0.001,
     description:
       'Settlement-cycle descriptive bundle — FTD stats, threshold-list status, T+21/T+35 calendar markers, ' +
       'Reg SHO 204 13-day marker. Req: { symbol: string }',
   },
   'Options Flow Intelligence': {
-    price: 0.05,
+    price: 0.001,
     description:
       'Institutional options flow — sweeps, whale detection, unusual volume, dark-pool prints (Tradier brokerage-grade). ' +
       'Req: { symbol?: string } (default IWM)',
   },
   'CASCADE Accumulator Signal': {
-    price: 0.25,
+    price: 0.001,
     description:
       'CASCADE ACCUMULATOR directive — ACCUMULATE/PYRAMID/EXIT/STOP mode for a symbol. Req: { symbol: string }',
   },
   'IAM Inevitable Action Model': {
-    price: 0.05,
+    price: 0.001,
     description:
       'Inevitable Action Model resolution — obligation committee verdict, Truth Layer state, and mandatory action. ' +
       'Req: { symbol: string }',
@@ -358,7 +358,7 @@ export const OFFERINGS: Record<string, Offering> = {
       'Real-time regulator compliance dashboard query for a bank. Req: { bank_id: string }',
   },
   'SqueezeOS Max-Conviction Rare Signal': {
-    price: 0.25,
+    price: 0.001,
     description:
       'TRIPLE_LOCK_VERDICT — distinct from and rarer than the standard Triple Lock Signal job above. ' +
       'Returns BULL or BEAR only when three independent proprietary engines (macro price stretch, dark-pool ' +

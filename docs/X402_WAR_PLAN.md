@@ -1,3 +1,6 @@
+## ALL-OUT $0.001 (2026-07-25)
+Every paid call floor = **$0.001 USDC**. Volume doctrine. Make it up on quantity.
+
 # X402 WAR PLAN — ScriptMaster Labs
 **Status:** ACTIVE  
 **Date:** 2026-07-25  
