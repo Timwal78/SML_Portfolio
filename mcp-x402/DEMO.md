@@ -1,17 +1,20 @@
 # 30-second demo (no API keys)
 
-## One command
+## Holy shit path
+
+1. **Challenge (free):**
 ```bash
-curl -sS https://mcp-x402.onrender.com/health && \
-curl -sS "https://sml-rwa-api.onrender.com/x402/rwa-assets?limit=3"
+curl -sS https://acp-x402-scriptmasterlabs.onrender.com/x402/gas-tracker | head -c 500
+# HTTP 402 — amount 1000 = $0.001 USDC on Base
 ```
 
-Or:
-```bash
-bash scripts/demo-one-command.sh
-```
+2. **Snacks page (share this):**  
+https://www.scriptmasterlabs.com/x402-snacks.html
 
-## Claude / Cursor (remote MCP — free discover)
+3. **Hermes loop (Claude/Cursor):**  
+https://www.scriptmasterlabs.com/hermes-loop.html
+
+## Claude / Cursor (remote MCP)
 ```json
 {
   "mcpServers": {
@@ -23,16 +26,23 @@ bash scripts/demo-one-command.sh
 }
 ```
 
-## First paid call (stupidly cheap)
-| Path | Price | What |
+## First paid calls (floor $0.001)
+| Path | Price | Host |
 |------|-------|------|
-| ACP `gas_tracker` | **$0.01** | Multi-chain gas |
-| ACP `rwa_intelligence` | **$0.03** | RWA scan/risk |
-| x402 free lead | **$0.00** | `/x402/rwa-assets` |
+| `/x402/gas-tracker` | **$0.001** | ACP |
+| `/x402/crypto-price` | **$0.001** | MCP |
+| `/x402/grants` | **$0.001** | MCP |
+| `/x402/funding-rates` | **$0.001** | ACP |
+| `/x402/rwa-valuation` | **$0.001** | RWA |
 
-Search **scriptmasterlabs** on ACP → hire **gas_tracker**.
-
-## Install
+## Install / run
 ```bash
 npx @scriptmasterlabs/mcp-x402
+```
+
+## One-line paywall (your API)
+```bash
+# repo: packages/x402-paywall
+import { x402 } from '@scriptmasterlabs/x402-paywall'
+app.use('/premium', x402({ price: '0.001', payTo: '0x…', freeForHumans: true }))
 ```

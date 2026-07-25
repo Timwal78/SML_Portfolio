@@ -1,0 +1,20 @@
+{
+  "name": "@scriptmasterlabs/x402-paywall",
+  "version": "0.1.0",
+  "description": "One-line x402 paywall: app.use('/premium', x402({ price: '0.001', payTo: '0x...' })). Agents pay USDC on Base. Humans optional free.",
+  "type": "module",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": ["src", "README.md", "examples"],
+  "keywords": ["x402", "http-402", "paywall", "usdc", "base", "ai-agents", "middleware", "express", "micropayments"],
+  "author": "ScriptMasterLabs",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Timwal78/SML_Portfolio.git",
+    "directory": "packages/x402-paywall"
+  },
+  "engines": { "node": ">=18" }
+}
