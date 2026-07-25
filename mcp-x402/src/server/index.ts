@@ -2973,7 +2973,7 @@ async function runSSE(): Promise<void> {
         version: VERSION,
         protocol: 'MCP/streamable-http',
         status: 'ready',
-        tools: '85+ tools available',
+        tools: '89+ tools available',
         how_to_connect: 'POST /mcp with a JSON-RPC initialize request',
         sse_alternative: 'GET /sse for legacy SSE transport',
         health: '/health',
