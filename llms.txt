@@ -421,3 +421,10 @@ Personal toolkit: https://www.scriptmasterlabs.com/housing-landlord.html
 - GET /x402/housing-windsor — Kinston 4BR bundle (1607 Windsor Rd profile)
 MCP tools: pha_lookup, hcv_fmr, housing_landlord_checklist, hud_vash_contacts
 Disclaimer: FMR is HUD baseline; PHA payment standard controls HAP. Not legal/tax advice.
+
+## x402 on-ramps (viral)
+- Snacks try-now: https://www.scriptmasterlabs.com/x402-snacks.html
+- Hermes 30s money loop: https://www.scriptmasterlabs.com/hermes-loop.html
+- One-line paywall package: https://github.com/Timwal78/SML_Portfolio/tree/main/packages/x402-paywall
+- CRAWLTOLL: https://www.scriptmasterlabs.com/crawltoll.html
+- Floor: $0.001 USDC on Base (eip155:8453), header X-PAYMENT-TX
