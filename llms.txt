@@ -1,5 +1,25 @@
 ScriptMasterLabs x402: ALL paid calls **$0.001 USDC** on Base. Volume war. No API key.
 
+
+## HIGH-TRAFFIC x402 SNACKS — $0.001 USDC (Base, CAIP-2 eip155:8453)
+Otto/BlockRun-style agent must-haves. No API key. Pay-per-call.
+Host: https://acp-x402-scriptmasterlabs.onrender.com
+- GET /x402/crypto-news — headlines (RSS)
+- GET /x402/token-details?id=bitcoin — CoinGecko token
+- GET /x402/trending-altcoins — CoinGecko trending
+- GET /x402/funding-rates?symbol=BTCUSDT — Binance perp funding
+- GET /x402/defi-analytics — DefiLlama protocols TVL
+- GET /x402/stablecoin-watch — stablecoin mcaps
+- GET /x402/web-fetch?url=https://api.coingecko.com/api/v3/ping — public URL fetch
+- GET /x402/token-top-markets?id=ethereum — top markets liquidity proxy
+- GET /x402/gas-tracker · /x402/btc-price · /x402/fear-greed-index · /x402/fx-rate
+Also: https://mcp-x402.onrender.com (federal/FTD/cascade/options @ $0.001)
+RWA: https://sml-rwa-api.onrender.com @ $0.001
+x402scan: https://www.x402scan.com/recipient/0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700
+x402scan ACP: https://www.x402scan.com/recipient/0x72330994f379A71542e7bd5a4CF99A9d9743F4aA
+Registered origins: mcp-x402 (51) · acp-x402 (83) · sml-rwa-api (5)
+
+
 GOV CAPTURE: npx @scriptmasterlabs/gov-procurement-intel · https://www.scriptmasterlabs.com/gov-procurement · SDVOSB federal awards/set-asides + signed capture logs. Pair @scriptmasterlabs/agent-wallet.
 
 AGENT BUSINESS TENT: https://www.scriptmasterlabs.com/agent-wallet — Your AI agent is a business. npx @scriptmasterlabs/agent-wallet (collect_payment · prove_creditworthiness · generate_compliance_log). SDVOSB UEI G24VZA4RLMK3.
