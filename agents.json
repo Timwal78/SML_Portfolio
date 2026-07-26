@@ -22,7 +22,7 @@
     {
       "name": "Agent Credit Bureau",
       "description": "The Equifax for AI Agents. FICO-style 300-850 credit scoring for XRPL wallet addresses. 5 dimensions: payment history, reliability streak, timeliness, wallet age, volume. Free score endpoint. Full report 0.05 RLUSD. Batch scoring 0.01 RLUSD/wallet. Court-admissible audit trail. x402 gated.",
-      "url": "https://sml-agent-credit-bureau.onrender.com/mcp",
+      "url": "https://github.com/Timwal78/sml-agent-credit-bureau",
       "protocol": "MCP JSON-RPC 2.0",
       "landing_page": "https://www.scriptmasterlabs.com/agent-credit-bureau.html",
       "tools": 5,
@@ -66,7 +66,7 @@
     {
       "name": "402Proof",
       "description": "11-tool x402 payment firewall and agent credit bureau MCP server. Invoices, payment verification, FICO-style bureau scores, attestations, passports.",
-      "url": "https://four02proof.onrender.com/mcp",
+      "url": "https://four02proof.onrender.com/",
       "protocol": "MCP JSON-RPC 2.0",
       "tools": 11
     },
@@ -83,7 +83,7 @@
   "live_services": [
     {
       "name": "TrustVerify AI",
-      "url": "https://api.trustverify.ai",
+      "url": "https://www.scriptmasterlabs.com/trustverify.html",
       "landing_page": "https://www.scriptmasterlabs.com/trustverify.html",
       "description": "Enterprise AI vendor trust platform for CISOs and CPOs. FICO-style TrustScore (300\u2013850) across 5 dimensions: Payment Reliability (25%), Uptime Consistency (25%), Security Posture (20%), Contract Adherence (15%), Operational Longevity (15%). Shadow AI Detection discovers unauthorized agents via network traffic analysis. REST API with OAuth 2.0 Client Credentials. Native integrations: Salesforce, ServiceNow, Slack. SOC 2 Type II in progress.",
       "x402": false,
@@ -305,7 +305,7 @@
     },
     {
       "name": "Ghost Layer",
-      "url": "https://ghost-layer.onrender.com",
+      "url": "https://github.com/Timwal78/ghost-layer",
       "description": "x402 bridge, stealth routing, chain attestation, notary.",
       "x402": true
     },
@@ -317,7 +317,7 @@
     },
     {
       "name": "Shadow Desk",
-      "url": "https://shadow-desk.onrender.com/.well-known/mcp.json",
+      "url": "https://mcp-x402.onrender.com/.well-known/mcp.json",
       "description": "Institutional trading alpha \u2014 real-time Pine Script signals, gamma walls, and block flow imbalances. x402 pay-per-call: 0.005 USDC on Base, zero signups, zero API keys. MCP-discoverable.",
       "x402": true
     },
@@ -386,7 +386,7 @@
     "version": "1.0.0",
     "description": "Cryptographic identity, verifiable credentials (W3C VC 2.0), and reputation scoring for autonomous AI agents across the SML stack.",
     "spec": "https://github.com/timwal78/sml_portfolio/tree/main/vapl/spec",
-    "registry": "https://vapl-registry.onrender.com",
+    "registry": "https://www.scriptmasterlabs.com/agents.json",
     "ecosystemManifest": "https://www.scriptmasterlabs.com/.well-known/vapl.json",
     "vcHeader": "X-VAPL-VC",
     "cryptosuite": "eddsa-vapl-2024",
@@ -403,7 +403,7 @@
       },
       {
         "service": "GhostLayer",
-        "manifest": "https://ghost-layer.onrender.com/.well-known/vapl.json"
+        "manifest": "https://github.com/Timwal78/ghost-layer"
       }
     ],
     "reputation": {

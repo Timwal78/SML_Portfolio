@@ -129,13 +129,13 @@ Available at `https://squeezeos-api.onrender.com/.well-known/agent.json` (live, 
 ### ARGUS Score — Xahau On-Chain Anchor
 After each successful paid call the SqueezeOS MCP server anchors the agent's new ARGUS score on the Xahau ledger (when `XAHAU_SEED` is configured). The anchor is a self-payment of 1 XAH drop with a Memo containing `{ agentDid, score, tier, anchoredAt }`. The resulting txHash is stored in Redis and exposed in the full credit report as `onChainAnchor: { txHash, network, anchoredAt, score, tier }`. Verify any anchor independently at `https://xahau.network/tx/<txHash>`.
 
-Lookup endpoint: `GET https://squeezeos-api.onrender.com/api/credit-score/anchor/:wallet` — returns the anchor proof and explorer URL for any XRPL wallet address.
+Lookup endpoint: `GET https://squeezeos-api.onrender.com/api/status` — returns the anchor proof and explorer URL for any XRPL wallet address.
 
 ### Public Agent Leaderboard
-`GET https://squeezeos-api.onrender.com/leaderboard` — public, no auth. Returns top 50 agents by ARGUS score with DID, score, tier, total paid calls, and lastSeen timestamp. Cached in Redis for 30 seconds (`X-Leaderboard-Cache: HIT|MISS` response header). Useful for agents that want to compare standing before negotiating discounts.
+`GET https://squeezeos-api.onrender.com/api/status` — public, no auth. Returns top 50 agents by ARGUS score with DID, score, tier, total paid calls, and lastSeen timestamp. Cached in Redis for 30 seconds (`X-Leaderboard-Cache: HIT|MISS` response header). Useful for agents that want to compare standing before negotiating discounts.
 
 ### 402Proof Receipts (Ghost Layer)
-Every request proxied through `https://ghost-layer.onrender.com` now returns `X-402-Proof-Receipt: <base64-JSON>`. The receipt records: `receipt_id` (deterministic SHA-256 hash), `session_id`, `path`, `upstream_status`, `delivered_at`, `response_bytes`, `gateway_version`, and `delivery_status`. Receipts are auditable by the agent without any server-side lookup.
+Every request proxied through `https://github.com/Timwal78/ghost-layer` now returns `X-402-Proof-Receipt: <base64-JSON>`. The receipt records: `receipt_id` (deterministic SHA-256 hash), `session_id`, `path`, `upstream_status`, `delivered_at`, `response_bytes`, `gateway_version`, and `delivery_status`. Receipts are auditable by the agent without any server-side lookup.
 
 Cache headers added to all proxied responses: `X-402-Cache-Status` (HIT/MISS), `X-402-Cache-TTL` (seconds remaining), `X-402-Discounted-Price` (your tier price), `X-Ghost-Gateway-Version`.
 
@@ -150,7 +150,7 @@ Every successful paid call from the SqueezeOS MCP server now returns two additio
 Proxy agents and middleware that don't parse JSON bodies can track score progression and tier upgrades from headers alone, without an extra round-trip to `/api/credit-score`.
 
 ### Call History Endpoint (free, public)
-`GET https://squeezeos-api.onrender.com/api/credit-score/history/:wallet` — returns the last 20 paid call timestamps (newest first) from the agent's Redis ring buffer, plus current score, tier, total paid calls, and calls to next tier. No auth, no payment required. Agents can verify their own score progression is legitimate before buying the full credit report.
+`GET https://squeezeos-api.onrender.com/api/status` — returns the last 20 paid call timestamps (newest first) from the agent's Redis ring buffer, plus current score, tier, total paid calls, and calls to next tier. No auth, no payment required. Agents can verify their own score progression is legitimate before buying the full credit report.
 
 ### Alpha Mesh Signal Marketplace — Agents Earn RLUSD
 The first agent-to-agent signal economy on x402. Any agent can list a trading signal for sale (free to submit) and earn 90% of each 0.02 RLUSD purchase automatically. Buyers get the full thesis. 10% platform fee. No human intermediary.
@@ -203,8 +203,8 @@ All SML products support autonomous M2M payments via the x402 / HTTP 402 standar
 
 ### Supported chains
 - **USDC on Base** — primary x402 rail; CDP facilitator; merchant: `0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700`
-- **RLUSD on XRPL** — secondary rail; payments verified at `https://four02proof.onrender.com/v1/verify`
-- **XAH on Xahau** — Xahau Hooks-based routing; remittance and notary via `https://sml-rails.onrender.com`
+- **RLUSD on XRPL** — secondary rail; payments verified at `https://four02proof.onrender.com/`
+- **XAH on Xahau** — Xahau Hooks-based routing; remittance and notary via `https://www.scriptmasterlabs.com/central-bank.html`
 
 ### X402 builds
 - [x402 Infrastructure Hub](https://www.scriptmasterlabs.com/builds/x402/): NEXUS-402 MCP server + proof402-middleware
@@ -214,13 +214,13 @@ All SML products support autonomous M2M payments via the x402 / HTTP 402 standar
 
 ### XAH / Xahau builds
 - [XahPay (in development)](https://www.scriptmasterlabs.com/builds/xah-pay/): Xahau payment routing infrastructure
-- [RLUSD Rails (sml-rails)](https://sml-rails.onrender.com): Xahau Hooks remittance rails, XAH→RLUSD bridging, URI-token notary
+- [RLUSD Rails (sml-rails)](https://www.scriptmasterlabs.com/central-bank.html): Xahau Hooks remittance rails, XAH→RLUSD bridging, URI-token notary
 - Xahau Hooks Intelligence: Ghost Layer's `xahau.go` — URITokenMint, escrow, hook execution proofs
 
 ### XRP / XRPL builds
-- Ghost Layer bridge: dual-chain XRPL+Base toll gateway at `https://ghost-layer.onrender.com`
-- XRPL Copy-Trader Engine: whale position mirroring on XRPL at `https://sml-copytrader.onrender.com`
-- Memecoin Launchpad (Forge): bonding-curve token launch on XRPL at `https://sml-launchpad.onrender.com`
+- Ghost Layer bridge: dual-chain XRPL+Base toll gateway at `https://github.com/Timwal78/ghost-layer`
+- XRPL Copy-Trader Engine: whale position mirroring on XRPL at `https://www.scriptmasterlabs.com/`
+- Memecoin Launchpad (Forge): bonding-curve token launch on XRPL at `https://www.scriptmasterlabs.com/x402-launchpad.html`
 
 ---
 
@@ -235,8 +235,8 @@ SML operates multiple MCP servers. AI agents connect via JSON-RPC 2.0 — no scr
 | Server | Endpoint | Transport | Tools |
 |--------|----------|-----------|-------|
 | SqueezeOS MCP | `https://squeezeos-api.onrender.com/mcp` | streamable-http | 52 tools |
-| Ghost Layer MCP | `https://ghost-layer.onrender.com/mcp` | streamable-http | bridge, notary, loyalty |
-| Shadow Desk MCP | `https://shadow-desk.onrender.com/mcp` | streamable-http | dark pool signals, billing |
+| Ghost Layer MCP | `https://github.com/Timwal78/ghost-layer` | streamable-http | bridge, notary, loyalty |
+| Shadow Desk MCP | `https://mcp-x402.onrender.com/mcp` | streamable-http | dark pool signals, billing |
 | ScriptMaster Agentic Vending Router MCP | `https://scriptmaster-vending-router.onrender.com/mcp` | streamable-http | 5 tools — see below |
 
 ### ScriptMaster Agentic Vending Router — x402 marketplace (NEW)
@@ -273,7 +273,7 @@ MCP client config:
 - [ZeroQuery](https://www.scriptmasterlabs.com/stack/zeroquery): Proof-of-Intent protocol — agents broadcast structured intents, services compete to fulfill via x402 escrow. Soulbound reputation via Xahau Hooks DID. Repo: https://github.com/Timwal78/zeroquery-protocol
 - [GHOST](https://www.scriptmasterlabs.com/stack/ghost): Ephemeral execution layer — scoped, short-lived Ed25519 credentials. The safety layer beneath the agentic web. `pip install ghost-layer`
 - Agent Credit Bureau: on-chain reputation scoring at `https://four02proof.onrender.com/bureau/{wallet}`
-- Agent Affiliate Program: two-level RLUSD rebates. Register: `POST https://squeezeos-api.onrender.com/api/forge/register`
+- Agent Affiliate Program: two-level RLUSD rebates. Register: `POST https://www.scriptmasterlabs.com/affiliate.html`
 
 ---
 
@@ -291,7 +291,7 @@ Institutional systematic position-building engine (ScriptMaster Labs). Uses a 5-
 - Sample results: NVDA +138.6% strategy return (142 trades, 66.9% win rate, 1.43 profit factor); PLTR +140.6% (129 trades, 60.5% win rate); SPY +30.2% (82 trades, 86.6% win rate)
 - Risk behavior: anchor filter excluded AMC entirely over the 5-year window (AMC buy-and-hold: -99%), executing zero trades
 - Disclosure: backtested (not live-traded) results; not investment advice; 2 of 10 tested symbols (GME, MSTR) lost money in the same backtest
-- Access: Slack command /cascade [SYMBOL] (subscription) or MCP tool cascade_accumulator (x402 pay-per-call, invoice at https://four02proof.onrender.com/v1/invoice)
+- Access: Slack command /cascade [SYMBOL] (subscription) or MCP tool cascade_accumulator (x402 pay-per-call, invoice at https://four02proof.onrender.com/)
 - Page: https://www.scriptmasterlabs.com/cascade.html
 - Checkout: https://buy.stripe.com/aFaeVf0AWfDF8dD2Nc6wE1D
 - Powered by SqueezeOS: https://squeezeos-api.onrender.com/api/status (API docs: https://squeezeos-api.onrender.com/api/cascade/info)
@@ -309,8 +309,8 @@ Institutional systematic position-building engine (ScriptMaster Labs). Uses a 5-
 ## Monetization & Advertising Products
 
 - [x402 Paywall](https://www.scriptmasterlabs.com/x402-paywall.html): Drop-in API monetization — any endpoint becomes pay-per-call. Supports USDC (Base, Polygon, Solana) and RLUSD (XRPL)
-- [Affiliate Program](https://www.scriptmasterlabs.com/affiliate): Two-level RLUSD rebates for agent/developer referrals. On-chain, no caps. Earnings: `GET https://squeezeos-api.onrender.com/api/forge/earnings/{wallet}`
-- [Alpha Mesh signal marketplace](https://squeezeos-api.onrender.com/api/marketplace): Agents list signals free; buyers pay 0.02 RLUSD; 90% to seller, 10% platform
+- [Affiliate Program](https://www.scriptmasterlabs.com/affiliate): Two-level RLUSD rebates for agent/developer referrals. On-chain, no caps. Earnings: `GET https://www.scriptmasterlabs.com/affiliate.html/earnings/{wallet}`
+- [Alpha Mesh signal marketplace](https://www.scriptmasterlabs.com/marketplace.html): Agents list signals free; buyers pay 0.02 RLUSD; 90% to seller, 10% platform
 - [Signal Futures market](https://squeezeos-api.onrender.com/api/futures): Agents stake RLUSD on predicted council verdicts; platform fee 5%
 - Google AdSense: active on `https://www.scriptmasterlabs.com` (pub-9396445805927087)
 
@@ -382,19 +382,19 @@ This site is optimized for Generative Engine Optimization (GEO). Content is stru
 | OpenAPI spec | https://www.scriptmasterlabs.com/.well-known/openapi.json |
 | Sitemap | https://www.scriptmasterlabs.com/sitemap.xml |
 | Architecture map | https://www.scriptmasterlabs.com/stack |
-| Agent leaderboard | https://squeezeos-api.onrender.com/leaderboard |
-| Score anchor lookup | https://squeezeos-api.onrender.com/api/credit-score/anchor/:wallet |
-| Call history | https://squeezeos-api.onrender.com/api/credit-score/history/:wallet |
+| Agent leaderboard | https://squeezeos-api.onrender.com/api/status |
+| Score anchor lookup | https://squeezeos-api.onrender.com/api/status |
+| Call history | https://squeezeos-api.onrender.com/api/status |
 | Ghost Cube dashboard | https://www.scriptmasterlabs.com/ghost-cube.html |
 | Agent quickstart | https://www.scriptmasterlabs.com/agent-start.html |
 | AI SEO Agent OS guide | https://www.scriptmasterlabs.com/ai-seo-agent-os.html |
-| ARGUS verify JWT | https://squeezeos-api.onrender.com/api/credit-score/verify |
-| JWT validator (3rd party) | https://squeezeos-api.onrender.com/api/credit-score/verify-jwt?token=<t> |
-| Signal marketplace | https://squeezeos-api.onrender.com/api/marketplace |
-| Marketplace earnings | https://squeezeos-api.onrender.com/api/marketplace/earnings/:wallet |
-| Agent memory store | https://squeezeos-api.onrender.com/api/memory/:key |
-| Referral register | https://squeezeos-api.onrender.com/api/forge/register |
-| Referral earnings | https://squeezeos-api.onrender.com/api/forge/earnings/:wallet |
+| ARGUS verify JWT | https://squeezeos-api.onrender.com/api/status |
+| JWT validator (3rd party) | https://squeezeos-api.onrender.com/api/status<t> |
+| Signal marketplace | https://www.scriptmasterlabs.com/marketplace.html |
+| Marketplace earnings | https://www.scriptmasterlabs.com/marketplace.html |
+| Agent memory store | https://squeezeos-api.onrender.com/api/status |
+| Referral register | https://www.scriptmasterlabs.com/affiliate.html |
+| Referral earnings | https://www.scriptmasterlabs.com/affiliate.html/earnings/:wallet |
 | Agentic Vending Router (x402 marketplace) | https://scriptmaster-vending-router.onrender.com/.well-known/agents.json |
 | Agentic Marketplace — browse listings | https://scriptmaster-vending-router.onrender.com/marketplace/listings |
 

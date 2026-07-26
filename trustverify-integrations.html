@@ -7,7 +7,7 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <title>TrustVerify AI — Integration Guides | Script Master Labs</title>
 <meta name="description" content="Step-by-step integration guides for TrustVerify AI. Connect to Salesforce, ServiceNow, and Slack. Full code examples included.">
-<link rel="canonical" href="https://www.scriptmasterlabs.com/trustverify-integrations">
+<link rel="canonical" href="https://www.scriptmasterlabs.com/trustverify-integrations.html">
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-QHTHMG61N6"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-QHTHMG61N6');</script>
 <style>
@@ -172,7 +172,7 @@
     <div class="step">
       <div class="step-num">STEP 01</div>
       <h3>Create a Connected App in Salesforce</h3>
-      <p>In Salesforce Setup, navigate to <strong>Apps &rarr; App Manager &rarr; New Connected App</strong>. Enable OAuth Settings, add the callback URL <code>https://api.trustverify.ai/oauth/salesforce/callback</code>, and select scopes: <code>api</code>, <code>refresh_token</code>, <code>offline_access</code>.</p>
+      <p>In Salesforce Setup, navigate to <strong>Apps &rarr; App Manager &rarr; New Connected App</strong>. Enable OAuth Settings, add the callback URL <code>https://www.scriptmasterlabs.com/trustverify-integrations.html</code>, and select scopes: <code>api</code>, <code>refresh_token</code>, <code>offline_access</code>.</p>
       <div class="tip"><strong>Tip:</strong> Save your Consumer Key and Consumer Secret — you'll need them in the next step.</div>
     </div>
 
@@ -182,7 +182,7 @@
       <p>Go to <strong>Settings &rarr; Integrations &rarr; Salesforce</strong> in your TrustVerify dashboard. Enter your Consumer Key, Consumer Secret, and your Salesforce instance URL.</p>
       <div class="code-block">
         <div class="code-header"><span class="code-lang">REST API &mdash; Configure Salesforce Integration</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
-        <pre><span class="kw">POST</span> https://api.trustverify.ai/v1/integrations/salesforce
+        <pre><span class="kw">POST</span> https://www.scriptmasterlabs.com/trustverify-integrations.html
 <span class="key">Authorization</span>: Bearer <span class="str">&lt;your_access_token&gt;</span>
 <span class="key">Content-Type</span>: application/json
 
@@ -282,7 +282,7 @@ SF_TOKEN = <span class="str">"your_salesforce_access_token"</span>
       <p>In TrustVerify AI, register a webhook targeting your ServiceNow MID Server or a direct inbound REST endpoint. Subscribe to <code>alert.created</code> and <code>vendor.blocked</code> events.</p>
       <div class="code-block">
         <div class="code-header"><span class="code-lang">REST API &mdash; Register ServiceNow Webhook</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
-        <pre><span class="kw">POST</span> https://api.trustverify.ai/v1/webhooks
+        <pre><span class="kw">POST</span> https://www.scriptmasterlabs.com/trustverify-integrations.html
 <span class="key">Authorization</span>: Bearer <span class="str">&lt;your_access_token&gt;</span>
 
 {
@@ -365,7 +365,7 @@ SF_TOKEN = <span class="str">"your_salesforce_access_token"</span>
       <h3>Register Your Slack Webhook in TrustVerify AI</h3>
       <div class="code-block">
         <div class="code-header"><span class="code-lang">REST API &mdash; Register Slack Webhook</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
-        <pre><span class="kw">POST</span> https://api.trustverify.ai/v1/webhooks
+        <pre><span class="kw">POST</span> https://www.scriptmasterlabs.com/trustverify-integrations.html
 <span class="key">Authorization</span>: Bearer <span class="str">&lt;your_access_token&gt;</span>
 
 {
@@ -433,7 +433,7 @@ app.<span class="fn">post</span>(<span class="str">'/slack/trustscore'</span>, <
 
   <span class="cm">// Search vendors by name</span>
   <span class="kw">const</span> r = <span class="kw">await</span> <span class="fn">fetch</span>(
-    `https://api.trustverify.ai/v1/vendors?search=${<span class="fn">encodeURIComponent</span>(vendorName)}&limit=1`,
+    `https://www.scriptmasterlabs.com/trustverify.html?search=${<span class="fn">encodeURIComponent</span>(vendorName)}&limit=1`,
     { headers: { Authorization: `Bearer ${TV_TOKEN}` } }
   );
   <span class="kw">const</span> { data } = <span class="kw">await</span> r.<span class="fn">json</span>();

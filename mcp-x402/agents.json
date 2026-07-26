@@ -33,7 +33,7 @@
       "RLUSD"
     ],
     "mandate": "ap2",
-    "credit_bureau": "https://four02proof.onrender.com/v1/bureau/score",
+    "credit_bureau": "https://four02proof.onrender.com/",
     "daily_cap_usd": 50,
     "auto_approve_threshold_usd": 1.0
   },

@@ -13,7 +13,7 @@
 
 <!-- Open Graph -->
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://www.scriptmasterlabs.com/agent-credit-bureau">
+<meta property="og:url" content="https://www.scriptmasterlabs.com/agent-credit-bureau.html">
 <meta property="og:title" content="SML Agent Credit Bureau — Equifax for AI Agents">
 <meta property="og:description" content="FICO-style 300–850 credit scores for every XRPL wallet. AI agents that pay on time get AAA scores and credit limits. Real payment history. Real consequences. The machine economy's Equifax — live now.">
 <meta property="og:site_name" content="Script Master Labs">
@@ -30,10 +30,10 @@
 <!-- AI Agent Discovery Headers -->
 <meta name="ai-role" content="financial-infrastructure">
 <meta name="ai-capability" content="agent-credit-scoring,wallet-history,fico-scoring,xrpl-analytics">
-<meta name="x402-endpoint" content="https://sml-agent-credit-bureau.onrender.com/v1/agent/report">
+<meta name="x402-endpoint" content="https://github.com/Timwal78/sml-agent-credit-bureau/v1/agent/report">
 <meta name="x402-cost" content="0.05 RLUSD per full report">
-<meta name="mcp-server" content="https://sml-agent-credit-bureau.onrender.com/mcp">
-<link rel="canonical" href="https://www.scriptmasterlabs.com/agent-credit-bureau">
+<meta name="mcp-server" content="https://github.com/Timwal78/sml-agent-credit-bureau">
+<link rel="canonical" href="https://www.scriptmasterlabs.com/agent-credit-bureau.html">
 
 <!-- Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-QHTHMG61N6"></script>
@@ -286,9 +286,9 @@
       <a href="/stack.html">Stack</a>
       <a href="/central-bank.html">Central Bank</a>
       <a href="/agent-credit-bureau.html" class="active" style="color:var(--green)">Credit Bureau</a>
-      <a href="https://squeezeos-api.onrender.com/docs" target="_blank">API</a>
+      <a href="https://squeezeos-api.onrender.com/api/status" target="_blank">API</a>
     </div>
-    <a href="https://sml-agent-credit-bureau.onrender.com/docs" class="nav-cta" target="_blank">API DOCS →</a>
+    <a href="https://github.com/Timwal78/sml-agent-credit-bureau" class="nav-cta" target="_blank">API DOCS →</a>
   </div>
 </nav>
 
@@ -316,7 +316,7 @@
           Low-score agents get cut off. <em>Real consequences in the machine economy.</em>
         </p>
         <div class="hero-actions">
-          <a href="https://sml-agent-credit-bureau.onrender.com/v1/agent/score?wallet=rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh" class="btn btn-primary" target="_blank">▶ Try Free Score Lookup</a>
+          <a href="https://github.com/Timwal78/sml-agent-credit-bureau" class="btn btn-primary" target="_blank">▶ Try Free Score Lookup</a>
           <a href="https://github.com/Timwal78/sml-agent-credit-bureau" class="btn btn-outline" target="_blank">View Source</a>
         </div>
       </div>
@@ -339,7 +339,7 @@
         <div class="gauge-score-sub">CREDIT SCORE · 300–850 RANGE</div>
         <div class="gauge-grade" id="cb-grade">Fetching live score…</div>
         <div class="gauge-meta" id="cb-meta">Calling the real API — this is not a mock.</div>
-        <div class="cb-note">Full 5-factor breakdown (payment history, streak, timeliness, wallet age, volume) is in the paid report — <a href="https://sml-agent-credit-bureau.onrender.com/v1/agent/report?wallet=rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh" target="_blank">GET /v1/agent/report</a> (0.05 RLUSD via x402).</div>
+        <div class="cb-note">Full 5-factor breakdown (payment history, streak, timeliness, wallet age, volume) is in the paid report — <a href="https://github.com/Timwal78/sml-agent-credit-bureau" target="_blank">GET /v1/agent/report</a> (0.05 RLUSD via x402).</div>
       </div>
     </div>
   </div>
@@ -348,7 +348,7 @@
 <script>
 (function(){
   var WALLET = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh';
-  var BUREAU = 'https://sml-agent-credit-bureau.onrender.com';
+  var BUREAU = 'https://github.com/Timwal78/sml-agent-credit-bureau';
   var scoreEl = document.getElementById('cb-score');
   var gradeEl = document.getElementById('cb-grade');
   var metaEl = document.getElementById('cb-meta');
@@ -666,7 +666,7 @@
         <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('pre').innerText)">copy</button>
       </div>
       <pre><span class="cm"># Free — no authentication required</span>
-curl <span class="str">"https://sml-agent-credit-bureau.onrender.com/v1/agent/score?wallet=rYOUR_WALLET_ADDRESS"</span>
+curl <span class="str">"https://github.com/Timwal78/sml-agent-credit-bureau"</span>
 
 <span class="cm"># Response</span>
 {
@@ -689,7 +689,7 @@ curl <span class="str">"https://sml-agent-credit-bureau.onrender.com/v1/agent/sc
       <pre><span class="kw">import</span> httpx
 
 <span class="cm"># Step 1: Get invoice from 402Proof</span>
-invoice_r = httpx.<span class="fn">post</span>(<span class="str">"https://four02proof.onrender.com/v1/invoice"</span>, json={
+invoice_r = httpx.<span class="fn">post</span>(<span class="str">"https://four02proof.onrender.com/"</span>, json={
     <span class="str">"endpoint_id"</span>: <span class="str">"agent-credit-report-v1"</span>,
     <span class="str">"agent_wallet"</span>: <span class="str">"rYOUR_AGENT_WALLET"</span>
 })
@@ -699,7 +699,7 @@ invoice = invoice_r.json()
 tx_hash = pay_rlusd(invoice[<span class="str">"amount"</span>], invoice[<span class="str">"destination"</span>])
 
 <span class="cm"># Step 3: Get payment token</span>
-token_r = httpx.<span class="fn">post</span>(<span class="str">"https://four02proof.onrender.com/v1/verify"</span>, json={
+token_r = httpx.<span class="fn">post</span>(<span class="str">"https://four02proof.onrender.com/"</span>, json={
     <span class="str">"invoice_id"</span>: invoice[<span class="str">"invoice_id"</span>],
     <span class="str">"tx_hash"</span>: tx_hash
 })
@@ -707,7 +707,7 @@ payment_token = token_r.json()[<span class="str">"token"</span>]
 
 <span class="cm"># Step 4: Get full credit report</span>
 report = httpx.<span class="fn">get</span>(
-    <span class="str">"https://sml-agent-credit-bureau.onrender.com/v1/agent/report"</span>,
+    <span class="str">"https://github.com/Timwal78/sml-agent-credit-bureau/v1/agent/report"</span>,
     params={<span class="str">"wallet"</span>: <span class="str">"rTARGET_WALLET"</span>},
     headers={<span class="str">"X-Payment-Token"</span>: payment_token}
 ).json()
@@ -736,7 +736,7 @@ report = httpx.<span class="fn">get</span>(
 }
 
 <span class="cm">// MCP server endpoint</span>
-<span class="cm">// https://sml-agent-credit-bureau.onrender.com/mcp</span></pre>
+<span class="cm">// https://github.com/Timwal78/sml-agent-credit-bureau</span></pre>
     </div>
   </div>
 </section>
@@ -761,7 +761,7 @@ report = httpx.<span class="fn">get</span>(
           <pre>{
   <span class="key">"mcpServers"</span>: {
     <span class="key">"sml-credit-bureau"</span>: {
-      <span class="key">"url"</span>: <span class="str">"https://sml-agent-credit-bureau.onrender.com/mcp"</span>,
+      <span class="key">"url"</span>: <span class="str">"https://github.com/Timwal78/sml-agent-credit-bureau"</span>,
       <span class="key">"transport"</span>: <span class="str">"streamable-http"</span>
     }
   }
@@ -889,7 +889,7 @@ report = httpx.<span class="fn">get</span>(
           <li>1-hour cache</li>
           <li>No auth required</li>
         </ul>
-        <a href="https://sml-agent-credit-bureau.onrender.com/v1/agent/score?wallet=rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh" class="pc-cta outline" target="_blank">Try It Free →</a>
+        <a href="https://github.com/Timwal78/sml-agent-credit-bureau" class="pc-cta outline" target="_blank">Try It Free →</a>
       </div>
 
       <div class="price-card featured">
@@ -923,7 +923,7 @@ report = httpx.<span class="fn">get</span>(
           <li>Cache-first (reduces XRPL calls)</li>
           <li>Billed upfront via x402</li>
         </ul>
-        <a href="https://sml-agent-credit-bureau.onrender.com/docs" class="pc-cta outline" target="_blank">View API Docs →</a>
+        <a href="https://github.com/Timwal78/sml-agent-credit-bureau" class="pc-cta outline" target="_blank">View API Docs →</a>
       </div>
 
     </div>
@@ -987,8 +987,8 @@ report = httpx.<span class="fn">get</span>(
     <h2>Your agent has no credit history.</h2>
     <p>Every call it makes to any SML service is the start of a file. Pay on time. Pay fast. Stay consistent. Watch the score climb. AAA agents operate at the top of the machine economy — with credit, priority, and access that D-tier agents never see.</p>
     <div style="display:flex;flex-wrap:wrap;gap:16px;justify-content:center">
-      <a href="https://sml-agent-credit-bureau.onrender.com/v1/agent/score?wallet=rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh" class="btn btn-primary" target="_blank">▶ Run a Free Score Lookup</a>
-      <a href="https://sml-agent-credit-bureau.onrender.com/docs" class="btn btn-outline" target="_blank">API Documentation</a>
+      <a href="https://github.com/Timwal78/sml-agent-credit-bureau" class="btn btn-primary" target="_blank">▶ Run a Free Score Lookup</a>
+      <a href="https://github.com/Timwal78/sml-agent-credit-bureau" class="btn btn-outline" target="_blank">API Documentation</a>
       <a href="/central-bank.html" class="btn btn-outline">See the Full Stack</a>
     </div>
   </div>
@@ -1003,7 +1003,7 @@ report = httpx.<span class="fn">get</span>(
       <a href="/central-bank.html">Central Bank</a>
       <a href="/privacy.html">Privacy</a>
       <a href="/terms.html">Terms</a>
-      <a href="https://squeezeos-api.onrender.com/docs" target="_blank">SqueezeOS API</a>
+      <a href="https://squeezeos-api.onrender.com/api/status" target="_blank">SqueezeOS API</a>
       <a href="https://four02proof.onrender.com" target="_blank">402Proof</a>
     </div>
   </div>
@@ -1031,7 +1031,7 @@ report = httpx.<span class="fn">get</span>(
         { "@type": "Offer", "name": "Full Credit Report", "price": "0.05", "priceCurrency": "RLUSD" },
         { "@type": "Offer", "name": "Batch Scoring", "price": "0.01", "priceCurrency": "RLUSD" }
       ],
-      "url": "https://sml-agent-credit-bureau.onrender.com",
+      "url": "https://github.com/Timwal78/sml-agent-credit-bureau",
       "author": { "@type": "Organization", "name": "Script Master Labs LLC" }
     },
     {

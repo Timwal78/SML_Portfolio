@@ -36,7 +36,7 @@ These features implement the "Agent Native" tier of the x402 protocol: idempoten
 
 ### B. Pre-flight Quote — `GET /x402/quote`
 
-**Endpoint:** `GET https://squeezeos-api.onrender.com/x402/quote?tool=<toolId>`
+**Endpoint:** `GET https://squeezeos-api.onrender.com/api/cascade/info<toolId>`
 
 **Headers required:** `X-Agent-DID: did:xrpl:<wallet>` (resolved by `agentDidMiddleware`).
 
@@ -72,7 +72,7 @@ These features implement the "Agent Native" tier of the x402 protocol: idempoten
 
 ### C. Workflow Orchestrator — `POST /x402/orchestrate`
 
-**Endpoint:** `POST https://squeezeos-api.onrender.com/x402/orchestrate`
+**Endpoint:** `POST https://squeezeos-api.onrender.com/api/cascade/info`
 
 **Headers:** `X-Agent-DID`, `X-Payment-Proof` (omit first call to receive 402), `X-Idempotency-Key` (recommended).
 
@@ -123,7 +123,7 @@ These features implement the "Agent Native" tier of the x402 protocol: idempoten
 
 ### D. 402Proof Receipts — Ghost Layer egress receipts
 
-**Emitted on every request** proxied through `https://ghost-layer.onrender.com`.
+**Emitted on every request** proxied through `https://github.com/Timwal78/ghost-layer`.
 
 **Header:** `X-402-Proof-Receipt: <base64-encoded-JSON>`
 
@@ -195,7 +195,7 @@ Pure CSS 3-D rotating cube — no Three.js, no external CDN. Uses `transform-sty
 
 **Live ticker:** `@keyframes scroll-ticker` showing system status and chain activity.
 
-**WebSocket:** connects to `wss://ghost-layer.onrender.com/ws/cube` for live updates. Graceful fallback (ticker continues on disconnect).
+**WebSocket:** connects to `wss://echo.websocket.events` for live updates. Graceful fallback (ticker continues on disconnect).
 
 **Demo mode:** `simulateTx()` — simulates a random API call, deducts mock balance, adds activity log entry, increments ARGUS score.
 
@@ -269,7 +269,7 @@ Response headers: `Access-Control-Allow-Origin: *`, `Cache-Control: public, max-
 
 ### J. Public Agent Leaderboard — `GET /leaderboard`
 
-**Endpoint:** `GET https://squeezeos-api.onrender.com/leaderboard`
+**Endpoint:** `GET https://squeezeos-api.onrender.com/api/status`
 
 **Auth:** None. Public read.
 
@@ -399,7 +399,7 @@ Proxy agents and middleware can parse these headers without reading the JSON bod
 
 ### L. Call History Endpoint — `GET /api/credit-score/history/:wallet`
 
-**Endpoint:** `GET https://squeezeos-api.onrender.com/api/credit-score/history/:wallet`
+**Endpoint:** `GET https://squeezeos-api.onrender.com/api/status`
 **Auth:** None — free and public.
 
 Returns the last 20 paid call timestamps (newest first) from the Redis ring buffer `bureau:history:<agentDid>`, plus current score, tier, total paid calls, and calls to next tier. Agents can audit their own score progression without buying the full credit report (0.10 RLUSD).
@@ -426,7 +426,7 @@ Returns the last 20 paid call timestamps (newest first) from the Redis ring buff
 
 When the SqueezeOS MCP server anchors an agent's ARGUS score on the Xahau ledger, it immediately POSTs to Ghost Layer's `POST /internal/broadcast` endpoint. Ghost Layer fans the event to all connected Ghost Cube WebSocket clients (`/ws/cube`). Net effect: every browser or agent watching the Ghost Cube sees the score update in real time at the moment of on-chain confirmation — no polling.
 
-**Ghost Layer endpoint:** `POST https://ghost-layer.onrender.com/internal/broadcast`
+**Ghost Layer endpoint:** `POST https://github.com/Timwal78/ghost-layer`
 - Protected by `GHOST_INTERNAL_SECRET` env var if set (`X-Internal-Secret` header)
 - Payload: `{ event: "xahau_anchor", agentDid, score, tier, txHash, anchoredAt, network }`
 - Returns: `{ ok: true, clients_notified: <count> }`
@@ -469,7 +469,7 @@ Two-endpoint system that lets agents cryptographically prove their ARGUS credit 
   "score": 755,
   "tier": "PULSAR",
   "expiresAt": "2026-06-30T13:00:00.000Z",
-  "verifyUrl": "https://squeezeos-api.onrender.com/api/credit-score/verify-jwt?token=<encoded>",
+  "verifyUrl": "https://squeezeos-api.onrender.com/api/status<encoded>",
   "usage": "Include this token in requests to third-party services as X-ARGUS-Token header to prove your credit standing."
 }
 ```

@@ -241,7 +241,7 @@ curl -sS -H "X-PAYMENT-TX: 0xYOUR_TX_HASH" \
   <span style="margin-left:auto;color:var(--muted);font-size:.85rem;">
     <a href="https://squeezeos-api.onrender.com/.well-known/agent.json">AgentCard</a> ·
     <a href="/.well-known/openapi.json">OpenAPI</a> ·
-    <a href="https://squeezeos-api.onrender.com/leaderboard">Leaderboard</a>
+    <a href="https://squeezeos-api.onrender.com/api/status">Leaderboard</a>
   </span>
 </header>
 
@@ -270,7 +270,7 @@ curl -sS -H "X-PAYMENT-TX: 0xYOUR_TX_HASH" \
     <div class="step-body">
       <p>Your DID is derived from your XRPL wallet address. Format: <code>did:poi:xrpl:&lt;wallet&gt;</code>. Check your current score (starts at 300, max 850).</p>
       <pre><code><span class="comment"># Check ARGUS credit score — free, no auth</span>
-curl https://squeezeos-api.onrender.com/api/credit-score \
+curl https://squeezeos-api.onrender.com/api/status \
   -H <span class="str">"X-Agent-DID: did:poi:xrpl:rYOUR_WALLET_ADDRESS"</span></code></pre>
       <pre><code><span class="comment"># Response</span>
 {
@@ -292,7 +292,7 @@ curl https://squeezeos-api.onrender.com/api/credit-score \
     </div>
     <div class="step-body">
       <p>Call <code>/x402/quote</code> to get the exact cost before paying. ARGUS tier discounts are applied automatically. Quote is valid for 60 seconds.</p>
-      <pre><code>curl "https://squeezeos-api.onrender.com/x402/quote?tool=council_full" \
+      <pre><code>curl "https://squeezeos-api.onrender.com/api/cascade/infocouncil_full" \
   -H <span class="str">"X-Agent-DID: did:poi:xrpl:rYOUR_WALLET_ADDRESS"</span></code></pre>
       <pre><code>{
   <span class="key">"quoteId"</span>: <span class="str">"q_abc123"</span>,
@@ -492,7 +492,7 @@ result = client.beta.messages.create(
         </tbody>
       </table>
       <div class="infobox" style="margin-top:1.25rem;">
-        <strong>On-chain score anchor</strong> — When your score updates, it is anchored on the Xahau ledger as a verifiable txHash. Check: <a href="https://squeezeos-api.onrender.com/api/credit-score/anchor/:wallet">GET /api/credit-score/anchor/:wallet</a>
+        <strong>On-chain score anchor</strong> — When your score updates, it is anchored on the Xahau ledger as a verifiable txHash. Check: <a href="https://squeezeos-api.onrender.com/api/status">GET /api/credit-score/anchor/:wallet</a>
       </div>
     </div>
   </div>
