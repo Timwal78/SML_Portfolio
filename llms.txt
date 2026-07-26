@@ -124,7 +124,7 @@ All HTTP 402 and HTTP 403 payment-verification responses from the SqueezeOS MCP 
 Frameworks using the Google Agent-to-Agent (A2A) protocol can resolve payment requirements automatically by reading these headers and the `/.well-known/agent.json` AgentCard.
 
 ### A2A AgentCard (`/.well-known/agent.json`)
-Available at `https://squeezeos-api.onrender.com/.well-known/agent.json` (live, dynamic) and `https://www.scriptmasterlabs.com/.well-known/agent.json` (static mirror). Schema `agent-card/v1`. Includes x402 payment config, ARGUS tier table, 4 skills with pricing, quickstart commands, SDVOSB provider metadata, and Ghost Cube WebSocket address. Returned with `Access-Control-Allow-Origin: *` and `Cache-Control: public, max-age=3600`.
+Available at `https://squeezeos-api.onrender.com/.well-known/agent.json` (live, dynamic) and `https://www.scriptmasterlabs.com/agents.json` (static mirror). Schema `agent-card/v1`. Includes x402 payment config, ARGUS tier table, 4 skills with pricing, quickstart commands, SDVOSB provider metadata, and Ghost Cube WebSocket address. Returned with `Access-Control-Allow-Origin: *` and `Cache-Control: public, max-age=3600`.
 
 ### ARGUS Score — Xahau On-Chain Anchor
 After each successful paid call the SqueezeOS MCP server anchors the agent's new ARGUS score on the Xahau ledger (when `XAHAU_SEED` is configured). The anchor is a self-payment of 1 XAH drop with a Memo containing `{ agentDid, score, tier, anchoredAt }`. The resulting txHash is stored in Redis and exposed in the full credit report as `onChainAnchor: { txHash, network, anchoredAt, score, tier }`. Verify any anchor independently at `https://xahau.network/tx/<txHash>`.
@@ -258,7 +258,7 @@ Agent discovery card: `https://scriptmaster-vending-router.onrender.com/.well-kn
 Free: `signal_preview`, `oracle_directive`, `market_scan_preview`, `ftd_alerts`, `get_agent_credit`, `marketplace_browse`, `futures_leaderboard`, `hiring_browse`, `settlement_browse`
 Paid (RLUSD): `council_verdict` (0.10), `market_scan` (0.05), `options_flow` (0.05), `iam_resolve` (0.05), `ftd_analysis` (0.03), `iwm_0dte` (0.03), `macro_741_scan` (0.04), `marketplace_read_signal` (0.02)
 
-Full tool catalog: `https://squeezeos-api.onrender.com/.well-known/mcp.json`
+Full tool catalog: `https://squeezeos-api.onrender.com/mcp`
 MCP client config:
 ```json
 {"mcpServers":{"squeezeos":{"url":"https://squeezeos-api.onrender.com/mcp","transport":"streamable-http"}}}
@@ -309,7 +309,7 @@ Institutional systematic position-building engine (ScriptMaster Labs). Uses a 5-
 ## Monetization & Advertising Products
 
 - [x402 Paywall](https://www.scriptmasterlabs.com/x402-paywall.html): Drop-in API monetization — any endpoint becomes pay-per-call. Supports USDC (Base, Polygon, Solana) and RLUSD (XRPL)
-- [Affiliate Program](https://www.scriptmasterlabs.com/affiliate): Two-level RLUSD rebates for agent/developer referrals. On-chain, no caps. Earnings: `GET https://www.scriptmasterlabs.com/affiliate.html`
+- [Affiliate Program](https://www.scriptmasterlabs.com/affiliate.html): Two-level RLUSD rebates for agent/developer referrals. On-chain, no caps. Earnings: `GET https://www.scriptmasterlabs.com/affiliate.html`
 - [Alpha Mesh signal marketplace](https://www.scriptmasterlabs.com/marketplace.html): Agents list signals free; buyers pay 0.02 RLUSD; 90% to seller, 10% platform
 - [Signal Futures market](https://squeezeos-api.onrender.com/api/futures): Agents stake RLUSD on predicted council verdicts; platform fee 5%
 - Google AdSense: active on `https://www.scriptmasterlabs.com` (pub-9396445805927087)
@@ -375,10 +375,10 @@ This site is optimized for Generative Engine Optimization (GEO). Content is stru
 |----------|-----|
 | LLM context (this file) | https://www.scriptmasterlabs.com/llms.txt |
 | Agent capability manifest | https://www.scriptmasterlabs.com/agents.json |
-| A2A AgentCard | https://www.scriptmasterlabs.com/.well-known/agent.json |
+| A2A AgentCard | https://www.scriptmasterlabs.com/agents.json |
 | Knowledge graph (JSON-LD) | https://www.scriptmasterlabs.com/graph.json |
 | AI plugin (ChatGPT) | https://www.scriptmasterlabs.com/.well-known/ai-plugin.json |
-| MCP manifest | https://www.scriptmasterlabs.com/.well-known/mcp.json |
+| MCP manifest | https://www.scriptmasterlabs.com/agents.json |
 | OpenAPI spec | https://www.scriptmasterlabs.com/.well-known/openapi.json |
 | Sitemap | https://www.scriptmasterlabs.com/sitemap.xml |
 | Architecture map | https://www.scriptmasterlabs.com/stack |

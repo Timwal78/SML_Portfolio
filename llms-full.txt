@@ -205,7 +205,7 @@ Pure CSS 3-D rotating cube — no Three.js, no external CDN. Uses `transform-sty
 
 ### G. Tool Catalog Manifest — `/.well-known/mcp.json`
 
-`ToolCatalog` class (`mcp-x402-xrpl/src/tool-catalog.ts`) produces the full manifest served at `https://squeezeos-api.onrender.com/.well-known/mcp.json`.
+`ToolCatalog` class (`mcp-x402-xrpl/src/tool-catalog.ts`) produces the full manifest served at `https://squeezeos-api.onrender.com/mcp`.
 
 Free tools: `beastmode_preview`, `council_demo`, `credit_score_read`.
 Paid tools: `council_full` (0.10), `beastmode_full` (0.10), `credit_report_full` (0.10), `orchestrate` (0.20 standard).
