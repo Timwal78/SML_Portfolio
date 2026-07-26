@@ -89,11 +89,11 @@
     .wall-empty { color:var(--m); font-size:.82rem }
   </style>
 </head>
-<body class="mode-live">
+<body class="mode-preview">
   <div class="wrap">
     <div class="eyebrow">WATCH THE AGENT PAY · NO HUMANS</div>
     <h1>A real <em>402</em>. A real <em>$0.001</em>.<br/>Settled on Base — live.</h1>
-    <p class="lede">No API key. No checkout form. Free discover, one paid call, real settlement. Pick a mode below: <strong style="color:#fff">Live</strong> uses your own Base wallet and a real endpoint. <strong style="color:var(--amber)">Preview</strong> walks the same script with no wallet and no funds moved — for people deciding whether to wire this up.</p>
+    <p class="lede">No API key. No checkout form. Free discover, one paid call, real settlement. This page auto-plays a <strong style="color:var(--amber)">PREVIEW</strong> walkthrough on load — no wallet, no funds moved — so it plays itself for anyone landing on a shared link. Flip to <strong style="color:#fff">LIVE</strong> whenever you want to actually pay with your own Base wallet.</p>
 
     <div class="pills">
       <span class="pill on">$0.001 USDC</span>
@@ -103,8 +103,8 @@
     </div>
 
     <div class="modeswitch" role="tablist" aria-label="Mode">
-      <button type="button" id="btnModeLive" class="active live">LIVE — real wallet, real tx</button>
-      <button type="button" id="btnModePreview" class="preview">PREVIEW — no wallet needed</button>
+      <button type="button" id="btnModeLive" class="live">LIVE — real wallet, real tx</button>
+      <button type="button" id="btnModePreview" class="active preview">PREVIEW — auto-playing</button>
     </div>
 
     <!-- MAIN DEMO CARD -->
@@ -266,7 +266,7 @@ https://www.scriptmasterlabs.com/watch-the-agent-pay.html</pre>
     ];
     const TRANSFER_TOPIC = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
 
-    let liveMode = true; // false = preview (illustrative walkthrough, no wallet, no funds)
+    let liveMode = false; // false = preview (illustrative walkthrough, no wallet, no funds)
 
     const statusEl = document.getElementById('status');
     const receiptEl = document.getElementById('receipt');
@@ -393,10 +393,11 @@ https://www.scriptmasterlabs.com/watch-the-agent-pay.html</pre>
       }
     };
 
-    document.getElementById('btnPay').onclick = async () => {
+    async function runFlow() {
       const btn = document.getElementById('btnPay');
       btn.disabled = true;
       resetTerm();
+      receiptEl.classList.remove('show');
       try {
         logLine('agent', 'discovering tool → <strong>GET ' + new URL(URL).pathname + '</strong> (free, real endpoint)');
         setStatus('1/4 Reading 402 challenge…', 'wait');
@@ -477,7 +478,30 @@ https://www.scriptmasterlabs.com/watch-the-agent-pay.html</pre>
         setStatus(String(e.message || e), 'bad');
       }
       btn.disabled = false;
-    };
+    }
+
+    // ---- Auto-play + loop: only ever runs the harmless PREVIEW walkthrough.
+    // LIVE can't auto-play by design — wallets require a real user click to
+    // even open (eth_requestAccounts), so nothing here can trigger a real
+    // payment without someone deliberately pressing the button.
+    let userTookControl = false;
+    function takeControl() { userTookControl = true; }
+    document.getElementById('btnPay').addEventListener('click', () => {
+      takeControl();
+      runFlow();
+    });
+    document.getElementById('btnChallenge').addEventListener('click', takeControl, { capture: true });
+    document.getElementById('btnModeLive').addEventListener('click', takeControl, { capture: true });
+    document.getElementById('btnModePreview').addEventListener('click', takeControl, { capture: true });
+
+    async function autoPlayLoop() {
+      await wait(900);
+      while (!userTookControl && !liveMode && document.visibilityState !== 'hidden') {
+        await runFlow();
+        if (userTookControl || liveMode) break;
+        await wait(4500);
+      }
+    }
 
     document.getElementById('btnCopyReceipt').onclick = () => {
       const tx = document.getElementById('r-tx').textContent;
@@ -555,6 +579,9 @@ https://www.scriptmasterlabs.com/watch-the-agent-pay.html`;
         wall.innerHTML = '<div class="wall-empty">Could not reach Base public RPC from your browser just now (' + (e.message || e) + '). <a href="https://basescan.org/address/0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700" target="_blank" rel="noopener">View live history directly on Basescan</a> instead.</div>';
       }
     };
+
+    applyMode();
+    autoPlayLoop();
   })();
   </script>
 </body>
