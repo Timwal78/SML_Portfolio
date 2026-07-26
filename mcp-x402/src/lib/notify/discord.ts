@@ -51,6 +51,51 @@ const TOOL_LABELS: Record<HeatmapToolName, string> = {
  * Fire-and-forget by design — the caller does not await this, so a slow or
  * failed webhook can never add latency or an error path to the tool response.
  */
+export interface PaymentAlertInput {
+  toolName: string;
+  amountPaid: string;
+  currency: string;
+  payer: string;
+  rail: string;
+}
+
+/**
+ * Post a simple embed to DISCORD_WEBHOOK_URL for any completed tool payment —
+ * a real on-chain/facilitator-settled payment, or an operator-bypass call.
+ * Fire-and-forget, same guarantee as notifyHeatmapSale: never awaited, never
+ * throws into the caller.
+ */
+export function notifyPayment(input: PaymentAlertInput): void {
+  if (!DISCORD_WEBHOOK_URL) return;
+
+  const isOperator = input.rail === 'operator';
+  const embed = {
+    title: isOperator ? `🔧 Operator call — ${input.toolName}` : `💵 ${input.toolName} — ${input.amountPaid} ${input.currency}`,
+    color: isOperator ? 0x6b7280 : 0x22c55e,
+    fields: [
+      { name: 'Payer', value: `${input.payer.slice(0, 20)}${input.payer.length > 20 ? '…' : ''}`, inline: true },
+      { name: 'Rail', value: input.rail, inline: true },
+    ],
+    footer: { text: 'mcp-x402' },
+    timestamp: new Date().toISOString(),
+  };
+
+  fetch(DISCORD_WEBHOOK_URL, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ embeds: [embed] }),
+    signal: AbortSignal.timeout(5_000),
+  })
+    .then((res) => {
+      if (!res.ok) {
+        AuditLogger.getInstance().warn('discord_payment_alert_failed', { status: res.status, tool: input.toolName });
+      }
+    })
+    .catch((err) => {
+      AuditLogger.getInstance().warn('discord_payment_alert_error', { error: String(err), tool: input.toolName });
+    });
+}
+
 export function notifyHeatmapSale(input: HeatmapAlertInput): void {
   if (!DISCORD_WEBHOOK_URL) return;
 

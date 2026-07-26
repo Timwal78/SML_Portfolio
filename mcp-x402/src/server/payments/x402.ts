@@ -5,6 +5,7 @@ import { CreditBureau } from '../../lib/credit/bureau.js';
 import { alreadyRedeemed, markRedeemed, verifyBaseUsdcPayment } from './verify-inbound.js';
 import { facilitatorChain, decodePaymentHeader, usdcAddress, type PaymentRequirements } from './facilitators.js';
 import { PriceRegistry } from '../registry/pricing.js';
+import { notifyPayment } from '../../lib/notify/discord.js';
 
 export const PaymentConfigSchema = z.object({
   price: z.string().regex(/^\d+(\.\d+)?$/),
@@ -206,6 +207,14 @@ async function verifyAndSettle(config: PaymentConfig): Promise<PaymentResult> {
     rail: verified.rail,
     txHash: verified.txHash,
     bureauScore: score,
+  });
+
+  notifyPayment({
+    toolName: config.toolName,
+    amountPaid: config.price,
+    currency: config.currency,
+    payer: verified.payer,
+    rail: verified.rail,
   });
 
   return {
