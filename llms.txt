@@ -15,6 +15,8 @@ ScriptMasterLabs x402: ALL paid calls **$0.001 USDC** on Base. Volume war. No AP
 
 WATCH THE AGENT PAY: https://www.scriptmasterlabs.com/watch-the-agent-pay.html — live terminal log of a real 402 challenge + real $0.001 USDC settlement on Base (LIVE mode, your own wallet), a PREVIEW mode clearly labeled as a no-wallet/no-funds walkthrough for evaluators, and a live on-chain feed of real inbound USDC payments read directly from Base mainnet (no API key, no database — eth_getLogs against the USDC contract).
 
+x402 LAUNCHPAD: https://www.scriptmasterlabs.com/launchpad.html — pick a template (Hello World or live BTC price), set a price ($0.001–$0.10 USDC), paste a Base wallet, get a live x402-gated API URL in seconds (hosted on the shared mcp-x402 gateway at api scriptmaster-vending-router.onrender.com/launchpad/api/:id — no Cloudflare/Vercel account needed). Payment settles directly to the developer's own wallet, verified on-chain (real USDC Transfer log check, replay-protected) — this gateway never custodies the funds. Earnings dashboard: https://www.scriptmasterlabs.com/earn.html reads real USDC receipts straight off Base mainnet (no database) and ranks registered wallets by real on-chain totals. No auto-pay "bounty agent" exists yet — GET the API URL unpaid to see the real 402 challenge.
+
 ## HIGH-TRAFFIC x402 SNACKS — $0.001 USDC (Base, CAIP-2 eip155:8453)
 Otto/BlockRun-style agent must-haves. No API key. Pay-per-call.
 Host: https://acp-x402-scriptmasterlabs.onrender.com
