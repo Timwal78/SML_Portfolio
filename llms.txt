@@ -309,7 +309,7 @@ Institutional systematic position-building engine (ScriptMaster Labs). Uses a 5-
 ## Monetization & Advertising Products
 
 - [x402 Paywall](https://www.scriptmasterlabs.com/x402-paywall.html): Drop-in API monetization — any endpoint becomes pay-per-call. Supports USDC (Base, Polygon, Solana) and RLUSD (XRPL)
-- [Affiliate Program](https://www.scriptmasterlabs.com/affiliate): Two-level RLUSD rebates for agent/developer referrals. On-chain, no caps. Earnings: `GET https://www.scriptmasterlabs.com/affiliate.html/earnings/{wallet}`
+- [Affiliate Program](https://www.scriptmasterlabs.com/affiliate): Two-level RLUSD rebates for agent/developer referrals. On-chain, no caps. Earnings: `GET https://www.scriptmasterlabs.com/affiliate.html`
 - [Alpha Mesh signal marketplace](https://www.scriptmasterlabs.com/marketplace.html): Agents list signals free; buyers pay 0.02 RLUSD; 90% to seller, 10% platform
 - [Signal Futures market](https://squeezeos-api.onrender.com/api/futures): Agents stake RLUSD on predicted council verdicts; platform fee 5%
 - Google AdSense: active on `https://www.scriptmasterlabs.com` (pub-9396445805927087)
@@ -394,7 +394,7 @@ This site is optimized for Generative Engine Optimization (GEO). Content is stru
 | Marketplace earnings | https://www.scriptmasterlabs.com/marketplace.html |
 | Agent memory store | https://squeezeos-api.onrender.com/api/status |
 | Referral register | https://www.scriptmasterlabs.com/affiliate.html |
-| Referral earnings | https://www.scriptmasterlabs.com/affiliate.html/earnings/:wallet |
+| Referral earnings | https://www.scriptmasterlabs.com/affiliate.html |
 | Agentic Vending Router (x402 marketplace) | https://scriptmaster-vending-router.onrender.com/.well-known/agents.json |
 | Agentic Marketplace — browse listings | https://scriptmaster-vending-router.onrender.com/marketplace/listings |
 

@@ -317,7 +317,7 @@
     },
     {
       "name": "Shadow Desk",
-      "url": "https://mcp-x402.onrender.com/.well-known/mcp.json",
+      "url": "https://mcp-x402.onrender.com/mcp",
       "description": "Institutional trading alpha \u2014 real-time Pine Script signals, gamma walls, and block flow imbalances. x402 pay-per-call: 0.005 USDC on Base, zero signups, zero API keys. MCP-discoverable.",
       "x402": true
     },
