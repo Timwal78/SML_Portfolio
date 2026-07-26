@@ -380,6 +380,14 @@ https://www.scriptmasterlabs.com/watch-the-agent-pay.html</pre>
       receiptEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
+    function friendlyFetchError(e) {
+      const msg = String((e && e.message) || e);
+      if (/failed to fetch|networkerror|load failed/i.test(msg)) {
+        return 'Could not reach the live endpoint from this browser (network, CORS, or a cold start on the free-tier backend). Try again in ~10s, or use the terminal one-liner below, which hits the same endpoint from a plain server-side curl.';
+      }
+      return msg;
+    }
+
     document.getElementById('btnChallenge').onclick = async () => {
       setStatus('Fetching the real 402 challenge…', 'wait');
       try {
@@ -389,7 +397,7 @@ https://www.scriptmasterlabs.com/watch-the-agent-pay.html</pre>
         box.textContent = 'HTTP ' + status + ' (real, live response from ' + ENDPOINT_URL + ')\n\n' + JSON.stringify(body, null, 2).slice(0, 2500);
         setStatus(status === 402 ? '402 Payment Required — rail is live.' : 'HTTP ' + status, status === 402 ? 'ok' : 'wait');
       } catch (e) {
-        setStatus(String(e.message || e), 'bad');
+        setStatus(friendlyFetchError(e), 'bad');
       }
     };
 
@@ -400,16 +408,31 @@ https://www.scriptmasterlabs.com/watch-the-agent-pay.html</pre>
       receiptEl.classList.remove('show');
       try {
         logLine('agent', 'discovering tool → <strong>GET ' + new URL(ENDPOINT_URL).pathname + '</strong> (free, real endpoint)');
-        setStatus('1/4 Reading 402 challenge…', 'wait');
-        const { status, body } = await getChallenge();
-        logLine('srv', 'HTTP ' + status + (status === 402 ? ' Payment Required' : ''), status === 402 ? 'ok' : 'warn');
-        if (status !== 402 || !body.accepts || !body.accepts[0]) {
-          throw new Error('Expected HTTP 402 with accepts[]. Got ' + status);
+
+        let payTo, amount, asset;
+        if (!liveMode) {
+          // PREVIEW never touches the network — it illustrates the real, documented
+          // x402 402 contract (real payTo/amount constants used elsewhere on this
+          // site) without depending on a live round-trip, so the auto-play loop
+          // can never get stuck on a cold-start/CORS failure from the backend.
+          setStatus('1/4 Reading 402 challenge (preview, no network call)…', 'wait');
+          await wait(500);
+          payTo = RECEIVERS[0];
+          amount = '1000';
+          asset = USDC;
+          logLine('srv', 'HTTP 402 Payment Required — illustrated locally, matches the real documented response shape (no network call in PREVIEW)', 'warn');
+        } else {
+          setStatus('1/4 Reading 402 challenge…', 'wait');
+          const { status, body } = await getChallenge();
+          logLine('srv', 'HTTP ' + status + (status === 402 ? ' Payment Required' : ''), status === 402 ? 'ok' : 'warn');
+          if (status !== 402 || !body.accepts || !body.accepts[0]) {
+            throw new Error('Expected HTTP 402 with accepts[]. Got ' + status);
+          }
+          const acc = body.accepts[0];
+          payTo = acc.payTo;
+          amount = acc.amount || acc.maxAmountRequired || '1000';
+          asset = (acc.asset || USDC);
         }
-        const acc = body.accepts[0];
-        const payTo = acc.payTo;
-        const amount = acc.amount || acc.maxAmountRequired || '1000';
-        const asset = (acc.asset || USDC);
         logLine('agent', 'parsed accepts[] → payTo=' + payTo.slice(0,10) + '… amount=' + amount + ' (0.001 USDC) network=base');
         logLine('agent', 'decision: within $0.05 budget cap, exactly one paid call → PAY');
 
@@ -474,8 +497,9 @@ https://www.scriptmasterlabs.com/watch-the-agent-pay.html</pre>
         showReceipt({ payTo, tx: txHash, http: 200, preview: paid.body, isPreview: false });
         setStatus('✓ Paid $0.001 · data unlocked. Screenshot the receipt.', 'ok');
       } catch (e) {
-        logLine('agent', String(e.message || e), 'bad');
-        setStatus(String(e.message || e), 'bad');
+        const msg = friendlyFetchError(e);
+        logLine('agent', msg, 'bad');
+        setStatus(msg, 'bad');
       }
       btn.disabled = false;
     }
