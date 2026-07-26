@@ -1,3 +1,16 @@
+# SEO + DUAL NARRATIVE HUBS (2026-07-26)
+- Dev door (x402 Launchpad): https://www.scriptmasterlabs.com/x402-launchpad.html
+- Gov/Enterprise door (Sovereign Payrails): https://www.scriptmasterlabs.com/sml-sovereign-payrails.html
+- Pricing oracle: https://www.scriptmasterlabs.com/x402-market-rates.html
+- Consumer send-agent: https://www.scriptmasterlabs.com/agent-send.html
+- How to charge AI agents: https://www.scriptmasterlabs.com/how-to-charge-ai-agents-for-your-api.html
+- Micropayments for APIs: https://www.scriptmasterlabs.com/micropayments-for-apis-complete-guide.html
+- Stripe vs crypto APIs: https://www.scriptmasterlabs.com/stripe-vs-crypto-api-payments.html
+- HTTP 402 guide: https://www.scriptmasterlabs.com/http-402-payment-required-guide.html
+- Agent-native business: https://www.scriptmasterlabs.com/building-agent-native-business.html
+- Primary demo: https://www.scriptmasterlabs.com/watch-the-agent-pay.html
+- Sitemap: https://www.scriptmasterlabs.com/sitemap.xml
+
 ScriptMasterLabs x402: ALL paid calls **$0.001 USDC** on Base. Volume war. No API key.
 
 WATCH THE AGENT PAY: https://www.scriptmasterlabs.com/watch-the-agent-pay.html — live terminal log of a real 402 challenge + real $0.001 USDC settlement on Base (LIVE mode, your own wallet), a PREVIEW mode clearly labeled as a no-wallet/no-funds walkthrough for evaluators, and a live on-chain feed of real inbound USDC payments read directly from Base mainnet (no API key, no database — eth_getLogs against the USDC contract).
