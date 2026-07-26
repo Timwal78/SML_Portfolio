@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Watch the Agent Pay — No Humans | ScriptMasterLabs</title>
+  <link rel="canonical" href="https://www.scriptmasterlabs.com/watch-the-agent-pay.html" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <meta name="description" content="Watch a live 402 challenge, a real x402 payment settle on Base, and real agents paying right now — pulled straight from Base mainnet. Zero install." />
+  <meta property="og:title" content="WATCH THE AGENT PAY — No Humans" />
+  <meta property="og:description" content="A real 402. A real $0.001 USDC settlement on Base. Real agents paying right now, live from the chain. No key. No checkout." />
+  <meta property="og:url" content="https://www.scriptmasterlabs.com/watch-the-agent-pay.html" />
+  <meta property="og:image" content="https://www.scriptmasterlabs.com/og-image.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="WATCH THE AGENT PAY — No Humans" />
+  <meta name="twitter:description" content="Real 402. Real settlement on Base. No checkout. https://www.scriptmasterlabs.com/watch-the-agent-pay.html" />
+  <style>
+    :root {
+      --bg:#050508; --g:#39FF14; --c:#67e8f9; --m:#8b9bb4; --card:#0c0c14;
+      --bd:#1e1e30; --pink:#FF2D95; --warn:#FFD700; --amber:#ffb020;
+    }
+    * { box-sizing:border-box; margin:0; padding:0 }
+    body { background:var(--bg); color:#e8eef7; font-family: ui-sans-serif, system-ui, -apple-system, sans-serif; line-height:1.55 }
+    a { color:var(--c) }
+    .wrap { max-width:900px; margin:0 auto; padding:1.5rem 1.1rem 4rem }
+    .eyebrow { color:var(--g); font-family: ui-monospace, monospace; font-size:.78rem; font-weight:700; letter-spacing:.12em; margin-bottom:.5rem }
+    h1 { font-size:clamp(1.9rem, 5.5vw, 3rem); line-height:1.06; font-weight:850; margin:.2rem 0 1rem }
+    h1 em { font-style:normal; color:var(--g); text-shadow:0 0 28px rgba(57,255,20,.35) }
+    .lede { color:var(--m); font-size:1.08rem; max-width:38rem; margin-bottom:1.25rem }
+    .pills { display:flex; flex-wrap:wrap; gap:.4rem; margin-bottom:1.25rem }
+    .pill { border:1px solid var(--bd); color:var(--m); font-family:ui-monospace,monospace; font-size:.72rem; padding:.25rem .65rem; border-radius:999px }
+    .pill.on { border-color:var(--g); color:var(--g) }
+    .card { background:var(--card); border:1px solid var(--bd); border-radius:16px; padding:1.15rem 1.25rem; margin:1rem 0 }
+    .card h2 { font-size:1.05rem; margin-bottom:.45rem }
+    .card .tag { font-family:ui-monospace,monospace; font-size:.7rem; color:var(--pink); font-weight:700; letter-spacing:.08em; margin-bottom:.35rem }
+    pre, code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace }
+    pre { background:#000; color:#b7f7c8; border:1px solid #1a1a22; border-radius:10px; padding:.9rem 1rem; overflow:auto; font-size:.78rem; margin-top:.55rem }
+    .row { display:flex; flex-wrap:wrap; gap:.55rem; margin:.85rem 0 }
+    button, .btn {
+      appearance:none; border:0; cursor:pointer; font-weight:800; font-size:.92rem;
+      padding:.7rem 1.1rem; border-radius:10px; text-decoration:none; display:inline-flex; align-items:center; gap:.4rem;
+    }
+    .btn-g { background:var(--g); color:#000 }
+    .btn-g:disabled { opacity:.5; cursor:not-allowed }
+    .btn-o { background:transparent; color:var(--c); border:1px solid var(--c) }
+    .btn-ghost { background:transparent; color:var(--m); border:1px solid var(--bd) }
+    .modeswitch { display:inline-flex; border:1px solid var(--bd); border-radius:999px; padding:3px; gap:3px; margin-bottom:.9rem }
+    .modeswitch button { padding:.45rem .9rem; border-radius:999px; font-size:.78rem; background:transparent; color:var(--m); font-weight:700 }
+    .modeswitch button.active.live { background:var(--g); color:#000 }
+    .modeswitch button.active.preview { background:var(--amber); color:#000 }
+
+    /* terminal log */
+    .term { background:#000; border:1px solid #1a1a22; border-radius:10px; padding:.85rem .95rem; margin-top:.7rem; height:260px; overflow-y:auto; font-family:ui-monospace,monospace; font-size:.76rem; }
+    .term .ln { white-space:pre-wrap; word-break:break-all; margin-bottom:.28rem; opacity:0; animation:fadeIn .25s ease forwards }
+    .term .t   { color:#5b6b85 }
+    .term .agent { color:var(--c) }
+    .term .srv   { color:var(--m) }
+    .term .ok    { color:var(--g) }
+    .term .warn  { color:var(--warn) }
+    .term .bad   { color:#ff6b6b }
+    @keyframes fadeIn { to { opacity:1 } }
+
+    .banner-preview { display:none; background:linear-gradient(90deg,#3a2c00,#0c0c14); border:1px dashed var(--amber); color:var(--amber); font-family:ui-monospace,monospace; font-size:.72rem; font-weight:700; letter-spacing:.06em; padding:.5rem .75rem; border-radius:8px; margin-bottom:.7rem }
+    body.mode-preview .banner-preview { display:block }
+    body.mode-preview .term { border-color:#3a2c00 }
+
+    .status { font-family:ui-monospace,monospace; font-size:.8rem; color:var(--m); min-height:1.2em; margin-top:.5rem }
+    .status.ok { color:var(--g) } .status.bad { color:#ff6b6b } .status.wait { color:var(--warn) }
+    #receipt {
+      display:none; margin-top:1rem; border:1px solid var(--g); box-shadow:0 0 40px rgba(57,255,20,.12);
+      background:linear-gradient(180deg,#0a150a,#0c0c14 40%);
+    }
+    #receipt.preview { border-color:var(--amber); box-shadow:0 0 40px rgba(255,176,32,.12); background:linear-gradient(180deg,#1a1300,#0c0c14 40%) }
+    #receipt.show { display:block }
+    #receipt h3 { color:var(--g); font-size:1rem; margin-bottom:.6rem }
+    #receipt.preview h3 { color:var(--amber) }
+    .kv { display:grid; grid-template-columns:120px 1fr; gap:.35rem .75rem; font-family:ui-monospace,monospace; font-size:.8rem }
+    .kv b { color:var(--m); font-weight:500 } .kv span { color:#e8eef7; word-break:break-all }
+    .preview-box { margin-top:.75rem; max-height:180px; overflow:auto; background:#000; border-radius:8px; padding:.7rem; font-size:.72rem; color:#9fe6b0; border:1px solid #1a2a1a }
+    .shot { margin-top:.6rem; color:var(--m); font-size:.78rem }
+    .two { display:grid; gap:1rem } @media(min-width:760px){ .two { grid-template-columns:1fr 1fr } }
+    footer { margin-top:2rem; color:var(--m); font-size:.8rem }
+
+    /* live receipts wall */
+    .wall { display:flex; flex-direction:column; gap:.5rem; margin-top:.7rem }
+    .wall-row { display:grid; grid-template-columns:1fr auto; gap:.4rem; align-items:center; font-family:ui-monospace,monospace; font-size:.76rem; border:1px solid var(--bd); border-radius:8px; padding:.5rem .65rem }
+    .wall-row a { color:var(--c) }
+    .wall-amt { color:var(--g); font-weight:700 }
+    .wall-empty { color:var(--m); font-size:.82rem }
+  </style>
+</head>
+<body class="mode-live">
+  <div class="wrap">
+    <div class="eyebrow">WATCH THE AGENT PAY · NO HUMANS</div>
+    <h1>A real <em>402</em>. A real <em>$0.001</em>.<br/>Settled on Base — live.</h1>
+    <p class="lede">No API key. No checkout form. Free discover, one paid call, real settlement. Pick a mode below: <strong style="color:#fff">Live</strong> uses your own Base wallet and a real endpoint. <strong style="color:var(--amber)">Preview</strong> walks the same script with no wallet and no funds moved — for people deciding whether to wire this up.</p>
+
+    <div class="pills">
+      <span class="pill on">$0.001 USDC</span>
+      <span class="pill on">Base · eip155:8453</span>
+      <span class="pill on">X-PAYMENT-TX</span>
+      <span class="pill">No accounts</span>
+    </div>
+
+    <div class="modeswitch" role="tablist" aria-label="Mode">
+      <button type="button" id="btnModeLive" class="active live">LIVE — real wallet, real tx</button>
+      <button type="button" id="btnModePreview" class="preview">PREVIEW — no wallet needed</button>
+    </div>
+
+    <!-- MAIN DEMO CARD -->
+    <div class="card" id="demo">
+      <div class="banner-preview">⚠ PREVIEW MODE — scripted walkthrough for illustration only. No wallet connects, no funds move, no real transaction is created. Switch to LIVE for the real thing.</div>
+      <div class="tag" id="stepTag">STEP 0 · DO IT FOR REAL (30s)</div>
+      <h2 id="cardTitle">Authorize the agent to pay $0.001 → unlock live gas data</h2>
+      <p style="color:var(--m);font-size:.95rem;margin:.2rem 0 .6rem" id="cardSub">The agent fetches the real 402 challenge, then your Base wallet (MetaMask / Coinbase / Rabby) signs one $0.001 USDC transfer. The agent retries the endpoint with the tx hash and reports back.</p>
+      <div class="row">
+        <button class="btn-g" id="btnPay" type="button">Watch it pay $0.001</button>
+        <button class="btn-ghost" id="btnChallenge" type="button">Fetch the real 402 only</button>
+        <a class="btn-o" href="#wire">Wire your own agent</a>
+      </div>
+      <div class="status" id="status">Ready. Network: Base. Amount: $0.001 USDC.</div>
+
+      <div class="term" id="term" aria-live="polite"></div>
+
+      <div id="receipt">
+        <h3 id="receiptTitle">✓ PAYMENT RECEIPT — IT WORKED</h3>
+        <div class="kv">
+          <b>tool</b><span id="r-tool">gas-tracker</span>
+          <b>amount</b><span id="r-amount">$0.001 USDC</span>
+          <b>network</b><span>Base (8453)</span>
+          <b>payTo</b><span id="r-payto">—</span>
+          <b>tx</b><span id="r-tx">—</span>
+          <b>explorer</b><span id="r-ex">—</span>
+          <b>http</b><span id="r-http">—</span>
+        </div>
+        <div class="preview-box" id="r-preview">data preview…</div>
+        <p class="shot" id="r-shot">Screenshot this card. That's the social object.</p>
+        <div class="row">
+          <button class="btn-o" type="button" id="btnCopyReceipt">Copy receipt text</button>
+          <a class="btn-ghost" id="btnBasescan" href="#" target="_blank" rel="noopener">Open tx on Basescan</a>
+        </div>
+      </div>
+
+      <pre id="challengeBox" style="display:none;margin-top:1rem"></pre>
+    </div>
+
+    <!-- LIVE ON-CHAIN RECEIPTS WALL -->
+    <div class="card" id="wall-card">
+      <div class="tag">DIRECT FROM BASE MAINNET · NOT OUR DATABASE</div>
+      <h2>Real agents, paying right now</h2>
+      <p style="color:var(--m);font-size:.92rem;margin:.2rem 0 .4rem">Read straight off Base mainnet via public RPC (<code style="color:var(--c)">eth_getLogs</code> on the USDC contract) — the same on-chain USDC transfers anyone can verify on Basescan. Nothing here is stored or generated by this page.</p>
+      <div class="row">
+        <button class="btn-o" type="button" id="btnLoadWall">Load recent on-chain payments</button>
+        <a class="btn-ghost" href="https://basescan.org/address/0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700" target="_blank" rel="noopener">Full history on Basescan</a>
+      </div>
+      <div class="wall" id="wall"><div class="wall-empty">Click "Load recent on-chain payments" to query Base mainnet live.</div></div>
+    </div>
+
+    <!-- ONE LINE PAYWALL -->
+    <div class="card" id="paywall">
+      <div class="tag">FOR BACKEND ENGINEERS · SHIPS TODAY</div>
+      <h2>One-line paywall. Your API. Agent money.</h2>
+      <pre>npm i @scriptmasterlabs/x402-paywall   # or use repo path packages/x402-paywall
+
+import { x402 } from '@scriptmasterlabs/x402-paywall'
+
+app.use('/premium', x402({
+  price: '0.001',
+  payTo: '0xYourBaseAddress',
+  freeForHumans: true, // GPTBot pays · Chrome free
+}))</pre>
+      <div class="row">
+        <a class="btn-g" href="https://github.com/Timwal78/SML_Portfolio/tree/main/packages/x402-paywall">Get the package</a>
+        <a class="btn-o" href="/x402-snacks.html">5 live snacks</a>
+        <a class="btn-ghost" href="/hermes-loop.html">Hermes Loop</a>
+      </div>
+    </div>
+
+    <div class="two">
+      <div class="card" id="wire">
+        <div class="tag">STEP 1 · CLAUDE / CURSOR</div>
+        <h2>Copy-paste MCP</h2>
+        <pre>{
+  "mcpServers": {
+    "scriptmasterlabs": {
+      "url": "https://mcp-x402.onrender.com/mcp",
+      "transport": "streamable-http"
+    }
+  }
+}</pre>
+        <p style="color:var(--m);font-size:.85rem;margin-top:.5rem">Or: <code style="color:var(--c)">npx @scriptmasterlabs/mcp-x402</code></p>
+      </div>
+      <div class="card">
+        <div class="tag">STEP 2 · BUDGET-CAP PROMPT</div>
+        <h2>Paste into the agent</h2>
+        <pre>You use ScriptMasterLabs MCP (x402).
+1) Free discover first. Don't pay yet.
+2) Budget cap: $0.05 USDC total.
+3) Exactly ONE paid call at $0.001
+   (gas OR crypto-price OR grants).
+4) Report: tool, amount, tx, summary.
+5) Stop. Never loop paid calls.
+Go.</pre>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="tag">STEP 3 · TERMINAL ONE-LINER (your own agent wallet, no browser)</div>
+      <h2>If you already have an <code style="color:var(--c)">acp</code> wallet</h2>
+      <pre>curl -sS https://raw.githubusercontent.com/Timwal78/SML_Portfolio/main/scripts/pay-snack.sh | bash -s -- gas</pre>
+      <p style="color:var(--m);font-size:.85rem;margin-top:.45rem">This is the actual "no humans" path — your agent's own wallet signs, nobody clicks MetaMask. Clone repo → <code style="color:var(--c)">bash scripts/pay-snack.sh gas</code></p>
+    </div>
+
+    <div class="card">
+      <div class="tag">POST THIS</div>
+      <h2>Meme-ready challenge</h2>
+      <pre id="social">I just watched an agent pay $0.001 for live gas data. No human clicked checkout.
+
+https://www.scriptmasterlabs.com/watch-the-agent-pay.html</pre>
+      <div class="row">
+        <button class="btn-g" type="button" id="btnCopySocial">Copy challenge</button>
+        <a class="btn-o" href="/x402-snacks.html">More snacks</a>
+      </div>
+    </div>
+
+    <footer>
+      ScriptMasterLabs · sovereign x402 on Base · LIVE mode hits a real endpoint and moves real USDC; PREVIEW mode is a labeled walkthrough with no wallet and no funds. Not financial advice.
+      <br/><a href="/hermes-loop.html">hermes-loop</a> · <a href="/agent-start.html">agent-start</a> · <a href="/agentswarm-seo.html">command center</a> · <a href="/x402-snacks.html">snacks</a>
+    </footer>
+  </div>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "TechArticle",
+        "@id": "https://www.scriptmasterlabs.com/watch-the-agent-pay.html",
+        "headline": "Watch the Agent Pay — No Humans",
+        "description": "Live 402 challenge, real $0.001 USDC settlement on Base via x402, and a live on-chain feed of real agent payments read directly from Base mainnet.",
+        "author": { "@type": "Person", "name": "Timothy Walton" },
+        "publisher": { "@type": "Organization", "name": "ScriptMasterLabs", "url": "https://www.scriptmasterlabs.com" },
+        "datePublished": "2026-07-26",
+        "keywords": ["x402", "USDC", "Base", "AI agent", "MCP", "payment", "agentic commerce"]
+      },
+      {
+        "@type": "SoftwareApplication",
+        "@id": "https://acp-x402-scriptmasterlabs.onrender.com",
+        "name": "ScriptMasterLabs x402 gas-tracker",
+        "applicationCategory": "FinanceApplication",
+        "offers": { "@type": "Offer", "price": "0.001", "priceCurrency": "USD" }
+      }
+    ]
+  }
+  </script>
+
+  <script>
+  (function () {
+    const URL = 'https://acp-x402-scriptmasterlabs.onrender.com/x402/gas-tracker';
+    const USDC = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
+    const BASE_HEX = '0x2105'; // 8453
+    const BASE_RPC = 'https://mainnet.base.org';
+    const RECEIVERS = [
+      '0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700',
+      '0x72330994f379A71542e7bd5a4CF99A9d9743F4aA',
+    ];
+    const TRANSFER_TOPIC = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
+
+    let liveMode = true; // false = preview (illustrative walkthrough, no wallet, no funds)
+
+    const statusEl = document.getElementById('status');
+    const receiptEl = document.getElementById('receipt');
+    const termEl = document.getElementById('term');
+
+    function setStatus(msg, kind) {
+      statusEl.textContent = msg;
+      statusEl.className = 'status' + (kind ? ' ' + kind : '');
+    }
+
+    function logLine(actor, msg, kind) {
+      const t = ((performance.now() - (window.__t0 || performance.now())) / 1000).toFixed(1);
+      const el = document.createElement('div');
+      el.className = 'ln';
+      el.innerHTML = '<span class="t">[T+' + t + 's]</span> <span class="' + actor + (kind ? ' ' + kind : '') + '">' + actor + ':</span> ' + msg;
+      termEl.appendChild(el);
+      termEl.scrollTop = termEl.scrollHeight;
+    }
+    function resetTerm() { termEl.innerHTML = ''; window.__t0 = performance.now(); }
+    function wait(ms) { return new Promise((r) => setTimeout(r, ms)); }
+
+    function applyMode() {
+      document.body.classList.toggle('mode-live', liveMode);
+      document.body.classList.toggle('mode-preview', !liveMode);
+      document.getElementById('btnModeLive').classList.toggle('active', liveMode);
+      document.getElementById('btnModePreview').classList.toggle('active', !liveMode);
+      document.getElementById('stepTag').textContent = liveMode ? 'STEP 0 · DO IT FOR REAL (30s)' : 'STEP 0 · PREVIEW THE SCRIPT (no wallet, no funds)';
+      document.getElementById('cardTitle').textContent = liveMode
+        ? 'Authorize the agent to pay $0.001 → unlock live gas data'
+        : 'Walk through the same script — nothing real happens';
+      document.getElementById('cardSub').textContent = liveMode
+        ? 'The agent fetches the real 402 challenge, then your Base wallet (MetaMask / Coinbase / Rabby) signs one $0.001 USDC transfer. The agent retries the endpoint with the tx hash and reports back.'
+        : 'Same steps, same real 402 challenge fetched live — but the payment, tx hash, and receipt below are a clearly-labeled illustration. No wallet prompt, no funds move. Switch to LIVE to actually do it.';
+      document.getElementById('btnPay').textContent = liveMode ? 'Watch it pay $0.001' : 'Preview the payment script';
+      setStatus(liveMode ? 'Ready. Network: Base. Amount: $0.001 USDC.' : 'Preview mode — no wallet required. Nothing here moves real funds.');
+      receiptEl.classList.remove('show');
+      resetTerm();
+    }
+    document.getElementById('btnModeLive').onclick = () => { liveMode = true; applyMode(); };
+    document.getElementById('btnModePreview').onclick = () => { liveMode = false; applyMode(); };
+
+    function erc20TransferData(to, amountAtomic) {
+      const sel = 'a9059cbb';
+      const addr = to.toLowerCase().replace(/^0x/, '').padStart(64, '0');
+      const amt = BigInt(amountAtomic).toString(16).padStart(64, '0');
+      return '0x' + sel + addr + amt;
+    }
+
+    async function ensureBase(eth) {
+      try {
+        await eth.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: BASE_HEX }] });
+      } catch (e) {
+        if (e.code === 4902 || (e.message || '').includes('Unrecognized chain')) {
+          await eth.request({
+            method: 'wallet_addEthereumChain',
+            params: [{
+              chainId: BASE_HEX,
+              chainName: 'Base',
+              nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+              rpcUrls: ['https://mainnet.base.org'],
+              blockExplorerUrls: ['https://basescan.org'],
+            }],
+          });
+        } else { throw e; }
+      }
+    }
+
+    async function getChallenge() {
+      const r = await fetch(URL, { headers: { Accept: 'application/json' } });
+      const text = await r.text();
+      let body; try { body = JSON.parse(text); } catch { body = { raw: text }; }
+      return { status: r.status, body };
+    }
+
+    async function fetchPaid(tx) {
+      const r = await fetch(URL, {
+        headers: { Accept: 'application/json', 'X-PAYMENT-TX': tx },
+      });
+      const text = await r.text();
+      let body; try { body = JSON.parse(text); } catch { body = text; }
+      return { status: r.status, body, text };
+    }
+
+    function showReceipt({ payTo, tx, http, preview, isPreview }) {
+      receiptEl.classList.toggle('preview', !!isPreview);
+      document.getElementById('receiptTitle').textContent = isPreview
+        ? '◐ PREVIEW RECEIPT — illustrative, no funds moved'
+        : '✓ PAYMENT RECEIPT — IT WORKED';
+      document.getElementById('r-payto').textContent = payTo;
+      document.getElementById('r-tx').textContent = tx;
+      if (isPreview) {
+        document.getElementById('r-ex').textContent = 'n/a — preview mode, no real transaction';
+        document.getElementById('btnBasescan').style.pointerEvents = 'none';
+        document.getElementById('btnBasescan').style.opacity = '.4';
+        document.getElementById('btnBasescan').textContent = 'No real tx in preview mode';
+      } else {
+        const ex = 'https://basescan.org/tx/' + tx;
+        document.getElementById('r-ex').innerHTML = '<a href="'+ex+'" target="_blank" rel="noopener">'+ex+'</a>';
+        document.getElementById('btnBasescan').style.pointerEvents = 'auto';
+        document.getElementById('btnBasescan').style.opacity = '1';
+        document.getElementById('btnBasescan').textContent = 'Open tx on Basescan';
+        document.getElementById('btnBasescan').href = ex;
+      }
+      document.getElementById('r-http').textContent = String(http);
+      document.getElementById('r-preview').textContent =
+        typeof preview === 'string' ? preview.slice(0, 1200) : JSON.stringify(preview, null, 2).slice(0, 1200);
+      document.getElementById('r-shot').textContent = isPreview
+        ? 'This is a preview — switch to LIVE mode to generate a real, screenshot-worthy receipt.'
+        : "Screenshot this card. That's the social object.";
+      receiptEl.classList.add('show');
+      receiptEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    document.getElementById('btnChallenge').onclick = async () => {
+      setStatus('Fetching the real 402 challenge…', 'wait');
+      try {
+        const { status, body } = await getChallenge();
+        const box = document.getElementById('challengeBox');
+        box.style.display = 'block';
+        box.textContent = 'HTTP ' + status + ' (real, live response from ' + URL + ')\n\n' + JSON.stringify(body, null, 2).slice(0, 2500);
+        setStatus(status === 402 ? '402 Payment Required — rail is live.' : 'HTTP ' + status, status === 402 ? 'ok' : 'wait');
+      } catch (e) {
+        setStatus(String(e.message || e), 'bad');
+      }
+    };
+
+    document.getElementById('btnPay').onclick = async () => {
+      const btn = document.getElementById('btnPay');
+      btn.disabled = true;
+      resetTerm();
+      try {
+        logLine('agent', 'discovering tool → <strong>GET ' + new URL(URL).pathname + '</strong> (free, real endpoint)');
+        setStatus('1/4 Reading 402 challenge…', 'wait');
+        const { status, body } = await getChallenge();
+        logLine('srv', 'HTTP ' + status + (status === 402 ? ' Payment Required' : ''), status === 402 ? 'ok' : 'warn');
+        if (status !== 402 || !body.accepts || !body.accepts[0]) {
+          throw new Error('Expected HTTP 402 with accepts[]. Got ' + status);
+        }
+        const acc = body.accepts[0];
+        const payTo = acc.payTo;
+        const amount = acc.amount || acc.maxAmountRequired || '1000';
+        const asset = (acc.asset || USDC);
+        logLine('agent', 'parsed accepts[] → payTo=' + payTo.slice(0,10) + '… amount=' + amount + ' (0.001 USDC) network=base');
+        logLine('agent', 'decision: within $0.05 budget cap, exactly one paid call → PAY');
+
+        if (!liveMode) {
+          logLine('agent', 'PREVIEW MODE — stopping before any wallet interaction. No signature requested, no funds move.', 'warn');
+          await wait(500);
+          const fakeTx = '0x' + 'preview'.padEnd(64, '0');
+          logLine('agent', 'illustrative tx reference generated locally (not broadcast, not on any chain)', 'warn');
+          await wait(400);
+          logLine('srv', '(preview) would retry with X-PAYMENT-TX and receive the same JSON shape as the real endpoint');
+          showReceipt({ payTo, tx: fakeTx, http: 200, preview: { note: 'PREVIEW — this is the shape of the real response; no real call was made in preview mode.' }, isPreview: true });
+          setStatus('Preview complete. Switch to LIVE to actually pay and get a real receipt.', 'wait');
+          btn.disabled = false;
+          return;
+        }
+
+        const eth = window.ethereum;
+        if (!eth) {
+          logLine('agent', 'no injected wallet found in this browser', 'bad');
+          setStatus('No wallet found. Install MetaMask / Coinbase Wallet, switch to PREVIEW, or use the terminal one-liner below.', 'bad');
+          btn.disabled = false;
+          return;
+        }
+        setStatus('2/4 Connect wallet on Base…', 'wait');
+        logLine('agent', 'requesting wallet authorization on Base (chainId 8453)…');
+        await eth.request({ method: 'eth_requestAccounts' });
+        await ensureBase(eth);
+        const accounts = await eth.request({ method: 'eth_accounts' });
+        const from = accounts[0];
+        if (!from) throw new Error('No account');
+        logLine('wallet', 'authorized ' + from.slice(0,10) + '…', 'ok');
+
+        setStatus('3/4 Send $0.001 USDC → ' + payTo.slice(0, 10) + '…', 'wait');
+        logLine('agent', 'building ERC-20 transfer(' + payTo.slice(0,10) + '…, ' + amount + ') on USDC');
+        const data = erc20TransferData(payTo, amount);
+        const txHash = await eth.request({
+          method: 'eth_sendTransaction',
+          params: [{ from, to: asset, data, value: '0x0' }],
+        });
+        logLine('wallet', 'broadcast tx ' + txHash.slice(0,14) + '…', 'ok');
+
+        setStatus('4/4 Waiting briefly, then unlocking data… tx ' + txHash.slice(0, 12) + '…', 'wait');
+        logLine('agent', 'waiting for indexing before retrying the endpoint…');
+        await wait(4000);
+
+        let paid = await fetchPaid(txHash);
+        logLine('srv', 'retry with X-PAYMENT-TX → HTTP ' + paid.status, paid.status === 200 ? 'ok' : 'warn');
+        if (paid.status === 402) {
+          setStatus('Receipt lag — retrying once…', 'wait');
+          logLine('agent', 'receipt lag, retrying once more…', 'warn');
+          await wait(5000);
+          paid = await fetchPaid(txHash);
+          logLine('srv', 'retry #2 → HTTP ' + paid.status, paid.status === 200 ? 'ok' : 'warn');
+        }
+        if (paid.status !== 200) {
+          showReceipt({ payTo, tx: txHash, http: paid.status, preview: paid.body, isPreview: false });
+          setStatus('Payment sent but API returned HTTP ' + paid.status + '. Open Basescan; retry header X-PAYMENT-TX in a few seconds.', 'wait');
+          btn.disabled = false;
+          return;
+        }
+        logLine('agent', 'data received. reporting back and stopping (no further paid calls).', 'ok');
+        showReceipt({ payTo, tx: txHash, http: 200, preview: paid.body, isPreview: false });
+        setStatus('✓ Paid $0.001 · data unlocked. Screenshot the receipt.', 'ok');
+      } catch (e) {
+        logLine('agent', String(e.message || e), 'bad');
+        setStatus(String(e.message || e), 'bad');
+      }
+      btn.disabled = false;
+    };
+
+    document.getElementById('btnCopyReceipt').onclick = () => {
+      const tx = document.getElementById('r-tx').textContent;
+      const isPreview = receiptEl.classList.contains('preview');
+      const text = (isPreview ? 'Watch the Agent Pay — PREVIEW (no real funds moved)\n' : 'Watch the Agent Pay receipt\n') +
+        `tool: gas-tracker
+amount: $0.001 USDC on Base
+tx: ${tx}
+${isPreview ? '(preview mode — no real transaction)' : 'https://basescan.org/tx/' + tx}
+https://www.scriptmasterlabs.com/watch-the-agent-pay.html`;
+      navigator.clipboard.writeText(text).then(() => setStatus('Receipt copied.', 'ok'));
+    };
+
+    document.getElementById('btnCopySocial').onclick = () => {
+      const t = document.getElementById('social').textContent;
+      navigator.clipboard.writeText(t).then(() => setStatus('Challenge copied.', 'ok'));
+    };
+
+    // ---- Live on-chain receipts wall: real eth_getLogs against Base mainnet, no API key ----
+    async function rpc(method, params) {
+      const r = await fetch(BASE_RPC, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }),
+      });
+      const j = await r.json();
+      if (j.error) throw new Error(j.error.message || 'RPC error');
+      return j.result;
+    }
+
+    function fmtUsdc(hexValue) {
+      const v = BigInt(hexValue);
+      const whole = v / 1000000n;
+      const frac = (v % 1000000n).toString().padStart(6, '0').slice(0, 3);
+      return whole.toString() + '.' + frac;
+    }
+
+    document.getElementById('btnLoadWall').onclick = async () => {
+      const wall = document.getElementById('wall');
+      wall.innerHTML = '<div class="wall-empty">Querying Base mainnet (eth_getLogs)…</div>';
+      try {
+        const latestHex = await rpc('eth_blockNumber', []);
+        const latest = parseInt(latestHex, 16);
+        const fromBlock = '0x' + Math.max(0, latest - 5000).toString(16); // ~last few hours on Base
+
+        let logs = [];
+        for (const addr of RECEIVERS) {
+          const topicAddr = '0x' + addr.toLowerCase().replace('0x', '').padStart(64, '0');
+          const res = await rpc('eth_getLogs', [{
+            fromBlock, toBlock: 'latest', address: USDC,
+            topics: [TRANSFER_TOPIC, null, topicAddr],
+          }]);
+          logs = logs.concat(res || []);
+        }
+        logs.sort((a, b) => parseInt(b.blockNumber, 16) - parseInt(a.blockNumber, 16));
+        logs = logs.slice(0, 8);
+
+        if (!logs.length) {
+          wall.innerHTML = '<div class="wall-empty">No inbound USDC transfers in the last ~5,000 Base blocks (real, live query — this is a genuinely quiet window, not an error). <a href="https://basescan.org/address/0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700" target="_blank" rel="noopener">Check full history on Basescan</a>.</div>';
+          return;
+        }
+
+        wall.innerHTML = '';
+        for (const log of logs) {
+          const from = '0x' + log.topics[1].slice(26);
+          const amt = fmtUsdc(log.data);
+          const row = document.createElement('div');
+          row.className = 'wall-row';
+          row.innerHTML =
+            '<span>from <a href="https://basescan.org/address/' + from + '" target="_blank" rel="noopener">' + from.slice(0,8) + '…' + from.slice(-4) + '</a> · block ' + parseInt(log.blockNumber,16) + '</span>' +
+            '<span><span class="wall-amt">$' + amt + '</span> · <a href="https://basescan.org/tx/' + log.transactionHash + '" target="_blank" rel="noopener">tx ↗</a></span>';
+          wall.appendChild(row);
+        }
+      } catch (e) {
+        wall.innerHTML = '<div class="wall-empty">Could not reach Base public RPC from your browser just now (' + (e.message || e) + '). <a href="https://basescan.org/address/0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700" target="_blank" rel="noopener">View live history directly on Basescan</a> instead.</div>';
+      }
+    };
+  })();
+  </script>
+</body>
+</html>
