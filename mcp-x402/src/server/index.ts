@@ -152,6 +152,10 @@ async function runSSE(): Promise<void> {
   // UA tokens instead of a loose "sounds AI-ish" regex.
   const _statsStartMs = Date.now();
   const _agentCounts = { today: 0, allTime: 0 };
+  try {
+    const persistedAllTime = X402Stats.getInstance().getAiAgentsAllTime();
+    if (persistedAllTime > 0) _agentCounts.allTime = persistedAllTime;
+  } catch { /* first boot */ }
   let _agentCountDay = new Date().toDateString();
   const AI_AGENT_UA_TOKENS = [
     'gptbot', 'oai-searchbot', 'chatgpt-user',                 // OpenAI
@@ -187,6 +191,7 @@ async function runSSE(): Promise<void> {
     const matchedToken = AI_AGENT_UA_TOKENS.find((token) => lowerUa.includes(token));
     if (matchedToken) {
       _agentCounts.today++; _agentCounts.allTime++;
+      try { X402Stats.getInstance().recordAgentVisit(); } catch { /* stats optional */ }
       _recentAgentHits.unshift({ ts: new Date().toISOString(), path: req.path, matchedToken, userAgent: ua });
       if (_recentAgentHits.length > 20) _recentAgentHits.length = 20;
     }
@@ -248,12 +253,18 @@ async function runSSE(): Promise<void> {
 
   // Agent traffic stats — polled by dashboard every 60s
   app.get('/api/stats', (_req, res) => {
+    let persistedAllTime = _agentCounts.allTime;
+    try {
+      const snap = X402Stats.getInstance().getAiAgentsAllTime();
+      if (snap > persistedAllTime) persistedAllTime = snap;
+    } catch { /* ignore */ }
     res.set('Access-Control-Allow-Origin', '*').json({
       aiAgentsToday: _agentCounts.today,
-      aiAgentsAllTime: _agentCounts.allTime,
+      aiAgentsAllTime: persistedAllTime,
       uptime_seconds: Math.floor((Date.now() - _statsStartMs) / 1000),
       endpoint_count: 44,
       version: VERSION,
+      persistent: true,
     });
   });
 
