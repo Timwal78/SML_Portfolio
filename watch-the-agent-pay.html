@@ -256,7 +256,7 @@ https://www.scriptmasterlabs.com/watch-the-agent-pay.html</pre>
 
   <script>
   (function () {
-    const URL = 'https://acp-x402-scriptmasterlabs.onrender.com/x402/gas-tracker';
+    const ENDPOINT_URL = 'https://acp-x402-scriptmasterlabs.onrender.com/x402/gas-tracker';
     const USDC = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
     const BASE_HEX = '0x2105'; // 8453
     const BASE_RPC = 'https://mainnet.base.org';
@@ -335,14 +335,14 @@ https://www.scriptmasterlabs.com/watch-the-agent-pay.html</pre>
     }
 
     async function getChallenge() {
-      const r = await fetch(URL, { headers: { Accept: 'application/json' } });
+      const r = await fetch(ENDPOINT_URL, { headers: { Accept: 'application/json' } });
       const text = await r.text();
       let body; try { body = JSON.parse(text); } catch { body = { raw: text }; }
       return { status: r.status, body };
     }
 
     async function fetchPaid(tx) {
-      const r = await fetch(URL, {
+      const r = await fetch(ENDPOINT_URL, {
         headers: { Accept: 'application/json', 'X-PAYMENT-TX': tx },
       });
       const text = await r.text();
@@ -386,7 +386,7 @@ https://www.scriptmasterlabs.com/watch-the-agent-pay.html</pre>
         const { status, body } = await getChallenge();
         const box = document.getElementById('challengeBox');
         box.style.display = 'block';
-        box.textContent = 'HTTP ' + status + ' (real, live response from ' + URL + ')\n\n' + JSON.stringify(body, null, 2).slice(0, 2500);
+        box.textContent = 'HTTP ' + status + ' (real, live response from ' + ENDPOINT_URL + ')\n\n' + JSON.stringify(body, null, 2).slice(0, 2500);
         setStatus(status === 402 ? '402 Payment Required — rail is live.' : 'HTTP ' + status, status === 402 ? 'ok' : 'wait');
       } catch (e) {
         setStatus(String(e.message || e), 'bad');
@@ -399,7 +399,7 @@ https://www.scriptmasterlabs.com/watch-the-agent-pay.html</pre>
       resetTerm();
       receiptEl.classList.remove('show');
       try {
-        logLine('agent', 'discovering tool → <strong>GET ' + new URL(URL).pathname + '</strong> (free, real endpoint)');
+        logLine('agent', 'discovering tool → <strong>GET ' + new URL(ENDPOINT_URL).pathname + '</strong> (free, real endpoint)');
         setStatus('1/4 Reading 402 challenge…', 'wait');
         const { status, body } = await getChallenge();
         logLine('srv', 'HTTP ' + status + (status === 402 ? ' Payment Required' : ''), status === 402 ? 'ok' : 'warn');
