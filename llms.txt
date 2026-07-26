@@ -1,5 +1,6 @@
 ScriptMasterLabs x402: ALL paid calls **$0.001 USDC** on Base. Volume war. No API key.
 
+WATCH THE AGENT PAY: https://www.scriptmasterlabs.com/watch-the-agent-pay.html — live terminal log of a real 402 challenge + real $0.001 USDC settlement on Base (LIVE mode, your own wallet), a PREVIEW mode clearly labeled as a no-wallet/no-funds walkthrough for evaluators, and a live on-chain feed of real inbound USDC payments read directly from Base mainnet (no API key, no database — eth_getLogs against the USDC contract).
 
 ## HIGH-TRAFFIC x402 SNACKS — $0.001 USDC (Base, CAIP-2 eip155:8453)
 Otto/BlockRun-style agent must-haves. No API key. Pay-per-call.
