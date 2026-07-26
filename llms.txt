@@ -429,3 +429,8 @@ Disclaimer: FMR is HUD baseline; PHA payment standard controls HAP. Not legal/ta
 - One-line paywall package: https://github.com/Timwal78/SML_Portfolio/tree/main/packages/x402-paywall
 - CRAWLTOLL: https://www.scriptmasterlabs.com/crawltoll.html
 - Floor: $0.001 USDC on Base (eip155:8453), header X-PAYMENT-TX
+
+## Primary demo (share this)
+- Watch the agent pay: https://www.scriptmasterlabs.com/watch-the-agent-pay.html
+- PREVIEW auto-plays (no wallet); LIVE uses real Base USDC $0.001
+- Hermes Loop: https://www.scriptmasterlabs.com/hermes-loop.html
