@@ -1,3 +1,8 @@
+> ## ⚡ WATCH THE AGENT PAY
+> **Live demo (0.001 USDC on Base):** https://www.scriptmasterlabs.com/watch-the-agent-pay.html  
+> Snacks: https://www.scriptmasterlabs.com/x402-snacks.html · MCP: https://mcp-x402.onrender.com/mcp  
+> One-line paywall: [`packages/x402-paywall`](./packages/x402-paywall)
+
 # SML Portfolio
 
 ScriptMasterLabs' monorepo — product code, MCP servers, and the
