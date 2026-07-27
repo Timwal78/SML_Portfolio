@@ -175,7 +175,7 @@
     </p>
     <div class="live-bar">
       <div class="chip live"><span class="dot"></span><span id="listing-count-chip">Loading live listings…</span></div>
-      <div class="chip gold"><span class="dot" style="background:var(--gold)"></span>0.05 USDC/RLUSD to list</div>
+      <div class="chip gold"><span class="dot" style="background:var(--gold)"></span>0.05 USDC list fee → SML rails</div>
       <div class="chip blue"><span class="dot" style="background:var(--blue)"></span>Base + XRPL settlement</div>
     </div>
   </section>
@@ -203,7 +203,7 @@
     <div class="section-head">
       <div>
         <h2>List Your API</h2>
-        <p class="sh-sub">One-time 0.05 USDC (Base) or 0.05 RLUSD (XRPL) listing fee. No subscription, no recurring cost.</p>
+        <p class="sh-sub">One-time 0.05 USDC listing fee on Base (SML rails / platform tax). Your API price still settles to your payTo. No subscription.</p>
       </div>
     </div>
     <div class="list-panel">
@@ -291,10 +291,14 @@
         </div>
         <div class="field" style="margin-top:16px">
           <label for="f-txhash">Transaction Hash (after you've paid)</label>
-          <input id="f-txhash" placeholder="Paste your on-chain transaction hash here">
-          <div class="hint">We verify this on-chain — real payment required, no honor system.</div>
+          <input id="f-txhash" placeholder="0x… Base USDC transfer hash">
+          <div class="hint">Listing fee 0.05 USDC goes to SML rails wallet (tax/platform). Your API still receives agent payments at <em>your</em> payTo. Verified on-chain.</div>
         </div>
-        <button type="button" class="btn primary" id="submit-listing-btn" style="margin-top:14px">Submit Listing →</button>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:14px;align-items:center">
+          <button type="button" class="btn primary" id="btn-wallet-pay" disabled>Pay 0.05 USDC with wallet →</button>
+          <button type="button" class="btn primary" id="submit-listing-btn">I already paid — Submit Listing →</button>
+        </div>
+        <p id="wallet-pay-status" class="hint" style="margin-top:10px"></p>
       </div>
 
       <div id="result-msg" class="result-msg"></div>
@@ -493,18 +497,36 @@
             (res.body.required ? " (missing: " + res.body.required.join(", ") + ")" : ""));
           return;
         }
-        var base = res.body.accepts.find(function (a) { return a.network === "eip155:8453"; });
-        var xrpl = res.body.accepts.find(function (a) { return a.network === "xrpl-mainnet"; });
+        // API returns network "base" (and sometimes eip155:8453) — accept both
+        var base = res.body.accepts.find(function (a) {
+          var n = String(a.network || "").toLowerCase();
+          return n === "base" || n === "eip155:8453" || n.indexOf("8453") !== -1;
+        });
+        var xrpl = res.body.accepts.find(function (a) {
+          var n = String(a.network || "").toLowerCase();
+          return n === "xrpl-mainnet" || n.indexOf("xrpl") !== -1;
+        });
+        window.__listAccepts = { base: base || null, xrpl: xrpl || null, raw: res.body };
         if (base) {
-          document.getElementById("pay-base-amount").textContent = (Number(base.amount) / 1e6).toFixed(2);
+          var amtAtomic = base.amount || base.maxAmountRequired || "50000";
+          var amtHuman = (Number(amtAtomic) >= 1000) ? (Number(amtAtomic) / 1e6).toFixed(2) : String(amtAtomic);
+          document.getElementById("pay-base-amount").textContent = amtHuman;
           document.getElementById("pay-base-addr").textContent = base.payTo;
+          var ba = document.getElementById("btn-wallet-pay");
+          if (ba) { ba.disabled = false; ba.dataset.payTo = base.payTo; ba.dataset.amount = String(amtAtomic); ba.dataset.asset = base.asset || "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"; }
         }
         if (xrpl) {
           document.getElementById("pay-xrpl-amount").textContent = xrpl.amount;
           document.getElementById("pay-xrpl-addr").textContent = xrpl.payTo;
         }
+        if (!base && !xrpl) {
+          showResult(false, "402 returned but no Base/XRPL accept entry found. Raw networks: " +
+            (res.body.accepts || []).map(function (a) { return a.network; }).join(", "));
+          return;
+        }
         document.getElementById("pay-panel").classList.add("visible");
         document.getElementById("pay-panel").scrollIntoView({ behavior: "smooth", block: "nearest" });
+        showResult(true, "Pay 0.05 USDC on Base to the address below (listing fee → SML rails). Then click Pay with wallet or paste tx hash.");
       })
       .catch(function (err) {
         btn.disabled = false;
@@ -513,42 +535,142 @@
       });
   });
 
+
+  // ── Base wallet pay for 0.05 listing fee → auto-resubmit with X-Payment-Proof ──
+  var USDC_BASE = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
+  var BASE_HEX = "0x2105";
+
+  function erc20TransferData(to, amountAtomic) {
+    var sel = "a9059cbb";
+    var addr = String(to).toLowerCase().replace(/^0x/, "").padStart(64, "0");
+    var amt = BigInt(String(amountAtomic)).toString(16).padStart(64, "0");
+    return "0x" + sel + addr + amt;
+  }
+
+  async function ensureBase(eth) {
+    try {
+      await eth.request({ method: "wallet_switchEthereumChain", params: [{ chainId: BASE_HEX }] });
+    } catch (e) {
+      if (e && (e.code === 4902 || String(e.message || "").indexOf("Unrecognized chain") !== -1)) {
+        await eth.request({
+          method: "wallet_addEthereumChain",
+          params: [{
+            chainId: BASE_HEX,
+            chainName: "Base",
+            nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
+            rpcUrls: ["https://mainnet.base.org"],
+            blockExplorerUrls: ["https://basescan.org"],
+          }],
+        });
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  function setWalletStatus(msg, ok) {
+    var el = document.getElementById("wallet-pay-status");
+    if (!el) return;
+    el.textContent = msg;
+    el.style.color = ok === true ? "#39FF14" : ok === false ? "#ff6b6b" : "#FFD700";
+  }
+
+  async function submitListingWithTx(txHash) {
+    if (!lastFormBody) {
+      showResult(false, "Fill the form and get payment instructions first.");
+      return;
+    }
+    var proof = btoa(JSON.stringify({ txHash: txHash }));
+    var btn = document.getElementById("submit-listing-btn");
+    if (btn) { btn.disabled = true; btn.textContent = "Verifying payment…"; }
+    setWalletStatus("Verifying on-chain + creating listing…", null);
+    try {
+      var r = await fetch(API_BASE + "/marketplace/list", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Payment-Proof": proof },
+        body: JSON.stringify(lastFormBody),
+      });
+      var body = await r.json();
+      if (btn) { btn.disabled = false; btn.textContent = "I already paid — Submit Listing →"; }
+      if (r.status !== 200 || !body.listing) {
+        var reason = body.reason || body.error || "unknown";
+        showResult(false, "Payment verification failed: " + reason + ". Wait for Base confirmation, then retry Submit.");
+        setWalletStatus("Verify failed: " + reason, false);
+        return;
+      }
+      showResult(true, "Listed! \"" + body.listing.name + "\" is live. Fee settled to SML rails; your payTo earns future agent calls.");
+      setWalletStatus("✓ Listed. Tx " + txHash.slice(0, 12) + "…", true);
+      document.getElementById("listing-form").reset();
+      document.getElementById("pay-panel").classList.remove("visible");
+      var txEl = document.getElementById("f-txhash");
+      if (txEl) txEl.value = "";
+      loadListings();
+    } catch (err) {
+      if (btn) { btn.disabled = false; btn.textContent = "I already paid — Submit Listing →"; }
+      showResult(false, "Network error: " + err.message);
+      setWalletStatus(String(err.message || err), false);
+    }
+  }
+
+  var walletBtn = document.getElementById("btn-wallet-pay");
+  if (walletBtn) {
+    walletBtn.addEventListener("click", async function () {
+      var eth = window.ethereum;
+      if (!eth) {
+        setWalletStatus("No wallet found. Install MetaMask / Coinbase / Rabby on Base.", false);
+        return;
+      }
+      var payTo = walletBtn.dataset.payTo;
+      var amount = walletBtn.dataset.amount || "50000";
+      var asset = walletBtn.dataset.asset || USDC_BASE;
+      if (!payTo) {
+        setWalletStatus("Get payment instructions first.", false);
+        return;
+      }
+      // normalize atomic: if human "0.05" slipped in, convert
+      if (String(amount).indexOf(".") !== -1) {
+        amount = String(Math.round(parseFloat(amount) * 1e6));
+      }
+      walletBtn.disabled = true;
+      try {
+        setWalletStatus("1/3 Connect wallet on Base…", null);
+        await eth.request({ method: "eth_requestAccounts" });
+        await ensureBase(eth);
+        var accounts = await eth.request({ method: "eth_accounts" });
+        var from = accounts[0];
+        if (!from) throw new Error("No account");
+
+        setWalletStatus("2/3 Send 0.05 USDC listing fee → " + payTo.slice(0, 10) + "… (SML rails/tax)", null);
+        var data = erc20TransferData(payTo, amount);
+        var txHash = await eth.request({
+          method: "eth_sendTransaction",
+          params: [{ from: from, to: asset, data: data, value: "0x0" }],
+        });
+        document.getElementById("f-txhash").value = txHash;
+        setWalletStatus("3/3 Tx sent " + txHash.slice(0, 12) + "… waiting for Base, then auto-submit", null);
+        await new Promise(function (r) { setTimeout(r, 4500); });
+        await submitListingWithTx(txHash);
+      } catch (e) {
+        setWalletStatus(String(e.message || e), false);
+        showResult(false, String(e.message || e));
+      }
+      walletBtn.disabled = false;
+    });
+  }
+
+  // Replace manual submit handler body to reuse submitListingWithTx
+
   document.getElementById("submit-listing-btn").addEventListener("click", function () {
     var txHash = document.getElementById("f-txhash").value.trim();
     if (!txHash) {
-      showResult(false, "Enter your transaction hash first.");
+      showResult(false, "Pay with wallet first, or paste your Base tx hash.");
       return;
     }
-    var btn = document.getElementById("submit-listing-btn");
-    btn.disabled = true;
-    btn.textContent = "Verifying payment…";
-
-    var proof = btoa(JSON.stringify({ txHash: txHash }));
-
-    fetch(API_BASE + "/marketplace/list", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "X-Payment-Proof": proof },
-      body: JSON.stringify(lastFormBody),
-    })
-      .then(function (r) { return r.json().then(function (body) { return { status: r.status, body: body }; }); })
-      .then(function (res) {
-        btn.disabled = false;
-        btn.textContent = "Submit Listing →";
-        if (res.status !== 200 || !res.body.listing) {
-          showResult(false, "Payment verification failed: " + (res.body.reason || res.body.error || "unknown error") +
-            ". Double check the transaction hash and that the amount/destination match exactly.");
-          return;
-        }
-        showResult(true, "Listed! \"" + res.body.listing.name + "\" is now live in the marketplace below.");
-        document.getElementById("listing-form").reset();
-        document.getElementById("pay-panel").classList.remove("visible");
-        loadListings();
-      })
-      .catch(function (err) {
-        btn.disabled = false;
-        btn.textContent = "Submit Listing →";
-        showResult(false, "Network error: " + err.message);
-      });
+    if (txHash.indexOf("0x") !== 0) {
+      // allow raw 64 hex
+      if (/^[0-9a-fA-F]{64}$/.test(txHash)) txHash = "0x" + txHash;
+    }
+    submitListingWithTx(txHash);
   });
 
   loadListings();

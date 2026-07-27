@@ -235,10 +235,11 @@
         </div>
         <div class="field"><label>Short description</label><textarea id="f-desc" rows="2" placeholder="What the agent gets back as JSON"></textarea></div>
         <div class="row">
-          <button class="btn btn-g" type="button" id="btn-list">Get 402 listing challenge</button>
-          <a class="btn btn-ghost" href="/marketplace.html#list-your-api">Full form + XRPL option</a>
+          <button class="btn btn-g" type="button" id="btn-list">1 · Get 402 challenge</button>
+          <button class="btn btn-o" type="button" id="btn-pay-list" disabled>2 · Pay 0.05 USDC + list</button>
+          <a class="btn btn-ghost" href="/marketplace.html#list-your-api">Full marketplace form</a>
         </div>
-        <div class="status" id="list-status">Ready. Listing fee is separate from your API price.</div>
+        <div class="status" id="list-status">Listing fee 0.05 USDC → SML rails wallet (platform/tax). Your payTo still receives agent purchases. No SML seller payouts.</div>
         <pre id="list-out" style="display:none;margin-top:.7rem;background:#000;border:1px solid #1a1a22;border-radius:10px;padding:.8rem;overflow:auto;font-size:.75rem;color:#b7f7c8;font-family:ui-monospace,monospace"></pre>
       </div>
     </section>
@@ -347,10 +348,38 @@
       }
     }
 
-    document.getElementById('btn-list').onclick = async () => {
-      const status = document.getElementById('list-status');
-      const out = document.getElementById('list-out');
-      const body = {
+
+    const USDC = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
+    const BASE_HEX = '0x2105';
+    let lastListBody = null;
+    let lastBaseAccept = null;
+
+    function erc20TransferData(to, amountAtomic) {
+      const sel = 'a9059cbb';
+      const addr = to.toLowerCase().replace(/^0x/, '').padStart(64, '0');
+      const amt = BigInt(amountAtomic).toString(16).padStart(64, '0');
+      return '0x' + sel + addr + amt;
+    }
+    async function ensureBase(eth) {
+      try {
+        await eth.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: BASE_HEX }] });
+      } catch (e) {
+        if (e.code === 4902 || String(e.message || '').includes('Unrecognized chain')) {
+          await eth.request({
+            method: 'wallet_addEthereumChain',
+            params: [{
+              chainId: BASE_HEX, chainName: 'Base',
+              nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+              rpcUrls: ['https://mainnet.base.org'],
+              blockExplorerUrls: ['https://basescan.org'],
+            }],
+          });
+        } else throw e;
+      }
+    }
+
+    function collectListBody() {
+      return {
         name: document.getElementById('f-name').value.trim(),
         description: document.getElementById('f-desc').value.trim(),
         base_url: document.getElementById('f-base').value.trim(),
@@ -360,30 +389,45 @@
         network: document.getElementById('f-net').value.trim() || 'base',
         pay_to: document.getElementById('f-pay').value.trim(),
         method: 'GET',
-        tags: ['vendos','community']
+        tags: ['vendos', 'community'],
       };
+    }
+
+    document.getElementById('btn-list').onclick = async () => {
+      const status = document.getElementById('list-status');
+      const out = document.getElementById('list-out');
+      const body = collectListBody();
       if (!body.name || !body.base_url || !body.endpoint || !body.pay_to) {
-        status.textContent = 'Name, base URL, endpoint, and payTo are required.';
+        status.textContent = 'Name, base URL, endpoint, and your payTo are required.';
         status.className = 'status bad';
         return;
       }
-      status.textContent = 'Requesting listing challenge (0.05 USDC)…';
+      lastListBody = body;
+      status.textContent = 'Requesting listing challenge (0.05 USDC → SML rails)…';
       status.className = 'status wait';
       try {
         const r = await fetch(API + '/marketplace/list', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-          body: JSON.stringify(body)
+          body: JSON.stringify(body),
         });
         const text = await r.text();
         let data; try { data = JSON.parse(text); } catch { data = { raw: text }; }
         out.style.display = 'block';
         out.textContent = 'HTTP ' + r.status + '\n\n' + JSON.stringify(data, null, 2).slice(0, 4000);
-        if (r.status === 402) {
-          status.textContent = '402 listing fee — pay 0.05 USDC on Base to payTo in accepts[], then resubmit with payment proof via full marketplace form.';
+        if (r.status === 402 && data.accepts) {
+          lastBaseAccept = (data.accepts || []).find(a => {
+            const n = String(a.network || '').toLowerCase();
+            return n === 'base' || n === 'eip155:8453' || n.includes('8453');
+          }) || data.accepts[0];
+          const payBtn = document.getElementById('btn-pay-list');
+          payBtn.disabled = !lastBaseAccept;
+          const human = lastBaseAccept && Number(lastBaseAccept.amount) >= 1000
+            ? (Number(lastBaseAccept.amount) / 1e6).toFixed(2) : (lastBaseAccept && lastBaseAccept.amount);
+          status.textContent = '402 ready. Fee ' + human + ' USDC → ' + (lastBaseAccept.payTo || '').slice(0, 12) + '… (SML). Then click Pay + list.';
           status.className = 'status ok';
         } else if (r.status === 200) {
-          status.textContent = 'Listed.';
+          status.textContent = 'Listed without fee? Unexpected — refresh inventory.';
           status.className = 'status ok';
           loadListings();
         } else {
@@ -395,6 +439,84 @@
         status.className = 'status bad';
       }
     };
+
+    document.getElementById('btn-pay-list').onclick = async () => {
+      const status = document.getElementById('list-status');
+      const out = document.getElementById('list-out');
+      const btn = document.getElementById('btn-pay-list');
+      if (!lastListBody || !lastBaseAccept) {
+        status.textContent = 'Get 402 challenge first.';
+        status.className = 'status bad';
+        return;
+      }
+      const eth = window.ethereum;
+      if (!eth) {
+        status.textContent = 'No wallet. Install MetaMask/Coinbase/Rabby on Base.';
+        status.className = 'status bad';
+        return;
+      }
+      btn.disabled = true;
+      try {
+        const payTo = lastBaseAccept.payTo;
+        let amount = lastBaseAccept.amount || lastBaseAccept.maxAmountRequired || '50000';
+        if (String(amount).includes('.')) amount = String(Math.round(parseFloat(amount) * 1e6));
+        const asset = lastBaseAccept.asset || USDC;
+
+        status.textContent = '1/4 Connect wallet…';
+        status.className = 'status wait';
+        await eth.request({ method: 'eth_requestAccounts' });
+        await ensureBase(eth);
+        const accounts = await eth.request({ method: 'eth_accounts' });
+        const from = accounts[0];
+        if (!from) throw new Error('No account');
+
+        status.textContent = '2/4 Pay 0.05 USDC listing fee to SML rails…';
+        const data = erc20TransferData(payTo, amount);
+        const txHash = await eth.request({
+          method: 'eth_sendTransaction',
+          params: [{ from, to: asset, data, value: '0x0' }],
+        });
+
+        status.textContent = '3/4 Waiting for Base… ' + txHash.slice(0, 12) + '…';
+        await new Promise(r => setTimeout(r, 4500));
+
+        status.textContent = '4/4 Submitting listing with proof…';
+        const proof = btoa(JSON.stringify({ txHash }));
+        let r = await fetch(API + '/marketplace/list', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json', 'X-Payment-Proof': proof },
+          body: JSON.stringify(lastListBody),
+        });
+        let resText = await r.text();
+        let resBody; try { resBody = JSON.parse(resText); } catch { resBody = { raw: resText }; }
+        if (r.status === 402 || (resBody && resBody.error === 'payment_verification_failed')) {
+          status.textContent = 'Receipt lag — retrying verify once…';
+          await new Promise(r => setTimeout(r, 5000));
+          r = await fetch(API + '/marketplace/list', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json', 'X-Payment-Proof': proof },
+            body: JSON.stringify(lastListBody),
+          });
+          resText = await r.text();
+          try { resBody = JSON.parse(resText); } catch { resBody = { raw: resText }; }
+        }
+        out.style.display = 'block';
+        out.textContent = 'HTTP ' + r.status + '\n\n' + JSON.stringify(resBody, null, 2).slice(0, 4000);
+        if (r.status === 200 && resBody.listing) {
+          status.textContent = '✓ Listed \"' + resBody.listing.name + '\". Fee → SML. Future agent buys → your payTo.';
+          status.className = 'status ok';
+          loadListings();
+        } else {
+          status.textContent = 'Verify failed: ' + (resBody.reason || resBody.error || r.status) + '. Tx ' + txHash.slice(0, 12) + '… — retry Pay + list after confirm.';
+          status.className = 'status wait';
+        }
+      } catch (e) {
+        status.textContent = String(e.message || e);
+        status.className = 'status bad';
+      }
+      btn.disabled = false;
+    };
+
 
     loadListings();
     loadFeed();
