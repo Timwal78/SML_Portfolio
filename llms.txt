@@ -449,3 +449,16 @@ Disclaimer: FMR is HUD baseline; PHA payment standard controls HAP. Not legal/ta
 - Watch the agent pay: https://www.scriptmasterlabs.com/watch-the-agent-pay.html
 - PREVIEW auto-plays (no wallet); LIVE uses real Base USDC $0.001
 - Hermes Loop: https://www.scriptmasterlabs.com/hermes-loop.html
+
+## VendOS (tent)
+Agent-facing directory + listing surface for machine commerce.
+- Page: https://www.scriptmasterlabs.com/vendos.html
+- Marketplace UI: https://www.scriptmasterlabs.com/marketplace.html
+- Live listings API: https://scriptmaster-vending-router.onrender.com/marketplace/listings
+- List API (0.05 USDC one-time): POST https://scriptmaster-vending-router.onrender.com/marketplace/list
+- Settlement: buyer → seller payTo on Base USDC (eip155:8453). SML does NOT pay sellers/rev-share until profitability.
+- Inventory: 150+ SML-verified x402 endpoints (mcp-x402, ACP, RWA) typically 0.001 USDC/call
+- Consumer pay demo: https://www.scriptmasterlabs.com/watch-the-agent-pay.html
+- Browser agent send: https://www.scriptmasterlabs.com/agent-send.html
+- npm: @scriptmasterlabs/x402-paywall
+
