@@ -2161,6 +2161,250 @@ async function runSSE(): Promise<void> {
     }
   });
 
+  // ── resilient outbound helpers (never burn stranger on one upstream) ─────
+  async function softFetchJson(url: string, init: RequestInit = {}, ms = 12000): Promise<{ ok: boolean; status: number; json: unknown; err?: string }> {
+    try {
+      const r = await fetch(url, {
+        ...init,
+        headers: {
+          'User-Agent': 'scriptmasterlabs-mcp-x402/1.0 (+https://www.scriptmasterlabs.com)',
+          Accept: 'application/json,text/plain,*/*',
+          ...(init.headers || {}),
+        },
+        signal: AbortSignal.timeout(ms),
+      });
+      const text = await r.text();
+      let json: unknown = null;
+      try { json = JSON.parse(text); } catch { json = { raw: text.slice(0, 4000) }; }
+      return { ok: r.ok, status: r.status, json };
+    } catch (e) {
+      return { ok: false, status: 0, json: null, err: String(e) };
+    }
+  }
+
+  async function runWebSearch(q: string, limit: number): Promise<{ results: Array<Record<string, string>>; sources: string[]; errors: string[] }> {
+    const results: Array<Record<string, string>> = [];
+    const sources: string[] = [];
+    const errors: string[] = [];
+    const push = (title: string, url: string, snippet: string, source: string) => {
+      if (!title && !url) return;
+      if (results.some((r) => r.url && url && r.url === url)) return;
+      results.push({ title: title || url || q, url: url || '', snippet: (snippet || '').slice(0, 500), source });
+    };
+
+    {
+      const w = await softFetchJson(
+        `https://en.wikipedia.org/w/api.php?action=opensearch&format=json&origin=*&limit=${limit}&search=${encodeURIComponent(q)}`,
+        {},
+        10000,
+      );
+      if (w.ok && Array.isArray(w.json) && (w.json as unknown[]).length >= 4) {
+        const arr = w.json as unknown[];
+        const titles = arr[1] as string[];
+        const descs = arr[2] as string[];
+        const links = arr[3] as string[];
+        titles.forEach((title, i) => push(title, links[i] || '', descs[i] || '', 'wikipedia'));
+        sources.push('wikipedia_opensearch');
+      } else if (w.err || !w.ok) {
+        errors.push(`wikipedia:${w.err || w.status}`);
+      }
+    }
+
+    if (results.length < limit) {
+      const w2 = await softFetchJson(
+        `https://en.wikipedia.org/w/rest.php/v1/search/title?q=${encodeURIComponent(q)}&limit=${limit}`,
+        {},
+        10000,
+      );
+      const pages = (w2.json && typeof w2.json === 'object' && Array.isArray((w2.json as { pages?: unknown }).pages))
+        ? (w2.json as { pages: Array<{ title?: string; description?: string; key?: string }> }).pages
+        : [];
+      if (pages.length) {
+        for (const pg of pages) {
+          const title = pg.title || '';
+          const key = pg.key || title.replace(/ /g, '_');
+          push(title, key ? `https://en.wikipedia.org/wiki/${encodeURIComponent(key)}` : '', pg.description || '', 'wikipedia_rest');
+        }
+        sources.push('wikipedia_rest_search');
+      } else if (w2.err || !w2.ok) {
+        errors.push(`wikipedia_rest:${w2.err || w2.status}`);
+      }
+    }
+
+    if (results.length < limit) {
+      const d = await softFetchJson(
+        `https://api.duckduckgo.com/?q=${encodeURIComponent(q)}&format=json&no_html=1&skip_disambig=1`,
+        {},
+        10000,
+      );
+      if (d.ok && d.json && typeof d.json === 'object') {
+        const j = d.json as Record<string, unknown>;
+        if (j.AbstractText) push(String(j.Heading || q), String(j.AbstractURL || ''), String(j.AbstractText), 'duckduckgo_abstract');
+        const topics = Array.isArray(j.RelatedTopics) ? j.RelatedTopics as Array<Record<string, unknown>> : [];
+        for (const t of topics) {
+          if (typeof t.Text === 'string') push(String(t.Text).slice(0, 80), String(t.FirstURL || ''), String(t.Text), 'duckduckgo_related');
+          if (Array.isArray(t.Topics)) {
+            for (const tt of t.Topics as Array<Record<string, unknown>>) {
+              if (typeof tt.Text === 'string') push(String(tt.Text).slice(0, 80), String(tt.FirstURL || ''), String(tt.Text), 'duckduckgo_related');
+            }
+          }
+        }
+        sources.push('duckduckgo_api');
+      } else if (d.err || !d.ok) {
+        errors.push(`duckduckgo:${d.err || d.status}`);
+      }
+    }
+
+    if (results.length < limit) {
+      const wd = await softFetchJson(
+        `https://www.wikidata.org/w/api.php?action=wbsearchentities&search=${encodeURIComponent(q)}&language=en&limit=${limit}&format=json&origin=*`,
+        {},
+        10000,
+      );
+      const search = (wd.json && typeof wd.json === 'object' && Array.isArray((wd.json as { search?: unknown }).search))
+        ? (wd.json as { search: Array<{ label?: string; description?: string; concepturi?: string; id?: string }> }).search
+        : [];
+      if (search.length) {
+        for (const s of search) {
+          push(s.label || s.id || q, s.concepturi || (s.id ? `https://www.wikidata.org/wiki/${s.id}` : ''), s.description || '', 'wikidata');
+        }
+        sources.push('wikidata_wbsearchentities');
+      } else if (wd.err || !wd.ok) {
+        errors.push(`wikidata:${wd.err || wd.status}`);
+      }
+    }
+
+    if (!results.length) {
+      push(
+        `Search: ${q}`,
+        `https://en.wikipedia.org/wiki/Special:Search?search=${encodeURIComponent(q)}`,
+        errors.length
+          ? `Upstream search degraded (${errors.slice(0, 3).join('; ')}). Use linked search page.`
+          : 'No structured hits; open Wikipedia search.',
+        'fallback_search_link',
+      );
+      sources.push('fallback_search_link');
+    }
+
+    return { results: results.slice(0, limit), sources, errors };
+  }
+
+  async function runLlmChat(opts: {
+    prompt?: string;
+    messages?: unknown;
+    model?: string;
+    max_tokens?: number;
+    temperature?: unknown;
+  }): Promise<{ ok: boolean; status: number; body: Record<string, unknown> }> {
+    const max_tokens = Math.max(16, Math.min(Number(opts.max_tokens ?? 256) || 256, 1024));
+    const temperature = opts.temperature ?? 0.2;
+    const anthKey = (process.env['ANTHROPIC_API_KEY'] || '').trim();
+    const llmBase = (process.env['LLM_BASE_URL'] || '').replace(/\/$/, '');
+    const llmKey = (process.env['LLM_API_KEY'] || '').trim();
+    const model = (opts.model || process.env['LLM_MODEL_ID'] || (anthKey ? 'claude-sonnet-4-5' : 'gpt-4o-mini')).toString();
+
+    let messages: Array<{ role: string; content: string }> = [];
+    if (Array.isArray(opts.messages)) {
+      messages = (opts.messages as Array<Record<string, unknown>>).map((m) => ({
+        role: String(m.role || 'user'),
+        content: typeof m.content === 'string' ? m.content : JSON.stringify(m.content ?? ''),
+      }));
+    } else if (opts.prompt && opts.prompt.trim()) {
+      messages = [{ role: 'user', content: opts.prompt.slice(0, 8000) }];
+    }
+    if (!messages.length) {
+      return { ok: false, status: 400, body: { error: 'prompt_or_messages_required' } };
+    }
+
+    if (anthKey) {
+      try {
+        const r = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'x-api-key': anthKey,
+            'anthropic-version': '2023-06-01',
+            'content-type': 'application/json',
+            Accept: 'application/json',
+            'User-Agent': 'scriptmasterlabs-mcp-x402/1.0',
+          },
+          body: JSON.stringify({
+            model: model.startsWith('claude') ? model : 'claude-sonnet-4-5',
+            max_tokens,
+            temperature,
+            messages: messages
+              .filter((m) => m.role === 'user' || m.role === 'assistant')
+              .map((m) => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: m.content })),
+          }),
+          signal: AbortSignal.timeout(60000),
+        });
+        const j = await r.json() as Record<string, unknown>;
+        if (!r.ok) {
+          return { ok: false, status: 502, body: { error: 'llm_upstream', status: r.status, body: j, provider: 'anthropic' } };
+        }
+        const contentBlocks = Array.isArray(j.content) ? j.content as Array<Record<string, unknown>> : [];
+        const text = contentBlocks.map((b) => (typeof b.text === 'string' ? b.text : '')).join('');
+        return {
+          ok: true,
+          status: 200,
+          body: {
+            timestamp: new Date().toISOString(),
+            model: j.model || model,
+            content: text,
+            usage: j.usage ?? null,
+            source: 'anthropic_messages',
+            choices: [{ index: 0, message: { role: 'assistant', content: text }, finish_reason: 'stop' }],
+            object: 'chat.completion',
+          },
+        };
+      } catch (e) {
+        return { ok: false, status: 502, body: { error: 'llm_failed', message: String(e), provider: 'anthropic' } };
+      }
+    }
+
+    if (llmBase && llmKey) {
+      try {
+        const r = await fetch(`${llmBase}/chat/completions`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${llmKey}`,
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+            'User-Agent': 'scriptmasterlabs-mcp-x402/1.0',
+          },
+          body: JSON.stringify({ model, messages, max_tokens, temperature }),
+          signal: AbortSignal.timeout(60000),
+        });
+        const j = await r.json() as Record<string, unknown>;
+        if (!r.ok) {
+          return { ok: false, status: 502, body: { error: 'llm_upstream', status: r.status, body: j, provider: 'openai_compatible' } };
+        }
+        const choice = Array.isArray(j.choices) ? (j.choices as Array<Record<string, unknown>>)[0] : undefined;
+        const msg = choice && typeof choice.message === 'object' && choice.message ? (choice.message as Record<string, unknown>).content : undefined;
+        return {
+          ok: true,
+          status: 200,
+          body: {
+            timestamp: new Date().toISOString(),
+            model,
+            content: msg ?? null,
+            usage: j.usage ?? null,
+            source: 'openai_compatible_proxy',
+            choices: j.choices,
+            object: j.object || 'chat.completion',
+          },
+        };
+      } catch (e) {
+        return { ok: false, status: 502, body: { error: 'llm_failed', message: String(e), provider: 'openai_compatible' } };
+      }
+    }
+
+    return {
+      ok: false,
+      status: 503,
+      body: { error: 'llm_unconfigured', detail: 'Set ANTHROPIC_API_KEY or LLM_BASE_URL+LLM_API_KEY on host' },
+    };
+  }
+
   app.get('/x402/web-search', async (req, res) => {
     const host = req.headers.host ?? 'mcp-x402.onrender.com';
     const resource = `https://${host}/x402/web-search`;
@@ -2168,33 +2412,33 @@ async function runSSE(): Promise<void> {
     const limit = Math.max(1, Math.min(parseInt(String(req.query['limit'] ?? '8'), 10) || 8, 15));
     const inputSchema = { type: 'object', properties: { q: { type: 'string' }, limit: { type: 'integer' } }, required: ['q'] };
     const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { q: { type: 'string', required: true } } }, output: null };
-    const pay = await requirePayment(req, res, { resource, priceUnits: HF, description: payInfoDesc('Keyless web search (Wikipedia + DuckDuckGo) for agent retrieval.'), inputSchema, outputSchema });
+    const pay = await requirePayment(req, res, { resource, priceUnits: HF, description: payInfoDesc('Keyless web search (Wikipedia + Wikidata + DuckDuckGo) for agent retrieval.'), inputSchema, outputSchema });
     if (!pay.ok) return;
     if (!q.trim()) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'q_required' }); }
     try {
-      const results: Array<Record<string, string>> = [];
-      const sources: string[] = [];
-      const w = await fetch(`https://en.wikipedia.org/w/api.php?action=opensearch&format=json&limit=${limit}&search=${encodeURIComponent(q)}`, { headers: { Accept: 'application/json', 'User-Agent': 'scriptmasterlabs-mcp-x402/1.0' } });
-      if (w.ok) {
-        const arr = await w.json() as unknown[];
-        if (Array.isArray(arr) && arr.length >= 4) {
-          const titles = arr[1] as string[]; const descs = arr[2] as string[]; const links = arr[3] as string[];
-          titles.forEach((title, i) => results.push({ title, url: links[i] || '', snippet: descs[i] || '', source: 'wikipedia' }));
-          sources.push('wikipedia_opensearch');
-        }
-      }
-      if (results.length < limit) {
-        const d = await fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(q)}&format=json&no_html=1&skip_disambig=1`, { headers: { Accept: 'application/json' } });
-        if (d.ok) {
-          const j = await d.json() as Record<string, unknown>;
-          if (j.AbstractText) results.push({ title: String(j.Heading || q), url: String(j.AbstractURL || ''), snippet: String(j.AbstractText), source: 'duckduckgo_abstract' });
-          sources.push('duckduckgo_api');
-        }
-      }
-      return res.set('Access-Control-Allow-Origin', '*').json({ timestamp: new Date().toISOString(), q, count: results.slice(0, limit).length, results: results.slice(0, limit), sources, source: sources.join('+'), _paid: pay.payer });
+      const out = await runWebSearch(q.trim(), limit);
+      return res.set('Access-Control-Allow-Origin', '*').json({
+        timestamp: new Date().toISOString(),
+        q,
+        count: out.results.length,
+        results: out.results,
+        sources: out.sources,
+        degraded: out.errors.length > 0,
+        upstream_errors: out.errors.slice(0, 6),
+        source: out.sources.join('+') || 'web_search',
+        _paid: pay.payer,
+      });
     } catch (err) {
-      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
-      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'web_search_failed', message: String(err) });
+      return res.set('Access-Control-Allow-Origin', '*').json({
+        timestamp: new Date().toISOString(),
+        q,
+        count: 1,
+        results: [{ title: `Search: ${q}`, url: `https://en.wikipedia.org/wiki/Special:Search?search=${encodeURIComponent(q)}`, snippet: String(err), source: 'fallback_search_link' }],
+        sources: ['fallback_search_link'],
+        degraded: true,
+        source: 'fallback_search_link',
+        _paid: pay.payer,
+      });
     }
   });
 
@@ -2202,41 +2446,22 @@ async function runSSE(): Promise<void> {
     const host = req.headers.host ?? 'mcp-x402.onrender.com';
     const resource = `https://${host}/x402/llm-chat`;
     const prompt = typeof req.query['prompt'] === 'string' ? req.query['prompt'] : (typeof req.query['message'] === 'string' ? req.query['message'] : '');
-    const model = typeof req.query['model'] === 'string' ? req.query['model'] : (process.env.LLM_MODEL_ID || 'x-ai-grok-4-5');
+    const model = typeof req.query['model'] === 'string' ? req.query['model'] : undefined;
     const max_tokens = Math.max(16, Math.min(parseInt(String(req.query['max_tokens'] ?? '256'), 10) || 256, 1024));
     const inputSchema = { type: 'object', properties: { prompt: { type: 'string' }, message: { type: 'string' }, model: { type: 'string' }, max_tokens: { type: 'integer' } }, required: ['prompt'] };
     const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { prompt: { type: 'string', required: true } } }, output: null };
-    const pay = await requirePayment(req, res, { resource, priceUnits: HF, description: payInfoDesc('OpenAI-compatible chat completion proxy for agents (small prompt).'), inputSchema, outputSchema });
+    const pay = await requirePayment(req, res, { resource, priceUnits: HF, description: payInfoDesc('Cheap LLM chat for agents (Anthropic or OpenAI-compatible).'), inputSchema, outputSchema });
     if (!pay.ok) return;
-    const base = (process.env.LLM_BASE_URL || '').replace(/\/$/, '');
-    const key = process.env.LLM_API_KEY || '';
-    if (!base || !key) {
-      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
-      return res.status(503).set('Access-Control-Allow-Origin', '*').json({ error: 'llm_unconfigured', detail: 'LLM_BASE_URL/LLM_API_KEY missing on host' });
-    }
     if (!prompt.trim()) {
       if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
       return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'prompt_required' });
     }
-    try {
-      const r = await fetch(`${base}/chat/completions`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({ model, messages: [{ role: 'user', content: prompt.slice(0, 8000) }], max_tokens, temperature: 0.2 }),
-        signal: AbortSignal.timeout(60000),
-      });
-      const j = await r.json() as Record<string, unknown>;
-      if (!r.ok) {
-        if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
-        return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'llm_upstream', status: r.status, body: j });
-      }
-      const choice = Array.isArray(j.choices) ? (j.choices as Array<Record<string, unknown>>)[0] : undefined;
-      const msg = choice && typeof choice.message === 'object' && choice.message ? (choice.message as Record<string, unknown>).content : undefined;
-      return res.set('Access-Control-Allow-Origin', '*').json({ timestamp: new Date().toISOString(), model, content: msg ?? null, usage: j.usage ?? null, source: 'openai_compatible_proxy', _paid: pay.payer });
-    } catch (err) {
+    const out = await runLlmChat({ prompt, model, max_tokens });
+    if (!out.ok) {
       if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
-      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'llm_failed', message: String(err) });
+      return res.status(out.status).set('Access-Control-Allow-Origin', '*').json(out.body);
     }
+    return res.set('Access-Control-Allow-Origin', '*').json({ ...out.body, _paid: pay.payer });
   });
 
   app.post('/x402/chat/completions', async (req, res) => {
@@ -2245,37 +2470,19 @@ async function runSSE(): Promise<void> {
     const body = (req.body && typeof req.body === 'object') ? req.body as Record<string, unknown> : {};
     const inputSchema = { type: 'object', properties: { model: { type: 'string' }, messages: { type: 'array' }, max_tokens: { type: 'integer' } }, required: ['messages'] };
     const outputSchema = { input: { type: 'http', method: 'POST' }, output: null };
-    const pay = await requirePayment(req, res, { resource, priceUnits: HF, description: payInfoDesc('OpenAI-compatible POST /chat/completions proxy for agents.'), inputSchema, outputSchema });
+    const pay = await requirePayment(req, res, { resource, priceUnits: HF, description: payInfoDesc('OpenAI-compatible POST /chat/completions (Anthropic or OpenAI-compatible upstream).'), inputSchema, outputSchema });
     if (!pay.ok) return;
-    const base = (process.env.LLM_BASE_URL || '').replace(/\/$/, '');
-    const key = process.env.LLM_API_KEY || '';
-    if (!base || !key) {
+    const out = await runLlmChat({
+      messages: body.messages,
+      model: typeof body.model === 'string' ? body.model : undefined,
+      max_tokens: Number(body.max_tokens ?? 256) || 256,
+      temperature: body.temperature,
+    });
+    if (!out.ok) {
       if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
-      return res.status(503).set('Access-Control-Allow-Origin', '*').json({ error: 'llm_unconfigured' });
+      return res.status(out.status).set('Access-Control-Allow-Origin', '*').json(out.body);
     }
-    try {
-      const payload = {
-        model: body.model || process.env.LLM_MODEL_ID || 'x-ai-grok-4-5',
-        messages: body.messages,
-        max_tokens: Math.max(16, Math.min(Number(body.max_tokens ?? 256) || 256, 1024)),
-        temperature: body.temperature ?? 0.2,
-      };
-      const r = await fetch(`${base}/chat/completions`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify(payload),
-        signal: AbortSignal.timeout(60000),
-      });
-      const j = await r.json();
-      if (!r.ok) {
-        if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
-        return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'llm_upstream', status: r.status, body: j });
-      }
-      return res.set('Access-Control-Allow-Origin', '*').json({ ...(j as object), _paid: pay.payer, source: 'openai_compatible_proxy' });
-    } catch (err) {
-      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
-      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'llm_failed', message: String(err) });
-    }
+    return res.set('Access-Control-Allow-Origin', '*').json({ ...out.body, _paid: pay.payer });
   });
 
   async function jsonRpcProxy(chain: 'ethereum' | 'base', req: Request, res: Response) {
@@ -2401,25 +2608,30 @@ async function runSSE(): Promise<void> {
     if (!pay.ok) return;
     if (!q.trim()) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'q_required' }); }
     try {
-      const qq = `${q} (site:x.com OR site:twitter.com OR site:reddit.com)`;
-      const w = await fetch(`https://en.wikipedia.org/w/api.php?action=opensearch&format=json&limit=${limit}&search=${encodeURIComponent(q)}`, { headers: { Accept: 'application/json', 'User-Agent': 'scriptmasterlabs-mcp-x402/1.0' } });
-      const results: Array<Record<string, string>> = [];
-      if (w.ok) {
-        const arr = await w.json() as unknown[];
-        if (Array.isArray(arr) && arr.length >= 4) {
-          const titles = arr[1] as string[]; const links = arr[3] as string[];
-          titles.forEach((title, i) => results.push({ title, url: links[i] || '', snippet: '', source: 'wikipedia' }));
-        }
-      }
-      const d = await fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(qq)}&format=json&no_html=1&skip_disambig=1`, { headers: { Accept: 'application/json' } });
-      if (d.ok) {
-        const j = await d.json() as Record<string, unknown>;
-        if (j.AbstractText) results.push({ title: String(j.Heading || q), url: String(j.AbstractURL || ''), snippet: String(j.AbstractText), source: 'duckduckgo' });
-      }
-      return res.set('Access-Control-Allow-Origin', '*').json({ timestamp: new Date().toISOString(), q, count: results.slice(0, limit).length, results: results.slice(0, limit), note: 'public_web_social_proxy_not_official_x_api', source: 'social_search', _paid: pay.payer });
+      const out = await runWebSearch(`${q.trim()} social OR twitter OR reddit OR x.com`, limit);
+      const results = out.results.map((r) => ({ ...r, lane: 'social_proxy' }));
+      return res.set('Access-Control-Allow-Origin', '*').json({
+        timestamp: new Date().toISOString(),
+        q,
+        count: results.length,
+        results,
+        note: 'public_web_social_proxy_not_official_x_api',
+        sources: out.sources,
+        degraded: out.errors.length > 0,
+        source: 'social_search',
+        _paid: pay.payer,
+      });
     } catch (err) {
-      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
-      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'social_search_failed', message: String(err) });
+      return res.set('Access-Control-Allow-Origin', '*').json({
+        timestamp: new Date().toISOString(),
+        q,
+        count: 1,
+        results: [{ title: q, url: `https://x.com/search?q=${encodeURIComponent(q)}`, snippet: String(err), source: 'fallback_x_search_link', lane: 'social_proxy' }],
+        note: 'public_web_social_proxy_not_official_x_api',
+        degraded: true,
+        source: 'social_search',
+        _paid: pay.payer,
+      });
     }
   });
 
