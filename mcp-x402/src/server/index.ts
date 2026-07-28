@@ -3016,9 +3016,9 @@ async function runSSE(): Promise<void> {
   // x402scan's canonical signal; served at /.well-known/x402 and /openapi.json.
   const OPENAPI_DOC = {
     openapi: '3.1.0',
-    info: { title: 'Script Master Labs — x402 Data API', version: VERSION, description: 'Pay-per-call U.S. federal data, settled in USDC on Base via x402.', contact: { name: 'Script Master Labs', email: 'ScriptMasterLabs@gmail.com', url: 'https://scriptmasterlabs.com' } },
+    info: { title: 'Script Master Labs — x402 Data API', version: VERSION, description: 'Pay-per-call crypto, RWA, federal, SEC, Section 8/HUD housing, and compliance APIs. Settled in USDC on Base via x402. Hyphen routes only (e.g. /x402/gas-tracker, /x402/pha-lookup, /x402/sec-8k).', contact: { name: 'Script Master Labs', email: 'ScriptMasterLabs@gmail.com', url: 'https://scriptmasterlabs.com' } },
     servers: [{ url: 'https://mcp-x402.onrender.com' }],
-    'x-service-info': { categories: ['government-data', 'grants', 'federal-contracts', 'market-intelligence', 'medical-reference', 'drug-data', 'healthcare-providers', 'clinical-trials', 'sec-filings', 'insider-trading', 'finance', 'drug-safety', 'treasury', 'yield-curve', 'compliance', 'entity-verification', 'agent-reputation', 'fact-checking', 'veteran-services', 'section-8', 'housing-authority', 'fair-market-rent', 'hud-vash', 'federal-procurement', 'institutional-holdings', 'lobbying', 'patent-data', 'economic-indicators', 'labor-safety', 'medical-devices', 'campaign-finance', 'environmental-compliance', 'innovation-grants', 'congressional-legislation', 'regulatory-enforcement', 'medicare-data', 'research-grants', 'broker-verification', 'activist-investing', 'fails-to-deliver', 'short-squeeze-data', 'reg-sho', 'options-flow', 'dark-pool-data', 'position-sizing', 'trading-signals', 'aml-compliance', 'bank-audit', 'financial-crime-detection', 'content-moderation', 'misinformation-detection', 'wallet-reputation', 'rsi-heatmap', 'options-delta', 'technical-indicators', 'market-screener', 'greeks-data'], payment: { protocol: 'x402', rails: [{ id: 'standard', scheme: 'exact', network: 'eip155:8453', settlement: 'facilitator', note: 'EIP-3009 via X-PAYMENT — settled through a hybrid facilitator chain.' }, { id: 'sovereign', scheme: 'exact', network: 'eip155:8453', settlement: 'onchain-tx', note: 'Pay USDC then send X-PAYMENT-TX — verified directly on-chain, no facilitator.' }], facilitators: '/x402/facilitators' }, docs: { homepage: 'https://scriptmasterlabs.com', llms: 'https://mcp-x402.onrender.com/llms.txt', apiReference: 'https://github.com/Timwal78/SML_Portfolio/tree/main/mcp-x402' } },
+    'x-service-info': { categories: ['rwa', 'real-world-assets', 'federal', 'section-8', 'hud', 'pha', 'hcv', 'fmr', 'crypto', 'fx', 'gas', 'web-fetch', 'news', 'grants-gov', 'sec', 'edgar', 'high-frequency', 'agent-snacks', 'base-usdc', 'x402', 'sdvosb', 'housing', 'landlord', 'compliance-api', 'llm', 'rpc', 'government-data', 'grants', 'federal-contracts', 'market-intelligence', 'medical-reference', 'drug-data', 'healthcare-providers', 'clinical-trials', 'sec-filings', 'insider-trading', 'finance', 'drug-safety', 'treasury', 'yield-curve', 'compliance', 'entity-verification', 'agent-reputation', 'fact-checking', 'veteran-services', 'housing-authority', 'fair-market-rent', 'hud-vash', 'federal-procurement', 'institutional-holdings', 'lobbying', 'patent-data', 'economic-indicators', 'labor-safety', 'medical-devices', 'campaign-finance', 'environmental-compliance', 'innovation-grants', 'congressional-legislation', 'regulatory-enforcement', 'medicare-data', 'research-grants', 'broker-verification', 'activist-investing', 'fails-to-deliver', 'short-squeeze-data', 'reg-sho', 'options-flow', 'dark-pool-data', 'position-sizing', 'trading-signals', 'aml-compliance', 'bank-audit', 'financial-crime-detection', 'content-moderation', 'misinformation-detection', 'wallet-reputation', 'rsi-heatmap', 'options-delta', 'technical-indicators', 'market-screener', 'greeks-data'], payment: { protocol: 'x402', rails: [{ id: 'standard', scheme: 'exact', network: 'eip155:8453', settlement: 'facilitator', note: 'EIP-3009 via X-PAYMENT — settled through a hybrid facilitator chain.' }, { id: 'sovereign', scheme: 'exact', network: 'eip155:8453', settlement: 'onchain-tx', note: 'Pay USDC then send X-PAYMENT-TX — verified directly on-chain, no facilitator.' }], facilitators: '/x402/facilitators' }, docs: { homepage: 'https://scriptmasterlabs.com', llms: 'https://mcp-x402.onrender.com/llms.txt', apiReference: 'https://github.com/Timwal78/SML_Portfolio/tree/main/mcp-x402' } },
     paths: { '/x402/grants': { get: {
       operationId: 'searchGrants',
       summary: 'Search live U.S. federal grant opportunities (Grants.gov Search2).',
@@ -3564,6 +3564,119 @@ async function runSSE(): Promise<void> {
       }
     }
   }
+
+  // x402scan server Tags come from OpenAPI operation `tags` + x-service-info.categories.
+  // Enrich every path so UI is not stuck on Utility/Crypto/Search/AI/Trading only.
+  const ROUTE_TAGS: Record<string, string[]> = {
+    '/x402/crypto-price': ['Crypto', 'Price', 'High-Frequency', 'Agent-Snack'],
+    '/x402/crypto-trending': ['Crypto', 'Market', 'High-Frequency'],
+    '/x402/fx-rate': ['FX', 'Finance', 'High-Frequency', 'Agent-Snack'],
+    '/x402/gas-tracker': ['Crypto', 'Gas', 'RPC', 'High-Frequency', 'Agent-Snack'],
+    '/x402/web-fetch': ['Web', 'Utility', 'High-Frequency', 'Agent-Snack'],
+    '/x402/web-search': ['Search', 'Web', 'High-Frequency', 'Agent-Snack'],
+    '/x402/web-markdown': ['Web', 'Utility'],
+    '/x402/news-headlines': ['News', 'Search', 'High-Frequency', 'Agent-Snack'],
+    '/x402/social-search': ['Search', 'Social', 'News'],
+    '/x402/grants': ['Federal', 'Grants', 'Government'],
+    '/x402/sbir-grants': ['Federal', 'Grants', 'SDVOSB'],
+    '/x402/nih-grants': ['Federal', 'Grants', 'Research'],
+    '/x402/firms': ['Federal', 'SDVOSB', 'Procurement'],
+    '/x402/market': ['Federal', 'Procurement', 'Market-Intelligence'],
+    '/x402/entity-compliance': ['Federal', 'Compliance', 'SAM'],
+    '/x402/pha-lookup': ['Section-8', 'HUD', 'Housing', 'Federal', 'PHA'],
+    '/x402/hcv-fmr': ['Section-8', 'HUD', 'Housing', 'FMR', 'Federal'],
+    '/x402/housing-landlord-checklist': ['Section-8', 'HUD', 'Housing', 'Landlord'],
+    '/x402/housing-windsor': ['Section-8', 'HUD', 'Housing', 'Landlord'],
+    '/x402/hud-vash-contacts': ['Section-8', 'HUD', 'Housing', 'Veteran-Services'],
+    '/x402/sec-8k': ['SEC', 'Federal', 'Filings', 'Trading'],
+    '/x402/sec-10k': ['SEC', 'Federal', 'Filings'],
+    '/x402/sec-10q': ['SEC', 'Federal', 'Filings'],
+    '/x402/sec-13f': ['SEC', 'Federal', 'Institutional', 'Trading'],
+    '/x402/sec-13dg': ['SEC', 'Federal', 'Activist', 'Trading'],
+    '/x402/insider-trades': ['SEC', 'Trading', 'Insider'],
+    '/x402/fred': ['Federal', 'Economic-Indicators', 'Treasury'],
+    '/x402/treasury-yields': ['Federal', 'Treasury', 'Finance'],
+    '/x402/ftd-threshold-list': ['SEC', 'Trading', 'FTD', 'Reg-SHO'],
+    '/x402/ftd-ratio': ['SEC', 'Trading', 'FTD'],
+    '/x402/ftd-time-series': ['SEC', 'Trading', 'FTD'],
+    '/x402/ftd-etf-basket': ['SEC', 'Trading', 'FTD'],
+    '/x402/ftd-settlement-cycle': ['SEC', 'Trading', 'FTD'],
+    '/x402/options-flow': ['Trading', 'Options'],
+    '/x402/options-delta-heatmap': ['Trading', 'Options', 'Greeks'],
+    '/x402/equities-heatmap': ['Trading', 'Market-Screener'],
+    '/x402/cascade-signal': ['Trading', 'Signals'],
+    '/x402/max-conviction-signal': ['Trading', 'Signals'],
+    '/x402/drug-label': ['Healthcare', 'FDA', 'Federal'],
+    '/x402/drug-recall': ['Healthcare', 'FDA', 'Federal'],
+    '/x402/drug-adverse-events': ['Healthcare', 'FDA', 'Federal'],
+    '/x402/npi': ['Healthcare', 'Federal'],
+    '/x402/clinical-trials': ['Healthcare', 'Federal'],
+    '/x402/cms-providers': ['Healthcare', 'Medicare', 'Federal'],
+    '/x402/fda-510k': ['Healthcare', 'FDA', 'Federal'],
+    '/x402/fda-warnings': ['Healthcare', 'FDA', 'Compliance'],
+    '/x402/agent-score': ['AI', 'Agent-Reputation'],
+    '/x402/fact-check': ['AI', 'Content-Trust'],
+    '/x402/ai-fact-check': ['AI', 'Content-Trust'],
+    '/x402/content-trust-score': ['AI', 'Content-Trust'],
+    '/x402/chat/completions': ['AI', 'LLM'],
+    '/x402/llm-chat': ['AI', 'LLM'],
+    '/x402/base-rpc': ['RPC', 'Crypto', 'Base'],
+    '/x402/eth-rpc': ['RPC', 'Crypto'],
+    '/x402/domain-enrich': ['Utility', 'OSINT'],
+    '/x402/compliance-anomaly': ['Compliance', 'AML'],
+    '/x402/compliance-audit': ['Compliance', 'AML'],
+    '/x402/compliance-regulator-query': ['Compliance', 'Federal'],
+    '/x402/restricted-party-screen': ['Compliance', 'Federal'],
+    '/x402/lobbying': ['Federal', 'Lobbying'],
+    '/x402/patents': ['Federal', 'Patents'],
+    '/x402/osha': ['Federal', 'Labor-Safety'],
+    '/x402/epa-violations': ['Federal', 'Environmental'],
+    '/x402/fec-finance': ['Federal', 'Campaign-Finance'],
+    '/x402/finra-broker': ['Finance', 'Compliance'],
+    '/x402/congress-bills': ['Federal', 'Congress'],
+    '/x402/trade-leads': ['Federal', 'Trade'],
+    '/.well-known/x402': ['Utility', 'Discovery'],
+    '/openapi.json': ['Utility', 'Discovery'],
+    '/x402/.well-known/x402': ['Utility', 'Discovery'],
+    '/x402/openapi.json': ['Utility', 'Discovery'],
+  };
+  const tagSet = new Set<string>(['Utility', 'Crypto', 'Search', 'AI', 'Trading', 'Federal', 'Section-8', 'HUD', 'RWA', 'SEC', 'Housing', 'Grants', 'Finance', 'Healthcare', 'Compliance', 'High-Frequency', 'Agent-Snack', 'FX', 'News', 'Web', 'RPC', 'SDVOSB']);
+  for (const [route, pathItem] of Object.entries(OPENAPI_DOC.paths) as Array<[string, Record<string, Record<string, unknown>>]>) {
+    for (const method of ['get', 'post'] as const) {
+      const op = pathItem[method];
+      if (!op || typeof op !== 'object') continue;
+      const mapped = ROUTE_TAGS[route] ?? [];
+      const r = route.toLowerCase();
+      const heur: string[] = [];
+      if (r.includes('rwa')) heur.push('RWA', 'Real-World-Assets', 'Finance');
+      if (r.includes('sec-') || r.includes('insider') || r.includes('ftd')) heur.push('SEC', 'Federal', 'Trading');
+      if (r.includes('pha') || r.includes('hcv') || r.includes('housing') || r.includes('hud') || r.includes('section')) heur.push('Section-8', 'HUD', 'Housing', 'Federal');
+      if (r.includes('grant')) heur.push('Federal', 'Grants');
+      if (r.includes('crypto') || r.includes('gas')) heur.push('Crypto');
+      if (r.includes('fx')) heur.push('FX', 'Finance');
+      if (r.includes('news')) heur.push('News');
+      if (r.includes('web-') || r.includes('search')) heur.push('Search', 'Web');
+      if (r.includes('llm') || r.includes('chat') || r.includes('fact') || r.includes('agent-score')) heur.push('AI');
+      if (r.includes('drug') || r.includes('npi') || r.includes('clinical') || r.includes('fda') || r.includes('cms')) heur.push('Healthcare', 'Federal');
+      if (r.includes('compliance') || r.includes('aml') || r.includes('restricted')) heur.push('Compliance');
+      if (op['x-payment-info']) heur.push('x402', 'Paid');
+      else heur.push('Utility', 'Public');
+      const prev = Array.isArray(op['tags']) ? (op['tags'] as string[]) : [];
+      const tags = Array.from(new Set([...prev, ...mapped, ...heur]));
+      op['tags'] = tags;
+      for (const tg of tags) tagSet.add(tg);
+    }
+  }
+  (OPENAPI_DOC as Record<string, unknown>)['tags'] = Array.from(tagSet).sort().map((name) => ({ name }));
+  {
+    const svc = (OPENAPI_DOC as Record<string, unknown>)['x-service-info'] as { categories?: string[] };
+    if (svc && Array.isArray(svc.categories)) {
+      for (const c of ['rwa', 'real-world-assets', 'federal', 'section-8', 'hud', 'housing', 'sec', 'crypto', 'high-frequency', 'agent-snacks']) {
+        if (!svc.categories.includes(c)) svc.categories.unshift(c);
+      }
+    }
+  }
+
   app.get('/.well-known/x402', (_req, res) => { res.set('Access-Control-Allow-Origin', '*').json(OPENAPI_DOC); });
   app.get('/openapi.json', (_req, res) => { res.set('Access-Control-Allow-Origin', '*').json(OPENAPI_DOC); });
   app.get('/x402/.well-known/x402', (_req, res) => { res.set('Access-Control-Allow-Origin', '*').json(OPENAPI_DOC); });
@@ -3599,7 +3712,7 @@ async function runSSE(): Promise<void> {
           id: op.operationId,
           name: String(op.summary ?? op.operationId).replace(/\.$/, ''),
           description: op.description ?? op.summary ?? '',
-          tags: [method, pi ? 'paid' : 'free', 'x402'],
+          tags: Array.from(new Set([method, pi ? 'paid' : 'free', 'x402', ...((op as { tags?: string[] }).tags ?? [])])),
           inputModes: ['application/json'],
           outputModes: ['application/json'],
           'x-endpoint': `${baseUrl}${route}`,
