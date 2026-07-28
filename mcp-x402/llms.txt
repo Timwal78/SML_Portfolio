@@ -74,3 +74,13 @@ npx @scriptmasterlabs/mcp-x402
 - https://mcp-x402.onrender.com/x402/fx-rate
 - https://mcp-x402.onrender.com/x402/grants
 Root `/` is discovery catalog only. Point scanners at paid snacks above.
+
+## EchoNet (this host)
+- GET /x402/bounties (free board)
+- GET /x402/echonet (manifest)
+- GET /x402/hunters (teaser)
+- GET /x402/graph?task=llm-chat (paid 0.001)
+- POST /x402/hunters/report (paid 0.001)
+- POST /x402/bounties (paid listing)
+- www: https://www.scriptmasterlabs.com/echonet.html
+
