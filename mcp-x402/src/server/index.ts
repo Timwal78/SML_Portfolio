@@ -745,10 +745,6 @@ async function runSSE(): Promise<void> {
   interface SamEntity { entityRegistration?: { legalBusinessName?: string; ueiSAM?: string; cageCode?: string; registrationStatus?: string; registrationExpirationDate?: string }; coreData?: { physicalAddress?: { city?: string; stateOrProvinceCode?: string }; businessTypes?: { businessTypeList?: Array<{ businessTypeCode?: string; businessTypeDesc?: string }> } }; }
   interface SamResponse { totalRecords?: number; entityData?: SamEntity[] }
   app.get('/x402/firms', async (req, res) => {
-    const samKey = byokKey(req, 'x-sam-key', 'SAM_API_KEY');
-    if (!samKey) {
-      return res.status(503).set('Access-Control-Allow-Origin', '*').json({ error: 'service_unconfigured', detail: 'Operator must set SAM_API_KEY (free at sam.gov). No payment taken.' });
-    }
     const host = req.headers.host ?? 'mcp-x402.onrender.com';
     const resource = `https://${host}/x402/firms`;
     const naics = typeof req.query['naics'] === 'string' ? req.query['naics'] : '';
@@ -761,6 +757,11 @@ async function runSSE(): Promise<void> {
 
     const pay = await requirePayment(req, res, { resource, priceUnits: FIRMS_PRICE_UNITS, description: 'Find self-certified SDVOSB/WOSB/SDB/minority firms by NAICS + state (SAM.gov). Pay 0.001 USDC on Base via X-PAYMENT (standard) or X-PAYMENT-TX (sovereign).', inputSchema, outputSchema });
     if (!pay.ok) return;
+    const samKey = byokKey(req, 'x-sam-key', 'SAM_API_KEY');
+    if (!samKey) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(503).set('Access-Control-Allow-Origin', '*').json({ error: 'service_unconfigured', detail: 'Operator must set SAM_API_KEY (free at sam.gov). Payment not consumed on sovereign; facilitator settle already completed if used.' });
+    }
     if (!/^\d{6}$/.test(naics)) {
       if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
       return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_or_invalid_naics', detail: 'Payment verified. Add ?naics=<6-digit> and retry with the same payment.' });
@@ -1097,8 +1098,6 @@ async function runSSE(): Promise<void> {
 
   // ── /x402/entity-compliance — SAM registration + exclusion + size standard ($0.35) ─
   app.get('/x402/entity-compliance', async (req, res) => {
-    const samKey = byokKey(req, 'x-sam-key', 'SAM_API_KEY');
-    if (!samKey) return res.status(503).set('Access-Control-Allow-Origin', '*').json({ error: 'service_unconfigured', detail: 'SAM_API_KEY required. No payment taken.' });
     const host = req.headers.host ?? 'mcp-x402.onrender.com';
     const resource = `https://${host}/x402/entity-compliance`;
     const uei = cleanTerm(typeof req.query['uei'] === 'string' ? req.query['uei'] : '').toUpperCase().replace(/\s/g, '');
@@ -1107,6 +1106,8 @@ async function runSSE(): Promise<void> {
     const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { uei: { type: 'string', required: false }, cage: { type: 'string', required: false } } }, output: null };
     const pay = await requirePayment(req, res, { resource, priceUnits: 1000n, description: 'Entity compliance bundle: SAM registration status + expiry + exclusion flag + set-aside types + size standard. Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
     if (!pay.ok) return;
+    const samKey = byokKey(req, 'x-sam-key', 'SAM_API_KEY');
+    if (!samKey) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(503).set('Access-Control-Allow-Origin', '*').json({ error: 'service_unconfigured', detail: 'SAM_API_KEY required.' }); }
     if (!uei && !cage) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_identifier', detail: 'Payment verified. Add ?uei= or ?cage= and retry with the same payment.' }); }
     try {
       const p = new URLSearchParams({ api_key: samKey, includeSections: 'entityRegistration,coreData,assertions', registrationStatus: 'A,E,I' });
@@ -2077,8 +2078,6 @@ async function runSSE(): Promise<void> {
 
   // ── /x402/crypto-price — CoinGecko real-time token price, $0.01 ──────────────
   app.get('/x402/crypto-price', async (req, res) => {
-    const cgKey = byokKey(req, 'x-coingecko-key', 'COINGECKO_API_KEY');
-    if (!cgKey) return res.status(503).set('Access-Control-Allow-Origin', '*').json({ error: 'service_unconfigured', detail: 'COINGECKO_API_KEY required. No payment taken.' });
     const host = req.headers.host ?? 'mcp-x402.onrender.com';
     const resource = `https://${host}/x402/crypto-price`;
     const ids = cleanTerm(typeof req.query['ids'] === 'string' ? req.query['ids'] : '');
@@ -2092,8 +2091,11 @@ async function runSSE(): Promise<void> {
     if (!pay.ok) return;
     if (!ids) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_ids', detail: 'Payment verified. Add ?ids= and retry with the same payment.' }); }
     try {
+      const cgKey = byokKey(req, 'x-coingecko-key', 'COINGECKO_API_KEY');
       const p = new URLSearchParams({ ids, vs_currencies, include_market_cap: String(include_market_cap), include_24hr_vol: String(include_24hr_vol), include_24hr_change: String(include_24hr_change) });
-      const r = await fetch(`https://api.coingecko.com/api/v3/simple/price?${p.toString()}`, { headers: { Accept: 'application/json', 'x-cg-demo-api-key': cgKey } });
+      const headers: Record<string, string> = { Accept: 'application/json' };
+      if (cgKey) headers['x-cg-demo-api-key'] = cgKey;
+      const r = await fetch(`https://api.coingecko.com/api/v3/simple/price?${p.toString()}`, { headers });
       if (!r.ok) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'coingecko_api_error', status: r.status }); }
       const j = await r.json();
       return res.set('Access-Control-Allow-Origin', '*').json({ source: 'coingecko.com/api/v3/simple/price', data: j, _paid: pay.payer });
@@ -2102,8 +2104,6 @@ async function runSSE(): Promise<void> {
 
   // ── /x402/crypto-trending — CoinGecko trending coins/NFTs/categories, $0.01 ──
   app.get('/x402/crypto-trending', async (req, res) => {
-    const cgKey = byokKey(req, 'x-coingecko-key', 'COINGECKO_API_KEY');
-    if (!cgKey) return res.status(503).set('Access-Control-Allow-Origin', '*').json({ error: 'service_unconfigured', detail: 'COINGECKO_API_KEY required. No payment taken.' });
     const host = req.headers.host ?? 'mcp-x402.onrender.com';
     const resource = `https://${host}/x402/crypto-trending`;
     const inputSchema = { type: 'object', properties: {}, required: [] };
@@ -2111,7 +2111,10 @@ async function runSSE(): Promise<void> {
     const pay = await requirePayment(req, res, { resource, priceUnits: 1000n, description: 'Top 15 trending coins, 7 trending NFTs, and 6 trending categories by user search activity in the last 24h (CoinGecko). Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
     if (!pay.ok) return;
     try {
-      const r = await fetch('https://api.coingecko.com/api/v3/search/trending', { headers: { Accept: 'application/json', 'x-cg-demo-api-key': cgKey } });
+      const cgKey = byokKey(req, 'x-coingecko-key', 'COINGECKO_API_KEY');
+      const headers: Record<string, string> = { Accept: 'application/json' };
+      if (cgKey) headers['x-cg-demo-api-key'] = cgKey;
+      const r = await fetch('https://api.coingecko.com/api/v3/search/trending', { headers });
       if (!r.ok) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'coingecko_api_error', status: r.status }); }
       const j = await r.json();
       return res.set('Access-Control-Allow-Origin', '*').json({ source: 'coingecko.com/api/v3/search/trending', data: j, _paid: pay.payer });
