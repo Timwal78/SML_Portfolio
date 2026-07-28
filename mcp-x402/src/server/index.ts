@@ -2329,7 +2329,7 @@ async function runSSE(): Promise<void> {
     const host = req.headers.host ?? 'mcp-x402.onrender.com';
     const resource = `https://${host}/x402/domain-enrich`;
     let domain = typeof req.query['domain'] === 'string' ? req.query['domain'] : (typeof req.query['url'] === 'string' ? req.query['url'] : '');
-    domain = domain.replace(/^https?:\/\//, '').split('/')[0].split(':')[0].toLowerCase();
+    domain = (domain || '').replace(/^https?:\/\//, '').split('/')[0]?.split(':')[0]?.toLowerCase() || '';
     const inputSchema = { type: 'object', properties: { domain: { type: 'string' } }, required: ['domain'] };
     const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { domain: { type: 'string', required: true } } }, output: null };
     const pay = await requirePayment(req, res, { resource, priceUnits: HF, description: payInfoDesc('Cheap domain enrichment: DNS + RDAP + IP geo.'), inputSchema, outputSchema });
@@ -3509,7 +3509,7 @@ async function runSSE(): Promise<void> {
   AuditLogger.getInstance().info('server_start', { transport: 'sse', port, version: VERSION });
   console.error(`[mcp-x402] listening on :${port} — health: http://localhost:${port}/health`);
 
-  if (process.env['ACP_WALLET_ID'] && process.env['ACP_SIGNER_PRIVATE_KEY']) {
+  if (process.env['ACP_WALLET_ID'] && (process.env['ACP_SIGNER_KEYS_JSON'] || process.env['ACP_SIGNER_PRIVATE_KEY'] || process.env['ACP_SIGNER_PUBLIC_KEY'])) {
     import('./acp/seller.js').then(({ startAcpSeller }) => {
       startAcpSeller().catch((err: unknown) => {
         const e = err as Error & { details?: unknown; shortMessage?: string; statusCode?: number };

@@ -869,14 +869,38 @@ function resolveSignerBin(): string {
 function ensureSignerKeystore(): void {
   const raw = process.env['ACP_SIGNER_KEYS_JSON']?.trim();
   if (!raw) return;
-  const home = process.env['HOME'] || '/home/hermes';
-  const dir = join(home, '.config/acp-cli');
-  mkdirSync(dir, { recursive: true });
-  const dest = join(dir, 'signer-keys.json');
-  if (!existsSync(dest) || process.env['ACP_SIGNER_KEYS_FORCE'] === '1') {
-    writeFileSync(dest, raw, { mode: 0o600 });
-    console.log(`[SML-ACP] wrote signer-keys.json (${raw.length} bytes) → ${dest}`);
+  // Validate JSON early — a public-key-only string used to land here and broke the signer.
+  try {
+    const parsed = JSON.parse(raw) as { secret?: string; salt?: string; keys?: Record<string, unknown> };
+    if (!parsed?.secret || !parsed?.salt || !parsed?.keys || typeof parsed.keys !== 'object') {
+      throw new Error('ACP_SIGNER_KEYS_JSON missing secret/salt/keys');
+    }
+  } catch (e) {
+    throw new Error(`ACP_SIGNER_KEYS_JSON invalid: ${(e as Error).message}`);
   }
+  const candidates = [
+    join(process.env['HOME'] || '', '.config/acp-cli'),
+    '/tmp/acp-cli',
+    join('/tmp', 'acp-cli'),
+  ].filter(Boolean);
+  let dest = '';
+  let lastErr: unknown;
+  for (const dir of candidates) {
+    try {
+      mkdirSync(dir, { recursive: true });
+      dest = join(dir, 'signer-keys.json');
+      writeFileSync(dest, raw, { mode: 0o600 });
+      // Point signer binary at this keyfile via HOME if we used /tmp
+      if (dir.startsWith('/tmp')) {
+        process.env['HOME'] = '/tmp';
+      }
+      console.log(`[SML-ACP] wrote signer-keys.json (${raw.length} bytes) → ${dest}`);
+      return;
+    } catch (e) {
+      lastErr = e;
+    }
+  }
+  throw new Error(`cannot write signer-keys.json: ${String(lastErr)}`);
 }
 
 function createSignFn(publicKeyB64: string, signerBin: string) {
