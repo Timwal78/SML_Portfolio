@@ -1,3 +1,16 @@
+# DISTRIBUTION / LIST EVERYWHERE (2026-07-28)
+- Master listings page: https://www.scriptmasterlabs.com/listings.html
+- Master pack: https://www.scriptmasterlabs.com/docs/listings/MASTER_LISTING_PACK.md
+- Machine catalog JSON: https://www.scriptmasterlabs.com/docs/listings/catalog.json
+- OpenAPI: https://mcp-x402.onrender.com/openapi.json
+- MCP: https://mcp-x402.onrender.com/mcp
+- SqueezeOS MCP: https://squeezeos-api.onrender.com/mcp
+- A2A card: https://mcp-x402.onrender.com/.well-known/agent.json
+- npm: @scriptmasterlabs/mcp-x402 · @scriptmasterlabs/mcp-x402-sdk
+- AWS company seat: $599/mo · 151+ APIs (resubmitted)
+- Agent floor: 0.001 USDC · eip155:8453 · payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700
+- Target directories: Smithery, mcp.so, Glama, PulseMCP, RapidAPI, Zyla, APILayer, API.market, Composio, Pipedream, Zapier AI, Lindy, Relevance AI, Hugging Face, Kong/Apigee/Azure/AWS APIM
+
 # SEO + DUAL NARRATIVE HUBS (2026-07-26)
 - Dev door (x402 Launchpad): https://www.scriptmasterlabs.com/x402-launchpad.html
 - Gov/Enterprise door (Sovereign Payrails): https://www.scriptmasterlabs.com/sml-sovereign-payrails.html
