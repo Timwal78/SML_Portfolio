@@ -29,6 +29,23 @@ import { healthHandler } from './health.js';
 import { verifyBaseUsdcPayment, alreadyRedeemed, markRedeemed, releaseRedeem } from './payments/verify-inbound.js';
 import { facilitatorChain, decodePaymentHeader, type PaymentRequirements } from './payments/facilitators.js';
 import { X402Stats } from './security/x402-stats.js';
+import {
+  onPaidSettle,
+  publicBoard,
+  seedSmlBootstrapBounties,
+  createBounty,
+  listBounties,
+  getBounty,
+  claimsForPayer,
+  queryGraph,
+  agentProfile,
+  publishReport,
+  listReports,
+  hunterLeaderboard,
+  listingFeeUnits,
+  protocolCutBps,
+  EchonetStore,
+} from './echonet/index.js';
 import { SqueezeOSAPI } from '../lib/sml-api/squeezeos.js';
 import { EquitiesHeatmapAPI, OptionsDeltaHeatmapAPI, type DataCredentials } from '../lib/sml-api/equities-heatmap.js';
 
@@ -436,7 +453,7 @@ async function runSSE(): Promise<void> {
   // Rail B (sovereign): client pays on-chain and sends `X-PAYMENT-TX`; verified
   //   directly on Base via viem, no facilitator, no custody.
   // Both advertised in one 402 `accepts` array; agent picks whichever it can fulfil.
-  type PayResult = { ok: true; payer: { rail: string; from: string; tx: string } } | { ok: false };
+  type PayResult = { ok: true; payer: { rail: string; from: string; tx: string }; echonet?: { stranger: boolean; claims: Array<{ id: string; bountyId: string; netRewardUnits: string; attestation: string; status: string }> } } | { ok: false };
   // x402 v2 payment challenge, validated against the agentcash/x402scan discovery
   // schema (validatePaymentRequiredDetailed). Three things that crawler requires
   // and that the deployed body was missing:
@@ -564,6 +581,35 @@ async function runSSE(): Promise<void> {
     };
     const header402 = Buffer.from(JSON.stringify(challenge)).toString('base64');
 
+    const finishPaid = (payer: { rail: string; from: string; tx: string }): PayResult => {
+      try {
+        const hook = onPaidSettle({
+          payer: payer.from,
+          resource: opts.resource,
+          units: opts.priceUnits.toString(),
+          tx: payer.tx || '',
+          rail: payer.rail,
+        });
+        return {
+          ok: true,
+          payer,
+          echonet: {
+            stranger: hook.stranger,
+            claims: hook.claims.map((c) => ({
+              id: c.id,
+              bountyId: c.bountyId,
+              netRewardUnits: c.netRewardUnits,
+              attestation: c.attestation,
+              status: c.status,
+            })),
+          },
+        };
+      } catch (err) {
+        console.warn('[EchoNet] onPaidSettle failed', String(err).slice(0, 120));
+        return { ok: true, payer };
+      }
+    };
+
     const xPayment = typeof req.headers['x-payment'] === 'string' ? req.headers['x-payment'] : '';
     const txHash = typeof req.headers['x-payment-tx'] === 'string' ? req.headers['x-payment-tx'] : '';
 
@@ -612,7 +658,7 @@ async function runSSE(): Promise<void> {
       if (!payload) { send402(res, challenge, header402, { error: 'invalid_payment_payload' }); return { ok: false }; }
       const result = await facilitatorChain().process(payload, accepts[0] as PaymentRequirements);
       if (!result.success) { send402(res, challenge, header402, { error: 'payment_unsettled', detail: result.errorReason ?? '', attempts: result.attempts ?? [], receivedPayload: { x402Version: payload.x402Version, scheme: payload.scheme, network: payload.network } }); return { ok: false }; }
-      return { ok: true, payer: { rail: `standard:${result.facilitator ?? ''}`, from: result.payer ?? payload.payload.authorization.from, tx: result.transaction ?? '' } };
+      return finishPaid({ rail: `standard:${result.facilitator ?? ''}`, from: result.payer ?? payload.payload.authorization.from, tx: result.transaction ?? '' });
     }
 
     // Rail B — sovereign on-chain tx-hash
@@ -621,7 +667,7 @@ async function runSSE(): Promise<void> {
       const v = await verifyBaseUsdcPayment({ txHash, payTo: X402_PAY_TO, minAmountUnits: opts.priceUnits });
       if (!v.ok) { send402(res, challenge, header402, { error: 'payment_unverified', detail: v.error ?? '' }); return { ok: false }; }
       markRedeemed(txHash);
-      return { ok: true, payer: { rail: 'sovereign', from: v.from ?? '', tx: txHash } };
+      return finishPaid({ rail: 'sovereign', from: v.from ?? '', tx: txHash });
     }
 
     send402(res, challenge, header402);
@@ -2664,6 +2710,213 @@ async function runSSE(): Promise<void> {
   });
 
 
+
+  // ── EchoNet: reverse bounties + usage graph + hunter reports (SML rail) ───
+  // Free board / teaser. Paid: post bounty, graph query, hunter publish, agent profile deep.
+  try {
+    seedSmlBootstrapBounties(`https://${process.env['RENDER_EXTERNAL_HOSTNAME'] || 'mcp-x402.onrender.com'}`);
+    console.log('[EchoNet] bootstrap bounties ready', listBounties({ status: 'open' }).length);
+  } catch (e) {
+    console.warn('[EchoNet] bootstrap seed', String(e).slice(0, 120));
+  }
+
+  app.get('/x402/bounties', (_req, res) => {
+    res.set('Access-Control-Allow-Origin', '*').json({
+      ...publicBoard(),
+      how_to_earn: 'Settle any open bounty resource with X-PAYMENT or X-PAYMENT-TX (min 0.001 USDC). First unique stranger wallets auto-earn. Self/seed wallets excluded. Claim status in settle response._echonet or GET /x402/bounties/claims?payer=0x…',
+      money: {
+        snack_fee_usdc: 0.001,
+        protocol_cut_bps: protocolCutBps(),
+        listing_fee_usdc: Number(listingFeeUnits()) / 1e6,
+        note: 'Snacks pay SML. Bounty posts pay listing fee + cut. Graph/hunter queries are paid. Ledger-only reputation.',
+      },
+    });
+  });
+
+  app.get('/x402/bounties/claims', (req, res) => {
+    const payer = typeof req.query['payer'] === 'string' ? req.query['payer'] : '';
+    if (!payer) return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'payer_required' });
+    return res.set('Access-Control-Allow-Origin', '*').json({ payer, claims: claimsForPayer(payer) });
+  });
+
+  app.get('/x402/bounties/:id', (req, res) => {
+    const b = getBounty(String(req.params['id'] || ''));
+    if (!b) return res.status(404).set('Access-Control-Allow-Origin', '*').json({ error: 'bounty_not_found' });
+    return res.set('Access-Control-Allow-Origin', '*').json({ bounty: b, protocolCutBps: protocolCutBps() });
+  });
+
+  app.post('/x402/bounties', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/bounties`;
+    const body = (req.body && typeof req.body === 'object') ? req.body as Record<string, unknown> : {};
+    const fee = BigInt(listingFeeUnits());
+    const inputSchema = { type: 'object', properties: {
+      target_resource: { type: 'string' }, reward_usdc: { type: 'number' }, max_claims: { type: 'integer' },
+      title: { type: 'string' }, description: { type: 'string' },
+    }, required: ['target_resource', 'reward_usdc', 'max_claims', 'title'] };
+    const outputSchema = { input: { type: 'http', method: 'POST', bodyType: 'json', body: {} }, output: null };
+    const pay = await requirePayment(req, res, {
+      resource,
+      priceUnits: fee,
+      description: payInfoDesc(`EchoNet reverse-bounty listing fee (${Number(fee) / 1e6} USDC). Escrow semantics: SML ledger; first stranger settlers earn rewards from poster budget tracked off-board until on-chain escrow v2.`),
+      inputSchema,
+      outputSchema,
+    });
+    if (!pay.ok) return;
+    try {
+      const target = String(body['target_resource'] || body['resource'] || '');
+      const rewardUsdc = Number(body['reward_usdc'] ?? body['rewardUsdc'] ?? 0);
+      const maxClaims = parseInt(String(body['max_claims'] ?? body['maxClaims'] ?? '1'), 10) || 1;
+      const title = String(body['title'] || 'Reverse bounty');
+      const description = String(body['description'] || '');
+      if (!target.startsWith('http')) {
+        if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+        return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'target_resource_must_be_url' });
+      }
+      const rewardUnits = String(Math.round(rewardUsdc * 1e6));
+      const bounty = createBounty({
+        resource: target,
+        rewardUnits,
+        maxClaims,
+        poster: pay.payer.from || 'unknown',
+        title,
+        description,
+        listingFeeUnits: fee.toString(),
+      });
+      return res.set('Access-Control-Allow-Origin', '*').json({
+        ok: true,
+        bounty,
+        listingFeeUsdc: Number(fee) / 1e6,
+        protocolCutBps: protocolCutBps(),
+        _paid: pay.payer,
+        _echonet: pay.echonet,
+        note: 'Bounty is live on SML ledger. Stranger settles on target_resource auto-claim. You are not building free graduation for others — cut + listing stay here.',
+      });
+    } catch (err) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'bounty_create_failed', message: String(err) });
+    }
+  });
+
+  app.get('/x402/graph', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/graph`;
+    const taskType = typeof req.query['task'] === 'string' ? req.query['task'] : (typeof req.query['taskType'] === 'string' ? req.query['taskType'] : '');
+    const minRep = Math.max(0, parseInt(String(req.query['min_rep'] ?? '0'), 10) || 0);
+    const limit = Math.max(1, Math.min(parseInt(String(req.query['limit'] ?? '20'), 10) || 20, 50));
+    const inputSchema = { type: 'object', properties: { task: { type: 'string' }, min_rep: { type: 'integer' }, limit: { type: 'integer' } }, required: [] };
+    const outputSchema = { input: { type: 'http', method: 'GET' }, output: null };
+    const pay = await requirePayment(req, res, {
+      resource,
+      priceUnits: HF,
+      description: payInfoDesc('EchoNet usage graph: agents high-rep wallets route real money through for task type X. Observed settles only — no keyword theater.'),
+      inputSchema,
+      outputSchema,
+    });
+    if (!pay.ok) return;
+    EchonetStore.getInstance().mutate((s) => { s.stats.graphQueries += 1; });
+    const g = queryGraph({ taskType: taskType || undefined, minRep, limit });
+    return res.set('Access-Control-Allow-Origin', '*').json({
+      timestamp: new Date().toISOString(),
+      query: { taskType: taskType || null, minRep, limit },
+      ...g,
+      thesis: 'Search = who high-reputation agents pay for task X. Self-seed edges are dark.',
+      _paid: pay.payer,
+      _echonet: pay.echonet,
+    });
+  });
+
+  app.get('/x402/graph/agent', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/graph/agent`;
+    const address = typeof req.query['address'] === 'string' ? req.query['address'] : '';
+    const inputSchema = { type: 'object', properties: { address: { type: 'string' } }, required: ['address'] };
+    const outputSchema = { input: { type: 'http', method: 'GET' }, output: null };
+    const pay = await requirePayment(req, res, {
+      resource, priceUnits: HF,
+      description: payInfoDesc('EchoNet agent reputation profile from verified settles on SML rail.'),
+      inputSchema, outputSchema,
+    });
+    if (!pay.ok) return;
+    if (!address) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'address_required' });
+    }
+    const profile = agentProfile(address);
+    return res.set('Access-Control-Allow-Origin', '*').json({
+      address, profile: profile || { address, reputation: 0, note: 'no_settles_on_sml_rail' },
+      _paid: pay.payer, _echonet: pay.echonet,
+    });
+  });
+
+  app.get('/x402/hunters', (_req, res) => {
+    res.set('Access-Control-Allow-Origin', '*').json({
+      leaderboard: hunterLeaderboard(25),
+      recent: listReports({ limit: 15 }).map((r) => ({
+        id: r.id, hunter: r.hunter.slice(0, 10) + '…', target: r.targetResource, ok: r.ok,
+        latencyMs: r.latencyMs, usefulness: r.usefulness, ts: r.createdAt,
+      })),
+      publish: 'POST /x402/hunters/report (paid 0.001) — signed hunter report on SML ledger',
+    });
+  });
+
+  app.post('/x402/hunters/report', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/hunters/report`;
+    const body = (req.body && typeof req.body === 'object') ? req.body as Record<string, unknown> : {};
+    const inputSchema = { type: 'object', properties: {
+      target_resource: { type: 'string' }, ok: { type: 'boolean' }, latency_ms: { type: 'integer' },
+      settle_tx: { type: 'string' }, usefulness: { type: 'integer' }, notes: { type: 'string' },
+    }, required: ['target_resource', 'ok'] };
+    const outputSchema = { input: { type: 'http', method: 'POST' }, output: null };
+    const pay = await requirePayment(req, res, {
+      resource, priceUnits: HF,
+      description: payInfoDesc('Publish EchoNet hunter report (paid). Discovery layer is a market — reports without settle-through-us are worthless.'),
+      inputSchema, outputSchema,
+    });
+    if (!pay.ok) return;
+    try {
+      const report = publishReport({
+        hunter: pay.payer.from,
+        targetResource: String(body['target_resource'] || body['targetResource'] || ''),
+        ok: Boolean(body['ok']),
+        latencyMs: Number(body['latency_ms'] ?? body['latencyMs'] ?? 0) || 0,
+        settleUnits: String(body['settle_units'] ?? '0'),
+        settleTx: String(body['settle_tx'] ?? body['settleTx'] ?? pay.payer.tx ?? ''),
+        feeNotes: String(body['fee_notes'] ?? ''),
+        usefulness: Number(body['usefulness'] ?? 50),
+        notes: String(body['notes'] ?? ''),
+        paid: true,
+      });
+      return res.set('Access-Control-Allow-Origin', '*').json({ ok: true, report, _paid: pay.payer, _echonet: pay.echonet });
+    } catch (err) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'report_failed', message: String(err) });
+    }
+  });
+
+  app.get('/x402/echonet', (_req, res) => {
+    const s = EchonetStore.getInstance().getState();
+    res.set('Access-Control-Allow-Origin', '*').json({
+      name: 'EchoNet',
+      version: 1,
+      thesis: 'Kill ranking. Visibility = stranger settle volume on SML rail. Reverse bounties bootstrap. Hunters + graph are metered. Free-riders without this ledger get zero reputation.',
+      endpoints: {
+        board_free: 'GET /x402/bounties',
+        post_bounty_paid: 'POST /x402/bounties',
+        graph_paid: 'GET /x402/graph?task=llm-chat',
+        agent_paid: 'GET /x402/graph/agent?address=0x…',
+        hunters_free_teaser: 'GET /x402/hunters',
+        hunter_report_paid: 'POST /x402/hunters/report',
+      },
+      stats: s.stats,
+      open_bounties: listBounties({ status: 'open' }).length,
+      protocolCutBps: protocolCutBps(),
+      listingFeeUsdc: Number(listingFeeUnits()) / 1e6,
+    });
+  });
+
+
   // ── Housing / Section 8 / PHA (income + personal landlord toolkit) ─────────
   const HOUSING_PRICE = 1000n; // $0.001 USDC
   app.get('/x402/pha-lookup', async (req, res) => {
@@ -3217,6 +3470,47 @@ async function runSSE(): Promise<void> {
       parameters: [{ name: 'chain', in: 'query', required: false, schema: { type: 'string' }, example: 'ethereum' }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'eip155:8453', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.001', amountUnits: '1000', payTo: X402_PAY_TO },
       responses: { '200': { description: 'Gas data' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/bounties': { get: {
+      operationId: 'echonetBountiesBoard',
+      summary: 'EchoNet reverse-bounty board (free teaser).',
+      description: 'Open reverse bounties: first unique stranger wallets that settle listed x402 resources earn rewards. Self-seed excluded. Protocol cut stays on SML rail.',
+      security: [],
+      responses: { '200': { description: 'Bounty board' } },
+    }, post: {
+      operationId: 'echonetPostBounty',
+      summary: 'Post a reverse bounty (paid listing fee).',
+      description: 'Pay listing fee, post reverse bounty for first N stranger settlers on a target resource. SML takes protocol cut of rewards.',
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'eip155:8453', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.01', amountUnits: '10000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'Bounty created' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/graph': { get: {
+      operationId: 'echonetUsageGraph',
+      summary: 'EchoNet usage graph query (paid).',
+      description: 'Who high-reputation agents route real money through for task type X. Observed stranger settles only.',
+      parameters: [{ name: 'task', in: 'query', required: false, schema: { type: 'string' }, example: 'llm-chat' }, { name: 'min_rep', in: 'query', required: false, schema: { type: 'integer', default: 0 } }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', default: 20 } }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'eip155:8453', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.001', amountUnits: '1000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'Graph ranking' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/graph/agent': { get: {
+      operationId: 'echonetAgentProfile',
+      summary: 'EchoNet agent reputation profile (paid).',
+      parameters: [{ name: 'address', in: 'query', required: true, schema: { type: 'string' } }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'eip155:8453', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.001', amountUnits: '1000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'Profile' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/hunters': { get: {
+      operationId: 'echonetHuntersTeaser',
+      summary: 'EchoNet hunter leaderboard teaser (free).',
+      security: [],
+      responses: { '200': { description: 'Hunter teaser' } },
+    } }, '/x402/hunters/report': { post: {
+      operationId: 'echonetHunterReport',
+      summary: 'Publish hunter report (paid).',
+      description: 'Signed hunter report on SML ledger. Discovery is a market — free shills do not count.',
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'eip155:8453', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.001', amountUnits: '1000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'Report stored' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/echonet': { get: {
+      operationId: 'echonetManifest',
+      summary: 'EchoNet manifest (free).',
+      security: [],
+      responses: { '200': { description: 'Manifest' } },
     } }, '/x402/pha-lookup': { get: {
       operationId: 'phaLookup',
       summary: 'Public Housing Authority (PHA) lookup by ZIP/city/county.',
