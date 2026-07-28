@@ -867,16 +867,27 @@ function resolveSignerBin(): string {
 }
 
 
+// Keystore is HOME-path-bound (same as acp-render/startup.sh).
+// Decrypt only works when files live under this exact HOME.
+const SIGNER_HOME = (process.env['ACP_SIGNER_HOME'] || '/home/hermes/.hermes/home').trim();
+
+function pinSignerHome(): void {
+  process.env['HOME'] = SIGNER_HOME;
+  process.env['TS_KEYRING_BACKEND'] = process.env['TS_KEYRING_BACKEND'] || 'file';
+  if (process.env['XDG_CONFIG_HOME']) delete process.env['XDG_CONFIG_HOME'];
+  process.env['XDG_DATA_HOME'] = join(SIGNER_HOME, '.local/share');
+  mkdirSync(join(SIGNER_HOME, '.config/acp-cli'), { recursive: true });
+  mkdirSync(join(SIGNER_HOME, '.config/keyring'), { recursive: true });
+  mkdirSync(join(SIGNER_HOME, '.local/share/keyring'), { recursive: true });
+}
+
 function materializeKeyring(): void {
+  pinSignerHome();
   const b64 = process.env['ACP_KEYRING_KEY_B64']?.trim();
   if (!b64) return;
   try {
-    const home = process.env['HOME'] || '/home/node';
-    const dir = join(home, '.config/keyring');
-    mkdirSync(dir, { recursive: true });
-    const dest = join(dir, 'file.key');
+    const dest = join(SIGNER_HOME, '.config/keyring/file.key');
     writeFileSync(dest, Buffer.from(b64, 'base64'), { mode: 0o600 });
-    process.env['TS_KEYRING_BACKEND'] = process.env['TS_KEYRING_BACKEND'] || 'file';
     console.log(`[SML-ACP] wrote keyring file.key (${Buffer.from(b64, 'base64').length} bytes) → ${dest}`);
   } catch (e) {
     console.warn('[SML-ACP] keyring materialize failed:', String(e));
@@ -884,9 +895,16 @@ function materializeKeyring(): void {
 }
 
 function ensureSignerKeystore(): void {
+  pinSignerHome();
   const raw = process.env['ACP_SIGNER_KEYS_JSON']?.trim();
-  if (!raw) return;
-  // Validate JSON early — a public-key-only string used to land here and broke the signer.
+  if (!raw) {
+    const existing = join(SIGNER_HOME, '.config/acp-cli/signer-keys.json');
+    if (existsSync(existing)) {
+      console.log(`[SML-ACP] using existing signer-keys.json at ${existing}`);
+      return;
+    }
+    return;
+  }
   try {
     const parsed = JSON.parse(raw) as { secret?: string; salt?: string; keys?: Record<string, unknown> };
     if (!parsed?.secret || !parsed?.salt || !parsed?.keys || typeof parsed.keys !== 'object') {
@@ -895,38 +913,19 @@ function ensureSignerKeystore(): void {
   } catch (e) {
     throw new Error(`ACP_SIGNER_KEYS_JSON invalid: ${(e as Error).message}`);
   }
-  const candidates = [
-    join(process.env['HOME'] || '', '.config/acp-cli'),
-    '/tmp/acp-cli',
-    join('/tmp', 'acp-cli'),
-  ].filter(Boolean);
-  let dest = '';
-  let lastErr: unknown;
-  for (const dir of candidates) {
-    try {
-      mkdirSync(dir, { recursive: true });
-      dest = join(dir, 'signer-keys.json');
-      writeFileSync(dest, raw, { mode: 0o600 });
-      // Point signer binary at this keyfile via HOME if we used /tmp
-      if (dir.startsWith('/tmp')) {
-        process.env['HOME'] = '/tmp';
-      }
-      console.log(`[SML-ACP] wrote signer-keys.json (${raw.length} bytes) → ${dest}`);
-      return;
-    } catch (e) {
-      lastErr = e;
-    }
-  }
-  throw new Error(`cannot write signer-keys.json: ${String(lastErr)}`);
+  const dest = join(SIGNER_HOME, '.config/acp-cli/signer-keys.json');
+  writeFileSync(dest, raw, { mode: 0o600 });
+  console.log(`[SML-ACP] wrote signer-keys.json (${raw.length} bytes) → ${dest} (HOME=${SIGNER_HOME})`);
 }
 
 function createSignFn(publicKeyB64: string, signerBin: string) {
   return async (payload: Uint8Array): Promise<string> => {
     const hex = Buffer.from(payload).toString('hex');
+    pinSignerHome();
     const res = spawnSync(
       signerBin,
       ['sign', '--public-key', publicKeyB64, '--payload', hex],
-      { encoding: 'utf8', env: process.env },
+      { encoding: 'utf8', env: { ...process.env, HOME: SIGNER_HOME, TS_KEYRING_BACKEND: 'file', XDG_DATA_HOME: join(SIGNER_HOME, '.local/share') } },
     );
     if (res.error) throw res.error;
     const out = (res.stdout || '').trim();
@@ -1025,10 +1024,11 @@ export async function startAcpSeller(): Promise<void> {
     console.log(`[SML-ACP] publicKey starts=${publicKey.slice(0, 24)}… len=${publicKey.length}`);
 
     // Preflight: sign a tiny payload with keystore (proves key exists)
+    pinSignerHome();
     const pre = spawnSync(
       signerBin,
       ['sign', '--public-key', publicKey, '--payload', '6869'],
-      { encoding: 'utf8', env: process.env },
+      { encoding: 'utf8', env: { ...process.env, HOME: SIGNER_HOME, TS_KEYRING_BACKEND: 'file', XDG_DATA_HOME: join(SIGNER_HOME, '.local/share') } },
     );
     const preOut = (pre.stdout || '').trim();
     console.log(`[SML-ACP] signer preflight rc=${pre.status} out=${preOut.slice(0, 120)}`);

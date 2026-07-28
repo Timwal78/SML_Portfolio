@@ -32,5 +32,13 @@ ENV NODE_ENV=production
 ENV MCP_TRANSPORT=sse
 ENV MCP_SSE_PORT=3402
 ENV ACP_SIGNER_BIN=/app/bin/acp-cli-signer-linux
+ENV ACP_SIGNER_HOME=/home/hermes/.hermes/home
+ENV HOME=/home/hermes/.hermes/home
+ENV TS_KEYRING_BACKEND=file
+# Signer keystore is path-bound to this HOME (must match acp-provider)
+RUN mkdir -p /home/hermes/.hermes/home/.config/acp-cli \
+             /home/hermes/.hermes/home/.config/keyring \
+             /home/hermes/.hermes/home/.local/share/keyring \
+    && chown -R node:node /home/hermes
 USER node
 CMD ["node", "dist/server/index.js"]
