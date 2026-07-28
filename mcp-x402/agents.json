@@ -330,5 +330,11 @@
       "description": "Validate backtest parameters.",
       "price": "free"
     }
-  ]
+  ],
+  "paid_demo_url": "https://mcp-x402.onrender.com/x402/crypto-price",
+  "price_floor_usdc": "0.001",
+  "network": "eip155:8453",
+  "endpoints": {
+    "paid_demo": "https://mcp-x402.onrender.com/x402/crypto-price"
+  }
 }

@@ -462,3 +462,13 @@ Agent-facing directory + listing surface for machine commerce.
 - Browser agent send: https://www.scriptmasterlabs.com/agent-send.html
 - npm: @scriptmasterlabs/x402-paywall
 
+## Paid demo URLs (HTTP 402 — use these for x402scan/Bazaar, NOT bare /)
+- mcp: https://mcp-x402.onrender.com/x402/crypto-price
+- mcp fx: https://mcp-x402.onrender.com/x402/fx-rate
+- mcp grants: https://mcp-x402.onrender.com/x402/grants
+- ACP: https://acp-x402-scriptmasterlabs.onrender.com/x402/crypto-price
+- ACP gas: https://acp-x402-scriptmasterlabs.onrender.com/x402/gas-tracker
+- RWA: https://sml-rwa-api.onrender.com/x402/rwa-valuation
+- Price floor: 0.001 USDC on Base (eip155:8453)
+- Root `/` is catalog (200). Scanners must hit paid paths above.
+

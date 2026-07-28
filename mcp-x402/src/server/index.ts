@@ -2095,6 +2095,363 @@ async function runSSE(): Promise<void> {
   });
 
 
+
+  // ── HIGH-FREQ TOP SNACKS (x402scan volume wedge) @ 0.001 USDC ──────────────
+  const HF = 1000n;
+  const payInfoDesc = (d: string) => `${d} Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.`;
+
+  app.get('/x402/web-fetch', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/web-fetch`;
+    const url = typeof req.query['url'] === 'string' ? req.query['url'] : '';
+    const inputSchema = { type: 'object', properties: { url: { type: 'string' } }, required: ['url'] };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { url: { type: 'string', required: true } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: HF, description: payInfoDesc('Fetch a public HTTP(S) URL and return truncated text/json.'), inputSchema, outputSchema });
+    if (!pay.ok) return;
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'url_required_https' });
+    }
+    const low = url.toLowerCase();
+    if (['localhost', '127.0.0.1', '0.0.0.0', '169.254.', 'metadata.google'].some((x) => low.includes(x))) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'url_blocked' });
+    }
+    try {
+      const r = await fetch(url, { headers: { 'User-Agent': 'scriptmasterlabs-mcp-x402/1.0', Accept: 'text/html,application/json,*/*' }, signal: AbortSignal.timeout(20000) });
+      const buf = Buffer.from(await r.arrayBuffer()).subarray(0, 80000);
+      const ctype = r.headers.get('content-type') || '';
+      const text = buf.toString('utf8');
+      let parsed: unknown = null;
+      if (ctype.includes('json') || text.trim().startsWith('{') || text.trim().startsWith('[')) {
+        try { parsed = JSON.parse(text); } catch { parsed = null; }
+      }
+      return res.set('Access-Control-Allow-Origin', '*').json({
+        timestamp: new Date().toISOString(), url, status: r.status, content_type: ctype, bytes: buf.length,
+        json: parsed, text: parsed == null ? text.slice(0, 12000) : null, source: 'sml_web_fetch', _paid: pay.payer,
+      });
+    } catch (err) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'fetch_failed', message: String(err) });
+    }
+  });
+
+  app.get('/x402/web-markdown', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/web-markdown`;
+    const url = typeof req.query['url'] === 'string' ? req.query['url'] : '';
+    const inputSchema = { type: 'object', properties: { url: { type: 'string' } }, required: ['url'] };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { url: { type: 'string', required: true } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: HF, description: payInfoDesc('Fetch URL and return simplified markdown/text for agents.'), inputSchema, outputSchema });
+    if (!pay.ok) return;
+    if (!url.startsWith('http')) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'url_required_https' }); }
+    try {
+      const r = await fetch(url, { headers: { 'User-Agent': 'scriptmasterlabs-mcp-x402/1.0', Accept: 'text/html,*/*' }, signal: AbortSignal.timeout(20000) });
+      let html = Buffer.from(await r.arrayBuffer()).subarray(0, 200000).toString('utf8');
+      html = html.replace(/<(script|style|noscript)[^>]*>[\s\S]*?<\/\1>/gi, ' ');
+      html = html.replace(/<!--[\s\S]*?-->/g, ' ');
+      html = html.replace(/<br\s*\/?>/gi, '\n').replace(/<\/p>/gi, '\n\n');
+      html = html.replace(/<\/?h([1-6])[^>]*>/gi, '\n');
+      html = html.replace(/<a[^>]+href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi, '[$2]($1)');
+      html = html.replace(/<[^>]+>/g, ' ').replace(/[ \t]+/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
+      return res.set('Access-Control-Allow-Origin', '*').json({ timestamp: new Date().toISOString(), url, status: r.status, markdown: html.slice(0, 20000), chars: html.length, source: 'sml_web_markdown', _paid: pay.payer });
+    } catch (err) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'markdown_failed', message: String(err) });
+    }
+  });
+
+  app.get('/x402/web-search', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/web-search`;
+    const q = typeof req.query['q'] === 'string' ? req.query['q'] : '';
+    const limit = Math.max(1, Math.min(parseInt(String(req.query['limit'] ?? '8'), 10) || 8, 15));
+    const inputSchema = { type: 'object', properties: { q: { type: 'string' }, limit: { type: 'integer' } }, required: ['q'] };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { q: { type: 'string', required: true } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: HF, description: payInfoDesc('Keyless web search (Wikipedia + DuckDuckGo) for agent retrieval.'), inputSchema, outputSchema });
+    if (!pay.ok) return;
+    if (!q.trim()) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'q_required' }); }
+    try {
+      const results: Array<Record<string, string>> = [];
+      const sources: string[] = [];
+      const w = await fetch(`https://en.wikipedia.org/w/api.php?action=opensearch&format=json&limit=${limit}&search=${encodeURIComponent(q)}`, { headers: { Accept: 'application/json', 'User-Agent': 'scriptmasterlabs-mcp-x402/1.0' } });
+      if (w.ok) {
+        const arr = await w.json() as unknown[];
+        if (Array.isArray(arr) && arr.length >= 4) {
+          const titles = arr[1] as string[]; const descs = arr[2] as string[]; const links = arr[3] as string[];
+          titles.forEach((title, i) => results.push({ title, url: links[i] || '', snippet: descs[i] || '', source: 'wikipedia' }));
+          sources.push('wikipedia_opensearch');
+        }
+      }
+      if (results.length < limit) {
+        const d = await fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(q)}&format=json&no_html=1&skip_disambig=1`, { headers: { Accept: 'application/json' } });
+        if (d.ok) {
+          const j = await d.json() as Record<string, unknown>;
+          if (j.AbstractText) results.push({ title: String(j.Heading || q), url: String(j.AbstractURL || ''), snippet: String(j.AbstractText), source: 'duckduckgo_abstract' });
+          sources.push('duckduckgo_api');
+        }
+      }
+      return res.set('Access-Control-Allow-Origin', '*').json({ timestamp: new Date().toISOString(), q, count: results.slice(0, limit).length, results: results.slice(0, limit), sources, source: sources.join('+'), _paid: pay.payer });
+    } catch (err) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'web_search_failed', message: String(err) });
+    }
+  });
+
+  app.get('/x402/llm-chat', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/llm-chat`;
+    const prompt = typeof req.query['prompt'] === 'string' ? req.query['prompt'] : (typeof req.query['message'] === 'string' ? req.query['message'] : '');
+    const model = typeof req.query['model'] === 'string' ? req.query['model'] : (process.env.LLM_MODEL_ID || 'x-ai-grok-4-5');
+    const max_tokens = Math.max(16, Math.min(parseInt(String(req.query['max_tokens'] ?? '256'), 10) || 256, 1024));
+    const inputSchema = { type: 'object', properties: { prompt: { type: 'string' }, message: { type: 'string' }, model: { type: 'string' }, max_tokens: { type: 'integer' } }, required: ['prompt'] };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { prompt: { type: 'string', required: true } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: HF, description: payInfoDesc('OpenAI-compatible chat completion proxy for agents (small prompt).'), inputSchema, outputSchema });
+    if (!pay.ok) return;
+    const base = (process.env.LLM_BASE_URL || '').replace(/\/$/, '');
+    const key = process.env.LLM_API_KEY || '';
+    if (!base || !key) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(503).set('Access-Control-Allow-Origin', '*').json({ error: 'llm_unconfigured', detail: 'LLM_BASE_URL/LLM_API_KEY missing on host' });
+    }
+    if (!prompt.trim()) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'prompt_required' });
+    }
+    try {
+      const r = await fetch(`${base}/chat/completions`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ model, messages: [{ role: 'user', content: prompt.slice(0, 8000) }], max_tokens, temperature: 0.2 }),
+        signal: AbortSignal.timeout(60000),
+      });
+      const j = await r.json() as Record<string, unknown>;
+      if (!r.ok) {
+        if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+        return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'llm_upstream', status: r.status, body: j });
+      }
+      const choice = Array.isArray(j.choices) ? (j.choices as Array<Record<string, unknown>>)[0] : undefined;
+      const msg = choice && typeof choice.message === 'object' && choice.message ? (choice.message as Record<string, unknown>).content : undefined;
+      return res.set('Access-Control-Allow-Origin', '*').json({ timestamp: new Date().toISOString(), model, content: msg ?? null, usage: j.usage ?? null, source: 'openai_compatible_proxy', _paid: pay.payer });
+    } catch (err) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'llm_failed', message: String(err) });
+    }
+  });
+
+  app.post('/x402/chat/completions', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/chat/completions`;
+    const body = (req.body && typeof req.body === 'object') ? req.body as Record<string, unknown> : {};
+    const inputSchema = { type: 'object', properties: { model: { type: 'string' }, messages: { type: 'array' }, max_tokens: { type: 'integer' } }, required: ['messages'] };
+    const outputSchema = { input: { type: 'http', method: 'POST' }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: HF, description: payInfoDesc('OpenAI-compatible POST /chat/completions proxy for agents.'), inputSchema, outputSchema });
+    if (!pay.ok) return;
+    const base = (process.env.LLM_BASE_URL || '').replace(/\/$/, '');
+    const key = process.env.LLM_API_KEY || '';
+    if (!base || !key) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(503).set('Access-Control-Allow-Origin', '*').json({ error: 'llm_unconfigured' });
+    }
+    try {
+      const payload = {
+        model: body.model || process.env.LLM_MODEL_ID || 'x-ai-grok-4-5',
+        messages: body.messages,
+        max_tokens: Math.max(16, Math.min(Number(body.max_tokens ?? 256) || 256, 1024)),
+        temperature: body.temperature ?? 0.2,
+      };
+      const r = await fetch(`${base}/chat/completions`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(60000),
+      });
+      const j = await r.json();
+      if (!r.ok) {
+        if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+        return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'llm_upstream', status: r.status, body: j });
+      }
+      return res.set('Access-Control-Allow-Origin', '*').json({ ...(j as object), _paid: pay.payer, source: 'openai_compatible_proxy' });
+    } catch (err) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'llm_failed', message: String(err) });
+    }
+  });
+
+  async function jsonRpcProxy(chain: 'ethereum' | 'base', req: Request, res: Response) {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const path = chain === 'base' ? '/x402/base-rpc' : '/x402/eth-rpc';
+    const resource = `https://${host}${path}`;
+    const method = typeof req.query['method'] === 'string' ? req.query['method'] : 'eth_blockNumber';
+    const address = typeof req.query['address'] === 'string' ? req.query['address'] : '';
+    const hash = typeof req.query['hash'] === 'string' ? req.query['hash'] : (typeof req.query['tx'] === 'string' ? req.query['tx'] : '');
+    const block = typeof req.query['block'] === 'string' ? req.query['block'] : 'latest';
+    const allowed = new Set(['eth_blockNumber','eth_chainId','eth_gasPrice','eth_getBalance','eth_getCode','eth_call','eth_getTransactionByHash','eth_getTransactionReceipt','eth_getBlockByNumber','net_version']);
+    const inputSchema = { type: 'object', properties: { method: { type: 'string' }, address: { type: 'string' }, hash: { type: 'string' }, block: { type: 'string' } }, required: [] };
+    const outputSchema = { input: { type: 'http', method: 'GET' }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: HF, description: payInfoDesc(`${chain} JSON-RPC read helper for agents (balances, blocks, txs).`), inputSchema, outputSchema });
+    if (!pay.ok) return;
+    if (!allowed.has(method)) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'method_not_allowed', allowed: [...allowed] });
+    }
+    let params: unknown[] = [];
+    if (method === 'eth_getBalance') {
+      if (!address.startsWith('0x')) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'address_required' }); }
+      params = [address, block];
+    } else if (method === 'eth_getBlockByNumber') {
+      params = [block, false];
+    } else if (method === 'eth_getTransactionByHash' || method === 'eth_getTransactionReceipt') {
+      if (!hash.startsWith('0x')) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'hash_required' }); }
+      params = [hash];
+    }
+    const rpcs = chain === 'base'
+      ? ['https://mainnet.base.org', 'https://base-rpc.publicnode.com']
+      : ['https://ethereum.publicnode.com', 'https://rpc.ankr.com/eth', 'https://cloudflare-eth.com'];
+    let lastErr = '';
+    for (const rpc of rpcs) {
+      try {
+        const r = await fetch(rpc, {
+          method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json', 'User-Agent': 'scriptmasterlabs-mcp-x402/1.0' },
+          body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }), signal: AbortSignal.timeout(20000),
+        });
+        const j = await r.json() as Record<string, unknown>;
+        return res.set('Access-Control-Allow-Origin', '*').json({ timestamp: new Date().toISOString(), chain, rpc, method, result: j.result ?? null, error: j.error ?? null, source: `${chain}_json_rpc`, _paid: pay.payer });
+      } catch (e) { lastErr = String(e); }
+    }
+    if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+    return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'rpc_failed', message: lastErr });
+  }
+  app.get('/x402/eth-rpc', (req, res) => { void jsonRpcProxy('ethereum', req, res); });
+  app.get('/x402/base-rpc', (req, res) => { void jsonRpcProxy('base', req, res); });
+
+  app.get('/x402/domain-enrich', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/domain-enrich`;
+    let domain = typeof req.query['domain'] === 'string' ? req.query['domain'] : (typeof req.query['url'] === 'string' ? req.query['url'] : '');
+    domain = domain.replace(/^https?:\/\//, '').split('/')[0].split(':')[0].toLowerCase();
+    const inputSchema = { type: 'object', properties: { domain: { type: 'string' } }, required: ['domain'] };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { domain: { type: 'string', required: true } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: HF, description: payInfoDesc('Cheap domain enrichment: DNS + RDAP + IP geo.'), inputSchema, outputSchema });
+    if (!pay.ok) return;
+    if (!domain || !domain.includes('.')) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'domain_required' }); }
+    try {
+      const dns = await fetch(`https://dns.google/resolve?name=${encodeURIComponent(domain)}&type=A`, { headers: { Accept: 'application/json' } });
+      const dj = dns.ok ? await dns.json() as { Answer?: Array<{ data?: string }> } : {};
+      const ips = (dj.Answer || []).map((a) => a.data).filter(Boolean) as string[];
+      let rdap: unknown = null;
+      try {
+        const rr = await fetch(`https://rdap.org/domain/${encodeURIComponent(domain)}`, { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(15000) });
+        if (rr.ok) rdap = await rr.json();
+      } catch { /* ignore */ }
+      let geo: unknown = null;
+      if (ips[0]) {
+        try {
+          const g = await fetch(`http://ip-api.com/json/${ips[0]}?fields=status,country,regionName,city,isp,org,as,query`, { signal: AbortSignal.timeout(10000) });
+          if (g.ok) geo = await g.json();
+        } catch { /* ignore */ }
+      }
+      return res.set('Access-Control-Allow-Origin', '*').json({ timestamp: new Date().toISOString(), domain, ips: ips.slice(0, 10), rdap, geo, source: 'sml_domain_enrich', _paid: pay.payer });
+    } catch (err) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'enrich_failed', message: String(err) });
+    }
+  });
+
+  app.get('/x402/news-headlines', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/news-headlines`;
+    const q = typeof req.query['q'] === 'string' ? req.query['q'] : 'crypto OR bitcoin OR AI agents';
+    const limit = Math.max(1, Math.min(parseInt(String(req.query['limit'] ?? '15'), 10) || 15, 40));
+    const hl = typeof req.query['hl'] === 'string' ? req.query['hl'] : 'en';
+    const gl = typeof req.query['gl'] === 'string' ? req.query['gl'] : 'US';
+    const inputSchema = { type: 'object', properties: { q: { type: 'string' }, limit: { type: 'integer' }, hl: { type: 'string' }, gl: { type: 'string' } }, required: [] };
+    const outputSchema = { input: { type: 'http', method: 'GET' }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: HF, description: payInfoDesc('Google News RSS headlines for agent news pulse.'), inputSchema, outputSchema });
+    if (!pay.ok) return;
+    try {
+      const url = `https://news.google.com/rss/search?q=${encodeURIComponent(q)}&hl=${encodeURIComponent(hl)}&gl=${encodeURIComponent(gl)}&ceid=${encodeURIComponent(gl + ':' + hl)}`;
+      const r = await fetch(url, { headers: { 'User-Agent': 'scriptmasterlabs-mcp-x402/1.0', Accept: 'application/rss+xml,application/xml,text/xml,*/*' }, signal: AbortSignal.timeout(20000) });
+      const xml = await r.text();
+      const items: Array<Record<string, string>> = [];
+      const blocks = xml.split('<item>').slice(1);
+      for (const b of blocks) {
+        const title = (b.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/) || b.match(/<title>(.*?)<\/title>/))?.[1] || '';
+        const link = (b.match(/<link>(.*?)<\/link>/))?.[1] || '';
+        const pub = (b.match(/<pubDate>(.*?)<\/pubDate>/))?.[1] || '';
+        const source = (b.match(/<source[^>]*>(.*?)<\/source>/))?.[1] || '';
+        items.push({ title, url: link, published: pub, source });
+        if (items.length >= limit) break;
+      }
+      return res.set('Access-Control-Allow-Origin', '*').json({ timestamp: new Date().toISOString(), q, count: items.length, headlines: items, source: 'google_news_rss', _paid: pay.payer });
+    } catch (err) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'news_failed', message: String(err) });
+    }
+  });
+
+  app.get('/x402/social-search', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/social-search`;
+    const q = typeof req.query['q'] === 'string' ? req.query['q'] : '';
+    const limit = Math.max(1, Math.min(parseInt(String(req.query['limit'] ?? '8'), 10) || 8, 15));
+    const inputSchema = { type: 'object', properties: { q: { type: 'string' }, limit: { type: 'integer' } }, required: ['q'] };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { q: { type: 'string', required: true } } }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: HF, description: payInfoDesc('Public web social pulse search (not official X API) for agent monitoring.'), inputSchema, outputSchema });
+    if (!pay.ok) return;
+    if (!q.trim()) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'q_required' }); }
+    try {
+      const qq = `${q} (site:x.com OR site:twitter.com OR site:reddit.com)`;
+      const w = await fetch(`https://en.wikipedia.org/w/api.php?action=opensearch&format=json&limit=${limit}&search=${encodeURIComponent(q)}`, { headers: { Accept: 'application/json', 'User-Agent': 'scriptmasterlabs-mcp-x402/1.0' } });
+      const results: Array<Record<string, string>> = [];
+      if (w.ok) {
+        const arr = await w.json() as unknown[];
+        if (Array.isArray(arr) && arr.length >= 4) {
+          const titles = arr[1] as string[]; const links = arr[3] as string[];
+          titles.forEach((title, i) => results.push({ title, url: links[i] || '', snippet: '', source: 'wikipedia' }));
+        }
+      }
+      const d = await fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(qq)}&format=json&no_html=1&skip_disambig=1`, { headers: { Accept: 'application/json' } });
+      if (d.ok) {
+        const j = await d.json() as Record<string, unknown>;
+        if (j.AbstractText) results.push({ title: String(j.Heading || q), url: String(j.AbstractURL || ''), snippet: String(j.AbstractText), source: 'duckduckgo' });
+      }
+      return res.set('Access-Control-Allow-Origin', '*').json({ timestamp: new Date().toISOString(), q, count: results.slice(0, limit).length, results: results.slice(0, limit), note: 'public_web_social_proxy_not_official_x_api', source: 'social_search', _paid: pay.payer });
+    } catch (err) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'social_search_failed', message: String(err) });
+    }
+  });
+
+  app.get('/x402/gas-tracker', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/gas-tracker`;
+    const inputSchema = { type: 'object', properties: { chain: { type: 'string' } }, required: [] };
+    const outputSchema = { input: { type: 'http', method: 'GET' }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: HF, description: payInfoDesc('Multi-chain gas tracker snack for agents.'), inputSchema, outputSchema });
+    if (!pay.ok) return;
+    try {
+      // public eth gas via rpc
+      const r = await fetch('https://ethereum.publicnode.com', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'eth_gasPrice', params: [] }),
+      });
+      const j = await r.json() as { result?: string };
+      const wei = j.result ? parseInt(j.result, 16) : 0;
+      const gwei = wei / 1e9;
+      return res.set('Access-Control-Allow-Origin', '*').json({
+        timestamp: new Date().toISOString(),
+        chains: [{ chain: 'ethereum', gas_gwei: gwei, source: 'public_rpc' }],
+        source: 'sml_gas_tracker',
+        _paid: pay.payer,
+      });
+    } catch (err) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'gas_failed', message: String(err) });
+    }
+  });
+
+
   // ── Housing / Section 8 / PHA (income + personal landlord toolkit) ─────────
   const HOUSING_PRICE = 1000n; // $0.001 USDC
   app.get('/x402/pha-lookup', async (req, res) => {
@@ -2572,6 +2929,82 @@ async function runSSE(): Promise<void> {
       parameters: [{ name: 'base', in: 'query', required: false, schema: { type: 'string', default: 'USD' }, example: 'USD' }, { name: 'quotes', in: 'query', required: false, schema: { type: 'string' }, description: 'Comma-separated 3-letter target currency codes.', example: 'EUR,GBP,JPY' }, { name: 'date', in: 'query', required: false, schema: { type: 'string' }, description: 'YYYY-MM-DD for a historical rate. Omit for latest.' }],
       'x-payment-info': { method: 'x402', scheme: 'exact', network: 'eip155:8453', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.001', amountUnits: '1000', payTo: X402_PAY_TO },
       responses: { '200': { description: 'Exchange rate data' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/web-fetch': { get: {
+      operationId: 'webFetch',
+      summary: 'Fetch a public URL and return text/json for agents.',
+      description: 'High-frequency web fetch snack. Pay 0.001 USDC on Base.',
+      parameters: [{ name: 'url', in: 'query', required: true, schema: { type: 'string' }, example: 'https://example.com' }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'eip155:8453', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.001', amountUnits: '1000', payTo: X402_PAY_TO, settlement: 'onchain-tx', paymentHeader: 'X-PAYMENT-TX' },
+      responses: { '200': { description: 'Fetched content' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/web-markdown': { get: {
+      operationId: 'webMarkdown',
+      summary: 'URL to simplified markdown/text.',
+      description: 'Agent-readable page extract. Pay 0.001 USDC on Base.',
+      parameters: [{ name: 'url', in: 'query', required: true, schema: { type: 'string' }, example: 'https://example.com' }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'eip155:8453', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.001', amountUnits: '1000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'Markdown' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/web-search': { get: {
+      operationId: 'webSearch',
+      summary: 'Keyless web search for agents.',
+      description: 'Wikipedia + DuckDuckGo search snack. Pay 0.001 USDC on Base.',
+      parameters: [{ name: 'q', in: 'query', required: true, schema: { type: 'string' }, example: 'x402 micropayments' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', default: 8 } }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'eip155:8453', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.001', amountUnits: '1000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'Search results' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/llm-chat': { get: {
+      operationId: 'llmChat',
+      summary: 'Cheap LLM chat completion proxy for agents.',
+      description: 'OpenAI-compatible chat snack. Pay 0.001 USDC on Base.',
+      parameters: [{ name: 'prompt', in: 'query', required: true, schema: { type: 'string' }, example: 'Say hi in one sentence' }, { name: 'model', in: 'query', required: false, schema: { type: 'string' } }, { name: 'max_tokens', in: 'query', required: false, schema: { type: 'integer', default: 256 } }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'eip155:8453', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.001', amountUnits: '1000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'Chat completion' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/chat/completions': { post: {
+      operationId: 'chatCompletions',
+      summary: 'OpenAI-compatible POST chat completions proxy.',
+      description: 'Standard /v1-style chat completions over x402. Pay 0.001 USDC on Base.',
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'eip155:8453', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.001', amountUnits: '1000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'Completion' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/eth-rpc': { get: {
+      operationId: 'ethRpc',
+      summary: 'Ethereum JSON-RPC read helper.',
+      description: 'Balances, blocks, txs via public RPC. Pay 0.001 USDC on Base.',
+      parameters: [{ name: 'method', in: 'query', required: false, schema: { type: 'string', default: 'eth_blockNumber' } }, { name: 'address', in: 'query', required: false, schema: { type: 'string' } }, { name: 'hash', in: 'query', required: false, schema: { type: 'string' } }, { name: 'block', in: 'query', required: false, schema: { type: 'string', default: 'latest' } }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'eip155:8453', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.001', amountUnits: '1000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'RPC result' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/base-rpc': { get: {
+      operationId: 'baseRpc',
+      summary: 'Base mainnet JSON-RPC read helper.',
+      description: 'Base chain reads for agents. Pay 0.001 USDC on Base.',
+      parameters: [{ name: 'method', in: 'query', required: false, schema: { type: 'string', default: 'eth_blockNumber' } }, { name: 'address', in: 'query', required: false, schema: { type: 'string' } }, { name: 'hash', in: 'query', required: false, schema: { type: 'string' } }, { name: 'block', in: 'query', required: false, schema: { type: 'string', default: 'latest' } }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'eip155:8453', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.001', amountUnits: '1000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'RPC result' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/domain-enrich': { get: {
+      operationId: 'domainEnrich',
+      summary: 'Domain enrichment: DNS + RDAP + geo.',
+      description: 'Cheap firmographic snack. Pay 0.001 USDC on Base.',
+      parameters: [{ name: 'domain', in: 'query', required: true, schema: { type: 'string' }, example: 'scriptmasterlabs.com' }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'eip155:8453', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.001', amountUnits: '1000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'Enrichment' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/news-headlines': { get: {
+      operationId: 'newsHeadlines',
+      summary: 'Google News RSS headlines.',
+      description: 'High-frequency news snack. Pay 0.001 USDC on Base.',
+      parameters: [{ name: 'q', in: 'query', required: false, schema: { type: 'string' }, example: 'bitcoin' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', default: 15 } }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'eip155:8453', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.001', amountUnits: '1000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'Headlines' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/social-search': { get: {
+      operationId: 'socialSearch',
+      summary: 'Public web social pulse search (not official X API).',
+      description: 'Social monitoring snack for agents. Pay 0.001 USDC on Base.',
+      parameters: [{ name: 'q', in: 'query', required: true, schema: { type: 'string' }, example: 'x402 agents' }, { name: 'limit', in: 'query', required: false, schema: { type: 'integer', default: 8 } }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'eip155:8453', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.001', amountUnits: '1000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'Social results' }, '402': { description: 'Payment required.' } },
+    } }, '/x402/gas-tracker': { get: {
+      operationId: 'gasTracker',
+      summary: 'Multi-chain gas tracker snack.',
+      description: 'Ethereum gas price for agents. Pay 0.001 USDC on Base.',
+      parameters: [{ name: 'chain', in: 'query', required: false, schema: { type: 'string' }, example: 'ethereum' }],
+      'x-payment-info': { method: 'x402', scheme: 'exact', network: 'eip155:8453', asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', currency: 'USDC', amount: '0.001', amountUnits: '1000', payTo: X402_PAY_TO },
+      responses: { '200': { description: 'Gas data' }, '402': { description: 'Payment required.' } },
     } }, '/x402/pha-lookup': { get: {
       operationId: 'phaLookup',
       summary: 'Public Housing Authority (PHA) lookup by ZIP/city/county.',
@@ -2759,7 +3192,8 @@ async function runSSE(): Promise<void> {
     <body><h1>Subscription received</h1>
     <p>If you just subscribed via AWS Marketplace, your API key is being provisioned — this can take a minute. Check your email, or if you have your AWS Marketplace order details handy, contact <a href="mailto:timothy.walton45@gmail.com">support</a> and reference your Customer ID.</p>
     <p>MCP endpoint: <code>https://mcp-x402.onrender.com/mcp</code></p>
-    <p>Full docs: <a href="/llms.txt">llms.txt</a></p></body></html>`;
+    <p>Paid demo (HTTP 402): <code>https://mcp-x402.onrender.com/x402/crypto-price</code></p>
+    <p>Full docs: <a href="/llms.txt">llms.txt</a> · <a href="https://www.scriptmasterlabs.com/vendos.html">VendOS</a></p></body></html>`;
   app.get('/', async (req: Request, res: Response) => {
     const tokenFromQuery = typeof req.query['x-amzn-marketplace-token'] === 'string' ? (req.query['x-amzn-marketplace-token'] as string) : '';
     if (tokenFromQuery) {
@@ -2772,17 +3206,45 @@ async function runSSE(): Promise<void> {
       res.send(rootWelcomePage());
       return;
     }
+    // Machine clients: advertise real paid snack URLs. Scanners that only hit /
+    // previously labeled us "not paid" — paid_demo_url is a live HTTP 402 resource.
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const base = `https://${host}`;
+    const paidDemo = `${base}/x402/crypto-price`;
+    const want402 = String(req.query['x402'] ?? req.headers['x-want-402'] ?? '') === '1'
+      || String(req.headers['accept'] ?? '').includes('application/x402');
+    if (want402) {
+      const challenge = inlineDiscover402(paidDemo, 'SML x402 crypto-price snack — 0.001 USDC on Base. Root catalog redirected scanners here.');
+      const h = Buffer.from(JSON.stringify(challenge)).toString('base64');
+      res.status(402).set('X-PAYMENT-REQUIRED', h).set('PAYMENT-REQUIRED', h)
+        .set('Access-Control-Expose-Headers', 'X-PAYMENT-REQUIRED, PAYMENT-REQUIRED')
+        .set('Access-Control-Allow-Origin', '*').json(challenge);
+      return;
+    }
     res.json({
       name: 'mcp-x402',
       version: VERSION,
-      description: 'The x402 Amazon — 85+ tools, pay-per-call via XRPL. scriptmasterlabs.com',
+      description: 'ScriptMasterLabs x402 — 85+ tools, pay-per-call USDC on Base. scriptmasterlabs.com',
       status: 'online',
+      x402: true,
+      price_floor_usdc: '0.001',
+      network: 'eip155:8453',
       transport: 'streamable-http + sse',
+      paid_demo_url: paidDemo,
+      paid_resources: [
+        `${base}/x402/crypto-price`,
+        `${base}/x402/fx-rate`,
+        `${base}/x402/grants`,
+        `${base}/x402/crypto-trending`,
+      ],
+      discovery: `${base}/.well-known/x402`,
+      scanner_hint: 'Root is catalog (200). GET paid_demo_url without payment → HTTP 402. Or GET /?x402=1 for challenge.',
       endpoints: {
         mcp_streamable: 'POST /mcp',
         sse_connect: 'GET /sse',
         sse_messages: 'POST /messages',
         health: 'GET /health',
+        paid_demo: 'GET /x402/crypto-price',
         agentCard: 'GET /.well-known/agentcard.json',
         a2aAgentCard: 'GET /.well-known/agent.json',
         openApiX402: 'GET /.well-known/x402',
@@ -2790,7 +3252,9 @@ async function runSSE(): Promise<void> {
       },
       links: {
         github: 'https://github.com/Timwal78/SML_Portfolio/tree/main/mcp-x402',
-        homepage: 'https://scriptmasterlabs.com',
+        homepage: 'https://www.scriptmasterlabs.com',
+        vendos: 'https://www.scriptmasterlabs.com/vendos.html',
+        watch_pay: 'https://www.scriptmasterlabs.com/watch-the-agent-pay.html',
       },
     });
   });

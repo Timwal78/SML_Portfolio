@@ -68,3 +68,9 @@ npx @scriptmasterlabs/mcp-x402
 ## Housing / Section 8 ($0.001)
 - /x402/pha-lookup · /x402/hcv-fmr · /x402/hud-vash-contacts
 - /x402/housing-landlord-checklist · /x402/housing-windsor
+
+## Paid snack URLs (HTTP 402)
+- https://mcp-x402.onrender.com/x402/crypto-price
+- https://mcp-x402.onrender.com/x402/fx-rate
+- https://mcp-x402.onrender.com/x402/grants
+Root `/` is discovery catalog only. Point scanners at paid snacks above.
