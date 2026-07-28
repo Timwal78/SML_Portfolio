@@ -3547,7 +3547,7 @@ async function runSSE(): Promise<void> {
   });
 }
 
-const transport = process.env['MCP_TRANSPORT'] ?? 'stdio';
+const transport = process.env['MCP_TRANSPORT'] ?? 'sse';
 if (transport === 'sse') {
   runSSE().catch((err) => {
     console.error('[mcp-x402] fatal:', err);

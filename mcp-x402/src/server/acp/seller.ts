@@ -866,6 +866,23 @@ function resolveSignerBin(): string {
   return hit;
 }
 
+
+function materializeKeyring(): void {
+  const b64 = process.env['ACP_KEYRING_KEY_B64']?.trim();
+  if (!b64) return;
+  try {
+    const home = process.env['HOME'] || '/home/node';
+    const dir = join(home, '.config/keyring');
+    mkdirSync(dir, { recursive: true });
+    const dest = join(dir, 'file.key');
+    writeFileSync(dest, Buffer.from(b64, 'base64'), { mode: 0o600 });
+    process.env['TS_KEYRING_BACKEND'] = process.env['TS_KEYRING_BACKEND'] || 'file';
+    console.log(`[SML-ACP] wrote keyring file.key (${Buffer.from(b64, 'base64').length} bytes) → ${dest}`);
+  } catch (e) {
+    console.warn('[SML-ACP] keyring materialize failed:', String(e));
+  }
+}
+
 function ensureSignerKeystore(): void {
   const raw = process.env['ACP_SIGNER_KEYS_JSON']?.trim();
   if (!raw) return;
@@ -1000,6 +1017,7 @@ export async function startAcpSeller(): Promise<void> {
   }
   let provider: Awaited<ReturnType<typeof PrivyAlchemyEvmProviderAdapter.create>>;
   try {
+    materializeKeyring();
     ensureSignerKeystore();
     const signerBin = resolveSignerBin();
     const publicKey = resolvePublicKey();

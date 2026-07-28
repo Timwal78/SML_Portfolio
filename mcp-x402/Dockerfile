@@ -29,6 +29,8 @@ RUN chmod +x ./bin/acp-cli-signer-linux
 COPY agents.json llms.txt .well-known/ ./
 EXPOSE 3402
 ENV NODE_ENV=production
+ENV MCP_TRANSPORT=sse
+ENV MCP_SSE_PORT=3402
 ENV ACP_SIGNER_BIN=/app/bin/acp-cli-signer-linux
 USER node
 CMD ["node", "dist/server/index.js"]
