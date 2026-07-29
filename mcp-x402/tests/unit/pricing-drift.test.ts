@@ -44,7 +44,7 @@ const PAID_TOOLS = [
   'housing_landlord_checklist',
   'hud_vash_contacts',
   'section8_geo_lookup',
-  'section8_fmr_national',
+  'section8_fmr',
   'section8_income_limits',
   'pha_opportunities',
 ] as const;
