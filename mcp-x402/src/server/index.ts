@@ -499,7 +499,7 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
 <h2>Three checkouts</h2>
 <div class="card"><strong>Zyla</strong> — non-crypto data pack (api=133808)</div>
 <div class="card"><strong>AWS seat</strong> — platform $599/mo · this page</div>
-<div class="card"><strong>x402 agents</strong> — $0.001 USDC/call · �� <a href="/.well-known/x402">/.well-known/x402</a></div>
+<div class="card"><strong>x402 agents</strong> — $0.001 USDC/call · <a href="/.well-known/x402">/.well-known/x402</a></div>
 <p class="muted">Status JSON: <a href="/aws/marketplace/status">/aws/marketplace/status</a> · Support: timothy.walton45@gmail.com · SAM UEI G24VZA4RLMK3</p>
 </body></html>`);
       return;
