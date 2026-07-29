@@ -102,12 +102,28 @@ interface VerifiedPayment {
 async function verifyPayment(config: PaymentConfig, priceUnits: bigint): Promise<VerifiedPayment> {
   const payTo = getPaymentReceiver();
 
-  // Operator bypass — mirrors the X-Operator-Key check on the REST /x402/* endpoints
-  // (server/index.ts). Reuses SML_API_KEY so there's only one operator secret to manage
-  // instead of a separate one per surface (REST vs MCP tool calls).
-  const operatorSecret = process.env['SML_API_KEY'];
-  if (operatorSecret && config.operatorKey && config.operatorKey === operatorSecret) {
+  // Operator / ACP bypass — mirrors REST /x402/* gates in server/index.ts:
+  //   • SML_API_KEY via operatorKey (dashboard / operator tools)
+  //   • SML_ACP_BYPASS_SECRET | LEVIATHAN_BYPASS_SECRET via operatorKey OR
+  //     payment_header OR payment_tx_hash (ACP seller already settled on-chain;
+  //     MCP tool handlers don't receive HTTP headers, so the same secret is
+  //     accepted in tool args — this is the proven Virtuals/ACP workaround)
+  const operatorSecret = (process.env['SML_API_KEY'] || '').trim();
+  const acpBypass = (
+    process.env['SML_ACP_BYPASS_SECRET'] ||
+    process.env['LEVIATHAN_BYPASS_SECRET'] ||
+    ''
+  ).trim();
+  const presented = [
+    config.operatorKey,
+    config.paymentHeader,
+    config.paymentTxHash,
+  ].map((s) => (typeof s === 'string' ? s.trim() : '')).filter(Boolean);
+  if (operatorSecret && presented.includes(operatorSecret)) {
     return { payer: 'did:sml:operator', txHash: '', rail: 'operator' };
+  }
+  if (acpBypass && presented.includes(acpBypass)) {
+    return { payer: 'did:sml:acp:scriptmasterlabs', txHash: '', rail: 'sml-acp' };
   }
 
   if (config.paymentTxHash) {

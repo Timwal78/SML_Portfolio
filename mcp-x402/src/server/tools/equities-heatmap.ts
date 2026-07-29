@@ -33,6 +33,7 @@ const EquitiesHeatmapFullSchema = z.object({
   wallet_address: z.string().optional(),
   payment_tx_hash: z.string().optional(),
   payment_header: z.string().optional(),
+  operator_key: z.string().optional().describe('SML operator or ACP bypass secret when job already settled'),
   ...ByokFields,
 });
 
@@ -43,6 +44,7 @@ const OptionsDeltaHeatmapFullSchema = z.object({
   wallet_address: z.string().optional(),
   payment_tx_hash: z.string().optional(),
   payment_header: z.string().optional(),
+  operator_key: z.string().optional().describe('SML operator or ACP bypass secret when job already settled'),
   ...ByokFields,
 });
 
@@ -68,6 +70,7 @@ async function paidCall(
   paymentTxHash: string | undefined,
   paymentHeader: string | undefined,
   fn: () => Promise<unknown>,
+  operatorKey?: string,
 ): Promise<{ content: Array<{ type: 'text'; text: string }>; isError?: true }> {
   const audit = AuditLogger.getInstance();
 
@@ -83,7 +86,7 @@ async function paidCall(
 
   let payment;
   try {
-    payment = await executeX402Payment({ price, currency: 'USDC', toolName, walletAddress, paymentTxHash, paymentHeader });
+    payment = await executeX402Payment({ price, currency: 'USDC', toolName, walletAddress, paymentTxHash, paymentHeader, operatorKey: operatorKey || paymentHeader || paymentTxHash });
   } catch (err) {
     audit.warn(`${toolName}_payment_fail`, { error: String(err) });
     return { content: [{ type: 'text', text: JSON.stringify({ error: 'payment_failed', message: String(err) }) }], isError: true };
