@@ -11,6 +11,43 @@ import { AuditLogger } from '../security/audit.js';
 // whatever AWS decodes.
 const EXPECTED_PRODUCT_CODE = 'c6g8c5zsvgof5a4rpp6eqlzn';
 
+// Product Code for a second, not-yet-created AWS Marketplace listing scoped
+// to the nationwide Section 8/HUD tools (see housing.ts). Unset until the
+// operator creates that product in AWS Partner Central — same "not yet
+// configured" pattern as every other unbuilt AWS integration in this repo.
+// A token whose product code matches THIS gets a housing-only entitlement,
+// never the full catalog — see PRODUCT_TOOLSETS below.
+const HOUSING_PRODUCT_CODE = process.env['AWS_MARKETPLACE_HOUSING_PRODUCT_CODE']?.trim() || null;
+
+// Resource paths (REST /x402/* routes, see server/index.ts) each product
+// code's entitled customers get to bypass payment on. 'ALL' preserves the
+// original single-product behavior exactly. Keep this in sync when adding a
+// REST route to a scoped product — an unlisted path never bypasses, it just
+// falls through to ordinary x402 payment.
+const PRODUCT_TOOLSETS: Record<string, 'ALL' | string[]> = {
+  [EXPECTED_PRODUCT_CODE]: 'ALL',
+  ...(HOUSING_PRODUCT_CODE
+    ? {
+        [HOUSING_PRODUCT_CODE]: [
+          '/x402/pha-lookup',
+          '/x402/hcv-fmr',
+          '/x402/hud-vash-contacts',
+          '/x402/housing-landlord-checklist',
+          '/x402/housing-windsor',
+          '/x402/section8-geo-lookup',
+          '/x402/section8-fmr-national',
+          '/x402/section8-income-limits',
+          '/x402/pha-opportunities',
+        ],
+      }
+    : {}),
+};
+
+/** Which of the two configured product codes (if any) a registration token's ProductCode matches. */
+function matchExpectedProductCode(productCode: string): boolean {
+  return productCode === EXPECTED_PRODUCT_CODE || (HOUSING_PRODUCT_CODE !== null && productCode === HOUSING_PRODUCT_CODE);
+}
+
 let supabase: SupabaseClient | null = null;
 function getSupabase(): SupabaseClient | null {
   if (supabase) return supabase;
@@ -46,8 +83,8 @@ export async function resolveAwsMarketplaceCustomer(token: string): Promise<Reso
   if (!customerIdentifier || !productCode) {
     return { ok: false, error: 'incomplete_resolve_response' };
   }
-  if (productCode !== EXPECTED_PRODUCT_CODE) {
-    AuditLogger.getInstance().error('aws_mp_product_code_mismatch', { got: productCode, expected: EXPECTED_PRODUCT_CODE });
+  if (!matchExpectedProductCode(productCode)) {
+    AuditLogger.getInstance().error('aws_mp_product_code_mismatch', { got: productCode, expected: [EXPECTED_PRODUCT_CODE, HOUSING_PRODUCT_CODE].filter(Boolean) });
     return { ok: false, error: 'product_code_mismatch' };
   }
 
@@ -98,11 +135,30 @@ export async function resolveAwsMarketplaceCustomer(token: string): Promise<Reso
 // in README/TODO. A key issued here stays 'entitled' until something calls
 // resolveAwsMarketplaceCustomer or a future SNS handler marks it otherwise.
 export async function isEntitledAwsMarketplaceKey(key: string): Promise<boolean> {
-  if (!key) return false;
+  return (await getEntitledAwsMarketplaceProduct(key)) !== null;
+}
+
+/** Returns the entitled customer's product_code, or null if the key isn't entitled. */
+export async function getEntitledAwsMarketplaceProduct(key: string): Promise<string | null> {
+  if (!key) return null;
   const db = getSupabase();
-  if (!db) return false;
-  const { data } = await db.from('aws_marketplace_customers').select('status').eq('api_key', key).maybeSingle();
-  return data?.status === 'entitled';
+  if (!db) return null;
+  const { data } = await db.from('aws_marketplace_customers').select('status, product_code').eq('api_key', key).maybeSingle();
+  if (data?.status !== 'entitled') return null;
+  return (data.product_code as string) ?? null;
+}
+
+/**
+ * Does an entitled product's subscription cover this REST resource path?
+ * 'ALL' (the original single-product listing) covers everything; a scoped
+ * product (e.g. the Section 8/HUD listing) only covers its own PRODUCT_TOOLSETS
+ * entry. An unrecognized product code (shouldn't happen — resolveAwsMarketplaceCustomer
+ * only ever stores a matched code) covers nothing, never fails open.
+ */
+export function productCoversResource(productCode: string, resourcePath: string): boolean {
+  const allowed = PRODUCT_TOOLSETS[productCode];
+  if (!allowed) return false;
+  return allowed === 'ALL' || allowed.includes(resourcePath);
 }
 
 // ── GetEntitlements audit self-check ────────────────────────────────────────

@@ -16,12 +16,12 @@ import express, { type Request, type Response } from 'express';
 import { randomUUID } from 'crypto';
 import cors from 'cors';
 import Stripe from 'stripe';
-import { resolveAwsMarketplaceCustomer, isEntitledAwsMarketplaceKey, runEntitlementsSelfCheck, getEntitlementsSelfCheckStatus } from './aws/marketplace.js';
+import { resolveAwsMarketplaceCustomer, getEntitledAwsMarketplaceProduct, productCoversResource, runEntitlementsSelfCheck, getEntitlementsSelfCheckStatus } from './aws/marketplace.js';
 import { handleSnsMessage } from './aws/sns-entitlement.js';
 import { handleStripeWebhookEvent, getApiKeyForCheckoutSession, isEntitledStripeKey } from './stripe/entitlement.js';
 import { runCommunityScan } from './marketing/community.js';
 import { registerTools } from './tools/index.js';
-import { lookupPha, lookupFmr, landlordChecklist, windsorBundle, VASH_CONTACTS } from './tools/housing.js';
+import { lookupPha, lookupFmr, landlordChecklist, windsorBundle, VASH_CONTACTS, section8GeoLookup, section8FmrNational, section8IncomeLimits, phaOpportunities } from './tools/housing.js';
 import { AuditLogger } from './security/audit.js';
 import { RateLimiter } from './security/rate-limit.js';
 import { tryZylaBypass, zylaCatalogPublic, ZYLA_ALLOWLIST } from './security/zyla.js';
@@ -750,11 +750,25 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
     }
 
     // AWS Marketplace bypass — customer already paying AWS a flat monthly fee
-    // via the SaaS Contract product (prod-lop2m2yjjcs76); their key (issued at
-    // /aws/marketplace/resolve) skips the per-call x402 charge entirely.
+    // via one of the SaaS Contract products; their key (issued at
+    // /aws/marketplace/resolve) skips the per-call x402 charge for whatever
+    // that specific product's subscription covers. The full-catalog listing
+    // (prod-lop2m2yjjcs76) covers every resource; a scoped listing (e.g. the
+    // Section 8/HUD one) only covers its own resource paths — a key entitled
+    // to one product does NOT get free access to another product's tools.
     const awsMpKey = typeof req.headers['x-aws-mp-key'] === 'string' ? req.headers['x-aws-mp-key'] : '';
-    if (awsMpKey && await isEntitledAwsMarketplaceKey(awsMpKey)) {
-      return { ok: true, payer: { rail: 'aws-marketplace', from: `aws:${awsMpKey.slice(0, 16)}…`, tx: '' } };
+    if (awsMpKey) {
+      const product = await getEntitledAwsMarketplaceProduct(awsMpKey);
+      if (product) {
+        const resourcePath = (() => {
+          try { return new URL(opts.resource).pathname; } catch { return req.path || ''; }
+        })();
+        if (productCoversResource(product, resourcePath)) {
+          return { ok: true, payer: { rail: 'aws-marketplace', from: `aws:${awsMpKey.slice(0, 16)}…`, tx: '' } };
+        }
+        // Entitled to a different AWS Marketplace product than this resource
+        // belongs to — fall through to ordinary x402 payment, never bypass.
+      }
     }
 
     // Stripe subscription bypass — customer already paying a flat monthly fee
@@ -3147,6 +3161,88 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
     } catch (err) {
       if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
       return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'windsor_failed', message: String(err) });
+    }
+  });
+
+  // ── Section 8 — nationwide, live HUD User API (not the curated Kinston seed above) ──
+
+  app.get('/x402/section8-geo-lookup', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/section8-geo-lookup`;
+    const scope = String(req.query['scope'] ?? '');
+    if (scope !== 'states' && scope !== 'counties' && scope !== 'metros') {
+      return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'scope must be states, counties, or metros' });
+    }
+    const stateCode = typeof req.query['state_code'] === 'string' ? req.query['state_code'] : undefined;
+    const inputSchema = { type: 'object', properties: { scope: { type: 'string', enum: ['states', 'counties', 'metros'] }, state_code: { type: 'string' } }, required: ['scope'] };
+    const outputSchema = { input: { type: 'http', method: 'GET' }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: HOUSING_PRICE, description: 'List HUD entity IDs for states, counties, or metro areas — nationwide, live HUD User API. Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    try {
+      const data = await section8GeoLookup(scope, stateCode);
+      return res.set('Access-Control-Allow-Origin', '*').json({ ...data, _paid: pay.payer });
+    } catch (err) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'section8_geo_lookup_failed', message: String(err) });
+    }
+  });
+
+  app.get('/x402/section8-fmr-national', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/section8-fmr-national`;
+    const entityId = typeof req.query['entity_id'] === 'string' ? req.query['entity_id'] : undefined;
+    const stateCode = typeof req.query['state_code'] === 'string' ? req.query['state_code'] : undefined;
+    const year = req.query['year'] ? parseInt(String(req.query['year']), 10) : undefined;
+    const inputSchema = { type: 'object', properties: { entity_id: { type: 'string' }, state_code: { type: 'string' }, year: { type: 'integer' } }, required: [] };
+    const outputSchema = { input: { type: 'http', method: 'GET' }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: HOUSING_PRICE, description: 'Fair Market Rents for any US county/metro entity_id or state — nationwide, live HUD User API. Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    try {
+      const data = await section8FmrNational(entityId, stateCode, year);
+      return res.set('Access-Control-Allow-Origin', '*').json({ ...data, _paid: pay.payer });
+    } catch (err) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'section8_fmr_national_failed', message: String(err) });
+    }
+  });
+
+  app.get('/x402/section8-income-limits', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/section8-income-limits`;
+    const entityId = typeof req.query['entity_id'] === 'string' ? req.query['entity_id'] : undefined;
+    const stateCode = typeof req.query['state_code'] === 'string' ? req.query['state_code'] : undefined;
+    const year = req.query['year'] ? parseInt(String(req.query['year']), 10) : undefined;
+    const inputSchema = { type: 'object', properties: { entity_id: { type: 'string' }, state_code: { type: 'string' }, year: { type: 'integer' } }, required: [] };
+    const outputSchema = { input: { type: 'http', method: 'GET' }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: HOUSING_PRICE, description: 'HUD income limits (30/50/80% AMI) for any US county/metro entity_id or state — nationwide, live HUD User API. Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    try {
+      const data = await section8IncomeLimits(entityId, stateCode, year);
+      return res.set('Access-Control-Allow-Origin', '*').json({ ...data, _paid: pay.payer });
+    } catch (err) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'section8_income_limits_failed', message: String(err) });
+    }
+  });
+
+  app.get('/x402/pha-opportunities', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/pha-opportunities`;
+    const keyword = typeof req.query['keyword'] === 'string' ? req.query['keyword'] : undefined;
+    const naics = typeof req.query['naics'] === 'string' ? req.query['naics'] : undefined;
+    const setAside = typeof req.query['set_aside'] === 'string' ? req.query['set_aside'] : undefined;
+    const days = req.query['days'] ? parseInt(String(req.query['days']), 10) : undefined;
+    const limit = req.query['limit'] ? parseInt(String(req.query['limit']), 10) : undefined;
+    const inputSchema = { type: 'object', properties: { keyword: { type: 'string' }, naics: { type: 'string' }, set_aside: { type: 'string' }, days: { type: 'integer' }, limit: { type: 'integer' } }, required: [] };
+    const outputSchema = { input: { type: 'http', method: 'GET' }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: HOUSING_PRICE, description: 'SAM.gov opportunities filtered for housing authority / Section 8 / HCV work, with set-aside filtering. Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    try {
+      const data = await phaOpportunities({ keyword, naics, setAside, days, limit });
+      return res.set('Access-Control-Allow-Origin', '*').json({ ...data, _paid: pay.payer });
+    } catch (err) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'pha_opportunities_failed', message: String(err) });
     }
   });
 
