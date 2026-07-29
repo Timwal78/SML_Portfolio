@@ -1,0 +1,74 @@
+{
+  "name": "Script Master Labs x402 Data API",
+  "slug": "scriptmasterlabs-x402",
+  "description": "Pay-per-call crypto, RWA, federal, SEC, Section 8/HUD, and compliance APIs. Settled in USDC on Base via HTTP 402 (x402). Built by Script Master Labs, LLC (SDVOSB).",
+  "category": "Data",
+  "website": "https://www.scriptmasterlabs.com",
+  "base_url": "https://mcp-x402.onrender.com",
+  "openapi_url": "https://mcp-x402.onrender.com/openapi.json",
+  "x402_catalog": "https://mcp-x402.onrender.com/.well-known/x402",
+  "mcp_url": "https://mcp-x402.onrender.com/mcp",
+  "contact_email": "ScriptMasterLabs@gmail.com",
+  "vendor": {
+    "legal_name": "Script Master Labs, LLC",
+    "sam_gov_uei": "G24VZA4RLMK3",
+    "cage_code": "21U51",
+    "sdvosb": true
+  },
+  "pricing": {
+    "model": "pay_per_use",
+    "currency": "USDC",
+    "chain": "eip155:8453",
+    "floor_usd": 0.001,
+    "pay_to": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+    "notes": "x402 micropayments on Base mainnet. Optional enterprise seat via AWS Marketplace $599/mo for 150+ APIs.",
+    "tiers": [
+      {
+        "name": "Agent Snack",
+        "price_usd": 0.001,
+        "unit": "call",
+        "billing": "x402 USDC Base"
+      },
+      {
+        "name": "Enterprise Seat",
+        "price_usd": 599,
+        "unit": "month",
+        "billing": "AWS Marketplace / invoice",
+        "apis": "150+"
+      }
+    ]
+  },
+  "endpoints_count": 77,
+  "endpoints_sample": [
+    "/x402/grants",
+    "/x402/firms",
+    "/x402/market",
+    "/x402/drug-label",
+    "/x402/drug-recall",
+    "/x402/npi",
+    "/x402/clinical-trials",
+    "/x402/insider-trades",
+    "/x402/drug-adverse-events",
+    "/x402/sec-8k",
+    "/x402/treasury-yields",
+    "/x402/entity-compliance",
+    "/x402/agent-score",
+    "/x402/fact-check",
+    "/x402/sec-13f",
+    "/x402/lobbying",
+    "/x402/patents",
+    "/x402/fred",
+    "/x402/osha",
+    "/x402/fda-510k"
+  ],
+  "auth": {
+    "types": [
+      "x402",
+      "optional_api_key"
+    ],
+    "x402": true,
+    "header_payment": "X-PAYMENT / PAYMENT-SIGNATURE per x402"
+  },
+  "generated_at": "2026-07-29",
+  "source": "https://mcp-x402.onrender.com/openapi.json"
+}

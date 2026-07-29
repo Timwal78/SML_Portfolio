@@ -1,0 +1,20 @@
+{
+  "name": "scriptmasterlabs.com:mcp-x402",
+  "description": "Pay-per-call crypto, RWA, federal, SEC, Section 8/HUD housing, and compliance APIs. Settled in USDC on Base via x402. Hyphen routes only (e.g. /x402/gas-tracker, /x402/pha-lookup, /x402/sec-8k).",
+  "url": "https://mcp-x402.onrender.com/openapi.json",
+  "openapi_ver": "3.1.0",
+  "contact": {
+    "name": "Script Master Labs, LLC",
+    "email": "ScriptMasterLabs@gmail.com",
+    "url": "https://www.scriptmasterlabs.com"
+  },
+  "x-providerName": "scriptmasterlabs.com",
+  "x-apisguru-categories": [
+    "data",
+    "financial",
+    "government"
+  ],
+  "x-sam-gov-uei": "G24VZA4RLMK3",
+  "x-cage": "21U51",
+  "generated_at": "2026-07-29"
+}

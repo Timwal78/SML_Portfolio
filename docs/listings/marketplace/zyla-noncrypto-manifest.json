@@ -1,0 +1,246 @@
+{
+  "name": "SML Non-Crypto Federal & Compliance APIs",
+  "note": "Zyla = NON-CRYPTO only per SML policy. List federal/SEC/Section8/housing snacks only.",
+  "base_url": "https://mcp-x402.onrender.com",
+  "vendor": {
+    "sam_uei": "G24VZA4RLMK3",
+    "cage": "21U51",
+    "sdvosb": true
+  },
+  "endpoints": [
+    {
+      "path": "/x402/grants",
+      "method": "GET",
+      "operationId": "searchGrants",
+      "summary": "Search live U.S. federal grant opportunities (Grants.gov Search2).",
+      "tags": [
+        "Federal",
+        "Grants",
+        "Government",
+        "x402",
+        "Paid"
+      ],
+      "x402": true
+    },
+    {
+      "path": "/x402/firms",
+      "method": "GET",
+      "operationId": "findFirms",
+      "summary": "Find self-certified SDVOSB/WOSB/SDB/minority firms by NAICS + state (SAM.gov).",
+      "tags": [
+        "Federal",
+        "SDVOSB",
+        "Procurement",
+        "x402",
+        "Paid"
+      ],
+      "x402": true
+    },
+    {
+      "path": "/x402/sec-8k",
+      "method": "GET",
+      "operationId": "sec8k",
+      "summary": "SEC EDGAR 8-K material event filings by ticker.",
+      "tags": [
+        "SEC",
+        "Federal",
+        "Filings",
+        "Trading",
+        "x402",
+        "Paid"
+      ],
+      "x402": true
+    },
+    {
+      "path": "/x402/entity-compliance",
+      "method": "GET",
+      "operationId": "entityCompliance",
+      "summary": "SAM entity compliance bundle: registration + exclusion + set-asides + NAICS.",
+      "tags": [
+        "Federal",
+        "Compliance",
+        "SAM",
+        "x402",
+        "Paid"
+      ],
+      "x402": true
+    },
+    {
+      "path": "/x402/sec-13f",
+      "method": "GET",
+      "operationId": "sec13f",
+      "summary": "SEC EDGAR 13F institutional holdings \u2014 hedge fund quarterly positions.",
+      "tags": [
+        "SEC",
+        "Federal",
+        "Institutional",
+        "Trading",
+        "x402",
+        "Paid"
+      ],
+      "x402": true
+    },
+    {
+      "path": "/x402/sec-10k",
+      "method": "GET",
+      "operationId": "sec10k",
+      "summary": "SEC EDGAR 10-K annual report filings by ticker.",
+      "tags": [
+        "SEC",
+        "Federal",
+        "Filings",
+        "Trading",
+        "x402",
+        "Paid"
+      ],
+      "x402": true
+    },
+    {
+      "path": "/x402/sec-10q",
+      "method": "GET",
+      "operationId": "sec10q",
+      "summary": "SEC EDGAR 10-Q quarterly report filings by ticker.",
+      "tags": [
+        "SEC",
+        "Federal",
+        "Filings",
+        "Trading",
+        "x402",
+        "Paid"
+      ],
+      "x402": true
+    },
+    {
+      "path": "/x402/sec-13dg",
+      "method": "GET",
+      "operationId": "sec13dg",
+      "summary": "SEC EDGAR 13D/13G activist investor filings by ticker.",
+      "tags": [
+        "SEC",
+        "Federal",
+        "Activist",
+        "Trading",
+        "x402",
+        "Paid"
+      ],
+      "x402": true
+    },
+    {
+      "path": "/x402/sbir-grants",
+      "method": "GET",
+      "operationId": "sbirGrants",
+      "summary": "SBIR/STTR small business innovation research grants.",
+      "tags": [
+        "Federal",
+        "Grants",
+        "SDVOSB",
+        "x402",
+        "Paid"
+      ],
+      "x402": true
+    },
+    {
+      "path": "/x402/nih-grants",
+      "method": "GET",
+      "operationId": "nihGrants",
+      "summary": "NIH Reporter research grant database.",
+      "tags": [
+        "Federal",
+        "Grants",
+        "Research",
+        "x402",
+        "Paid"
+      ],
+      "x402": true
+    },
+    {
+      "path": "/x402/compliance-anomaly",
+      "method": "POST",
+      "operationId": "complianceAnomaly",
+      "summary": "Submit a bank compliance anomaly for scoring.",
+      "tags": [
+        "Compliance",
+        "AML",
+        "x402",
+        "Paid"
+      ],
+      "x402": true
+    },
+    {
+      "path": "/x402/compliance-audit",
+      "method": "POST",
+      "operationId": "complianceAudit",
+      "summary": "Full Leviathan Matrix compliance audit cycle for a bank.",
+      "tags": [
+        "Compliance",
+        "AML",
+        "x402",
+        "Paid"
+      ],
+      "x402": true
+    },
+    {
+      "path": "/x402/compliance-regulator-query",
+      "method": "GET",
+      "operationId": "complianceRegulatorQuery",
+      "summary": "Real-time regulator compliance dashboard query for a bank.",
+      "tags": [
+        "Compliance",
+        "Federal",
+        "x402",
+        "Paid"
+      ],
+      "x402": true
+    },
+    {
+      "path": "/x402/pha-lookup",
+      "method": "GET",
+      "operationId": "phaLookup",
+      "summary": "Public Housing Authority (PHA) lookup by ZIP/city/county.",
+      "tags": [
+        "Section-8",
+        "HUD",
+        "Housing",
+        "Federal",
+        "PHA",
+        "x402",
+        "Paid"
+      ],
+      "x402": true
+    },
+    {
+      "path": "/x402/hcv-fmr",
+      "method": "GET",
+      "operationId": "hcvFmr",
+      "summary": "HUD Fair Market Rent + estimated payment-standard band.",
+      "tags": [
+        "Section-8",
+        "HUD",
+        "Housing",
+        "FMR",
+        "Federal",
+        "x402",
+        "Paid"
+      ],
+      "x402": true
+    },
+    {
+      "path": "/x402/hud-vash-contacts",
+      "method": "GET",
+      "operationId": "hudVashContacts",
+      "summary": "HUD-VASH veteran housing contact guidance.",
+      "tags": [
+        "Section-8",
+        "HUD",
+        "Housing",
+        "Veteran-Services",
+        "Federal",
+        "x402",
+        "Paid"
+      ],
+      "x402": true
+    }
+  ],
+  "pricing_hint": "map to Zyla Basic/Ultimate RPM; no crypto settlement on Zyla",
+  "generated_at": "2026-07-29"
+}

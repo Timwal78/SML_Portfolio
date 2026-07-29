@@ -1,0 +1,20 @@
+{
+  "displayName": "SML x402 Data API",
+  "description": "Script Master Labs pay-per-call APIs (crypto, RWA, federal, SEC, housing). x402 USDC Base. SDVOSB.",
+  "apiSpec": {
+    "openApiSpec": "https://mcp-x402.onrender.com/openapi.json"
+  },
+  "owner": {
+    "displayName": "Script Master Labs, LLC",
+    "email": "ScriptMasterLabs@gmail.com"
+  },
+  "attributes": {
+    "sam_gov_uei": "G24VZA4RLMK3",
+    "cage": "21U51",
+    "sdvosb": "true",
+    "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+    "chain": "eip155:8453"
+  },
+  "targetBaseUrl": "https://mcp-x402.onrender.com",
+  "generated_at": "2026-07-29"
+}

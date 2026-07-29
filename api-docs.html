@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SML x402 API Docs — SDVOSB · SAM G24VZA4RLMK3</title>
+  <meta name="description" content="Script Master Labs x402 Data API. SAM UEI G24VZA4RLMK3, CAGE 21U51, SDVOSB. Live OpenAPI from mcp-x402." />
+  <link rel="canonical" href="https://www.scriptmasterlabs.com/api-docs.html" />
+  <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css" />
+  <style>
+    body { margin:0; background:#0b0f14; color:#e8eef7; font-family: ui-sans-serif, system-ui, sans-serif; }
+    .banner { padding:14px 20px; background:#111827; border-bottom:1px solid #1f2937; display:flex; flex-wrap:wrap; gap:12px; align-items:center; }
+    .banner strong { color:#6ee7b7; }
+    .badge { font-size:12px; padding:3px 8px; border-radius:999px; background:#064e3b; color:#a7f3d0; }
+    a { color:#93c5fd; }
+    .swagger-ui .topbar { display:none; }
+    .swagger-ui { background:#0b0f14; }
+  </style>
+</head>
+<body>
+  <div class="banner">
+    <div><strong>Script Master Labs — x402 Data API</strong></div>
+    <span class="badge">SDVOSB</span>
+    <span class="badge">SAM UEI G24VZA4RLMK3</span>
+    <span class="badge">CAGE 21U51</span>
+    <span class="badge">Base USDC · $0.001 floor</span>
+    <a href="https://mcp-x402.onrender.com/openapi.json">openapi.json</a>
+    <a href="https://mcp-x402.onrender.com/.well-known/x402">x402 catalog</a>
+    <a href="https://www.scriptmasterlabs.com/downloads/api-marketplace/">downloads</a>
+  </div>
+  <div id="swagger-ui"></div>
+  <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+  <script>
+    window.ui = SwaggerUIBundle({
+      url: "https://mcp-x402.onrender.com/openapi.json",
+      dom_id: "#swagger-ui",
+      deepLinking: true,
+      presets: [SwaggerUIBundle.presets.apis],
+      layout: "BaseLayout"
+    });
+  </script>
+</body>
+</html>

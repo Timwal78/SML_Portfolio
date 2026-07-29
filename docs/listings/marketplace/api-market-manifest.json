@@ -1,0 +1,18 @@
+{
+  "name": "scriptmasterlabs-x402",
+  "base_url": "https://mcp-x402.onrender.com",
+  "openapi": "https://mcp-x402.onrender.com/openapi.json",
+  "pricing": {
+    "per_call_usdc": 0.001,
+    "pay_to": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+    "chain": "base"
+  },
+  "vendor": {
+    "uei": "G24VZA4RLMK3",
+    "cage": "21U51",
+    "sdvosb": true,
+    "email": "ScriptMasterLabs@gmail.com"
+  },
+  "endpoints_count": 77,
+  "generated_at": "2026-07-29"
+}

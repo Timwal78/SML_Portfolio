@@ -1,0 +1,28 @@
+{
+  "generated_at": "2026-07-29",
+  "source_openapi": "https://mcp-x402.onrender.com/openapi.json",
+  "paths": 77,
+  "operations": 78,
+  "sam_uei": "G24VZA4RLMK3",
+  "cage": "21U51",
+  "sdvosb": true,
+  "pay_to": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+  "files": [
+    "API_MARKETPLACE_LISTINGS.md",
+    "api-market-manifest.json",
+    "apis-guru-manifest.json",
+    "aws-marketplace-api-listing.json",
+    "client-sdk.ts",
+    "client_sdk.py",
+    "gcp-api-hub-listing.json",
+    "index.html",
+    "openapi.json",
+    "postman_collection.json",
+    "public-apis-manifest.json",
+    "publish_api_listings.js",
+    "rapidapi-manifest.json",
+    "zyla-noncrypto-manifest.json"
+  ],
+  "downloads_path": "downloads/api-marketplace/",
+  "swagger_page": "api-docs.html"
+}

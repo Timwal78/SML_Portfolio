@@ -1,0 +1,31 @@
+{
+  "productTitle": "Script Master Labs \u2014 Institutional + Agent Data API Platform",
+  "productType": "SaaS",
+  "shortDescription": "150+ pay-per-call and seat-based APIs: crypto, RWA, federal, SEC, Section 8/HUD. x402 USDC on Base + enterprise seat.",
+  "longDescription": "Script Master Labs, LLC (SAM.gov UEI G24VZA4RLMK3, CAGE 21U51, SDVOSB) provides institutional and agent-native data APIs. Dual GTM: (1) AWS Marketplace enterprise seat $599/mo for 150+ APIs; (2) agent micropayments at $0.001 USDC on Base via x402. Live OpenAPI: https://mcp-x402.onrender.com/openapi.json. MCP: https://mcp-x402.onrender.com/mcp.",
+  "categories": [
+    "Data Products",
+    "Developer Tools",
+    "Financial Services"
+  ],
+  "pricing": {
+    "enterprise_seat_usd_month": 599,
+    "agent_snack_usdc": 0.001,
+    "endpoints": "150+"
+  },
+  "fulfillmentUrl": "https://www.scriptmasterlabs.com",
+  "openapiUrl": "https://mcp-x402.onrender.com/openapi.json",
+  "supportEmail": "ScriptMasterLabs@gmail.com",
+  "vendor": {
+    "legalName": "Script Master Labs, LLC",
+    "samGovUei": "G24VZA4RLMK3",
+    "cageCode": "21U51",
+    "sdvosb": true,
+    "website": "https://www.scriptmasterlabs.com"
+  },
+  "regions": [
+    "us-east-1"
+  ],
+  "generated_at": "2026-07-29",
+  "note": "AWS seller console still requires human publish; this file is the registration payload + process pack."
+}

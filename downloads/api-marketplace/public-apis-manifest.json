@@ -1,0 +1,17 @@
+{
+  "API": "Script Master Labs x402 Data API",
+  "Description": "Pay-per-call crypto, RWA, federal, SEC, Section 8/HUD APIs. USDC on Base via x402. SDVOSB vendor.",
+  "Auth": "x402 (USDC Base) / optional API key",
+  "HTTPS": true,
+  "Cors": "unknown",
+  "Link": "https://mcp-x402.onrender.com/openapi.json",
+  "Category": "Data",
+  "extra": {
+    "website": "https://www.scriptmasterlabs.com",
+    "mcp": "https://mcp-x402.onrender.com/mcp",
+    "sam_uei": "G24VZA4RLMK3",
+    "cage": "21U51",
+    "sdvosb": true,
+    "pay_to": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700"
+  }
+}
