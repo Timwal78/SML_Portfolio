@@ -1,7 +1,7 @@
 {
   "info": {
-    "name": "SML Non-Crypto Compliance APIs v3 2026-07-29",
-    "description": "SML Non-Crypto Compliance APIs v3 2026-07-29. NON-CRYPTO only. Renamed to avoid Zyla \"info.name already taken\". NON-CRYPTO only. 31 live endpoints. Auth Bearer sml_zyla_*. SAM UEI G24VZA4RLMK3 CAGE 21U51 SDVOSB. Generated 2026-07-29.",
+    "name": "SML Non-Crypto Compliance API Pack v4 2026-07-29",
+    "description": "SML Non-Crypto Compliance API v3 2026-07-29 API. Every endpoint name includes the word API. NON-CRYPTO only. Auth: Authorization Bearer sml_zyla_* or X-Zyla-Key. Generated 2026-07-29.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [

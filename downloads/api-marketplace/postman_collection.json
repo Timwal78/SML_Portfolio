@@ -1,13 +1,13 @@
 {
   "info": {
-    "name": "Script Master Labs \u2014 x402 Data API",
+    "name": "SML Non-Crypto Compliance API Pack v4 2026-07-29",
     "description": "Live collection generated 2026-07-29 from https://mcp-x402.onrender.com/openapi.json.\n\n**Script Master Labs, LLC**\n- SAM.gov UEI: G24VZA4RLMK3\n- CAGE: 21U51\n- SDVOSB: Service-Disabled Veteran-Owned Small Business\n- Settlement: USDC on Base (eip155:8453) via x402\n- payTo: 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700\n- Floor: $0.001 USDC / call\n- Contact: ScriptMasterLabs@gmail.com\n- Site: https://www.scriptmasterlabs.com",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_postman_id": "sml-x402-20260729"
   },
   "item": [
     {
-      "name": "AI",
+      "name": "AI API",
       "item": [
         {
           "name": "GET /x402/agent-score",
@@ -168,7 +168,7 @@
       ]
     },
     {
-      "name": "Compliance",
+      "name": "Compliance API",
       "item": [
         {
           "name": "POST /x402/compliance-anomaly",
@@ -297,7 +297,7 @@
       ]
     },
     {
-      "name": "Crypto",
+      "name": "Crypto API",
       "item": [
         {
           "name": "GET /x402/crypto-price",
@@ -395,7 +395,7 @@
       ]
     },
     {
-      "name": "Federal",
+      "name": "Federal API",
       "item": [
         {
           "name": "GET /x402/grants",
@@ -865,7 +865,7 @@
       ]
     },
     {
-      "name": "Finance",
+      "name": "Finance API",
       "item": [
         {
           "name": "GET /x402/finra-broker",
@@ -901,7 +901,7 @@
       ]
     },
     {
-      "name": "FX",
+      "name": "FX API",
       "item": [
         {
           "name": "GET /x402/fx-rate",
@@ -937,7 +937,7 @@
       ]
     },
     {
-      "name": "Healthcare",
+      "name": "Healthcare API",
       "item": [
         {
           "name": "GET /x402/drug-label",
@@ -1190,7 +1190,7 @@
       ]
     },
     {
-      "name": "News",
+      "name": "News API",
       "item": [
         {
           "name": "GET /x402/news-headlines",
@@ -1226,7 +1226,7 @@
       ]
     },
     {
-      "name": "RPC",
+      "name": "RPC API",
       "item": [
         {
           "name": "GET /x402/eth-rpc",
@@ -1293,7 +1293,7 @@
       ]
     },
     {
-      "name": "Search",
+      "name": "Search API",
       "item": [
         {
           "name": "GET /x402/web-search",
@@ -1360,7 +1360,7 @@
       ]
     },
     {
-      "name": "SEC",
+      "name": "SEC API",
       "item": [
         {
           "name": "GET /x402/insider-trades",
@@ -1706,7 +1706,7 @@
       ]
     },
     {
-      "name": "Section-8",
+      "name": "Section-8 API",
       "item": [
         {
           "name": "GET /x402/pha-lookup",
@@ -1866,7 +1866,7 @@
       ]
     },
     {
-      "name": "Trading",
+      "name": "Trading API",
       "item": [
         {
           "name": "GET /x402/options-flow",
@@ -2026,7 +2026,7 @@
       ]
     },
     {
-      "name": "Utility",
+      "name": "Utility API",
       "item": [
         {
           "name": "GET /x402/domain-enrich",
@@ -2279,7 +2279,7 @@
       ]
     },
     {
-      "name": "Web",
+      "name": "Web API",
       "item": [
         {
           "name": "GET /x402/web-fetch",
@@ -2346,7 +2346,7 @@
       ]
     },
     {
-      "name": "x402",
+      "name": "x402 API",
       "item": [
         {
           "name": "GET /x402/iam-model",
