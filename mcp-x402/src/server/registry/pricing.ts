@@ -94,11 +94,18 @@ const BASE_PRICES: Record<string, string> = {
   hcv_fmr: '0.001',
   housing_landlord_checklist: '0.001',
   hud_vash_contacts: '0.001',
-  // Housing / Section 8 — nationwide, live HUD User API (not the curated Kinston seed above)
-  section8_geo_lookup: '0.001',
-  section8_fmr_national: '0.001',
-  section8_income_limits: '0.001',
-  pha_opportunities: '0.001',
+  // Housing / Section 8 — nationwide, live HUD User API (not the curated Kinston seed above).
+  // Differentiated pricing per the Section 8/HUD listing's public agent (x402) rate card —
+  // deliberately NOT the flat $0.001 used elsewhere in this file.
+  section8_geo_lookup: '0.004',
+  section8_fmr: '0.006',
+  section8_income_limits: '0.006',
+  pha_opportunities: '0.012',
+  // pha_search: $0.008 per the rate card, but NOT YET BUILT — no verified
+  // nationwide PHA directory data source exists in this codebase (only the
+  // curated single-city pha_lookup seed). Do not add this key until the tool
+  // itself exists — an entry here with no matching tool would be a price
+  // advertised for something that can't be called.
 };
 
 interface CachedPrice {

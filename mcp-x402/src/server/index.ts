@@ -3071,7 +3071,16 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
 
 
   // ── Housing / Section 8 / PHA (income + personal landlord toolkit) ─────────
-  const HOUSING_PRICE = 1000n; // $0.001 USDC
+  const HOUSING_PRICE = 1000n; // $0.001 USDC — curated Kinston-only tools
+  // Section 8/HUD listing public agent (x402) rate card — differentiated
+  // per tool, deliberately NOT the flat HOUSING_PRICE above. Must match
+  // pricing.ts's BASE_PRICES for the same tool name (MCP tool calls charge
+  // via PriceRegistry there; these REST routes charge via hardcoded
+  // priceUnits here — kept in sync manually since they're two code paths).
+  const SECTION8_GEO_LOOKUP_PRICE = 4000n; // $0.004 USDC
+  const SECTION8_FMR_PRICE = 6000n; // $0.006 USDC
+  const SECTION8_INCOME_LIMITS_PRICE = 6000n; // $0.006 USDC
+  const PHA_OPPORTUNITIES_PRICE = 12000n; // $0.012 USDC
   app.get('/x402/pha-lookup', async (req, res) => {
     const host = req.headers.host ?? 'mcp-x402.onrender.com';
     const resource = `https://${host}/x402/pha-lookup`;
@@ -3176,7 +3185,7 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
     const stateCode = typeof req.query['state_code'] === 'string' ? req.query['state_code'] : undefined;
     const inputSchema = { type: 'object', properties: { scope: { type: 'string', enum: ['states', 'counties', 'metros'] }, state_code: { type: 'string' } }, required: ['scope'] };
     const outputSchema = { input: { type: 'http', method: 'GET' }, output: null };
-    const pay = await requirePayment(req, res, { resource, priceUnits: HOUSING_PRICE, description: 'List HUD entity IDs for states, counties, or metro areas — nationwide, live HUD User API. Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    const pay = await requirePayment(req, res, { resource, priceUnits: SECTION8_GEO_LOOKUP_PRICE, description: 'List HUD entity IDs for states, counties, or metro areas — nationwide, live HUD User API. Pay 0.004 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
     if (!pay.ok) return;
     try {
       const data = await section8GeoLookup(scope, stateCode);
@@ -3187,22 +3196,22 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
     }
   });
 
-  app.get('/x402/section8-fmr-national', async (req, res) => {
+  app.get('/x402/section8-fmr', async (req, res) => {
     const host = req.headers.host ?? 'mcp-x402.onrender.com';
-    const resource = `https://${host}/x402/section8-fmr-national`;
+    const resource = `https://${host}/x402/section8-fmr`;
     const entityId = typeof req.query['entity_id'] === 'string' ? req.query['entity_id'] : undefined;
     const stateCode = typeof req.query['state_code'] === 'string' ? req.query['state_code'] : undefined;
     const year = req.query['year'] ? parseInt(String(req.query['year']), 10) : undefined;
     const inputSchema = { type: 'object', properties: { entity_id: { type: 'string' }, state_code: { type: 'string' }, year: { type: 'integer' } }, required: [] };
     const outputSchema = { input: { type: 'http', method: 'GET' }, output: null };
-    const pay = await requirePayment(req, res, { resource, priceUnits: HOUSING_PRICE, description: 'Fair Market Rents for any US county/metro entity_id or state — nationwide, live HUD User API. Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    const pay = await requirePayment(req, res, { resource, priceUnits: SECTION8_FMR_PRICE, description: 'Fair Market Rents for any US county/metro entity_id or state — nationwide, live HUD User API. Pay 0.006 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
     if (!pay.ok) return;
     try {
       const data = await section8FmrNational(entityId, stateCode, year);
       return res.set('Access-Control-Allow-Origin', '*').json({ ...data, _paid: pay.payer });
     } catch (err) {
       if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
-      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'section8_fmr_national_failed', message: String(err) });
+      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'section8_fmr_failed', message: String(err) });
     }
   });
 
@@ -3214,7 +3223,7 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
     const year = req.query['year'] ? parseInt(String(req.query['year']), 10) : undefined;
     const inputSchema = { type: 'object', properties: { entity_id: { type: 'string' }, state_code: { type: 'string' }, year: { type: 'integer' } }, required: [] };
     const outputSchema = { input: { type: 'http', method: 'GET' }, output: null };
-    const pay = await requirePayment(req, res, { resource, priceUnits: HOUSING_PRICE, description: 'HUD income limits (30/50/80% AMI) for any US county/metro entity_id or state — nationwide, live HUD User API. Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    const pay = await requirePayment(req, res, { resource, priceUnits: SECTION8_INCOME_LIMITS_PRICE, description: 'HUD income limits (30/50/80% AMI) for any US county/metro entity_id or state — nationwide, live HUD User API. Pay 0.006 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
     if (!pay.ok) return;
     try {
       const data = await section8IncomeLimits(entityId, stateCode, year);
@@ -3235,7 +3244,7 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
     const limit = req.query['limit'] ? parseInt(String(req.query['limit']), 10) : undefined;
     const inputSchema = { type: 'object', properties: { keyword: { type: 'string' }, naics: { type: 'string' }, set_aside: { type: 'string' }, days: { type: 'integer' }, limit: { type: 'integer' } }, required: [] };
     const outputSchema = { input: { type: 'http', method: 'GET' }, output: null };
-    const pay = await requirePayment(req, res, { resource, priceUnits: HOUSING_PRICE, description: 'SAM.gov opportunities filtered for housing authority / Section 8 / HCV work, with set-aside filtering. Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    const pay = await requirePayment(req, res, { resource, priceUnits: PHA_OPPORTUNITIES_PRICE, description: 'SAM.gov opportunities filtered for housing authority / Section 8 / HCV work, with set-aside filtering. Pay 0.012 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
     if (!pay.ok) return;
     try {
       const data = await phaOpportunities({ keyword, naics, setAside, days, limit });

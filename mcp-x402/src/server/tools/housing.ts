@@ -245,12 +245,12 @@ export function lookupFmr(opts: { zip?: string; county?: string; state?: string;
   // through to those numbers relabeled as if they applied elsewhere — that
   // would be exactly the "hardcoded value behind a payment gate" the
   // sovereign data policy prohibits. Anything sold nationwide goes through
-  // the live section8_fmr_national tool (real HUD User API) instead.
+  // the live section8_fmr tool (real HUD User API) instead.
   if (!isLenoir) {
     return {
       error: 'zip_not_in_curated_seed',
       message:
-        'This curated dataset only covers Lenoir County, NC (Kinston) — the operator\'s own rental market. For any other US location, call section8_fmr_national (live HUD User API) with an entity_id from section8_geo_lookup.',
+        'This curated dataset only covers Lenoir County, NC (Kinston) — the operator\'s own rental market. For any other US location, call section8_fmr (live HUD User API) with an entity_id from section8_geo_lookup.',
       query: { zip, county: opts.county || '', state, year, bedrooms: br },
     };
   }
@@ -727,13 +727,13 @@ export function registerHousing(server: McpServer): void {
     section8GeoLookup(args.scope, args.state_code)
   ));
 
-  server.tool('section8_fmr_national', {
+  server.tool('section8_fmr', {
     entity_id: z.string().optional().describe('HUD FMR entity ID for a county/metro area (get one via section8_geo_lookup)'),
     state_code: z.string().optional().describe('Alternative to entity_id: 2-letter state code for statewide data'),
     year: z.number().optional().describe('Fiscal year, defaults to the current HUD dataset year'),
     wallet_address: z.string().optional().describe('Agent wallet address for USDC payment'),
     operator_key: z.string().optional().describe('Operator bypass key (internal use only) — skips payment when it matches the deployment\'s SML_API_KEY'),
-  }, async (args) => runPaidTool('section8_fmr_national', args.wallet_address, args.operator_key, () =>
+  }, async (args) => runPaidTool('section8_fmr', args.wallet_address, args.operator_key, () =>
     section8FmrNational(args.entity_id, args.state_code, args.year)
   ));
 
