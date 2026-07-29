@@ -2,29 +2,28 @@ Hi Tomas,
 
 Publisher account email: timothy.walton45@gmail.com
 
-We have completed a non-cryptocurrency live pack for Zyla review:
+Non-cryptocurrency live pack ready for Zyla review:
 
 Collection: SML Public Records Compliance Data API Pack
-Live endpoints: 31 (all verified HTTP 200 with API key)
-Cryptocurrency: NONE — gas-tracker and all crypto routes are blocked (HTTP 403) on this plan
-Auth for Zyla: Authorization: Bearer sml_zyla_REDACTED_ROTATED
-  (or header X-Zyla-Key: sml_zyla_REDACTED_ROTATED)
+Live endpoints: 31 (verified HTTP 200 with API key)
+Cryptocurrency: NONE — gas-tracker and crypto routes return HTTP 403 on this plan
+
+Auth: Authorization: Bearer sml_zyla_*   (reviewer key sent in private email thread)
+Alt header: X-Zyla-Key: sml_zyla_*
 
 Catalog: https://mcp-x402.onrender.com/x402/zyla/catalog
-Pack JSON: https://www.scriptmasterlabs.com/downloads/zyla_noncrypto_live_pack.json
+Pack: https://www.scriptmasterlabs.com/downloads/zyla_noncrypto_live_pack.json
 Postman: https://www.scriptmasterlabs.com/downloads/zyla_noncrypto_live_postman.json
 
-Sample live calls (with the key above):
+Sample live endpoints:
 - GET https://mcp-x402.onrender.com/x402/grants?keyword=veteran
 - GET https://mcp-x402.onrender.com/x402/sec-8k?ticker=AAPL
 - GET https://mcp-x402.onrender.com/x402/pha-lookup?state=NC
 - GET https://mcp-x402.onrender.com/x402/drug-label?drug=aspirin
 - GET https://mcp-x402.onrender.com/x402/treasury-yields
 
-Crypto block proof:
-- GET https://mcp-x402.onrender.com/x402/gas-tracker → 403 zyla_crypto_blocked
-
-Unauthenticated calls correctly return 402; Zyla key returns real JSON on the approved list only.
+Crypto block: GET /x402/gas-tracker → 403 zyla_crypto_blocked
+Unauthenticated → 402; Zyla key → real JSON on approved list only.
 
 Vendor: Script Master Labs, LLC · SAM UEI G24VZA4RLMK3 · CAGE 21U51 · SDVOSB
 

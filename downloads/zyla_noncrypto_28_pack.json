@@ -12,7 +12,8 @@
     "key_prefix": "sml_zyla_",
     "header": "Authorization: Bearer <key>",
     "alt_header": "X-Zyla-Key: <key>",
-    "review_key": "sml_zyla_REDACTED_ROTATED"
+    "review_key": "provided_to_zyla_via_email",
+    "note": "Contact timothy.walton45@gmail.com for Zyla reviewer key (sml_zyla_*)."
   },
   "base_url": "https://mcp-x402.onrender.com",
   "catalog": "https://mcp-x402.onrender.com/x402/zyla/catalog",
@@ -62,7 +63,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "value_format": "Bearer sml_zyla_REDACTED_ROTATED",
+        "value_format": "Bearer sml_zyla_***",
         "alt_header": "X-Zyla-Key"
       },
       "example": "https://mcp-x402.onrender.com/x402/grants?keyword=example",
@@ -100,7 +101,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "value_format": "Bearer sml_zyla_REDACTED_ROTATED",
+        "value_format": "Bearer sml_zyla_***",
         "alt_header": "X-Zyla-Key"
       },
       "example": "https://mcp-x402.onrender.com/x402/firms?naics=example",
@@ -132,7 +133,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "value_format": "Bearer sml_zyla_REDACTED_ROTATED",
+        "value_format": "Bearer sml_zyla_***",
         "alt_header": "X-Zyla-Key"
       },
       "example": "https://mcp-x402.onrender.com/x402/market?naics=example",
@@ -164,7 +165,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "value_format": "Bearer sml_zyla_REDACTED_ROTATED",
+        "value_format": "Bearer sml_zyla_***",
         "alt_header": "X-Zyla-Key"
       },
       "example": "https://mcp-x402.onrender.com/x402/sec-8k?ticker=example",
@@ -196,7 +197,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "value_format": "Bearer sml_zyla_REDACTED_ROTATED",
+        "value_format": "Bearer sml_zyla_***",
         "alt_header": "X-Zyla-Key"
       },
       "example": "https://mcp-x402.onrender.com/x402/sec-10k?ticker=example",
@@ -228,7 +229,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "value_format": "Bearer sml_zyla_REDACTED_ROTATED",
+        "value_format": "Bearer sml_zyla_***",
         "alt_header": "X-Zyla-Key"
       },
       "example": "https://mcp-x402.onrender.com/x402/sec-13f?cik=example",
@@ -260,7 +261,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "value_format": "Bearer sml_zyla_REDACTED_ROTATED",
+        "value_format": "Bearer sml_zyla_***",
         "alt_header": "X-Zyla-Key"
       },
       "example": "https://mcp-x402.onrender.com/x402/sec-13dg?ticker=example",
@@ -292,7 +293,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "value_format": "Bearer sml_zyla_REDACTED_ROTATED",
+        "value_format": "Bearer sml_zyla_***",
         "alt_header": "X-Zyla-Key"
       },
       "example": "https://mcp-x402.onrender.com/x402/insider-trades?ticker=example",
@@ -324,7 +325,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "value_format": "Bearer sml_zyla_REDACTED_ROTATED",
+        "value_format": "Bearer sml_zyla_***",
         "alt_header": "X-Zyla-Key"
       },
       "example": "https://mcp-x402.onrender.com/x402/drug-label?drug=example",
@@ -356,7 +357,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "value_format": "Bearer sml_zyla_REDACTED_ROTATED",
+        "value_format": "Bearer sml_zyla_***",
         "alt_header": "X-Zyla-Key"
       },
       "example": "https://mcp-x402.onrender.com/x402/drug-recall?drug=example",
@@ -388,7 +389,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "value_format": "Bearer sml_zyla_REDACTED_ROTATED",
+        "value_format": "Bearer sml_zyla_***",
         "alt_header": "X-Zyla-Key"
       },
       "example": "https://mcp-x402.onrender.com/x402/drug-adverse-events?drug=example",
@@ -420,7 +421,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "value_format": "Bearer sml_zyla_REDACTED_ROTATED",
+        "value_format": "Bearer sml_zyla_***",
         "alt_header": "X-Zyla-Key"
       },
       "example": "https://mcp-x402.onrender.com/x402/fda-510k?device=example",
@@ -452,7 +453,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "value_format": "Bearer sml_zyla_REDACTED_ROTATED",
+        "value_format": "Bearer sml_zyla_***",
         "alt_header": "X-Zyla-Key"
       },
       "example": "https://mcp-x402.onrender.com/x402/fda-warnings?company=example",
@@ -484,7 +485,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "value_format": "Bearer sml_zyla_REDACTED_ROTATED",
+        "value_format": "Bearer sml_zyla_***",
         "alt_header": "X-Zyla-Key"
       },
       "example": "https://mcp-x402.onrender.com/x402/clinical-trials?condition=example",
@@ -522,7 +523,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "value_format": "Bearer sml_zyla_REDACTED_ROTATED",
+        "value_format": "Bearer sml_zyla_***",
         "alt_header": "X-Zyla-Key"
       },
       "example": "https://mcp-x402.onrender.com/x402/npi?last_name=example",
@@ -554,7 +555,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "value_format": "Bearer sml_zyla_REDACTED_ROTATED",
+        "value_format": "Bearer sml_zyla_***",
         "alt_header": "X-Zyla-Key"
       },
       "example": "https://mcp-x402.onrender.com/x402/finra-broker?name=example",
@@ -586,7 +587,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "value_format": "Bearer sml_zyla_REDACTED_ROTATED",
+        "value_format": "Bearer sml_zyla_***",
         "alt_header": "X-Zyla-Key"
       },
       "example": "https://mcp-x402.onrender.com/x402/fact-check?claim=example",
@@ -618,7 +619,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "value_format": "Bearer sml_zyla_REDACTED_ROTATED",
+        "value_format": "Bearer sml_zyla_***",
         "alt_header": "X-Zyla-Key"
       },
       "example": "https://mcp-x402.onrender.com/x402/compliance-regulator-query?bank_id=example",
@@ -650,7 +651,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "value_format": "Bearer sml_zyla_REDACTED_ROTATED",
+        "value_format": "Bearer sml_zyla_***",
         "alt_header": "X-Zyla-Key"
       },
       "example": "https://mcp-x402.onrender.com/x402/fec-finance?name=example",
@@ -688,7 +689,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "value_format": "Bearer sml_zyla_REDACTED_ROTATED",
+        "value_format": "Bearer sml_zyla_***",
         "alt_header": "X-Zyla-Key"
       },
       "example": "https://mcp-x402.onrender.com/x402/lobbying?client=example",
@@ -720,7 +721,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "value_format": "Bearer sml_zyla_REDACTED_ROTATED",
+        "value_format": "Bearer sml_zyla_***",
         "alt_header": "X-Zyla-Key"
       },
       "example": "https://mcp-x402.onrender.com/x402/treasury-yields?month=example",
@@ -758,7 +759,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "value_format": "Bearer sml_zyla_REDACTED_ROTATED",
+        "value_format": "Bearer sml_zyla_***",
         "alt_header": "X-Zyla-Key"
       },
       "example": "https://mcp-x402.onrender.com/x402/fx-rate?from=example",
@@ -796,7 +797,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "value_format": "Bearer sml_zyla_REDACTED_ROTATED",
+        "value_format": "Bearer sml_zyla_***",
         "alt_header": "X-Zyla-Key"
       },
       "example": "https://mcp-x402.onrender.com/x402/pha-lookup?state=example",
@@ -828,7 +829,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "value_format": "Bearer sml_zyla_REDACTED_ROTATED",
+        "value_format": "Bearer sml_zyla_***",
         "alt_header": "X-Zyla-Key"
       },
       "example": "https://mcp-x402.onrender.com/x402/hcv-fmr?zip=example",
@@ -854,7 +855,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "value_format": "Bearer sml_zyla_REDACTED_ROTATED",
+        "value_format": "Bearer sml_zyla_***",
         "alt_header": "X-Zyla-Key"
       },
       "example": "https://mcp-x402.onrender.com/x402/housing-landlord-checklist",
@@ -880,7 +881,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "value_format": "Bearer sml_zyla_REDACTED_ROTATED",
+        "value_format": "Bearer sml_zyla_***",
         "alt_header": "X-Zyla-Key"
       },
       "example": "https://mcp-x402.onrender.com/x402/housing-windsor",
@@ -912,7 +913,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "value_format": "Bearer sml_zyla_REDACTED_ROTATED",
+        "value_format": "Bearer sml_zyla_***",
         "alt_header": "X-Zyla-Key"
       },
       "example": "https://mcp-x402.onrender.com/x402/hud-vash-contacts?state=example",
@@ -938,7 +939,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "value_format": "Bearer sml_zyla_REDACTED_ROTATED",
+        "value_format": "Bearer sml_zyla_***",
         "alt_header": "X-Zyla-Key"
       },
       "example": "https://mcp-x402.onrender.com/x402/ftd-threshold-list",
@@ -970,7 +971,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "value_format": "Bearer sml_zyla_REDACTED_ROTATED",
+        "value_format": "Bearer sml_zyla_***",
         "alt_header": "X-Zyla-Key"
       },
       "example": "https://mcp-x402.onrender.com/x402/ftd-time-series?symbol=example",
@@ -1002,7 +1003,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "value_format": "Bearer sml_zyla_REDACTED_ROTATED",
+        "value_format": "Bearer sml_zyla_***",
         "alt_header": "X-Zyla-Key"
       },
       "example": "https://mcp-x402.onrender.com/x402/ftd-ratio?symbol=example",
@@ -1034,7 +1035,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "value_format": "Bearer sml_zyla_REDACTED_ROTATED",
+        "value_format": "Bearer sml_zyla_***",
         "alt_header": "X-Zyla-Key"
       },
       "example": "https://mcp-x402.onrender.com/x402/ftd-etf-basket?etf=example",
