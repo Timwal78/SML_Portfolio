@@ -98,6 +98,7 @@ const BASE_PRICES: Record<string, string> = {
   section8_geo_lookup: '0.001',
   section8_fmr_national: '0.001',
   section8_income_limits: '0.001',
+  pha_opportunities: '0.001',
 };
 
 interface CachedPrice {

@@ -21,7 +21,7 @@ import { handleSnsMessage } from './aws/sns-entitlement.js';
 import { handleStripeWebhookEvent, getApiKeyForCheckoutSession, isEntitledStripeKey } from './stripe/entitlement.js';
 import { runCommunityScan } from './marketing/community.js';
 import { registerTools } from './tools/index.js';
-import { lookupPha, lookupFmr, landlordChecklist, windsorBundle, VASH_CONTACTS, section8GeoLookup, section8FmrNational, section8IncomeLimits } from './tools/housing.js';
+import { lookupPha, lookupFmr, landlordChecklist, windsorBundle, VASH_CONTACTS, section8GeoLookup, section8FmrNational, section8IncomeLimits, phaOpportunities } from './tools/housing.js';
 import { AuditLogger } from './security/audit.js';
 import { RateLimiter } from './security/rate-limit.js';
 import { tryZylaBypass, zylaCatalogPublic, ZYLA_ALLOWLIST } from './security/zyla.js';
@@ -3222,6 +3222,27 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
     } catch (err) {
       if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
       return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'section8_income_limits_failed', message: String(err) });
+    }
+  });
+
+  app.get('/x402/pha-opportunities', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/pha-opportunities`;
+    const keyword = typeof req.query['keyword'] === 'string' ? req.query['keyword'] : undefined;
+    const naics = typeof req.query['naics'] === 'string' ? req.query['naics'] : undefined;
+    const setAside = typeof req.query['set_aside'] === 'string' ? req.query['set_aside'] : undefined;
+    const days = req.query['days'] ? parseInt(String(req.query['days']), 10) : undefined;
+    const limit = req.query['limit'] ? parseInt(String(req.query['limit']), 10) : undefined;
+    const inputSchema = { type: 'object', properties: { keyword: { type: 'string' }, naics: { type: 'string' }, set_aside: { type: 'string' }, days: { type: 'integer' }, limit: { type: 'integer' } }, required: [] };
+    const outputSchema = { input: { type: 'http', method: 'GET' }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: HOUSING_PRICE, description: 'SAM.gov opportunities filtered for housing authority / Section 8 / HCV work, with set-aside filtering. Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    try {
+      const data = await phaOpportunities({ keyword, naics, setAside, days, limit });
+      return res.set('Access-Control-Allow-Origin', '*').json({ ...data, _paid: pay.payer });
+    } catch (err) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'pha_opportunities_failed', message: String(err) });
     }
   });
 

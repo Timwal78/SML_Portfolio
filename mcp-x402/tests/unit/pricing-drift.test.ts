@@ -46,6 +46,7 @@ const PAID_TOOLS = [
   'section8_geo_lookup',
   'section8_fmr_national',
   'section8_income_limits',
+  'pha_opportunities',
 ] as const;
 
 describe('pricing drift guard', () => {

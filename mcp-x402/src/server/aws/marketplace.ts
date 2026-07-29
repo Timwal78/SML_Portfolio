@@ -37,6 +37,7 @@ const PRODUCT_TOOLSETS: Record<string, 'ALL' | string[]> = {
           '/x402/section8-geo-lookup',
           '/x402/section8-fmr-national',
           '/x402/section8-income-limits',
+          '/x402/pha-opportunities',
         ],
       }
     : {}),

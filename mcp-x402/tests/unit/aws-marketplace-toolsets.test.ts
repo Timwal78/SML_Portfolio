@@ -38,6 +38,7 @@ describe('productCoversResource', () => {
       '/x402/section8-geo-lookup',
       '/x402/section8-fmr-national',
       '/x402/section8-income-limits',
+      '/x402/pha-opportunities',
     ]) {
       expect(productCoversResource(HOUSING_PRODUCT_CODE, path)).toBe(true);
     }
