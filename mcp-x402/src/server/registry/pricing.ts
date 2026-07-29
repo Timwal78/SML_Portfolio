@@ -101,11 +101,9 @@ const BASE_PRICES: Record<string, string> = {
   section8_fmr: '0.006',
   section8_income_limits: '0.006',
   pha_opportunities: '0.012',
-  // pha_search: $0.008 per the rate card, but NOT YET BUILT — no verified
-  // nationwide PHA directory data source exists in this codebase (only the
-  // curated single-city pha_lookup seed). Do not add this key until the tool
-  // itself exists — an entry here with no matching tool would be a price
-  // advertised for something that can't be called.
+  // Live as of the HUD Open Data ArcGIS FeatureServer being independently
+  // verified — see docs/SECTION8_HUD_LISTING.md.
+  pha_search: '0.008',
 };
 
 interface CachedPrice {

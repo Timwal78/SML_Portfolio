@@ -38,6 +38,7 @@ const PRODUCT_TOOLSETS: Record<string, 'ALL' | string[]> = {
           '/x402/section8-fmr',
           '/x402/section8-income-limits',
           '/x402/pha-opportunities',
+          '/x402/pha-search',
         ],
       }
     : {}),

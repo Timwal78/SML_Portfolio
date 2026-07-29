@@ -3,8 +3,8 @@
  * Nationwide HUD/SAM.gov product (differentiated pricing) + personal
  * landlord toolkit data (Kinston/Lenoir, flat $0.001). See
  * docs/SECTION8_HUD_LISTING.md for positioning, the SDVOSB moat, the
- * full rate card, and what's still proposed-not-wired (pha_search,
- * AWS subscription tiers).
+ * full rate card, and what's still proposed-not-wired (AWS subscription
+ * tiers).
  */
 import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
@@ -392,6 +392,83 @@ async function paidMeta(toolName: string, wallet: string, paymentTxHash?: string
 const HUD_FMR_BASE = 'https://www.huduser.gov/hudapi/public/fmr';
 const HUD_IL_BASE = 'https://www.huduser.gov/hudapi/public/il';
 
+// Nationwide PHA directory — HUD Open Data's official "Public Housing
+// Authorities" ArcGIS FeatureServer (~3,300+ agencies, no auth required).
+// Landing page: https://hudgis-hud.opendata.arcgis.com/datasets/3d6ef39026b94eb59ddb7ce28eb0b692
+// This URL was independently verified live (not guessed) before being wired
+// in — see docs/SECTION8_HUD_LISTING.md for how.
+const HUD_PHA_FEATURESERVER =
+  'https://services.arcgis.com/VTyQ9soqVukalItT/ArcGIS/rest/services/Public_Housing_Authorities/FeatureServer/0/query';
+
+function escapeArcgisLiteral(v: string): string {
+  return v.replace(/'/g, "''");
+}
+
+async function arcgisPhaQuery(where: string, limit: number): Promise<unknown> {
+  const params = new URLSearchParams({
+    where,
+    outFields: '*',
+    returnGeometry: 'false',
+    f: 'json',
+    resultRecordCount: String(limit),
+  });
+  const res = await fetch(`${HUD_PHA_FEATURESERVER}?${params}`, {
+    headers: { 'User-Agent': 'ScriptMasterLabs-mcp-x402/2.1' },
+    signal: AbortSignal.timeout(15000),
+  });
+  const text = await res.text();
+  if (!res.ok) throw new Error(`HUD PHA ArcGIS query HTTP ${res.status}: ${text.slice(0, 200)}`);
+  let data: any;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    throw new Error(`HUD PHA ArcGIS query returned non-JSON: ${text.slice(0, 200)}`);
+  }
+  if (data.error) throw new Error(`HUD PHA ArcGIS query error: ${JSON.stringify(data.error).slice(0, 200)}`);
+  return data;
+}
+
+export async function phaSearch(opts: { name?: string; city?: string; state?: string; zip?: string; limit?: number }) {
+  const limit = Math.min(opts.limit ?? 15, 50);
+  const clauses: string[] = [];
+  if (opts.name) clauses.push(`UPPER(FORMAL_PARTICIPANT_NAME) LIKE '%${escapeArcgisLiteral(opts.name.toUpperCase())}%'`);
+  if (opts.city) clauses.push(`UPPER(STD_CITY) LIKE '%${escapeArcgisLiteral(opts.city.toUpperCase())}%'`);
+  if (opts.state) clauses.push(`STD_ST = '${escapeArcgisLiteral(opts.state.toUpperCase().slice(0, 2))}'`);
+  if (opts.zip) clauses.push(`STD_ZIP5 = '${escapeArcgisLiteral(normalizeZip(opts.zip))}'`);
+  if (!clauses.length) throw new Error('at least one of name, city, state, or zip is required');
+
+  const data = (await arcgisPhaQuery(clauses.join(' AND '), limit)) as { features?: Array<{ attributes?: Record<string, unknown> }> };
+  const results = (data.features ?? []).map((f) => {
+    const a = f.attributes ?? {};
+    return {
+      code: a['PARTICIPANT_CODE'] ?? null,
+      name: a['FORMAL_PARTICIPANT_NAME'] ?? null,
+      phone: a['HA_PHN_NUM'] ?? null,
+      fax: a['HA_FAX_NUM'] ?? null,
+      email: a['HA_EMAIL_ADDR_TEXT'] ?? null,
+      exec_director: {
+        phone: a['EXEC_DIR_PHONE'] ?? null,
+        fax: a['EXEC_DIR_FAX'] ?? null,
+        email: a['EXEC_DIR_EMAIL'] ?? null,
+      },
+      address: [a['STD_ADDR'], a['STD_CITY'], a['STD_ST'], a['STD_ZIP5']].filter(Boolean).join(', '),
+      city: a['STD_CITY'] ?? null,
+      state: a['STD_ST'] ?? null,
+      zip: a['STD_ZIP5'] ?? null,
+      program_type: a['HA_PROGRAM_TYPE'] ?? null,
+      section8_units: a['SECTION8_UNITS_CNT'] ?? null,
+    };
+  });
+
+  return {
+    source: 'HUD Open Data — Public Housing Authorities (live ArcGIS FeatureServer, ~3,300+ agencies)',
+    query: { name: opts.name ?? '', city: opts.city ?? '', state: opts.state ?? '', zip: opts.zip ?? '' },
+    returned: results.length,
+    results,
+    attribution: 'U.S. Department of Housing and Urban Development',
+  };
+}
+
 async function hudFetch(url: string): Promise<unknown> {
   const token = process.env['HUD_USER_TOKEN'] ?? '';
   if (!token) {
@@ -761,5 +838,17 @@ export function registerHousing(server: McpServer): void {
     operator_key: z.string().optional().describe('Operator bypass key (internal use only) — skips payment when it matches the deployment\'s SML_API_KEY'),
   }, async (args) => runPaidTool('pha_opportunities', args.wallet_address, args.operator_key, () =>
     phaOpportunities({ keyword: args.keyword, naics: args.naics, setAside: args.set_aside, days: args.days, limit: args.limit })
+  ));
+
+  server.tool('pha_search', {
+    name: z.string().optional().describe('PHA/agency name fragment'),
+    city: z.string().optional().describe('City name'),
+    state: z.string().optional().describe('2-letter state code, e.g. NC'),
+    zip: z.string().optional().describe('US ZIP code'),
+    limit: z.number().optional().describe('Max results (max 50). Default 15'),
+    wallet_address: z.string().optional().describe('Agent wallet address for USDC payment'),
+    operator_key: z.string().optional().describe('Operator bypass key (internal use only) — skips payment when it matches the deployment\'s SML_API_KEY'),
+  }, async (args) => runPaidTool('pha_search', args.wallet_address, args.operator_key, () =>
+    phaSearch({ name: args.name, city: args.city, state: args.state, zip: args.zip, limit: args.limit })
   ));
 }

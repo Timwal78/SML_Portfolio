@@ -28,13 +28,14 @@ const CATALOG = {
     },
     {
       product: 'Housing / Section 8 / PHA',
-      description: 'Section 8 (Housing Choice Voucher) and Public Housing Authority intelligence for landlords, property managers, and SDVOSB housing contractors. section8_fmr, section8_income_limits, and section8_geo_lookup are live nationwide data from the real HUD User API (any US county/metro). pha_lookup, hcv_fmr, housing_landlord_checklist, and hud_vash_contacts are a curated seed scoped to Lenoir County, NC (Kinston) only — hcv_fmr and pha_lookup return an explicit not-covered response rather than fabricated numbers for any other location.',
-      backend: 'https://www.huduser.gov/hudapi (nationwide tools, requires HUD_USER_TOKEN); curated seed (Kinston-only tools)',
+      description: 'Section 8 (Housing Choice Voucher) and Public Housing Authority intelligence for landlords, property managers, and SDVOSB housing contractors. section8_fmr, section8_income_limits, section8_geo_lookup, and pha_search are live nationwide data (HUD User API + HUD Open Data ArcGIS). pha_lookup, hcv_fmr, housing_landlord_checklist, and hud_vash_contacts are a curated seed scoped to Lenoir County, NC (Kinston) only — hcv_fmr and pha_lookup return an explicit not-covered response rather than fabricated numbers for any other location.',
+      backend: 'https://www.huduser.gov/hudapi (requires HUD_USER_TOKEN) + HUD Open Data ArcGIS FeatureServer (nationwide tools); curated seed (Kinston-only tools)',
       tools: [
         { name: 'section8_geo_lookup',    type: 'PAID', price_usdc: '0.004', description: 'List HUD entity IDs for states, counties, or metro areas — nationwide, live HUD User API' },
         { name: 'section8_fmr',  type: 'PAID', price_usdc: '0.006', description: 'Fair Market Rents (Section 8 payment-standard baseline) for any US county/metro entity_id or state — nationwide, live HUD User API' },
         { name: 'section8_income_limits', type: 'PAID', price_usdc: '0.006', description: 'HUD income limits (30/50/80% AMI) for any US county/metro entity_id or state — nationwide, live HUD User API' },
         { name: 'pha_opportunities',      type: 'PAID', price_usdc: '0.012', description: 'SAM.gov opportunities filtered for housing authority / Section 8 / HCV work, with NAICS + set-aside filtering — real api.sam.gov data, nationwide' },
+        { name: 'pha_search',             type: 'PAID', price_usdc: '0.008', description: 'Nationwide Public Housing Authority search by name/city/state/ZIP — live HUD Open Data ArcGIS FeatureServer, ~3,300+ agencies with contacts + program type' },
         { name: 'pha_lookup',                    type: 'PAID', price_usdc: '0.001', description: 'Public Housing Authority contact lookup — curated seed, Lenoir County NC only today' },
         { name: 'hcv_fmr',                       type: 'PAID', price_usdc: '0.001', description: 'Curated Section 8 FMR + payment-standard estimate for Lenoir County NC; use section8_fmr for anywhere else' },
         { name: 'housing_landlord_checklist',    type: 'PAID', price_usdc: '0.001', description: 'HCV/Section 8 landlord onboarding + HQS inspection checklist (Lenoir County NC context)' },
@@ -213,9 +214,9 @@ const CATALOG = {
     },
   ],
   stats: {
-    total_tools: 57,
+    total_tools: 58,
     free_tools: 24,
-    paid_tools: 32,
+    paid_tools: 33,
     products: 14,
     chains_supported: 3,
   },
