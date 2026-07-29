@@ -1,6 +1,10 @@
 /**
  * Section 8 / PHA / HUD-VASH housing intelligence.
- * Income product ($0.001 x402) + personal landlord toolkit data (Kinston/Lenoir).
+ * Nationwide HUD/SAM.gov product (differentiated pricing) + personal
+ * landlord toolkit data (Kinston/Lenoir, flat $0.001). See
+ * docs/SECTION8_HUD_LISTING.md for positioning, the SDVOSB moat, the
+ * full rate card, and what's still proposed-not-wired (pha_search,
+ * AWS subscription tiers).
  */
 import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
