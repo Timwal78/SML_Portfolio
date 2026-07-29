@@ -1,29 +1,33 @@
 Hi Tomas,
 
-Thank you for the follow-up.
+Publisher account email: timothy.walton45@gmail.com
 
-Publisher account email (where the 28 APIs were uploaded):
-timothy.walton45@gmail.com
+We have completed a non-cryptocurrency live pack for Zyla review:
 
-Confirmed — that is the correct account.
+Collection: SML Public Records Compliance Data API Pack
+Live endpoints: 31 (all verified HTTP 200 with API key)
+Cryptocurrency: NONE — gas-tracker and all crypto routes are blocked (HTTP 403) on this plan
+Auth for Zyla: Authorization: Bearer sml_zyla_REDACTED_ROTATED
+  (or header X-Zyla-Key: sml_zyla_REDACTED_ROTATED)
 
-Resubmission details:
-- Collection: SML Public Records Compliance Data API Pack
-- Count this chunk: 28 APIs
-- Cryptocurrency: NONE (gas/token/wallet/DeFi/blockchain endpoints removed)
-- Every API name includes "API"
-- Every endpoint includes parameters
-- Focus: federal contracts, public-company filings research, compliance screening, campaign finance, legislation, lobbying, economic indicators, workplace safety, environmental records, housing/FMR/PHA
+Catalog: https://mcp-x402.onrender.com/x402/zyla/catalog
+Pack JSON: https://www.scriptmasterlabs.com/downloads/zyla_noncrypto_live_pack.json
+Postman: https://www.scriptmasterlabs.com/downloads/zyla_noncrypto_live_postman.json
 
-Download pack (public):
-https://www.scriptmasterlabs.com/downloads/zyla_noncrypto_28_pack.json
-https://www.scriptmasterlabs.com/downloads/zyla_noncrypto_28_postman.json
+Sample live calls (with the key above):
+- GET https://mcp-x402.onrender.com/x402/grants?keyword=veteran
+- GET https://mcp-x402.onrender.com/x402/sec-8k?ticker=AAPL
+- GET https://mcp-x402.onrender.com/x402/pha-lookup?state=NC
+- GET https://mcp-x402.onrender.com/x402/drug-label?drug=aspirin
+- GET https://mcp-x402.onrender.com/x402/treasury-yields
 
-We can submit additional non-crypto chunks toward ~150 total after this chunk clears review.
+Crypto block proof:
+- GET https://mcp-x402.onrender.com/x402/gas-tracker → 403 zyla_crypto_blocked
+
+Unauthenticated calls correctly return 402; Zyla key returns real JSON on the approved list only.
 
 Vendor: Script Master Labs, LLC · SAM UEI G24VZA4RLMK3 · CAGE 21U51 · SDVOSB
 
 Best regards,
 Timothy Walton
-Script Master Labs, LLC
 timothy.walton45@gmail.com
