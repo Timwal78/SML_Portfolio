@@ -24,6 +24,7 @@ import { registerTools } from './tools/index.js';
 import { lookupPha, lookupFmr, landlordChecklist, windsorBundle, VASH_CONTACTS } from './tools/housing.js';
 import { AuditLogger } from './security/audit.js';
 import { RateLimiter } from './security/rate-limit.js';
+import { tryZylaBypass, zylaCatalogPublic, ZYLA_ALLOWLIST } from './security/zyla.js';
 import { rapidApiGuard } from './security/rapidapi.js';
 import { healthHandler } from './health.js';
 import { verifyBaseUsdcPayment, alreadyRedeemed, markRedeemed, releaseRedeem } from './payments/verify-inbound.js';
@@ -266,6 +267,14 @@ async function runSSE(): Promise<void> {
         docs: 'https://mcp-x402.onrender.com/openapi.json',
       },
     });
+  });
+
+
+  // ZylaLabs non-crypto catalog (public) — reviewers see approved endpoints + auth shape
+  app.get('/x402/zyla/catalog', (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const base = `https://${host}`;
+    res.set('Access-Control-Allow-Origin', '*').json(zylaCatalogPublic(base));
   });
 
   // Agent traffic stats — polled by dashboard every 60s
@@ -650,6 +659,28 @@ async function runSSE(): Promise<void> {
     const stripeKey = typeof req.headers['x-stripe-key'] === 'string' ? req.headers['x-stripe-key'] : '';
     if (stripeKey && await isEntitledStripeKey(stripeKey)) {
       return { ok: true, payer: { rail: 'stripe', from: `stripe:${stripeKey.slice(0, 16)}…`, tx: '' } };
+    }
+
+
+    // ZylaLabs marketplace rail — Bearer sml_zyla_* / X-Zyla-Key
+    // NON-CRYPTO allowlist only. Crypto product paths hard-403 even with valid key.
+    // Unauthenticated callers fall through to x402 402 as usual.
+    {
+      const resourcePath = (() => {
+        try {
+          const u = new URL(opts.resource);
+          return u.pathname;
+        } catch {
+          return req.path || '';
+        }
+      })();
+      const zyla = tryZylaBypass(req, res, resourcePath);
+      if (zyla && zyla.ok === true) {
+        return { ok: true, payer: { rail: `zyla:${zyla.tier}`, from: `zyla:${zyla.keyId}`, tx: '' } };
+      }
+      if (zyla && zyla.ok === false) {
+        return { ok: false }; // response already written (401/403/429/503)
+      }
     }
 
     // Rail A — standard EIP-3009 via hybrid facilitator chain
