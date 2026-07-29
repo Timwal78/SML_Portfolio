@@ -240,16 +240,23 @@ export function lookupFmr(opts: { zip?: string; county?: string; state?: string;
     county.includes('lenoir') ||
     (state === 'NC' && (county.includes('lenoir') || zip.startsWith('285')));
 
-  const rows = FMR_TABLE.filter((r) => r.year === year || !opts.year);
-  const areaRows = isLenoir
-    ? FMR_TABLE.filter((r) => r.area.toLowerCase().includes('lenoir'))
-    : FMR_TABLE.filter((r) => r.year === year);
+  // This curated seed table only ever contains Lenoir County, NC rows (the
+  // operator's own rental market). A query for anywhere else must never fall
+  // through to those numbers relabeled as if they applied elsewhere — that
+  // would be exactly the "hardcoded value behind a payment gate" the
+  // sovereign data policy prohibits. Anything sold nationwide goes through
+  // the live section8_fmr_national tool (real HUD User API) instead.
+  if (!isLenoir) {
+    return {
+      error: 'zip_not_in_curated_seed',
+      message:
+        'This curated dataset only covers Lenoir County, NC (Kinston) — the operator\'s own rental market. For any other US location, call section8_fmr_national (live HUD User API) with an entity_id from section8_geo_lookup.',
+      query: { zip, county: opts.county || '', state, year, bedrooms: br },
+    };
+  }
 
-  const primary =
-    areaRows.find((r) => r.year === year) ||
-    areaRows[0] ||
-    rows.find((r) => r.year === year) ||
-    FMR_TABLE[0];
+  const areaRows = FMR_TABLE.filter((r) => r.area.toLowerCase().includes('lenoir'));
+  const primary = areaRows.find((r) => r.year === year) || areaRows[0];
 
   if (!primary) {
     return { error: 'fmr_not_found', detail: 'No FMR row for query. Seed covers Lenoir County NC.' };
@@ -371,6 +378,73 @@ async function paidMeta(toolName: string, wallet: string, paymentTxHash?: string
     chain: payment.chain,
     amount_paid: `${payment.amountPaid} ${payment.currency}`,
   };
+}
+
+// ── Nationwide HUD User API (real Bearer-token gov API, same trust level as
+// federal.ts's SAM_API_KEY-gated tools — not the curated Kinston-only seed
+// data above). Fails loudly with upstream_unavailable / a clear "not
+// configured" message when HUD_USER_TOKEN is unset or HUD errors — never
+// silently substitutes the personal-use seed data above as a fallback.
+const HUD_FMR_BASE = 'https://www.huduser.gov/hudapi/public/fmr';
+const HUD_IL_BASE = 'https://www.huduser.gov/hudapi/public/il';
+
+async function hudFetch(url: string): Promise<unknown> {
+  const token = process.env['HUD_USER_TOKEN'] ?? '';
+  if (!token) {
+    throw new Error(
+      'HUD_USER_TOKEN not configured on this host — register a free token at https://www.huduser.gov/hudapi/public/register',
+    );
+  }
+  const res = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: 'application/json',
+      'User-Agent': 'ScriptMasterLabs-mcp-x402/2.1',
+    },
+    signal: AbortSignal.timeout(15000),
+  });
+  const text = await res.text();
+  if (!res.ok) throw new Error(`HUD User API HTTP ${res.status}: ${text.slice(0, 200)}`);
+  return JSON.parse(text);
+}
+
+async function runPaidTool(
+  toolName: string,
+  walletAddress: string | undefined,
+  operatorKey: string | undefined,
+  fn: () => Promise<unknown>,
+): Promise<{ content: Array<{ type: 'text'; text: string }>; isError?: boolean }> {
+  const audit = AuditLogger.getInstance();
+  if (!RateLimiter.getInstance().checkTool(toolName)) {
+    return { content: [{ type: 'text', text: JSON.stringify({ error: 'rate_limit_exceeded' }) }], isError: true };
+  }
+  await PriceRegistry.getInstance().seedDefaults();
+  const price = await PriceRegistry.getInstance().getPrice(toolName);
+  if (!price) {
+    return { content: [{ type: 'text', text: JSON.stringify({ error: 'price_unavailable' }) }], isError: true };
+  }
+  let payment;
+  try {
+    payment = await executeX402Payment({ price, currency: 'USDC', toolName, walletAddress, operatorKey });
+  } catch (err) {
+    return { content: [{ type: 'text', text: JSON.stringify({ error: 'payment_failed', message: String(err) }) }], isError: true };
+  }
+  try {
+    const data = await fn();
+    audit.info(`${toolName}_success`, { receiptId: payment.receiptId });
+    return {
+      content: [{
+        type: 'text',
+        text: JSON.stringify({
+          data,
+          tier: 'paid',
+          _meta: { receipt_id: payment.receiptId, tx_hash: payment.txHash, chain: payment.chain, amount_paid: `${payment.amountPaid} ${payment.currency}` },
+        }),
+      }],
+    };
+  } catch (err) {
+    return { content: [{ type: 'text', text: JSON.stringify({ error: 'upstream_unavailable', details: String(err) }) }], isError: true };
+  }
 }
 
 export function registerHousing(server: McpServer): void {
@@ -529,4 +603,63 @@ export function registerHousing(server: McpServer): void {
       }
     },
   );
+
+  // ── Nationwide, live HUD data (any US county/metro, not just Kinston) ──────
+
+  server.tool('section8_geo_lookup', {
+    scope: z.enum(['states', 'counties', 'metros']).describe('states: list all states. counties: list counties for a state (requires state_code). metros: list metro areas.'),
+    state_code: z.string().optional().describe('2-letter state code, required when scope=counties'),
+    wallet_address: z.string().optional().describe('Agent wallet address for USDC payment'),
+    operator_key: z.string().optional().describe('Operator bypass key (internal use only) — skips payment when it matches the deployment\'s SML_API_KEY'),
+  }, async (args) => runPaidTool('section8_geo_lookup', args.wallet_address, args.operator_key, async () => {
+    let path: string;
+    if (args.scope === 'states') path = '/listStates';
+    else if (args.scope === 'metros') path = '/listMetroAreas';
+    else {
+      if (!args.state_code) throw new Error('state_code required when scope=counties');
+      path = `/listCounties/${args.state_code.toUpperCase()}`;
+    }
+    const data = await hudFetch(`${HUD_FMR_BASE}${path}`);
+    return { scope: args.scope, source: 'HUD User API (huduser.gov/hudapi)', data };
+  }));
+
+  server.tool('section8_fmr_national', {
+    entity_id: z.string().optional().describe('HUD FMR entity ID for a county/metro area (get one via section8_geo_lookup)'),
+    state_code: z.string().optional().describe('Alternative to entity_id: 2-letter state code for statewide data'),
+    year: z.number().optional().describe('Fiscal year, defaults to the current HUD dataset year'),
+    wallet_address: z.string().optional().describe('Agent wallet address for USDC payment'),
+    operator_key: z.string().optional().describe('Operator bypass key (internal use only) — skips payment when it matches the deployment\'s SML_API_KEY'),
+  }, async (args) => runPaidTool('section8_fmr_national', args.wallet_address, args.operator_key, async () => {
+    if (!args.entity_id && !args.state_code) throw new Error('entity_id or state_code required');
+    let url = args.state_code
+      ? `${HUD_FMR_BASE}/statedata/${args.state_code.toUpperCase()}`
+      : `${HUD_FMR_BASE}/data/${args.entity_id}`;
+    if (args.year) url += `?year=${args.year}`;
+    const data = await hudFetch(url);
+    return {
+      source: 'HUD User Fair Market Rent API',
+      note: 'FMR values are the monthly gross-rent benchmark used to set Section 8 HCV payment standards. PHAs typically set their own payment standard 90-110% of FMR.',
+      data,
+    };
+  }));
+
+  server.tool('section8_income_limits', {
+    entity_id: z.string().optional().describe('HUD IL entity ID for a county/metro area (get one via section8_geo_lookup)'),
+    state_code: z.string().optional().describe('Alternative to entity_id: 2-letter state code for statewide data'),
+    year: z.number().optional().describe('Fiscal year, defaults to the current HUD dataset year'),
+    wallet_address: z.string().optional().describe('Agent wallet address for USDC payment'),
+    operator_key: z.string().optional().describe('Operator bypass key (internal use only) — skips payment when it matches the deployment\'s SML_API_KEY'),
+  }, async (args) => runPaidTool('section8_income_limits', args.wallet_address, args.operator_key, async () => {
+    if (!args.entity_id && !args.state_code) throw new Error('entity_id or state_code required');
+    let url = args.state_code
+      ? `${HUD_IL_BASE}/statedata/${args.state_code.toUpperCase()}`
+      : `${HUD_IL_BASE}/data/${args.entity_id}`;
+    if (args.year) url += `?year=${args.year}`;
+    const data = await hudFetch(url);
+    return {
+      source: 'HUD User Income Limits API',
+      note: 'extremely_low ~= 30% AMI, very_low ~= 50% AMI, low ~= 80% AMI — the eligibility thresholds for Section 8 / Public Housing, adjusted by family size.',
+      data,
+    };
+  }));
 }

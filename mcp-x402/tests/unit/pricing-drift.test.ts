@@ -39,6 +39,13 @@ const PAID_TOOLS = [
   'search_grants',
   'search_contracts',
   'lookup_entity',
+  'pha_lookup',
+  'hcv_fmr',
+  'housing_landlord_checklist',
+  'hud_vash_contacts',
+  'section8_geo_lookup',
+  'section8_fmr_national',
+  'section8_income_limits',
 ] as const;
 
 describe('pricing drift guard', () => {

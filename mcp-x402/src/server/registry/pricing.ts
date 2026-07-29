@@ -94,6 +94,10 @@ const BASE_PRICES: Record<string, string> = {
   hcv_fmr: '0.001',
   housing_landlord_checklist: '0.001',
   hud_vash_contacts: '0.001',
+  // Housing / Section 8 — nationwide, live HUD User API (not the curated Kinston seed above)
+  section8_geo_lookup: '0.001',
+  section8_fmr_national: '0.001',
+  section8_income_limits: '0.001',
 };
 
 interface CachedPrice {

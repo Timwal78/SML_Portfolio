@@ -27,6 +27,20 @@ const CATALOG = {
       ],
     },
     {
+      product: 'Housing / Section 8 / PHA',
+      description: 'Section 8 (Housing Choice Voucher) and Public Housing Authority intelligence for landlords, property managers, and SDVOSB housing contractors. section8_fmr_national, section8_income_limits, and section8_geo_lookup are live nationwide data from the real HUD User API (any US county/metro). pha_lookup, hcv_fmr, housing_landlord_checklist, and hud_vash_contacts are a curated seed scoped to Lenoir County, NC (Kinston) only — hcv_fmr and pha_lookup return an explicit not-covered response rather than fabricated numbers for any other location.',
+      backend: 'https://www.huduser.gov/hudapi (nationwide tools, requires HUD_USER_TOKEN); curated seed (Kinston-only tools)',
+      tools: [
+        { name: 'section8_geo_lookup',    type: 'PAID', price_usdc: '0.001', description: 'List HUD entity IDs for states, counties, or metro areas — nationwide, live HUD User API' },
+        { name: 'section8_fmr_national',  type: 'PAID', price_usdc: '0.001', description: 'Fair Market Rents (Section 8 payment-standard baseline) for any US county/metro entity_id or state — nationwide, live HUD User API' },
+        { name: 'section8_income_limits', type: 'PAID', price_usdc: '0.001', description: 'HUD income limits (30/50/80% AMI) for any US county/metro entity_id or state — nationwide, live HUD User API' },
+        { name: 'pha_lookup',                    type: 'PAID', price_usdc: '0.001', description: 'Public Housing Authority contact lookup — curated seed, Lenoir County NC only today' },
+        { name: 'hcv_fmr',                       type: 'PAID', price_usdc: '0.001', description: 'Curated Section 8 FMR + payment-standard estimate for Lenoir County NC; use section8_fmr_national for anywhere else' },
+        { name: 'housing_landlord_checklist',    type: 'PAID', price_usdc: '0.001', description: 'HCV/Section 8 landlord onboarding + HQS inspection checklist (Lenoir County NC context)' },
+        { name: 'hud_vash_contacts',             type: 'PAID', price_usdc: '0.001', description: 'HUD-VASH (veteran voucher) program contacts — curated, Eastern NC today' },
+      ],
+    },
+    {
       product: 'Export Compliance',
       description: 'Restricted-party screening against all 11 US export-control and sanctions lists in one search — BIS Denied Persons/Entity/Unverified Lists, State ITAR Debarred + Nonproliferation Sanctions, Treasury OFAC SDN and 5 more',
       backend: 'https://data.trade.gov',
@@ -198,10 +212,10 @@ const CATALOG = {
     },
   ],
   stats: {
-    total_tools: 49,
+    total_tools: 56,
     free_tools: 24,
-    paid_tools: 24,
-    products: 13,
+    paid_tools: 31,
+    products: 14,
     chains_supported: 3,
   },
 };
