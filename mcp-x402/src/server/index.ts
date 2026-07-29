@@ -387,9 +387,50 @@ async function runSSE(): Promise<void> {
   // resubmitting the "Update product visibility" request to confirm the
   // audit-satisfying call actually ran and succeeded.
   app.get('/aws/marketplace/status', (_req, res) => {
+    const hasAws = Boolean(process.env['AWS_ACCESS_KEY_ID'] && process.env['AWS_SECRET_ACCESS_KEY']);
+    const hasDb = Boolean(process.env['SUPABASE_URL'] && process.env['SUPABASE_SERVICE_ROLE_KEY']);
     res.set('Access-Control-Allow-Origin', '*').json({
-      configured: Boolean(process.env['AWS_ACCESS_KEY_ID'] && process.env['AWS_SECRET_ACCESS_KEY']),
+      ok: hasAws && hasDb,
+      configured: hasAws,
+      supabase_configured: hasDb,
+      product_id: 'prod-lop2m2yjjcs76',
       product_code: 'c6g8c5zsvgof5a4rpp6eqlzn',
+      strategy: 'Two engines, one door, three checkouts: Zyla (non-crypto data) · AWS seat (platform) · x402 (agents).',
+      engines: {
+        data: 'https://mcp-x402.onrender.com',
+        trading_os: 'https://squeezeos-api.onrender.com',
+      },
+      checkouts: {
+        zyla: { channel: 'ZylaLabs', surface: 'non-crypto data APIs', listing: 'api=133808' },
+        aws_seat: {
+          channel: 'AWS Marketplace',
+          surface: 'platform seat $599/mo',
+          product_id: 'prod-lop2m2yjjcs76',
+          header: 'X-AWS-MP-Key: sk_awsmp_*',
+          fulfillment_post: 'https://mcp-x402.onrender.com/aws/marketplace/resolve',
+          fulfillment_root_post: 'https://mcp-x402.onrender.com/',
+          note: 'AI Agents listing type may require bare domain fulfillment URL — root POST/GET also accepts x-amzn-marketplace-token',
+        },
+        x402_agents: {
+          channel: 'x402 USDC Base',
+          surface: 'pay-per-call snacks',
+          price_floor_usdc: '0.001',
+          discovery: 'https://mcp-x402.onrender.com/.well-known/x402',
+        },
+      },
+      routes: {
+        status: 'GET /aws/marketplace/status',
+        resolve_get: 'GET /aws/marketplace/resolve (docs + optional ?x-amzn-marketplace-token=)',
+        resolve_post: 'POST /aws/marketplace/resolve (AWS form body x-amzn-marketplace-token)',
+        sns: 'POST /aws/marketplace/sns',
+        root_get: 'GET / (?x-amzn-marketplace-token=)',
+        root_post: 'POST / (x-amzn-marketplace-token form)',
+      },
+      sns_topics_expected: [
+        'aws-mp-subscription-notification-c6g8c5zsvgof5a4rpp6eqlzn',
+        'aws-mp-entitlement-notification-c6g8c5zsvgof5a4rpp6eqlzn',
+      ],
+      sns_endpoint: 'https://mcp-x402.onrender.com/aws/marketplace/sns',
       last_entitlements_self_check: getEntitlementsSelfCheckStatus(),
     });
   });
@@ -417,6 +458,69 @@ async function runSSE(): Promise<void> {
       .hint{color:#64748b;font-size:.8rem;margin-top:1rem}a{color:#a78bfa}</style></head>
       <body>${inner}</body></html>`;
   };
+  // GET: browsers/docs hit this URL and used to see Express "Cannot GET".
+  // AWS itself POSTs the registration token; GET supports optional query token
+  // plus a clear three-checkout landing page when no token is present.
+  app.get('/aws/marketplace/resolve', async (req: Request, res: Response) => {
+    const tokenFromQuery = typeof req.query['x-amzn-marketplace-token'] === 'string'
+      ? (req.query['x-amzn-marketplace-token'] as string)
+      : '';
+    if (tokenFromQuery) {
+      const result = await resolveAwsMarketplaceCustomer(tokenFromQuery);
+      if (!result.ok) {
+        res.status(502).send(awsFulfillmentPage({ ok: false, error: result.error }));
+        return;
+      }
+      res.send(awsFulfillmentPage({ ok: true, apiKey: result.apiKey }));
+      return;
+    }
+    const acceptsHtml = typeof req.headers['accept'] === 'string' && req.headers['accept'].includes('text/html');
+    if (acceptsHtml) {
+      res.type('html').send(`<!doctype html><html><head><meta charset="utf-8"><title>SML — AWS Marketplace Fulfillment</title>
+<style>body{background:#050508;color:#e2e8f0;font-family:system-ui,sans-serif;max-width:720px;margin:3rem auto;padding:0 1.25rem;line-height:1.55}
+h1{color:#a78bfa;font-size:1.5rem}h2{color:#94a3b8;font-size:.85rem;text-transform:uppercase;letter-spacing:.06em;margin-top:1.75rem}
+code,pre{background:#0d0d14;border:1px solid #1e1e2e;border-radius:8px;padding:.55rem .75rem;color:#10b981;display:block;overflow:auto}
+a{color:#a78bfa}.card{border:1px solid #1e1e2e;border-radius:12px;padding:1rem 1.1rem;margin:.6rem 0;background:#0a0a10}
+.muted{color:#64748b;font-size:.9rem}</style></head><body>
+<h1>AWS Marketplace fulfillment</h1>
+<p><strong>Two engines, one door, three checkouts:</strong> Zyla (non-crypto data) · AWS seat (platform) · x402 (agents).</p>
+<p class="muted">This URL is the AWS seat door. AWS sends a <strong>POST</strong> with <code style="display:inline;padding:.1rem .35rem">x-amzn-marketplace-token</code> after subscribe. A bare GET (no token) is normal in a browser — it is not a failed deploy.</p>
+<h2>How checkout works</h2>
+<div class="card"><strong>1. Subscribe</strong> on AWS Marketplace (prod-lop2m2yjjcs76)</div>
+<div class="card"><strong>2. AWS redirects</strong> here (POST) or to site root with the registration token</div>
+<div class="card"><strong>3. We mint</strong> <code style="display:inline;padding:.1rem .35rem">sk_awsmp_*</code> and show it once</div>
+<div class="card"><strong>4. Call APIs</strong> with header <code style="display:inline;padding:.1rem .35rem">X-AWS-MP-Key: sk_awsmp_…</code> (skips per-call x402 for the seat term)</div>
+<h2>Endpoints</h2>
+<pre>POST https://mcp-x402.onrender.com/aws/marketplace/resolve
+GET  https://mcp-x402.onrender.com/aws/marketplace/resolve?x-amzn-marketplace-token=…
+POST https://mcp-x402.onrender.com/   (bare-domain fulfillment fallback)
+GET  https://mcp-x402.onrender.com/aws/marketplace/status
+POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
+<h2>Three checkouts</h2>
+<div class="card"><strong>Zyla</strong> — non-crypto data pack (api=133808)</div>
+<div class="card"><strong>AWS seat</strong> — platform $599/mo · this page</div>
+<div class="card"><strong>x402 agents</strong> — $0.001 USDC/call · �� <a href="/.well-known/x402">/.well-known/x402</a></div>
+<p class="muted">Status JSON: <a href="/aws/marketplace/status">/aws/marketplace/status</a> · Support: timothy.walton45@gmail.com · SAM UEI G24VZA4RLMK3</p>
+</body></html>`);
+      return;
+    }
+    res.set('Access-Control-Allow-Origin', '*').json({
+      ok: true,
+      method: 'GET',
+      message: 'AWS fulfillment endpoint. Browsers GET this for docs; AWS POSTs x-amzn-marketplace-token after subscribe.',
+      strategy: 'Two engines, one door, three checkouts: Zyla (non-crypto data) · AWS seat (platform) · x402 (agents).',
+      usage: {
+        aws_browser_post: 'POST application/x-www-form-urlencoded with x-amzn-marketplace-token',
+        manual_get: 'GET ?x-amzn-marketplace-token=...',
+        api_header_after_provision: 'X-AWS-MP-Key: sk_awsmp_*',
+      },
+      status: '/aws/marketplace/status',
+      sns: 'POST /aws/marketplace/sns',
+      product_code: 'c6g8c5zsvgof5a4rpp6eqlzn',
+      product_id: 'prod-lop2m2yjjcs76',
+    });
+  });
+
   app.post('/aws/marketplace/resolve', async (req: Request, res: Response) => {
     const token = typeof req.body?.['x-amzn-marketplace-token'] === 'string' ? req.body['x-amzn-marketplace-token'] : '';
     if (!token) {
@@ -430,6 +534,7 @@ async function runSSE(): Promise<void> {
     }
     res.send(awsFulfillmentPage({ ok: true, apiKey: result.apiKey }));
   });
+
 
   // Wallet info — shows the server's derived wallet address (safe to expose, no private key)
   app.get('/wallet', async (_req, res) => {
