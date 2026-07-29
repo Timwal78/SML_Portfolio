@@ -408,6 +408,45 @@ async function hudFetch(url: string): Promise<unknown> {
   return JSON.parse(text);
 }
 
+// Shared by the MCP tool handlers below and the REST /x402/section8-* routes
+// in server/index.ts — same "one implementation, two transports" convention
+// already used by lookupPha/lookupFmr/landlordChecklist/windsorBundle above.
+export async function section8GeoLookup(scope: 'states' | 'counties' | 'metros', stateCode?: string) {
+  let path: string;
+  if (scope === 'states') path = '/listStates';
+  else if (scope === 'metros') path = '/listMetroAreas';
+  else {
+    if (!stateCode) throw new Error('state_code required when scope=counties');
+    path = `/listCounties/${stateCode.toUpperCase()}`;
+  }
+  const data = await hudFetch(`${HUD_FMR_BASE}${path}`);
+  return { scope, source: 'HUD User API (huduser.gov/hudapi)', data };
+}
+
+export async function section8FmrNational(entityId?: string, stateCode?: string, year?: number) {
+  if (!entityId && !stateCode) throw new Error('entity_id or state_code required');
+  let url = stateCode ? `${HUD_FMR_BASE}/statedata/${stateCode.toUpperCase()}` : `${HUD_FMR_BASE}/data/${entityId}`;
+  if (year) url += `?year=${year}`;
+  const data = await hudFetch(url);
+  return {
+    source: 'HUD User Fair Market Rent API',
+    note: 'FMR values are the monthly gross-rent benchmark used to set Section 8 HCV payment standards. PHAs typically set their own payment standard 90-110% of FMR.',
+    data,
+  };
+}
+
+export async function section8IncomeLimits(entityId?: string, stateCode?: string, year?: number) {
+  if (!entityId && !stateCode) throw new Error('entity_id or state_code required');
+  let url = stateCode ? `${HUD_IL_BASE}/statedata/${stateCode.toUpperCase()}` : `${HUD_IL_BASE}/data/${entityId}`;
+  if (year) url += `?year=${year}`;
+  const data = await hudFetch(url);
+  return {
+    source: 'HUD User Income Limits API',
+    note: 'extremely_low ~= 30% AMI, very_low ~= 50% AMI, low ~= 80% AMI — the eligibility thresholds for Section 8 / Public Housing, adjusted by family size.',
+    data,
+  };
+}
+
 async function runPaidTool(
   toolName: string,
   walletAddress: string | undefined,
@@ -611,17 +650,9 @@ export function registerHousing(server: McpServer): void {
     state_code: z.string().optional().describe('2-letter state code, required when scope=counties'),
     wallet_address: z.string().optional().describe('Agent wallet address for USDC payment'),
     operator_key: z.string().optional().describe('Operator bypass key (internal use only) — skips payment when it matches the deployment\'s SML_API_KEY'),
-  }, async (args) => runPaidTool('section8_geo_lookup', args.wallet_address, args.operator_key, async () => {
-    let path: string;
-    if (args.scope === 'states') path = '/listStates';
-    else if (args.scope === 'metros') path = '/listMetroAreas';
-    else {
-      if (!args.state_code) throw new Error('state_code required when scope=counties');
-      path = `/listCounties/${args.state_code.toUpperCase()}`;
-    }
-    const data = await hudFetch(`${HUD_FMR_BASE}${path}`);
-    return { scope: args.scope, source: 'HUD User API (huduser.gov/hudapi)', data };
-  }));
+  }, async (args) => runPaidTool('section8_geo_lookup', args.wallet_address, args.operator_key, () =>
+    section8GeoLookup(args.scope, args.state_code)
+  ));
 
   server.tool('section8_fmr_national', {
     entity_id: z.string().optional().describe('HUD FMR entity ID for a county/metro area (get one via section8_geo_lookup)'),
@@ -629,19 +660,9 @@ export function registerHousing(server: McpServer): void {
     year: z.number().optional().describe('Fiscal year, defaults to the current HUD dataset year'),
     wallet_address: z.string().optional().describe('Agent wallet address for USDC payment'),
     operator_key: z.string().optional().describe('Operator bypass key (internal use only) — skips payment when it matches the deployment\'s SML_API_KEY'),
-  }, async (args) => runPaidTool('section8_fmr_national', args.wallet_address, args.operator_key, async () => {
-    if (!args.entity_id && !args.state_code) throw new Error('entity_id or state_code required');
-    let url = args.state_code
-      ? `${HUD_FMR_BASE}/statedata/${args.state_code.toUpperCase()}`
-      : `${HUD_FMR_BASE}/data/${args.entity_id}`;
-    if (args.year) url += `?year=${args.year}`;
-    const data = await hudFetch(url);
-    return {
-      source: 'HUD User Fair Market Rent API',
-      note: 'FMR values are the monthly gross-rent benchmark used to set Section 8 HCV payment standards. PHAs typically set their own payment standard 90-110% of FMR.',
-      data,
-    };
-  }));
+  }, async (args) => runPaidTool('section8_fmr_national', args.wallet_address, args.operator_key, () =>
+    section8FmrNational(args.entity_id, args.state_code, args.year)
+  ));
 
   server.tool('section8_income_limits', {
     entity_id: z.string().optional().describe('HUD IL entity ID for a county/metro area (get one via section8_geo_lookup)'),
@@ -649,17 +670,7 @@ export function registerHousing(server: McpServer): void {
     year: z.number().optional().describe('Fiscal year, defaults to the current HUD dataset year'),
     wallet_address: z.string().optional().describe('Agent wallet address for USDC payment'),
     operator_key: z.string().optional().describe('Operator bypass key (internal use only) — skips payment when it matches the deployment\'s SML_API_KEY'),
-  }, async (args) => runPaidTool('section8_income_limits', args.wallet_address, args.operator_key, async () => {
-    if (!args.entity_id && !args.state_code) throw new Error('entity_id or state_code required');
-    let url = args.state_code
-      ? `${HUD_IL_BASE}/statedata/${args.state_code.toUpperCase()}`
-      : `${HUD_IL_BASE}/data/${args.entity_id}`;
-    if (args.year) url += `?year=${args.year}`;
-    const data = await hudFetch(url);
-    return {
-      source: 'HUD User Income Limits API',
-      note: 'extremely_low ~= 30% AMI, very_low ~= 50% AMI, low ~= 80% AMI — the eligibility thresholds for Section 8 / Public Housing, adjusted by family size.',
-      data,
-    };
-  }));
+  }, async (args) => runPaidTool('section8_income_limits', args.wallet_address, args.operator_key, () =>
+    section8IncomeLimits(args.entity_id, args.state_code, args.year)
+  ));
 }
