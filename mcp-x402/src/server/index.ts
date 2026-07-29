@@ -21,7 +21,7 @@ import { handleSnsMessage } from './aws/sns-entitlement.js';
 import { handleStripeWebhookEvent, getApiKeyForCheckoutSession, isEntitledStripeKey } from './stripe/entitlement.js';
 import { runCommunityScan } from './marketing/community.js';
 import { registerTools } from './tools/index.js';
-import { lookupPha, lookupFmr, landlordChecklist, windsorBundle, VASH_CONTACTS, section8GeoLookup, section8FmrNational, section8IncomeLimits, phaOpportunities } from './tools/housing.js';
+import { lookupPha, lookupFmr, landlordChecklist, windsorBundle, VASH_CONTACTS, section8GeoLookup, section8FmrNational, section8IncomeLimits, phaOpportunities, phaSearch } from './tools/housing.js';
 import { AuditLogger } from './security/audit.js';
 import { RateLimiter } from './security/rate-limit.js';
 import { tryZylaBypass, zylaCatalogPublic, ZYLA_ALLOWLIST } from './security/zyla.js';
@@ -3081,6 +3081,7 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
   const SECTION8_FMR_PRICE = 6000n; // $0.006 USDC
   const SECTION8_INCOME_LIMITS_PRICE = 6000n; // $0.006 USDC
   const PHA_OPPORTUNITIES_PRICE = 12000n; // $0.012 USDC
+  const PHA_SEARCH_PRICE = 8000n; // $0.008 USDC
   app.get('/x402/pha-lookup', async (req, res) => {
     const host = req.headers.host ?? 'mcp-x402.onrender.com';
     const resource = `https://${host}/x402/pha-lookup`;
@@ -3252,6 +3253,27 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
     } catch (err) {
       if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
       return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'pha_opportunities_failed', message: String(err) });
+    }
+  });
+
+  app.get('/x402/pha-search', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/pha-search`;
+    const name = typeof req.query['name'] === 'string' ? req.query['name'] : undefined;
+    const city = typeof req.query['city'] === 'string' ? req.query['city'] : undefined;
+    const state = typeof req.query['state'] === 'string' ? req.query['state'] : undefined;
+    const zip = typeof req.query['zip'] === 'string' ? req.query['zip'] : undefined;
+    const limit = req.query['limit'] ? parseInt(String(req.query['limit']), 10) : undefined;
+    const inputSchema = { type: 'object', properties: { name: { type: 'string' }, city: { type: 'string' }, state: { type: 'string' }, zip: { type: 'string' }, limit: { type: 'integer' } }, required: [] };
+    const outputSchema = { input: { type: 'http', method: 'GET' }, output: null };
+    const pay = await requirePayment(req, res, { resource, priceUnits: PHA_SEARCH_PRICE, description: 'Nationwide Public Housing Authority search by name/city/state/ZIP — live HUD Open Data ArcGIS FeatureServer, ~3,300+ agencies. Pay 0.008 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    if (!pay.ok) return;
+    try {
+      const data = await phaSearch({ name, city, state, zip, limit });
+      return res.set('Access-Control-Allow-Origin', '*').json({ ...data, _paid: pay.payer });
+    } catch (err) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'pha_search_failed', message: String(err) });
     }
   });
 

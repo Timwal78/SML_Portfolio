@@ -47,6 +47,7 @@ const PAID_TOOLS = [
   'section8_fmr',
   'section8_income_limits',
   'pha_opportunities',
+  'pha_search',
 ] as const;
 
 describe('pricing drift guard', () => {

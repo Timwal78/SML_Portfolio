@@ -27,7 +27,7 @@ registered SDVOSB and don't already operate live federal procurement tools.
 
 ## LIVE TODAY
 
-### Nationwide tools (real HUD User API + real SAM.gov, any US location)
+### Nationwide tools (real HUD User API + HUD Open Data + real SAM.gov, any US location)
 
 | Tool | Price (USDC) | What it does |
 |------|--------------|--------------|
@@ -35,10 +35,19 @@ registered SDVOSB and don't already operate live federal procurement tools.
 | `section8_fmr` | $0.006 | Fair Market Rents (Section 8 payment-standard baseline), any county/metro/state |
 | `section8_income_limits` | $0.006 | HUD income limits (30/50/80% AMI eligibility), any county/metro/state |
 | `pha_opportunities` | $0.012 | Real SAM.gov opportunities filtered for housing authority / Section 8 / HCV work, with NAICS + set-aside filtering |
+| `pha_search` | $0.008 | Nationwide PHA search by name/city/state/ZIP — live HUD Open Data ArcGIS FeatureServer (`services.arcgis.com/VTyQ9soqVukalItT/.../Public_Housing_Authorities/FeatureServer/0`), ~3,300+ agencies, no auth |
 
-Gated on `HUD_USER_TOKEN` (free registration) and `SAM_API_KEY` — both fail
-with a clear "not configured" error rather than ever fabricating a number,
-per this repo's `SOVEREIGN_DATA_POLICY.md`.
+`section8_geo_lookup`/`section8_fmr`/`section8_income_limits` are gated on
+`HUD_USER_TOKEN` (free registration); `pha_opportunities` needs
+`SAM_API_KEY`; `pha_search` needs neither (public FeatureServer). All fail
+with a clear "not configured"/upstream error rather than ever fabricating a
+number, per this repo's `SOVEREIGN_DATA_POLICY.md`.
+
+`pha_search`'s FeatureServer URL was independently verified live (name,
+field list, and record count cross-checked against HUD's own published
+~3,300-agency figure) before being wired in — not guessed. If it ever 404s
+in production, that means HUD moved the dataset, not that the integration
+was ever speculative.
 
 ### Curated tools (Lenoir County, NC / Kinston only — not nationwide)
 
@@ -56,17 +65,6 @@ property) and are not part of the nationwide pitch above.
 `sml_discover`, `sml_status` (catalog + health, no wallet needed).
 
 ## PROPOSED — NOT YET WIRED (do not sell until built)
-
-### `pha_search` — nationwide PHA directory search by city/state/ZIP
-
-On the rate card at $0.008 but **has no code and no verified data source**.
-The only PHA data in this codebase is the single-entry Kinston seed above —
-not a search. Needs either a confirmed real HUD PHA contact dataset/API
-(this session's network access is blocked to both `huduser.gov` and
-`arcgis.com`, so no URL has been verified — do not guess one and ship it),
-or an explicit decision to launch with a small manually-curated PHA list
-that's honestly scoped in the listing copy rather than claimed as full
-nationwide coverage.
 
 ### AWS Marketplace subscription tiers (SDVOSB/federal-aware)
 
