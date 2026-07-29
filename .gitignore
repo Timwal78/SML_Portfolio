@@ -5,3 +5,7 @@ gov-procurement-intel/node_modules/
 # local signer secrets — never commit
 downloads/ACP_SIGNER_KEYS*
 **/signer-keys.json
+
+**/.credentials_local.txt
+**/ZYLA_ACCOUNT_CREDENTIALS.txt
+downloads/zyla/.credentials*
