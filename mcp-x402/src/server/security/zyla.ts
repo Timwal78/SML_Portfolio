@@ -31,60 +31,41 @@ export const ZYLA_CRYPTO_BLOCKLIST: readonly string[] = [
  * Keep this list product-safe for Tomas: no gas, no tokens, no wallets.
  */
 export const ZYLA_ALLOWLIST: readonly string[] = [
-  // Federal / contracts / grants
   '/x402/grants',
   '/x402/firms',
   '/x402/market',
   '/x402/entity-compliance',
-  '/x402/sbir-grants',
   '/x402/nih-grants',
-  '/x402/trade-leads',
-  '/x402/restricted-party-screen',
-  // SEC / filings
   '/x402/sec-8k',
   '/x402/sec-10k',
   '/x402/sec-10q',
   '/x402/sec-13f',
   '/x402/sec-13dg',
   '/x402/insider-trades',
-  // FDA / health
   '/x402/drug-label',
   '/x402/drug-recall',
   '/x402/drug-adverse-events',
   '/x402/fda-510k',
   '/x402/fda-warnings',
   '/x402/clinical-trials',
-  '/x402/cms-providers',
   '/x402/npi',
-  // Compliance / env / safety
-  '/x402/epa-violations',
-  '/x402/osha',
   '/x402/finra-broker',
   '/x402/fact-check',
-  '/x402/compliance-anomaly',
-  '/x402/compliance-audit',
   '/x402/compliance-regulator-query',
-  // Gov / politics
-  '/x402/congress-bills',
   '/x402/fec-finance',
   '/x402/lobbying',
-  '/x402/patents',
-  // Macro / FX (fiat only — not crypto)
   '/x402/fred',
   '/x402/treasury-yields',
   '/x402/fx-rate',
-  // Housing / HUD / Section 8
   '/x402/pha-lookup',
   '/x402/hcv-fmr',
   '/x402/housing-landlord-checklist',
   '/x402/housing-windsor',
   '/x402/hud-vash-contacts',
-  // Equities FTD / filings-adjacent (NOT crypto tokens)
   '/x402/ftd-threshold-list',
   '/x402/ftd-time-series',
   '/x402/ftd-ratio',
   '/x402/ftd-etf-basket',
-  '/x402/ftd-settlement-cycle',
 ] as const;
 
 const ALLOW = new Set(ZYLA_ALLOWLIST.map((p) => p.toLowerCase()));
