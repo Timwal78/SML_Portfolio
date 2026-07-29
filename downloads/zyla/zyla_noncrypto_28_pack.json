@@ -1,0 +1,762 @@
+{
+  "collection_name": "SML Public Records Compliance Data API Pack",
+  "vendor": {
+    "legal_name": "Script Master Labs, LLC",
+    "publisher_email": "timothy.walton45@gmail.com",
+    "agent_email": "scriptmasterlabs@agents.world",
+    "sam_uei": "G24VZA4RLMK3",
+    "cage": "21U51",
+    "sdvosb": true,
+    "website": "https://www.scriptmasterlabs.com"
+  },
+  "policy": {
+    "cryptocurrency_apis": false,
+    "note": "Explicitly excludes crypto, tokens, wallets, gas, DeFi, blockchain endpoints per Zyla policy."
+  },
+  "generated_at": "2026-07-29",
+  "api_count": 28,
+  "apis": [
+    {
+      "name": "Federal Contract Opportunities Feed API",
+      "description": "Real-time feed of federal contract opportunities. Search by NAICS code, agency, state, or keyword. Includes solicitation type, response deadline, award value, and contracting office details.",
+      "parameters": [
+        {
+          "name": "naics",
+          "type": "string",
+          "required": false,
+          "description": "NAICS industry code filter"
+        },
+        {
+          "name": "agency",
+          "type": "string",
+          "required": false,
+          "description": "Contracting agency name"
+        },
+        {
+          "name": "state",
+          "type": "string",
+          "required": false,
+          "description": "2-letter state code"
+        },
+        {
+          "name": "keyword",
+          "type": "string",
+          "required": false,
+          "description": "Search keyword"
+        },
+        {
+          "name": "limit",
+          "type": "integer",
+          "required": false,
+          "description": "Max results (default 50)"
+        }
+      ],
+      "suggested_endpoint": "/v1/federal-contract-opportunities-feed",
+      "category": "Data",
+      "auth": "API Key (Bearer)",
+      "https": true
+    },
+    {
+      "name": "Federal Award History Tracker API",
+      "description": "Historical federal contract award records. Track awarded contracts by recipient, agency, or date range. Includes award amount, recipient details, and contract performance data.",
+      "parameters": [
+        {
+          "name": "recipient",
+          "type": "string",
+          "required": false,
+          "description": "Contractor/recipient name"
+        },
+        {
+          "name": "agency",
+          "type": "string",
+          "required": false,
+          "description": "Awarding agency"
+        },
+        {
+          "name": "from_date",
+          "type": "string",
+          "required": false,
+          "description": "Start date YYYY-MM-DD"
+        },
+        {
+          "name": "to_date",
+          "type": "string",
+          "required": false,
+          "description": "End date YYYY-MM-DD"
+        },
+        {
+          "name": "limit",
+          "type": "integer",
+          "required": false,
+          "description": "Max results (default 50)"
+        }
+      ],
+      "suggested_endpoint": "/v1/federal-award-history-tracker",
+      "category": "Data",
+      "auth": "API Key (Bearer)",
+      "https": true
+    },
+    {
+      "name": "Set-Aside Contract Feed for Small Business API",
+      "description": "Federal set-aside contract opportunities filtered by socio-economic category (SDVOSB, WOSB, HUBZone, 8(a)). Includes eligibility requirements and response deadlines.",
+      "parameters": [
+        {
+          "name": "category",
+          "type": "string",
+          "required": false,
+          "description": "Set-aside type: SDVOSB, WOSB, HUBZone, 8(a)"
+        },
+        {
+          "name": "naics",
+          "type": "string",
+          "required": false,
+          "description": "NAICS code filter"
+        },
+        {
+          "name": "state",
+          "type": "string",
+          "required": false,
+          "description": "2-letter state code"
+        },
+        {
+          "name": "limit",
+          "type": "integer",
+          "required": false,
+          "description": "Max results (default 50)"
+        }
+      ],
+      "suggested_endpoint": "/v1/set-aside-contract-feed-for-small-business",
+      "category": "Data",
+      "auth": "API Key (Bearer)",
+      "https": true
+    },
+    {
+      "name": "Entity Registration Verification API",
+      "description": "Verify business entity registration status, exclusion/debarment flags, set-aside eligibility, and NAICS codes. Check if a contractor is registered and in good standing.",
+      "parameters": [
+        {
+          "name": "uei",
+          "type": "string",
+          "required": false,
+          "description": "Unique Entity Identifier"
+        },
+        {
+          "name": "cage",
+          "type": "string",
+          "required": false,
+          "description": "CAGE code"
+        },
+        {
+          "name": "entity_name",
+          "type": "string",
+          "required": false,
+          "description": "Legal entity name"
+        }
+      ],
+      "suggested_endpoint": "/v1/entity-registration-verification",
+      "category": "Data",
+      "auth": "API Key (Bearer)",
+      "https": true
+    },
+    {
+      "name": "Federal Spending by Agency API",
+      "description": "Federal spending breakdown by agency, category, and geographic distribution. Track obligation and outlay amounts across fiscal years.",
+      "parameters": [
+        {
+          "name": "agency",
+          "type": "string",
+          "required": false,
+          "description": "Agency name"
+        },
+        {
+          "name": "fiscal_year",
+          "type": "string",
+          "required": false,
+          "description": "Fiscal year (e.g. 2025)"
+        },
+        {
+          "name": "state",
+          "type": "string",
+          "required": false,
+          "description": "2-letter state code"
+        },
+        {
+          "name": "limit",
+          "type": "integer",
+          "required": false,
+          "description": "Max results (default 50)"
+        }
+      ],
+      "suggested_endpoint": "/v1/federal-spending-by-agency",
+      "category": "Data",
+      "auth": "API Key (Bearer)",
+      "https": true
+    },
+    {
+      "name": "Excluded Parties Check API",
+      "description": "Check if an entity is on the federal excluded/debarred parties list. Cross-reference recipient records with award history for compliance screening.",
+      "parameters": [
+        {
+          "name": "entity_name",
+          "type": "string",
+          "required": true,
+          "description": "Entity or contractor name to check"
+        }
+      ],
+      "suggested_endpoint": "/v1/excluded-parties-check",
+      "category": "Data",
+      "auth": "API Key (Bearer)",
+      "https": true
+    },
+    {
+      "name": "Annual Financial Report Filings API",
+      "description": "Annual financial report filings for any public company. Retrieve filing dates, accession numbers, and direct links to full reports. Includes balance sheet, income statement, and cash flow data.",
+      "parameters": [
+        {
+          "name": "ticker",
+          "type": "string",
+          "required": true,
+          "description": "Stock ticker symbol (e.g. AAPL)"
+        },
+        {
+          "name": "limit",
+          "type": "integer",
+          "required": false,
+          "description": "Max results (default 10, max 10)"
+        }
+      ],
+      "suggested_endpoint": "/v1/annual-financial-report-filings",
+      "category": "Data",
+      "auth": "API Key (Bearer)",
+      "https": true
+    },
+    {
+      "name": "Quarterly Financial Report Filings API",
+      "description": "Quarterly financial report filings for any public company. Retrieve filing dates, accession numbers, and links to full quarterly reports.",
+      "parameters": [
+        {
+          "name": "ticker",
+          "type": "string",
+          "required": true,
+          "description": "Stock ticker symbol"
+        },
+        {
+          "name": "limit",
+          "type": "integer",
+          "required": false,
+          "description": "Max results (default 10, max 10)"
+        }
+      ],
+      "suggested_endpoint": "/v1/quarterly-financial-report-filings",
+      "category": "Data",
+      "auth": "API Key (Bearer)",
+      "https": true
+    },
+    {
+      "name": "Material Event Filings Feed API",
+      "description": "Real-time material event filings for any public company. Includes event type, filing date, and summary for event-driven trading and monitoring.",
+      "parameters": [
+        {
+          "name": "ticker",
+          "type": "string",
+          "required": true,
+          "description": "Stock ticker symbol"
+        }
+      ],
+      "suggested_endpoint": "/v1/material-event-filings-feed",
+      "category": "Data",
+      "auth": "API Key (Bearer)",
+      "https": true
+    },
+    {
+      "name": "Insider Trading Activity Tracker API",
+      "description": "Insider trading transaction filings for any public company. Track executive buys, sells, and option exercises with transaction dates, share counts, and prices.",
+      "parameters": [
+        {
+          "name": "ticker",
+          "type": "string",
+          "required": true,
+          "description": "Stock ticker symbol"
+        }
+      ],
+      "suggested_endpoint": "/v1/insider-trading-activity-tracker",
+      "category": "Data",
+      "auth": "API Key (Bearer)",
+      "https": true
+    },
+    {
+      "name": "Institutional Holdings Filings API",
+      "description": "Quarterly institutional investment manager holdings filings. Retrieve position-level data for funds and institutions with filing URLs to full holdings tables.",
+      "parameters": [
+        {
+          "name": "cik",
+          "type": "string",
+          "required": false,
+          "description": "CIK number of the institution"
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "required": false,
+          "description": "Institution or fund name"
+        }
+      ],
+      "suggested_endpoint": "/v1/institutional-holdings-filings",
+      "category": "Data",
+      "auth": "API Key (Bearer)",
+      "https": true
+    },
+    {
+      "name": "Activist Investor Filings API",
+      "description": "Activist investor 5%+ stake filings for any ticker. Track filer name, form type, filing date, and stake percentage for activist position monitoring.",
+      "parameters": [
+        {
+          "name": "ticker",
+          "type": "string",
+          "required": true,
+          "description": "Stock ticker symbol"
+        },
+        {
+          "name": "limit",
+          "type": "integer",
+          "required": false,
+          "description": "Max results (default 20, max 20)"
+        }
+      ],
+      "suggested_endpoint": "/v1/activist-investor-filings",
+      "category": "Data",
+      "auth": "API Key (Bearer)",
+      "https": true
+    },
+    {
+      "name": "Warning Letters Feed API",
+      "description": "Regulatory warning letters issued to companies. Includes company name, subject, issued date, issuing office, and product type. Filter by company or product.",
+      "parameters": [
+        {
+          "name": "company",
+          "type": "string",
+          "required": false,
+          "description": "Company or issuer name"
+        },
+        {
+          "name": "product",
+          "type": "string",
+          "required": false,
+          "description": "Product, drug, or device name"
+        },
+        {
+          "name": "limit",
+          "type": "integer",
+          "required": false,
+          "description": "Max results (default 50)"
+        }
+      ],
+      "suggested_endpoint": "/v1/warning-letters-feed",
+      "category": "Data",
+      "auth": "API Key (Bearer)",
+      "https": true
+    },
+    {
+      "name": "Drug Recall Alerts API",
+      "description": "Drug and medical device recall enforcement reports. Track recall events by drug name, recall class, and date. Includes recalling firm and recall reason.",
+      "parameters": [
+        {
+          "name": "drug",
+          "type": "string",
+          "required": false,
+          "description": "Drug or product name"
+        },
+        {
+          "name": "limit",
+          "type": "integer",
+          "required": false,
+          "description": "Max results (default 50)"
+        }
+      ],
+      "suggested_endpoint": "/v1/drug-recall-alerts",
+      "category": "Data",
+      "auth": "API Key (Bearer)",
+      "https": true
+    },
+    {
+      "name": "Adverse Event Reports API",
+      "description": "Adverse event reports for drugs and medical products. Includes reaction type, severity, patient outcomes, and report dates. Filter by drug name.",
+      "parameters": [
+        {
+          "name": "drug",
+          "type": "string",
+          "required": true,
+          "description": "Drug or product name"
+        },
+        {
+          "name": "limit",
+          "type": "integer",
+          "required": false,
+          "description": "Max results (default 50)"
+        }
+      ],
+      "suggested_endpoint": "/v1/adverse-event-reports",
+      "category": "Data",
+      "auth": "API Key (Bearer)",
+      "https": true
+    },
+    {
+      "name": "Environmental Violation Records API",
+      "description": "Facility environmental enforcement and violation records. Includes inspection counts, penalty amounts, and compliance status. Filter by facility, state, or industry code.",
+      "parameters": [
+        {
+          "name": "facility",
+          "type": "string",
+          "required": false,
+          "description": "Facility or company name"
+        },
+        {
+          "name": "state",
+          "type": "string",
+          "required": false,
+          "description": "2-letter state code"
+        },
+        {
+          "name": "naics",
+          "type": "string",
+          "required": false,
+          "description": "NAICS industry code"
+        },
+        {
+          "name": "limit",
+          "type": "integer",
+          "required": false,
+          "description": "Max results (default 50)"
+        }
+      ],
+      "suggested_endpoint": "/v1/environmental-violation-records",
+      "category": "Data",
+      "auth": "API Key (Bearer)",
+      "https": true
+    },
+    {
+      "name": "Workplace Safety Inspection Records API",
+      "description": "Workplace safety inspection records with activity type, citations, penalties, and open/closed status. Filter by employer name, state, or industry code.",
+      "parameters": [
+        {
+          "name": "establishment",
+          "type": "string",
+          "required": false,
+          "description": "Employer or establishment name"
+        },
+        {
+          "name": "state",
+          "type": "string",
+          "required": false,
+          "description": "2-letter state code"
+        },
+        {
+          "name": "naics",
+          "type": "string",
+          "required": false,
+          "description": "6-digit NAICS code"
+        },
+        {
+          "name": "limit",
+          "type": "integer",
+          "required": false,
+          "description": "Max results (default 50)"
+        }
+      ],
+      "suggested_endpoint": "/v1/workplace-safety-inspection-records",
+      "category": "Data",
+      "auth": "API Key (Bearer)",
+      "https": true
+    },
+    {
+      "name": "Campaign Finance Data API",
+      "description": "Campaign finance data with receipts, disbursements, party affiliation, office sought, and election cycle. Filter by candidate, committee, or cycle.",
+      "parameters": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": false,
+          "description": "Candidate name"
+        },
+        {
+          "name": "committee",
+          "type": "string",
+          "required": false,
+          "description": "Committee name"
+        },
+        {
+          "name": "cycle",
+          "type": "string",
+          "required": false,
+          "description": "Election year (e.g. 2024)"
+        }
+      ],
+      "suggested_endpoint": "/v1/campaign-finance-data",
+      "category": "Data",
+      "auth": "API Key (Bearer)",
+      "https": true
+    },
+    {
+      "name": "Legislation Search API",
+      "description": "Search legislation by keyword, session number, and bill status. Includes sponsor, cosponsors, bill text, and legislative action history.",
+      "parameters": [
+        {
+          "name": "query",
+          "type": "string",
+          "required": true,
+          "description": "Search keyword"
+        },
+        {
+          "name": "congress",
+          "type": "string",
+          "required": false,
+          "description": "Congress number (e.g. 119)"
+        },
+        {
+          "name": "limit",
+          "type": "integer",
+          "required": false,
+          "description": "Max results (default 20)"
+        }
+      ],
+      "suggested_endpoint": "/v1/legislation-search",
+      "category": "Data",
+      "auth": "API Key (Bearer)",
+      "https": true
+    },
+    {
+      "name": "Lobbying Disclosures Feed API",
+      "description": "Lobbying registration and disclosure filings. Includes client, registrant, issue areas, and reported amounts. Filter by client, registrant, or issue code.",
+      "parameters": [
+        {
+          "name": "client",
+          "type": "string",
+          "required": false,
+          "description": "Client name"
+        },
+        {
+          "name": "registrant",
+          "type": "string",
+          "required": false,
+          "description": "Registrant (lobbying firm) name"
+        },
+        {
+          "name": "issue",
+          "type": "string",
+          "required": false,
+          "description": "Issue area code (e.g. TAX, HCR, DEF)"
+        },
+        {
+          "name": "limit",
+          "type": "integer",
+          "required": false,
+          "description": "Max results (default 50)"
+        }
+      ],
+      "suggested_endpoint": "/v1/lobbying-disclosures-feed",
+      "category": "Data",
+      "auth": "API Key (Bearer)",
+      "https": true
+    },
+    {
+      "name": "Economic Indicators Dashboard API",
+      "description": "Economic indicators including GDP, inflation, unemployment, interest rates, and consumer sentiment. Filter by indicator series ID or category.",
+      "parameters": [
+        {
+          "name": "series_id",
+          "type": "string",
+          "required": false,
+          "description": "Economic series ID"
+        },
+        {
+          "name": "category",
+          "type": "string",
+          "required": false,
+          "description": "Indicator category (e.g. inflation, employment)"
+        },
+        {
+          "name": "limit",
+          "type": "integer",
+          "required": false,
+          "description": "Max results (default 20)"
+        }
+      ],
+      "suggested_endpoint": "/v1/economic-indicators-dashboard",
+      "category": "Data",
+      "auth": "API Key (Bearer)",
+      "https": true
+    },
+    {
+      "name": "Fact Check Oracle API",
+      "description": "Grounding oracle that fact-checks claims against live government and regulatory data sources. Returns verdict, confidence score, and supporting sources.",
+      "parameters": [
+        {
+          "name": "claim",
+          "type": "string",
+          "required": true,
+          "description": "The claim to fact-check"
+        },
+        {
+          "name": "domain",
+          "type": "string",
+          "required": false,
+          "description": "Domain hint (e.g. health, finance, government)"
+        }
+      ],
+      "suggested_endpoint": "/v1/fact-check-oracle",
+      "category": "Data",
+      "auth": "API Key (Bearer)",
+      "https": true
+    },
+    {
+      "name": "Entity Compliance Check API",
+      "description": "Business entity compliance check including registration status, exclusion flags, set-aside eligibility, and industry code verification.",
+      "parameters": [
+        {
+          "name": "uei",
+          "type": "string",
+          "required": false,
+          "description": "Unique Entity Identifier"
+        },
+        {
+          "name": "cage",
+          "type": "string",
+          "required": false,
+          "description": "CAGE code"
+        }
+      ],
+      "suggested_endpoint": "/v1/entity-compliance-check",
+      "category": "Data",
+      "auth": "API Key (Bearer)",
+      "https": true
+    },
+    {
+      "name": "Macro Regime Analysis API",
+      "description": "Macro market regime analysis with liquidity outlook, forward view, and trade thesis. Classifies market as risk-on, risk-off, or transition. Includes asset recommendations and risk/reward ratios.",
+      "parameters": [
+        {
+          "name": "query",
+          "type": "string",
+          "required": true,
+          "description": "The macro question or scenario to analyze"
+        },
+        {
+          "name": "assets",
+          "type": "string",
+          "required": false,
+          "description": "Comma-separated tickers to focus on"
+        },
+        {
+          "name": "timeframe",
+          "type": "string",
+          "required": false,
+          "description": "Horizon: short, medium, or long"
+        }
+      ],
+      "suggested_endpoint": "/v1/macro-regime-analysis",
+      "category": "Data",
+      "auth": "API Key (Bearer)",
+      "https": true
+    },
+    {
+      "name": "Compliance Anomaly Reporter API",
+      "description": "Submit compliance anomalies for swarm-based scoring. Detects AML flags, financial crime indicators, and risk patterns. Returns severity score.",
+      "parameters": [
+        {
+          "name": "bank_id",
+          "type": "string",
+          "required": true,
+          "description": "Bank or institution identifier"
+        },
+        {
+          "name": "agent_id",
+          "type": "string",
+          "required": true,
+          "description": "Reporting agent identifier"
+        },
+        {
+          "name": "trigger",
+          "type": "string",
+          "required": true,
+          "description": "Anomaly trigger description"
+        },
+        {
+          "name": "detail",
+          "type": "string",
+          "required": true,
+          "description": "Detailed anomaly description"
+        },
+        {
+          "name": "severity",
+          "type": "string",
+          "required": false,
+          "description": "Severity level"
+        }
+      ],
+      "suggested_endpoint": "/v1/compliance-anomaly-reporter",
+      "category": "Data",
+      "auth": "API Key (Bearer)",
+      "https": true
+    },
+    {
+      "name": "Bank Compliance Audit API",
+      "description": "Full compliance audit cycle for financial institutions. Includes regulatory audit scoring, risk assessment, and compliance status dashboard.",
+      "parameters": [
+        {
+          "name": "bank_id",
+          "type": "string",
+          "required": true,
+          "description": "Bank or institution identifier"
+        }
+      ],
+      "suggested_endpoint": "/v1/bank-compliance-audit",
+      "category": "Data",
+      "auth": "API Key (Bearer)",
+      "https": true
+    },
+    {
+      "name": "Regulatory Compliance Query API",
+      "description": "Real-time regulatory compliance dashboard for financial institutions. Query compliance status, open issues, and regulatory findings.",
+      "parameters": [
+        {
+          "name": "bank_id",
+          "type": "string",
+          "required": true,
+          "description": "Bank or institution identifier"
+        }
+      ],
+      "suggested_endpoint": "/v1/regulatory-compliance-query",
+      "category": "Data",
+      "auth": "API Key (Bearer)",
+      "https": true
+    },
+    {
+      "name": "API Documentation Catalog",
+      "description": "Full API catalog with pricing, schemas, and data sources for all available endpoints. Includes example requests and response formats.",
+      "parameters": [
+        {
+          "name": "category",
+          "type": "string",
+          "required": false,
+          "description": "Optional capability category filter"
+        },
+        {
+          "name": "q",
+          "type": "string",
+          "required": false,
+          "description": "Keyword search across catalog entries"
+        },
+        {
+          "name": "limit",
+          "type": "integer",
+          "required": false,
+          "description": "Max entries to return (default 50)"
+        }
+      ],
+      "suggested_endpoint": "/v1/api-documentation-catalog",
+      "category": "Data",
+      "auth": "API Key (Bearer)",
+      "https": true
+    }
+  ]
+}

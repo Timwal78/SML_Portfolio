@@ -1,0 +1,29 @@
+Hi Tomas,
+
+Thank you for the follow-up.
+
+Publisher account email (where the 28 APIs were uploaded):
+timothy.walton45@gmail.com
+
+Confirmed — that is the correct account.
+
+Resubmission details:
+- Collection: SML Public Records Compliance Data API Pack
+- Count this chunk: 28 APIs
+- Cryptocurrency: NONE (gas/token/wallet/DeFi/blockchain endpoints removed)
+- Every API name includes "API"
+- Every endpoint includes parameters
+- Focus: federal contracts, public-company filings research, compliance screening, campaign finance, legislation, lobbying, economic indicators, workplace safety, environmental records, housing/FMR/PHA
+
+Download pack (public):
+https://www.scriptmasterlabs.com/downloads/zyla_noncrypto_28_pack.json
+https://www.scriptmasterlabs.com/downloads/zyla_noncrypto_28_postman.json
+
+We can submit additional non-crypto chunks toward ~150 total after this chunk clears review.
+
+Vendor: Script Master Labs, LLC · SAM UEI G24VZA4RLMK3 · CAGE 21U51 · SDVOSB
+
+Best regards,
+Timothy Walton
+Script Master Labs, LLC
+timothy.walton45@gmail.com

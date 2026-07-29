@@ -1,0 +1,1262 @@
+{
+  "info": {
+    "name": "SML Public Records Compliance Data API Pack",
+    "description": "Non-cryptocurrency only. Publisher: timothy.walton45@gmail.com. SAM UEI G24VZA4RLMK3 CAGE 21U51 SDVOSB. Generated 2026-07-29.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Federal Contract Opportunities Feed API",
+      "request": {
+        "method": "GET",
+        "description": "Real-time feed of federal contract opportunities. Search by NAICS code, agency, state, or keyword. Includes solicitation type, response deadline, award value, and contracting office details.\n\nParameters:\n- naics (string): NAICS industry code filter\n- agency (string): Contracting agency name\n- state (string): 2-letter state code\n- keyword (string): Search keyword\n- limit (integer): Max results (default 50)",
+        "url": {
+          "raw": "https://mcp-x402.onrender.com/v1/federal-contract-opportunities-feed-api",
+          "host": [
+            "mcp-x402",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "federal-contract-opportunities-feed-api"
+          ],
+          "query": [
+            {
+              "key": "naics",
+              "value": "",
+              "description": "NAICS industry code filter"
+            },
+            {
+              "key": "agency",
+              "value": "",
+              "description": "Contracting agency name"
+            },
+            {
+              "key": "state",
+              "value": "",
+              "description": "2-letter state code"
+            },
+            {
+              "key": "keyword",
+              "value": "",
+              "description": "Search keyword"
+            },
+            {
+              "key": "limit",
+              "value": "",
+              "description": "Max results (default 50)"
+            }
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{API_KEY}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Federal Award History Tracker API",
+      "request": {
+        "method": "GET",
+        "description": "Historical federal contract award records. Track awarded contracts by recipient, agency, or date range. Includes award amount, recipient details, and contract performance data.\n\nParameters:\n- recipient (string): Contractor/recipient name\n- agency (string): Awarding agency\n- from_date (string): Start date YYYY-MM-DD\n- to_date (string): End date YYYY-MM-DD\n- limit (integer): Max results (default 50)",
+        "url": {
+          "raw": "https://mcp-x402.onrender.com/v1/federal-award-history-tracker-api",
+          "host": [
+            "mcp-x402",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "federal-award-history-tracker-api"
+          ],
+          "query": [
+            {
+              "key": "recipient",
+              "value": "",
+              "description": "Contractor/recipient name"
+            },
+            {
+              "key": "agency",
+              "value": "",
+              "description": "Awarding agency"
+            },
+            {
+              "key": "from_date",
+              "value": "",
+              "description": "Start date YYYY-MM-DD"
+            },
+            {
+              "key": "to_date",
+              "value": "",
+              "description": "End date YYYY-MM-DD"
+            },
+            {
+              "key": "limit",
+              "value": "",
+              "description": "Max results (default 50)"
+            }
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{API_KEY}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Set-Aside Contract Feed for Small Business API",
+      "request": {
+        "method": "GET",
+        "description": "Federal set-aside contract opportunities filtered by socio-economic category (SDVOSB, WOSB, HUBZone, 8(a)). Includes eligibility requirements and response deadlines.\n\nParameters:\n- category (string): Set-aside type: SDVOSB, WOSB, HUBZone, 8(a)\n- naics (string): NAICS code filter\n- state (string): 2-letter state code\n- limit (integer): Max results (default 50)",
+        "url": {
+          "raw": "https://mcp-x402.onrender.com/v1/set-aside-contract-feed-for-small-business-api",
+          "host": [
+            "mcp-x402",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "set-aside-contract-feed-for-small-business-api"
+          ],
+          "query": [
+            {
+              "key": "category",
+              "value": "",
+              "description": "Set-aside type: SDVOSB, WOSB, HUBZone, 8(a)"
+            },
+            {
+              "key": "naics",
+              "value": "",
+              "description": "NAICS code filter"
+            },
+            {
+              "key": "state",
+              "value": "",
+              "description": "2-letter state code"
+            },
+            {
+              "key": "limit",
+              "value": "",
+              "description": "Max results (default 50)"
+            }
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{API_KEY}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Entity Registration Verification API",
+      "request": {
+        "method": "GET",
+        "description": "Verify business entity registration status, exclusion/debarment flags, set-aside eligibility, and NAICS codes. Check if a contractor is registered and in good standing.\n\nParameters:\n- uei (string): Unique Entity Identifier\n- cage (string): CAGE code\n- entity_name (string): Legal entity name",
+        "url": {
+          "raw": "https://mcp-x402.onrender.com/v1/entity-registration-verification-api",
+          "host": [
+            "mcp-x402",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "entity-registration-verification-api"
+          ],
+          "query": [
+            {
+              "key": "uei",
+              "value": "",
+              "description": "Unique Entity Identifier"
+            },
+            {
+              "key": "cage",
+              "value": "",
+              "description": "CAGE code"
+            },
+            {
+              "key": "entity_name",
+              "value": "",
+              "description": "Legal entity name"
+            }
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{API_KEY}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Federal Spending by Agency API",
+      "request": {
+        "method": "GET",
+        "description": "Federal spending breakdown by agency, category, and geographic distribution. Track obligation and outlay amounts across fiscal years.\n\nParameters:\n- agency (string): Agency name\n- fiscal_year (string): Fiscal year (e.g. 2025)\n- state (string): 2-letter state code\n- limit (integer): Max results (default 50)",
+        "url": {
+          "raw": "https://mcp-x402.onrender.com/v1/federal-spending-by-agency-api",
+          "host": [
+            "mcp-x402",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "federal-spending-by-agency-api"
+          ],
+          "query": [
+            {
+              "key": "agency",
+              "value": "",
+              "description": "Agency name"
+            },
+            {
+              "key": "fiscal_year",
+              "value": "",
+              "description": "Fiscal year (e.g. 2025)"
+            },
+            {
+              "key": "state",
+              "value": "",
+              "description": "2-letter state code"
+            },
+            {
+              "key": "limit",
+              "value": "",
+              "description": "Max results (default 50)"
+            }
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{API_KEY}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Excluded Parties Check API",
+      "request": {
+        "method": "GET",
+        "description": "Check if an entity is on the federal excluded/debarred parties list. Cross-reference recipient records with award history for compliance screening.\n\nParameters:\n- entity_name (string, required): Entity or contractor name to check",
+        "url": {
+          "raw": "https://mcp-x402.onrender.com/v1/excluded-parties-check-api",
+          "host": [
+            "mcp-x402",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "excluded-parties-check-api"
+          ],
+          "query": [
+            {
+              "key": "entity_name",
+              "value": "",
+              "description": "Entity or contractor name to check"
+            }
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{API_KEY}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Annual Financial Report Filings API",
+      "request": {
+        "method": "GET",
+        "description": "Annual financial report filings for any public company. Retrieve filing dates, accession numbers, and direct links to full reports. Includes balance sheet, income statement, and cash flow data.\n\nParameters:\n- ticker (string, required): Stock ticker symbol (e.g. AAPL)\n- limit (integer): Max results (default 10, max 10)",
+        "url": {
+          "raw": "https://mcp-x402.onrender.com/v1/annual-financial-report-filings-api",
+          "host": [
+            "mcp-x402",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "annual-financial-report-filings-api"
+          ],
+          "query": [
+            {
+              "key": "ticker",
+              "value": "",
+              "description": "Stock ticker symbol (e.g. AAPL)"
+            },
+            {
+              "key": "limit",
+              "value": "",
+              "description": "Max results (default 10, max 10)"
+            }
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{API_KEY}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Quarterly Financial Report Filings API",
+      "request": {
+        "method": "GET",
+        "description": "Quarterly financial report filings for any public company. Retrieve filing dates, accession numbers, and links to full quarterly reports.\n\nParameters:\n- ticker (string, required): Stock ticker symbol\n- limit (integer): Max results (default 10, max 10)",
+        "url": {
+          "raw": "https://mcp-x402.onrender.com/v1/quarterly-financial-report-filings-api",
+          "host": [
+            "mcp-x402",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "quarterly-financial-report-filings-api"
+          ],
+          "query": [
+            {
+              "key": "ticker",
+              "value": "",
+              "description": "Stock ticker symbol"
+            },
+            {
+              "key": "limit",
+              "value": "",
+              "description": "Max results (default 10, max 10)"
+            }
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{API_KEY}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Material Event Filings Feed API",
+      "request": {
+        "method": "GET",
+        "description": "Real-time material event filings for any public company. Includes event type, filing date, and summary for event-driven trading and monitoring.\n\nParameters:\n- ticker (string, required): Stock ticker symbol",
+        "url": {
+          "raw": "https://mcp-x402.onrender.com/v1/material-event-filings-feed-api",
+          "host": [
+            "mcp-x402",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "material-event-filings-feed-api"
+          ],
+          "query": [
+            {
+              "key": "ticker",
+              "value": "",
+              "description": "Stock ticker symbol"
+            }
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{API_KEY}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Insider Trading Activity Tracker API",
+      "request": {
+        "method": "GET",
+        "description": "Insider trading transaction filings for any public company. Track executive buys, sells, and option exercises with transaction dates, share counts, and prices.\n\nParameters:\n- ticker (string, required): Stock ticker symbol",
+        "url": {
+          "raw": "https://mcp-x402.onrender.com/v1/insider-trading-activity-tracker-api",
+          "host": [
+            "mcp-x402",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "insider-trading-activity-tracker-api"
+          ],
+          "query": [
+            {
+              "key": "ticker",
+              "value": "",
+              "description": "Stock ticker symbol"
+            }
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{API_KEY}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Institutional Holdings Filings API",
+      "request": {
+        "method": "GET",
+        "description": "Quarterly institutional investment manager holdings filings. Retrieve position-level data for funds and institutions with filing URLs to full holdings tables.\n\nParameters:\n- cik (string): CIK number of the institution\n- name (string): Institution or fund name",
+        "url": {
+          "raw": "https://mcp-x402.onrender.com/v1/institutional-holdings-filings-api",
+          "host": [
+            "mcp-x402",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "institutional-holdings-filings-api"
+          ],
+          "query": [
+            {
+              "key": "cik",
+              "value": "",
+              "description": "CIK number of the institution"
+            },
+            {
+              "key": "name",
+              "value": "",
+              "description": "Institution or fund name"
+            }
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{API_KEY}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Activist Investor Filings API",
+      "request": {
+        "method": "GET",
+        "description": "Activist investor 5%+ stake filings for any ticker. Track filer name, form type, filing date, and stake percentage for activist position monitoring.\n\nParameters:\n- ticker (string, required): Stock ticker symbol\n- limit (integer): Max results (default 20, max 20)",
+        "url": {
+          "raw": "https://mcp-x402.onrender.com/v1/activist-investor-filings-api",
+          "host": [
+            "mcp-x402",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "activist-investor-filings-api"
+          ],
+          "query": [
+            {
+              "key": "ticker",
+              "value": "",
+              "description": "Stock ticker symbol"
+            },
+            {
+              "key": "limit",
+              "value": "",
+              "description": "Max results (default 20, max 20)"
+            }
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{API_KEY}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Warning Letters Feed API",
+      "request": {
+        "method": "GET",
+        "description": "Regulatory warning letters issued to companies. Includes company name, subject, issued date, issuing office, and product type. Filter by company or product.\n\nParameters:\n- company (string): Company or issuer name\n- product (string): Product, drug, or device name\n- limit (integer): Max results (default 50)",
+        "url": {
+          "raw": "https://mcp-x402.onrender.com/v1/warning-letters-feed-api",
+          "host": [
+            "mcp-x402",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "warning-letters-feed-api"
+          ],
+          "query": [
+            {
+              "key": "company",
+              "value": "",
+              "description": "Company or issuer name"
+            },
+            {
+              "key": "product",
+              "value": "",
+              "description": "Product, drug, or device name"
+            },
+            {
+              "key": "limit",
+              "value": "",
+              "description": "Max results (default 50)"
+            }
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{API_KEY}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Drug Recall Alerts API",
+      "request": {
+        "method": "GET",
+        "description": "Drug and medical device recall enforcement reports. Track recall events by drug name, recall class, and date. Includes recalling firm and recall reason.\n\nParameters:\n- drug (string): Drug or product name\n- limit (integer): Max results (default 50)",
+        "url": {
+          "raw": "https://mcp-x402.onrender.com/v1/drug-recall-alerts-api",
+          "host": [
+            "mcp-x402",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "drug-recall-alerts-api"
+          ],
+          "query": [
+            {
+              "key": "drug",
+              "value": "",
+              "description": "Drug or product name"
+            },
+            {
+              "key": "limit",
+              "value": "",
+              "description": "Max results (default 50)"
+            }
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{API_KEY}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Adverse Event Reports API",
+      "request": {
+        "method": "GET",
+        "description": "Adverse event reports for drugs and medical products. Includes reaction type, severity, patient outcomes, and report dates. Filter by drug name.\n\nParameters:\n- drug (string, required): Drug or product name\n- limit (integer): Max results (default 50)",
+        "url": {
+          "raw": "https://mcp-x402.onrender.com/v1/adverse-event-reports-api",
+          "host": [
+            "mcp-x402",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "adverse-event-reports-api"
+          ],
+          "query": [
+            {
+              "key": "drug",
+              "value": "",
+              "description": "Drug or product name"
+            },
+            {
+              "key": "limit",
+              "value": "",
+              "description": "Max results (default 50)"
+            }
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{API_KEY}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Environmental Violation Records API",
+      "request": {
+        "method": "GET",
+        "description": "Facility environmental enforcement and violation records. Includes inspection counts, penalty amounts, and compliance status. Filter by facility, state, or industry code.\n\nParameters:\n- facility (string): Facility or company name\n- state (string): 2-letter state code\n- naics (string): NAICS industry code\n- limit (integer): Max results (default 50)",
+        "url": {
+          "raw": "https://mcp-x402.onrender.com/v1/environmental-violation-records-api",
+          "host": [
+            "mcp-x402",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "environmental-violation-records-api"
+          ],
+          "query": [
+            {
+              "key": "facility",
+              "value": "",
+              "description": "Facility or company name"
+            },
+            {
+              "key": "state",
+              "value": "",
+              "description": "2-letter state code"
+            },
+            {
+              "key": "naics",
+              "value": "",
+              "description": "NAICS industry code"
+            },
+            {
+              "key": "limit",
+              "value": "",
+              "description": "Max results (default 50)"
+            }
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{API_KEY}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Workplace Safety Inspection Records API",
+      "request": {
+        "method": "GET",
+        "description": "Workplace safety inspection records with activity type, citations, penalties, and open/closed status. Filter by employer name, state, or industry code.\n\nParameters:\n- establishment (string): Employer or establishment name\n- state (string): 2-letter state code\n- naics (string): 6-digit NAICS code\n- limit (integer): Max results (default 50)",
+        "url": {
+          "raw": "https://mcp-x402.onrender.com/v1/workplace-safety-inspection-records-api",
+          "host": [
+            "mcp-x402",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "workplace-safety-inspection-records-api"
+          ],
+          "query": [
+            {
+              "key": "establishment",
+              "value": "",
+              "description": "Employer or establishment name"
+            },
+            {
+              "key": "state",
+              "value": "",
+              "description": "2-letter state code"
+            },
+            {
+              "key": "naics",
+              "value": "",
+              "description": "6-digit NAICS code"
+            },
+            {
+              "key": "limit",
+              "value": "",
+              "description": "Max results (default 50)"
+            }
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{API_KEY}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Campaign Finance Data API",
+      "request": {
+        "method": "GET",
+        "description": "Campaign finance data with receipts, disbursements, party affiliation, office sought, and election cycle. Filter by candidate, committee, or cycle.\n\nParameters:\n- name (string): Candidate name\n- committee (string): Committee name\n- cycle (string): Election year (e.g. 2024)",
+        "url": {
+          "raw": "https://mcp-x402.onrender.com/v1/campaign-finance-data-api",
+          "host": [
+            "mcp-x402",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "campaign-finance-data-api"
+          ],
+          "query": [
+            {
+              "key": "name",
+              "value": "",
+              "description": "Candidate name"
+            },
+            {
+              "key": "committee",
+              "value": "",
+              "description": "Committee name"
+            },
+            {
+              "key": "cycle",
+              "value": "",
+              "description": "Election year (e.g. 2024)"
+            }
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{API_KEY}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Legislation Search API",
+      "request": {
+        "method": "GET",
+        "description": "Search legislation by keyword, session number, and bill status. Includes sponsor, cosponsors, bill text, and legislative action history.\n\nParameters:\n- query (string, required): Search keyword\n- congress (string): Congress number (e.g. 119)\n- limit (integer): Max results (default 20)",
+        "url": {
+          "raw": "https://mcp-x402.onrender.com/v1/legislation-search-api",
+          "host": [
+            "mcp-x402",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "legislation-search-api"
+          ],
+          "query": [
+            {
+              "key": "query",
+              "value": "",
+              "description": "Search keyword"
+            },
+            {
+              "key": "congress",
+              "value": "",
+              "description": "Congress number (e.g. 119)"
+            },
+            {
+              "key": "limit",
+              "value": "",
+              "description": "Max results (default 20)"
+            }
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{API_KEY}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Lobbying Disclosures Feed API",
+      "request": {
+        "method": "GET",
+        "description": "Lobbying registration and disclosure filings. Includes client, registrant, issue areas, and reported amounts. Filter by client, registrant, or issue code.\n\nParameters:\n- client (string): Client name\n- registrant (string): Registrant (lobbying firm) name\n- issue (string): Issue area code (e.g. TAX, HCR, DEF)\n- limit (integer): Max results (default 50)",
+        "url": {
+          "raw": "https://mcp-x402.onrender.com/v1/lobbying-disclosures-feed-api",
+          "host": [
+            "mcp-x402",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "lobbying-disclosures-feed-api"
+          ],
+          "query": [
+            {
+              "key": "client",
+              "value": "",
+              "description": "Client name"
+            },
+            {
+              "key": "registrant",
+              "value": "",
+              "description": "Registrant (lobbying firm) name"
+            },
+            {
+              "key": "issue",
+              "value": "",
+              "description": "Issue area code (e.g. TAX, HCR, DEF)"
+            },
+            {
+              "key": "limit",
+              "value": "",
+              "description": "Max results (default 50)"
+            }
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{API_KEY}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Economic Indicators Dashboard API",
+      "request": {
+        "method": "GET",
+        "description": "Economic indicators including GDP, inflation, unemployment, interest rates, and consumer sentiment. Filter by indicator series ID or category.\n\nParameters:\n- series_id (string): Economic series ID\n- category (string): Indicator category (e.g. inflation, employment)\n- limit (integer): Max results (default 20)",
+        "url": {
+          "raw": "https://mcp-x402.onrender.com/v1/economic-indicators-dashboard-api",
+          "host": [
+            "mcp-x402",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "economic-indicators-dashboard-api"
+          ],
+          "query": [
+            {
+              "key": "series_id",
+              "value": "",
+              "description": "Economic series ID"
+            },
+            {
+              "key": "category",
+              "value": "",
+              "description": "Indicator category (e.g. inflation, employment)"
+            },
+            {
+              "key": "limit",
+              "value": "",
+              "description": "Max results (default 20)"
+            }
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{API_KEY}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Fact Check Oracle API",
+      "request": {
+        "method": "GET",
+        "description": "Grounding oracle that fact-checks claims against live government and regulatory data sources. Returns verdict, confidence score, and supporting sources.\n\nParameters:\n- claim (string, required): The claim to fact-check\n- domain (string): Domain hint (e.g. health, finance, government)",
+        "url": {
+          "raw": "https://mcp-x402.onrender.com/v1/fact-check-oracle-api",
+          "host": [
+            "mcp-x402",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "fact-check-oracle-api"
+          ],
+          "query": [
+            {
+              "key": "claim",
+              "value": "",
+              "description": "The claim to fact-check"
+            },
+            {
+              "key": "domain",
+              "value": "",
+              "description": "Domain hint (e.g. health, finance, government)"
+            }
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{API_KEY}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Entity Compliance Check API",
+      "request": {
+        "method": "GET",
+        "description": "Business entity compliance check including registration status, exclusion flags, set-aside eligibility, and industry code verification.\n\nParameters:\n- uei (string): Unique Entity Identifier\n- cage (string): CAGE code",
+        "url": {
+          "raw": "https://mcp-x402.onrender.com/v1/entity-compliance-check-api",
+          "host": [
+            "mcp-x402",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "entity-compliance-check-api"
+          ],
+          "query": [
+            {
+              "key": "uei",
+              "value": "",
+              "description": "Unique Entity Identifier"
+            },
+            {
+              "key": "cage",
+              "value": "",
+              "description": "CAGE code"
+            }
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{API_KEY}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Macro Regime Analysis API",
+      "request": {
+        "method": "GET",
+        "description": "Macro market regime analysis with liquidity outlook, forward view, and trade thesis. Classifies market as risk-on, risk-off, or transition. Includes asset recommendations and risk/reward ratios.\n\nParameters:\n- query (string, required): The macro question or scenario to analyze\n- assets (string): Comma-separated tickers to focus on\n- timeframe (string): Horizon: short, medium, or long",
+        "url": {
+          "raw": "https://mcp-x402.onrender.com/v1/macro-regime-analysis-api",
+          "host": [
+            "mcp-x402",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "macro-regime-analysis-api"
+          ],
+          "query": [
+            {
+              "key": "query",
+              "value": "",
+              "description": "The macro question or scenario to analyze"
+            },
+            {
+              "key": "assets",
+              "value": "",
+              "description": "Comma-separated tickers to focus on"
+            },
+            {
+              "key": "timeframe",
+              "value": "",
+              "description": "Horizon: short, medium, or long"
+            }
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{API_KEY}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Compliance Anomaly Reporter API",
+      "request": {
+        "method": "GET",
+        "description": "Submit compliance anomalies for swarm-based scoring. Detects AML flags, financial crime indicators, and risk patterns. Returns severity score.\n\nParameters:\n- bank_id (string, required): Bank or institution identifier\n- agent_id (string, required): Reporting agent identifier\n- trigger (string, required): Anomaly trigger description\n- detail (string, required): Detailed anomaly description\n- severity (string): Severity level",
+        "url": {
+          "raw": "https://mcp-x402.onrender.com/v1/compliance-anomaly-reporter-api",
+          "host": [
+            "mcp-x402",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "compliance-anomaly-reporter-api"
+          ],
+          "query": [
+            {
+              "key": "bank_id",
+              "value": "",
+              "description": "Bank or institution identifier"
+            },
+            {
+              "key": "agent_id",
+              "value": "",
+              "description": "Reporting agent identifier"
+            },
+            {
+              "key": "trigger",
+              "value": "",
+              "description": "Anomaly trigger description"
+            },
+            {
+              "key": "detail",
+              "value": "",
+              "description": "Detailed anomaly description"
+            },
+            {
+              "key": "severity",
+              "value": "",
+              "description": "Severity level"
+            }
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{API_KEY}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Bank Compliance Audit API",
+      "request": {
+        "method": "GET",
+        "description": "Full compliance audit cycle for financial institutions. Includes regulatory audit scoring, risk assessment, and compliance status dashboard.\n\nParameters:\n- bank_id (string, required): Bank or institution identifier",
+        "url": {
+          "raw": "https://mcp-x402.onrender.com/v1/bank-compliance-audit-api",
+          "host": [
+            "mcp-x402",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "bank-compliance-audit-api"
+          ],
+          "query": [
+            {
+              "key": "bank_id",
+              "value": "",
+              "description": "Bank or institution identifier"
+            }
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{API_KEY}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Regulatory Compliance Query API",
+      "request": {
+        "method": "GET",
+        "description": "Real-time regulatory compliance dashboard for financial institutions. Query compliance status, open issues, and regulatory findings.\n\nParameters:\n- bank_id (string, required): Bank or institution identifier",
+        "url": {
+          "raw": "https://mcp-x402.onrender.com/v1/regulatory-compliance-query-api",
+          "host": [
+            "mcp-x402",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "regulatory-compliance-query-api"
+          ],
+          "query": [
+            {
+              "key": "bank_id",
+              "value": "",
+              "description": "Bank or institution identifier"
+            }
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{API_KEY}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ]
+      }
+    },
+    {
+      "name": "API Documentation Catalog",
+      "request": {
+        "method": "GET",
+        "description": "Full API catalog with pricing, schemas, and data sources for all available endpoints. Includes example requests and response formats.\n\nParameters:\n- category (string): Optional capability category filter\n- q (string): Keyword search across catalog entries\n- limit (integer): Max entries to return (default 50)",
+        "url": {
+          "raw": "https://mcp-x402.onrender.com/v1/api-documentation-catalog",
+          "host": [
+            "mcp-x402",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "api-documentation-catalog"
+          ],
+          "query": [
+            {
+              "key": "category",
+              "value": "",
+              "description": "Optional capability category filter"
+            },
+            {
+              "key": "q",
+              "value": "",
+              "description": "Keyword search across catalog entries"
+            },
+            {
+              "key": "limit",
+              "value": "",
+              "description": "Max entries to return (default 50)"
+            }
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{API_KEY}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ]
+      }
+    }
+  ]
+}
