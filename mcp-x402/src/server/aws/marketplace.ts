@@ -239,6 +239,7 @@ export interface EntitlementsSelfCheckResult {
   ts: number;
   error: string | null;
   entitlementCount: number | null;
+  perProduct?: Array<{ productCode: string; ok: boolean; entitlementCount: number | null; error: string | null }>;
 }
 let lastEntitlementsSelfCheck: EntitlementsSelfCheckResult = {
   ran: false, ok: null, ts: Date.now() / 1000, error: null, entitlementCount: null,
@@ -260,18 +261,37 @@ export async function runEntitlementsSelfCheck(): Promise<void> {
     return;
   }
   const region = process.env['AWS_REGION'] ?? 'us-east-1';
-  try {
-    const client = new MarketplaceEntitlementServiceClient({ region });
-    const resp = await client.send(new GetEntitlementsCommand({ ProductCode: EXPECTED_PRODUCT_CODE }));
-    lastEntitlementsSelfCheck = {
-      ran: true, ok: true, ts: Date.now() / 1000, error: null,
-      entitlementCount: resp.Entitlements?.length ?? 0,
-    };
-    AuditLogger.getInstance().info('aws_mp_entitlements_selfcheck_ok', {
-      count: lastEntitlementsSelfCheck.entitlementCount, productCode: EXPECTED_PRODUCT_CODE,
-    });
-  } catch (err) {
-    lastEntitlementsSelfCheck = { ran: true, ok: false, ts: Date.now() / 1000, error: String(err), entitlementCount: null };
-    AuditLogger.getInstance().error('aws_mp_entitlements_selfcheck_failed', { error: String(err) });
+  const client = new MarketplaceEntitlementServiceClient({ region });
+
+  // One product code per listing needs its own CloudTrail-visible
+  // GetEntitlements call — the audit requirement is per-product, not
+  // account-wide. Runs for the housing listing too once its product code is
+  // configured, so it doesn't hit the exact same AUDIT_ERROR the first
+  // listing did before this self-check existed at all.
+  const productCodes = [EXPECTED_PRODUCT_CODE, HOUSING_PRODUCT_CODE].filter((c): c is string => c !== null);
+  const results: Array<{ productCode: string; ok: boolean; entitlementCount: number | null; error: string | null }> = [];
+  for (const productCode of productCodes) {
+    try {
+      const resp = await client.send(new GetEntitlementsCommand({ ProductCode: productCode }));
+      const entitlementCount = resp.Entitlements?.length ?? 0;
+      results.push({ productCode, ok: true, entitlementCount, error: null });
+      AuditLogger.getInstance().info('aws_mp_entitlements_selfcheck_ok', { count: entitlementCount, productCode });
+    } catch (err) {
+      results.push({ productCode, ok: false, entitlementCount: null, error: String(err) });
+      AuditLogger.getInstance().error('aws_mp_entitlements_selfcheck_failed', { error: String(err), productCode });
+    }
   }
+
+  // Back-compat top-level fields mirror the original (single-product)
+  // listing's result — ok:true only when every configured product's
+  // self-check succeeded, matching the stricter "did this actually work"
+  // reading a monitoring dashboard would want.
+  lastEntitlementsSelfCheck = {
+    ran: results.length > 0,
+    ok: results.length > 0 ? results.every((r) => r.ok) : null,
+    ts: Date.now() / 1000,
+    error: results.find((r) => !r.ok)?.error ?? null,
+    entitlementCount: results.find((r) => r.productCode === EXPECTED_PRODUCT_CODE)?.entitlementCount ?? null,
+    perProduct: results,
+  };
 }
