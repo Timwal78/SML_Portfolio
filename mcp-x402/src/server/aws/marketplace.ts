@@ -3,6 +3,7 @@ import { MarketplaceEntitlementServiceClient, GetEntitlementsCommand } from '@aw
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { randomUUID } from 'crypto';
 import { AuditLogger } from '../security/audit.js';
+import { resolveTierFromDimension } from './tiers.js';
 
 // Product Code for "Script Master Labs Federal, Medical & Finance MCP (x402)"
 // (prod-lop2m2yjjcs76), from the AWS Marketplace Management Portal product
@@ -44,9 +45,23 @@ const PRODUCT_TOOLSETS: Record<string, 'ALL' | string[]> = {
     : {}),
 };
 
-/** Which of the two configured product codes (if any) a registration token's ProductCode matches. */
-function matchExpectedProductCode(productCode: string): boolean {
+/**
+ * Which of the two configured product codes (if any) a registration token's
+ * ProductCode matches. Exported for sns-entitlement.ts, which needs the same
+ * "known product code" check for real-time subscription lifecycle sync.
+ */
+export function matchExpectedProductCode(productCode: string): boolean {
   return productCode === EXPECTED_PRODUCT_CODE || (HOUSING_PRODUCT_CODE !== null && productCode === HOUSING_PRODUCT_CODE);
+}
+
+/**
+ * True only for the Section 8/HUD listing's product code. The full-catalog
+ * listing (EXPECTED_PRODUCT_CODE) is untiered/unlimited and must never be
+ * routed through tier/usage-cap logic (see aws/tiers.ts) — this is the one
+ * check that keeps that guarantee everywhere the distinction matters.
+ */
+export function isHousingProduct(productCode: string): boolean {
+  return HOUSING_PRODUCT_CODE !== null && productCode === HOUSING_PRODUCT_CODE;
 }
 
 let supabase: SupabaseClient | null = null;
@@ -110,6 +125,9 @@ export async function resolveAwsMarketplaceCustomer(token: string): Promise<Reso
         .update({ status: 'entitled', updated_at: new Date().toISOString() })
         .eq('customer_identifier', customerIdentifier);
     }
+    if (isHousingProduct(productCode)) {
+      await resolveAndStoreHousingTier(db, customerIdentifier, productCode);
+    }
     return { ok: true, apiKey: existing.data.api_key as string, customerIdentifier };
   }
 
@@ -126,7 +144,49 @@ export async function resolveAwsMarketplaceCustomer(token: string): Promise<Reso
     return { ok: false, error: 'provision_failed' };
   }
   AuditLogger.getInstance().info('aws_mp_customer_provisioned', { customerIdentifier });
+  if (isHousingProduct(productCode)) {
+    await resolveAndStoreHousingTier(db, customerIdentifier, productCode);
+  }
   return { ok: true, apiKey, customerIdentifier };
+}
+
+// Best-effort: looks up which SaaS Contract dimension this customer actually
+// purchased (via a real GetEntitlements call, per-customer) and stores the
+// mapped internal tier for aws/tiers.ts's cap enforcement to use. Only ever
+// called for the Section 8/HUD listing — the full-catalog listing has no
+// tiers. Never fails the caller: if this can't resolve a tier (dimension
+// mapping unset, the entitlement lookup errors, or the `tier` column
+// doesn't exist yet because the migration in
+// supabase/migrations/0001_aws_marketplace_tiers.sql hasn't been applied),
+// the customer's row is just left with tier=null, which aws/tiers.ts
+// already treats as "no cap enforcement" — same as today's unconditional
+// bypass. The exact GetEntitlementsCommand Filter shape used here
+// (Filter: { CUSTOMER_IDENTIFIER: [...] }) is the documented AWS API shape
+// but has not been exercised against a live AWS account from this
+// environment — verify once a real housing subscriber goes through checkout.
+async function resolveAndStoreHousingTier(db: SupabaseClient, customerIdentifier: string, productCode: string): Promise<void> {
+  try {
+    const region = process.env['AWS_REGION'] ?? 'us-east-1';
+    const client = new MarketplaceEntitlementServiceClient({ region });
+    const resp = await client.send(new GetEntitlementsCommand({
+      ProductCode: productCode,
+      Filter: { CUSTOMER_IDENTIFIER: [customerIdentifier] },
+    }));
+    const dimension = resp.Entitlements?.[0]?.Dimension;
+    const tier = resolveTierFromDimension(dimension);
+    if (!tier) {
+      AuditLogger.getInstance().warn('aws_mp_tier_unresolved', { customerIdentifier, dimension: dimension ?? null });
+      return;
+    }
+    const { error } = await db.from('aws_marketplace_customers').update({ tier }).eq('customer_identifier', customerIdentifier);
+    if (error) {
+      AuditLogger.getInstance().error('aws_mp_tier_store_failed', { error: error.message });
+      return;
+    }
+    AuditLogger.getInstance().info('aws_mp_tier_resolved', { customerIdentifier, tier });
+  } catch (err) {
+    AuditLogger.getInstance().error('aws_mp_tier_resolve_exception', { error: String(err) });
+  }
 }
 
 // Called from requirePayment()'s bypass chain (index.ts) — an entitled AWS

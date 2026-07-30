@@ -1,20 +1,22 @@
 import { createVerify } from 'crypto';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { AuditLogger } from '../security/audit.js';
+import { matchExpectedProductCode } from './marketplace.js';
 
-// Real-time entitlement/subscription lifecycle sync for the AWS Marketplace
-// listing (prod-lop2m2yjjcs76), via the two SNS topics AWS already
-// provisioned when the product was created:
-//   aws-mp-subscription-notification-c6g8c5zsvgof5a4rpp6eqlzn — subscribe/unsubscribe
-//   aws-mp-entitlement-notification-c6g8c5zsvgof5a4rpp6eqlzn  — contract create/renew/expire
+// Real-time entitlement/subscription lifecycle sync for AWS Marketplace
+// listings, via the two SNS topics AWS provisions per product:
+//   aws-mp-subscription-notification-<product-code> — subscribe/unsubscribe
+//   aws-mp-entitlement-notification-<product-code>  — contract create/renew/expire
 // Both topics deliver to the same HTTPS endpoint below; the message body
 // tells us which topic it came from (TopicArn).
 //
-// This is the piece that was missing since the very first AWS Marketplace
-// commit today: without it, a cancelled subscriber's x402-bypass key stays
-// 'entitled' forever — nobody ever tells us they left.
-
-const EXPECTED_PRODUCT_CODE = 'c6g8c5zsvgof5a4rpp6eqlzn';
+// This was the piece missing since the very first AWS Marketplace commit:
+// without it, a cancelled subscriber's x402-bypass key stays 'entitled'
+// forever — nobody ever tells us they left. Handles BOTH the full-catalog
+// listing (prod-lop2m2yjjcs76) and the Section 8/HUD listing (once
+// AWS_MARKETPLACE_HOUSING_PRODUCT_CODE is set) via matchExpectedProductCode
+// — a notification for either listing's product code is accepted, an
+// unrecognized code is rejected.
 
 let supabase: SupabaseClient | null = null;
 function getSupabase(): SupabaseClient | null {
@@ -98,8 +100,8 @@ interface EntitlementMessage {
 }
 
 async function applyStatus(customerIdentifier: string, productCode: string, status: 'entitled' | 'unsubscribed'): Promise<void> {
-  if (productCode !== EXPECTED_PRODUCT_CODE) {
-    AuditLogger.getInstance().warn('sns_product_code_mismatch', { got: productCode, expected: EXPECTED_PRODUCT_CODE });
+  if (!matchExpectedProductCode(productCode)) {
+    AuditLogger.getInstance().warn('sns_product_code_mismatch', { got: productCode });
     return;
   }
   const db = getSupabase();

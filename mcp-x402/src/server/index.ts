@@ -16,7 +16,8 @@ import express, { type Request, type Response } from 'express';
 import { randomUUID } from 'crypto';
 import cors from 'cors';
 import Stripe from 'stripe';
-import { resolveAwsMarketplaceCustomer, getEntitledAwsMarketplaceProduct, productCoversResource, runEntitlementsSelfCheck, getEntitlementsSelfCheckStatus } from './aws/marketplace.js';
+import { resolveAwsMarketplaceCustomer, getEntitledAwsMarketplaceProduct, productCoversResource, isHousingProduct, runEntitlementsSelfCheck, getEntitlementsSelfCheckStatus } from './aws/marketplace.js';
+import { checkAndRecordHousingUsage } from './aws/tiers.js';
 import { handleSnsMessage } from './aws/sns-entitlement.js';
 import { handleStripeWebhookEvent, getApiKeyForCheckoutSession, isEntitledStripeKey } from './stripe/entitlement.js';
 import { runCommunityScan } from './marketing/community.js';
@@ -764,7 +765,21 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
           try { return new URL(opts.resource).pathname; } catch { return req.path || ''; }
         })();
         if (productCoversResource(product, resourcePath)) {
-          return { ok: true, payer: { rail: 'aws-marketplace', from: `aws:${awsMpKey.slice(0, 16)}…`, tx: '' } };
+          // The full-catalog listing has no tiers — unconditional bypass,
+          // exactly as before. The Section 8/HUD listing is tiered by
+          // monthly call volume (docs/SECTION8_HUD_LISTING.md); a customer
+          // who has exceeded their tier's cap for this billing period does
+          // NOT get the free bypass — falling through below charges them
+          // the ordinary public x402 rate for the overage call, per the
+          // published "overage billed at the public x402 rate" policy.
+          const usage = isHousingProduct(product)
+            ? await checkAndRecordHousingUsage(awsMpKey)
+            : { withinCap: true };
+          if (usage.withinCap) {
+            return { ok: true, payer: { rail: 'aws-marketplace', from: `aws:${awsMpKey.slice(0, 16)}…`, tx: '' } };
+          }
+          // Cap exceeded for this billing period — fall through to ordinary
+          // x402 payment below (the overage charge).
         }
         // Entitled to a different AWS Marketplace product than this resource
         // belongs to — fall through to ordinary x402 payment, never bypass.
