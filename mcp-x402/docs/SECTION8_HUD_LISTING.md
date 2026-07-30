@@ -64,38 +64,61 @@ property) and are not part of the nationwide pitch above.
 ### Free
 `sml_discover`, `sml_status` (catalog + health, no wallet needed).
 
-## PROPOSED — NOT YET WIRED (do not sell until built)
+## PROPOSED — CODE EXISTS, DORMANT UNTIL CONFIGURED (do not sell until the AWS product exists)
 
 ### AWS Marketplace subscription tiers (SDVOSB/federal-aware)
 
-No AWS product, dimensions, or Stripe-equivalent billing exist for these
-yet — this table is the target once the listing is created in AWS Partner
-Central:
+| Tier | Monthly | Annual | Assumed call cap/mo* | Who it's for |
+|------|---------|--------|-----------------------|---------------|
+| Contractor | $199 | $1,990 | 5,000 | Small–mid SDVOSB/VOSB contractors, regional housing vendors |
+| Professional | $449 | $4,490 | 25,000 | Multi-state operators, mid-size contractors working with PHAs |
+| Authority / Enterprise | $999 | $9,990 | 100,000 | Large property groups, bigger contractors, some PHAs |
+| Government / Private Offer | Custom | Custom | Unlimited | Federal agencies, large primes, PHAs buying through AWS |
 
-| Tier | Monthly | Annual | Who it's for |
-|------|---------|--------|---------------|
-| Contractor | $199 | $1,990 | Small–mid SDVOSB/VOSB contractors, regional housing vendors |
-| Professional | $449 | $4,490 | Multi-state operators, mid-size contractors working with PHAs |
-| Authority / Enterprise | $999 | $9,990 | Large property groups, bigger contractors, some PHAs |
-| Government / Private Offer | Custom | Custom | Federal agencies, large primes, PHAs buying through AWS |
+\* The SDVOSB reposition renamed/repriced the tiers without restating call
+volumes. `src/server/aws/tiers.ts`'s `TIER_MONTHLY_CALL_CAP` assumes these
+map 1:1 onto the original four-tier structure in the same order — fix that
+constant if this assumption is wrong.
 
-Rules for when these get built:
+Rules (enforced by code, see below):
 - All paid tiers include the full Section 8 + PHA toolset (both nationwide
-  and curated) plus the set-aside-filtered opportunity tools.
-- Overage beyond a tier's contracted call volume bills at the public x402
-  rate card above.
+  and curated) plus the set-aside-filtered opportunity tools — tiers don't
+  gate *which* tools, only *how many calls/month* are free.
+- Overage beyond a tier's monthly call cap bills at the public x402 rate
+  card above — enforced by simply not granting the bypass once the cap is
+  hit, so the overage call falls through to ordinary payment automatically.
 - Use AWS Marketplace **Private Offers** for government and large-prime
   deals — the SDVOSB status is a real, usable lever there.
 - Consider a discount/special terms for other SDVOSB/VOSB firms (ecosystem
   goodwill, not required to launch).
-- Free 14-day trial on Contractor and Professional.
+- Free 14-day trial on Contractor and Professional (an AWS Partner Central
+  setting, not something this repo's code needs to implement).
 
-Implementing this for real needs, at minimum: a second AWS product code
-(`AWS_MARKETPLACE_HOUSING_PRODUCT_CODE`, already wired as a no-op env var —
-see `aws/marketplace.ts`'s `PRODUCT_TOOLSETS`), a tier field + monthly
-call-count tracking (does not exist anywhere in this codebase today — the
-current AWS bypass is all-or-nothing with no usage cap), and AWS Partner
-Central configuration this repo can't do on its own.
+**What's actually built (`src/server/aws/tiers.ts`, wired into `index.ts`'s
+`requirePayment`):** tier-cap tracking and overage fallthrough, gated
+entirely on `AWS_MARKETPLACE_HOUSING_PRODUCT_CODE` (unset by default). The
+full-catalog listing is never routed through this — `isHousingProduct()` in
+`aws/marketplace.ts` is the one guard that keeps that guarantee everywhere.
+`resolveAwsMarketplaceCustomer()` best-effort resolves a subscriber's tier
+via a real per-customer `GetEntitlements` call and
+`AWS_MARKETPLACE_TIER_DIMENSIONS_JSON` (maps AWS's operator-chosen dimension
+ID to the internal tier key — this repo can't know that ID until you create
+the product's dimensions in Partner Central).
+
+**Still needed before any of this actually enforces anything:**
+1. Create the second AWS product + its 4 SaaS Contract dimensions in AWS
+   Partner Central (operator action, not code).
+2. Set `AWS_MARKETPLACE_HOUSING_PRODUCT_CODE` and
+   `AWS_MARKETPLACE_TIER_DIMENSIONS_JSON` on Render.
+3. Run `supabase/migrations/0001_aws_marketplace_tiers.sql` against the real
+   Supabase project — **not applied by any agent**, this repo only ships the
+   SQL. Until it's run, `checkAndRecordHousingUsage()` fails open (logs an
+   error, treats every call as within-cap) rather than crashing — so tiers
+   silently don't enforce, they don't break anything either.
+4. The exact `GetEntitlementsCommand` `Filter`/`Dimension` shape used in
+   `resolveAndStoreHousingTier()` is the documented AWS API shape but has
+   not been exercised against a live AWS account — verify once a real
+   housing subscriber goes through checkout.
 
 ## Marketplace listing copy (ready to paste once the product exists)
 
