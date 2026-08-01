@@ -37,4 +37,17 @@ export class Sandbox {
       .replace(/\[\/?INST\]/gi, '')
       .slice(0, 50_000); // Hard cap on returned content size
   }
+
+  // Same sanitization as sanitizeApiResponse, recursing into arrays/objects
+  // — for tools (crawl_paid_fetch, xmit_edgar_decode) that return real
+  // external text (page/filing content) nested inside structured output,
+  // not just as a single top-level string.
+  static sanitizeDeep(value: unknown): unknown {
+    if (typeof value === 'string') return Sandbox.sanitizeApiResponse(value);
+    if (Array.isArray(value)) return value.map((v) => Sandbox.sanitizeDeep(v));
+    if (value !== null && typeof value === 'object') {
+      return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, Sandbox.sanitizeDeep(v)]));
+    }
+    return value;
+  }
 }

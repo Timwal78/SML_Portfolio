@@ -37,13 +37,9 @@ export function registerXdeo(server: McpServer): void {
       }
 
       // Fetch BEFORE charging — never bill for a call we can't fulfill.
-      // NOTE (found 2026-08-01): XdeoClient's backend host (SML_API_BASE,
-      // default api.scriptmasterlabs.com) does not correspond to any real,
-      // documented service in this account's infrastructure — confirmed by
-      // a repo-wide search finding zero real implementations of /xdeo/v1/*
-      // anywhere. This call is expected to fail until a real backend exists;
-      // failing closed here (before payment) is the honest behavior, not a
-      // fabricated success.
+      // XdeoClient pulls real earnings data from Alpha Vantage's free
+      // EARNINGS endpoint — fixed 2026-08-01, previously called a dead
+      // host with no real backend anywhere.
       const client = XdeoClient.getInstance();
       let data: unknown;
       try {
@@ -54,6 +50,14 @@ export function registerXdeo(server: McpServer): void {
         });
       } catch (err) {
         return { content: [{ type: 'text', text: JSON.stringify({ error: 'upstream_unavailable', message: String(err) }) }], isError: true };
+      }
+
+      // Real data genuinely wasn't available (no API key configured, rate
+      // limited, or the fiscal quarter hasn't reported/doesn't exist for
+      // this ticker) — never charge for a call that delivered nothing.
+      const dataStatus = (data as { status?: string } | null)?.status;
+      if (dataStatus && dataStatus !== 'success') {
+        return { content: [{ type: 'text', text: JSON.stringify({ data, charged: false, note: 'No usable data was available — you were not charged.' }) }] };
       }
 
       await PriceRegistry.getInstance().seedDefaults();

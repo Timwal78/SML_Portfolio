@@ -85,6 +85,19 @@ export const SqueezeOSAPI = {
   demo: () => squeezeGet('/api/demo'),
   marketplaceBrowse: () => squeezeGet('/api/marketplace'),
   futuresLeaderboard: () => squeezeGet('/api/futures/leaderboard'),
+  /**
+   * SqueezeOS's real, live Agent Hiring Protocol job board (core/api/hiring_bp.py,
+   * `/api/hiring`) — zero-custody, XRPL wallet-to-wallet. Backs nexus_agent_hire's
+   * free query tier.
+   */
+  hiringBrowse: (opts: { jobType?: string; symbol?: string; minBounty?: number } = {}) => {
+    const qs = new URLSearchParams();
+    if (opts.jobType) qs.set('type', opts.jobType);
+    if (opts.symbol) qs.set('symbol', opts.symbol);
+    if (opts.minBounty !== undefined) qs.set('min_bounty', String(opts.minBounty));
+    const q = qs.toString();
+    return squeezeGet(`/api/hiring${q ? `?${q}` : ''}`);
+  },
 
   // PAID — walletAddress is retained in the signature for logging/attribution
   // by callers; auth to SqueezeOS itself is the X-API-Key operator bypass
@@ -113,4 +126,31 @@ export const SqueezeOSAPI = {
   maxConvictionSignal: (symbol: string) => squeezePost('/api/triple-lock', { symbol }),
   contentWalletTrustScore: (content: string, senderWallet?: string) =>
     squeezePost('/api/ccs/validate', { content, ...(senderWallet ? { sender_wallet: senderWallet } : {}) }),
+
+  /**
+   * Posts a real job to SqueezeOS's Agent Hiring Protocol board. Zero
+   * custody — `poster`/`paymentWallet` must be real XRPL wallets (SqueezeOS
+   * validates this server-side); the bounty is paid wallet-to-wallet on
+   * XRPL once an executor delivers and the poster confirms, entirely
+   * outside this gateway. Backs nexus_agent_hire's paid "hire" tier.
+   */
+  hiringPost: (opts: {
+    posterXrplWallet: string;
+    description: string;
+    bountyRlusd: number;
+    jobType?: string;
+    symbol?: string;
+    requirements?: string;
+    deadlineHours?: number;
+  }) =>
+    squeezePost('/api/hiring/post', {
+      wallet: opts.posterXrplWallet,
+      job_type: opts.jobType,
+      description: opts.description,
+      bounty_rlusd: opts.bountyRlusd,
+      payment_wallet: opts.posterXrplWallet,
+      symbol: opts.symbol,
+      requirements: opts.requirements,
+      deadline_hours: opts.deadlineHours,
+    }),
 };

@@ -42,13 +42,10 @@ export function registerXmit(server: McpServer): void {
       }
 
       // Fetch BEFORE charging — never bill for a call we can't fulfill.
-      // NOTE (found 2026-08-01): XmitClient's backend host (SML_API_BASE,
-      // default api.scriptmasterlabs.com) does not correspond to any real,
-      // documented service in this account's infrastructure — confirmed by
-      // a repo-wide search finding zero real implementations of /xmit/v1/*
-      // anywhere. This call is expected to fail until a real backend exists;
-      // failing closed here (before payment) is the honest behavior, not a
-      // fabricated success.
+      // XmitClient does a real, self-contained SEC EDGAR fetch + best-effort
+      // structural extraction (SSRF-guarded) — fixed 2026-08-01, previously
+      // called a dead host (api.scriptmasterlabs.com) with no real backend
+      // anywhere.
       const client = XmitClient.getInstance();
       let data: unknown;
       try {
@@ -74,11 +71,15 @@ export function registerXmit(server: McpServer): void {
         return { content: [{ type: 'text', text: JSON.stringify({ error: 'payment_failed', message: String(err) }) }], isError: true };
       }
 
-      // Raw text NEVER returned (N3) — only structured parsed output
+      // Raw text NEVER returned (N3) — only structured parsed output.
+      // Sanitize recursively: the structured fields still contain real
+      // extracted filing text (table cells, headings), which is untrusted
+      // external content just like crawl_paid_fetch's.
+      const safeData = Sandbox.sanitizeDeep(data);
       audit.info('xmit_success', { receiptId: payment.receiptId });
 
       return {
-        content: [{ type: 'text', text: JSON.stringify({ data, _meta: { receipt_id: payment.receiptId, tx_hash: payment.txHash, chain: payment.chain, amount_paid: `${payment.amountPaid} ${payment.currency}` } }) }],
+        content: [{ type: 'text', text: JSON.stringify({ data: safeData, _meta: { receipt_id: payment.receiptId, tx_hash: payment.txHash, chain: payment.chain, amount_paid: `${payment.amountPaid} ${payment.currency}` } }) }],
       };
     },
   );

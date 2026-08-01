@@ -39,15 +39,9 @@ export function registerCrawl(server: McpServer): void {
       }
 
       // Fetch BEFORE charging — never bill for a call we can't fulfill.
-      // NOTE (found 2026-08-01): CrawlClient's backend host (SML_API_BASE,
-      // default api.scriptmasterlabs.com) does not correspond to any real,
-      // documented service in this account's infrastructure — confirmed by
-      // a repo-wide search finding zero real implementations of
-      // /crawl/v1/fetch anywhere (CRAWLTOLL is a different, unrelated
-      // product — server-side middleware a publisher installs to charge
-      // crawlers, not a client for fetching other sites). This call is
-      // expected to fail until a real backend exists; failing closed here
-      // (before payment) is the honest behavior, not a fabricated success.
+      // CrawlClient does a real, self-contained fetch + HTML extraction
+      // (SSRF-guarded) — fixed 2026-08-01, previously called a dead host
+      // (api.scriptmasterlabs.com) with no real backend anywhere.
       const client = CrawlClient.getInstance();
       let data: CrawlResult;
       try {
@@ -76,10 +70,11 @@ export function registerCrawl(server: McpServer): void {
         return { content: [{ type: 'text', text: JSON.stringify({ error: 'payment_failed', message: String(err) }) }], isError: true };
       }
 
-      // Sanitize response to prevent prompt injection
-      const safeContent = typeof data.content === 'string'
-        ? Sandbox.sanitizeApiResponse(data.content)
-        : data.content;
+      // Sanitize response to prevent prompt injection — recurse into
+      // arrays/objects too, since real page text (link labels, table cells,
+      // headings, meta values) now actually flows through for every
+      // extract mode, not just 'text'.
+      const safeContent = Sandbox.sanitizeDeep(data.content);
 
       audit.info('crawl_success', { receiptId: payment.receiptId });
 
