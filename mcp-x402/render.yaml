@@ -65,6 +65,15 @@ services:
         sync: false
       - key: LEVIATHAN_BASE_URL
         value: "https://mcp-x402.onrender.com"
+      # Durable x402 payment-activity counters (found needed 2026-08-01 —
+      # without this, /x402/stats's aiAgentsAllTime and settledByFacilitator
+      # silently reset to zero on every redeploy, since the fallback
+      # /tmp/x402-stats.json does not survive a fresh container). Add a
+      # Redis instance (Render's own, or reuse one already provisioned for
+      # another service in this account) and paste its URL here to make
+      # these counts actually durable across deploys.
+      - key: REDIS_URL
+        sync: false
       - key: DAILY_SPEND_CAP_USD
         value: "50"
       - key: AUTO_APPROVE_THRESHOLD_USD
