@@ -1,7 +1,8 @@
 /**
  * ACP graduation bootstrap: hires our OWN scriptmasterlabs seller agent
- * (leviathan.ts) from a separate buyer wallet, repeatedly, until it has
- * completed TARGET_JOB_COUNT jobs.
+ * (acp/seller.ts — leviathan.ts is now just a retired-name re-export shim,
+ * not the real implementation) from a separate buyer wallet, repeatedly,
+ * until it has completed TARGET_JOB_COUNT jobs.
  *
  * Why this exists: Virtuals requires 10 successful sandbox transactions
  * before an ACP agent can be submitted for graduation, and their own
@@ -43,8 +44,15 @@ const BUYER_WALLET_ADDRESS = process.env['BUYER_WALLET_ADDRESS'] as `0x${string}
 const BUYER_WALLET_ID = (process.env['BUYER_WALLET_ID'] ?? '').trim();
 const BUYER_SIGNER_PRIVATE_KEY = (process.env['BUYER_SIGNER_PRIVATE_KEY'] ?? '').trim();
 
+// Default was the OLD, retired "Leviathan" wallet (0x0f035c...) — stale
+// since the wallet rotation on 2026-07-24, found 2026-08-01 while
+// investigating "54 real ACP offerings, 0 real jobs" (this script is the
+// documented bootstrap path to clear that gap, but running it unmodified
+// would have hired the wrong, dead agent). The comment above this constant
+// already claimed it "defaults to the live scriptmasterlabs wallet" — that
+// was true before the rotation and false after; now it's true again.
 const SELLER_WALLET_ADDRESS = (
-  process.env['SELLER_WALLET_ADDRESS'] ?? '0x0f035c36c4ce65a6f1bf4370f779bac722d59004'
+  process.env['SELLER_WALLET_ADDRESS'] ?? '0x72330994f379a71542e7bd5a4cf99a9d9743f4aa'
 );
 const OFFERING_NAME = process.env['OFFERING_NAME'] ?? 'SqueezeOS Squeeze Signal (741-EMA)';
 const OFFERING_REQUIREMENT: Record<string, unknown> = JSON.parse(
