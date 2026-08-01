@@ -2241,7 +2241,7 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
     } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'trade_leads_fetch_failed', message: String(err) }); }
   });
 
-  // ── /x402/crypto-price — CoinGecko real-time token price, $0.01 ──────────────
+  // ── /x402/crypto-price — multi-source token price (never burn stranger on CG 502) ──
   app.get('/x402/crypto-price', async (req, res) => {
     const host = req.headers.host ?? 'mcp-x402.onrender.com';
     const resource = `https://${host}/x402/crypto-price`;
@@ -2252,38 +2252,115 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
     const include_24hr_change = req.query['include_24hr_change'] === 'true';
     const inputSchema = { type: 'object', properties: { ids: { type: 'string' }, vs_currencies: { type: 'string' }, include_market_cap: { type: 'boolean' }, include_24hr_vol: { type: 'boolean' }, include_24hr_change: { type: 'boolean' } }, required: ['ids'] };
     const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { ids: { type: 'string', required: true } } }, output: null };
-    const pay = await requirePayment(req, res, { resource, priceUnits: 1000n, description: 'Real-time price, market cap, and 24h volume/change for one or more tokens against one or more currencies (CoinGecko). Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    const pay = await requirePayment(req, res, { resource, priceUnits: 1000n, description: 'Real-time crypto prices (multi-source: CoinGecko + CoinCap + Binance). Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
     if (!pay.ok) return;
     if (!ids) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_ids', detail: 'Payment verified. Add ?ids= and retry with the same payment.' }); }
+    const idList = ids.split(',').map((s) => s.trim().toLowerCase()).filter(Boolean).slice(0, 20);
+    const vs = (vs_currencies || 'usd').toLowerCase().split(',')[0] || 'usd';
+    // Common id → ticker map for non-CG sources
+    const ID_TO_SYM: Record<string, string> = {
+      bitcoin: 'BTC', ethereum: 'ETH', solana: 'SOL', ripple: 'XRP', cardano: 'ADA',
+      dogecoin: 'DOGE', litecoin: 'LTC', polkadot: 'DOT', chainlink: 'LINK', avalanche: 'AVAX',
+      'usd-coin': 'USDC', tether: 'USDT', binancecoin: 'BNB', 'matic-network': 'MATIC',
+      uniswap: 'UNI', aave: 'AAVE', sui: 'SUI', aptos: 'APT', near: 'NEAR', stellar: 'XLM',
+    };
     try {
-      const cgKey = byokKey(req, 'x-coingecko-key', 'COINGECKO_API_KEY');
-      const p = new URLSearchParams({ ids, vs_currencies, include_market_cap: String(include_market_cap), include_24hr_vol: String(include_24hr_vol), include_24hr_change: String(include_24hr_change) });
-      const headers: Record<string, string> = { Accept: 'application/json' };
-      if (cgKey) headers['x-cg-demo-api-key'] = cgKey;
-      const r = await fetch(`https://api.coingecko.com/api/v3/simple/price?${p.toString()}`, { headers });
-      if (!r.ok) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'coingecko_api_error', status: r.status }); }
-      const j = await r.json();
-      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'coingecko.com/api/v3/simple/price', data: j, _paid: pay.payer });
-    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'coingecko_fetch_failed', message: String(err) }); }
+      // 1) CoinGecko (best schema when key/public works)
+      try {
+        const cgKey = byokKey(req, 'x-coingecko-key', 'COINGECKO_API_KEY');
+        const p = new URLSearchParams({ ids: idList.join(','), vs_currencies: vs_currencies || 'usd', include_market_cap: String(include_market_cap), include_24hr_vol: String(include_24hr_vol), include_24hr_change: String(include_24hr_change) });
+        const headers: Record<string, string> = { Accept: 'application/json', 'User-Agent': 'sml-mcp-x402/1.0' };
+        if (cgKey) headers['x-cg-demo-api-key'] = cgKey;
+        const r = await fetch(`https://api.coingecko.com/api/v3/simple/price?${p.toString()}`, { headers });
+        if (r.ok) {
+          const j = await r.json() as Record<string, unknown>;
+          if (j && typeof j === 'object' && Object.keys(j).length > 0) {
+            return res.set('Access-Control-Allow-Origin', '*').json({ source: 'coingecko.com/api/v3/simple/price', data: j, degraded: false, _paid: pay.payer });
+          }
+        }
+      } catch { /* fall through */ }
+
+      // 2) CoinCap assets (keyless)
+      const data: Record<string, Record<string, number>> = {};
+      let source = 'coincap.io';
+      for (const id of idList) {
+        try {
+          const r = await fetch(`https://api.coincap.io/v2/assets/${encodeURIComponent(id)}`, { headers: { Accept: 'application/json', 'User-Agent': 'sml-mcp-x402/1.0' } });
+          if (!r.ok) continue;
+          const j = await r.json() as { data?: { priceUsd?: string; marketCapUsd?: string; volumeUsd24Hr?: string; changePercent24Hr?: string } };
+          const row = j?.data;
+          if (!row?.priceUsd) continue;
+          const entry: Record<string, number> = { [vs]: Number(row.priceUsd) };
+          if (include_market_cap && row.marketCapUsd) entry[`${vs}_market_cap`] = Number(row.marketCapUsd);
+          if (include_24hr_vol && row.volumeUsd24Hr) entry[`${vs}_24h_vol`] = Number(row.volumeUsd24Hr);
+          if (include_24hr_change && row.changePercent24Hr) entry[`${vs}_24h_change`] = Number(row.changePercent24Hr);
+          data[id] = entry;
+        } catch { /* next id */ }
+      }
+      if (Object.keys(data).length > 0) {
+        return res.set('Access-Control-Allow-Origin', '*').json({ source, data, degraded: true, note: 'CoinGecko unavailable; CoinCap fallback', _paid: pay.payer });
+      }
+
+      // 3) Binance ticker by mapped symbol
+      source = 'api.binance.com';
+      for (const id of idList) {
+        const sym = ID_TO_SYM[id];
+        if (!sym) continue;
+        try {
+          const pair = `${sym}USDT`;
+          const r = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${pair}`, { headers: { Accept: 'application/json', 'User-Agent': 'sml-mcp-x402/1.0' } });
+          if (!r.ok) continue;
+          const j = await r.json() as { price?: string };
+          if (!j?.price) continue;
+          data[id] = { [vs]: Number(j.price) };
+        } catch { /* next */ }
+      }
+      if (Object.keys(data).length > 0) {
+        return res.set('Access-Control-Allow-Origin', '*').json({ source, data, degraded: true, note: 'CoinGecko/CoinCap unavailable; Binance fallback', _paid: pay.payer });
+      }
+
+      // 4) Hard 200 stub so stranger never burns — points at free public pages
+      const stub: Record<string, Record<string, unknown>> = {};
+      for (const id of idList) {
+        stub[id] = { [vs]: null, lookup: `https://www.coingecko.com/en/coins/${encodeURIComponent(id)}`, error: 'upstream_unavailable' };
+      }
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'sml-fallback', data: stub, degraded: true, note: 'All price upstreams unavailable; payment kept; retry shortly', _paid: pay.payer });
+    } catch (err) {
+      // Still 200 after pay — never 502 stranger-burn
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'sml-fallback', data: {}, degraded: true, error: 'price_fetch_degraded', message: String(err), _paid: pay.payer });
+    }
   });
 
-  // ── /x402/crypto-trending — CoinGecko trending coins/NFTs/categories, $0.01 ──
+  // ── /x402/crypto-trending — multi-source trending (never 502 after pay) ──
   app.get('/x402/crypto-trending', async (req, res) => {
     const host = req.headers.host ?? 'mcp-x402.onrender.com';
     const resource = `https://${host}/x402/crypto-trending`;
     const inputSchema = { type: 'object', properties: {}, required: [] };
     const outputSchema = { input: { type: 'http', method: 'GET' }, output: null };
-    const pay = await requirePayment(req, res, { resource, priceUnits: 1000n, description: 'Top 15 trending coins, 7 trending NFTs, and 6 trending categories by user search activity in the last 24h (CoinGecko). Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
+    const pay = await requirePayment(req, res, { resource, priceUnits: 1000n, description: 'Trending crypto (CoinGecko + CoinCap fallback). Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
     if (!pay.ok) return;
     try {
-      const cgKey = byokKey(req, 'x-coingecko-key', 'COINGECKO_API_KEY');
-      const headers: Record<string, string> = { Accept: 'application/json' };
-      if (cgKey) headers['x-cg-demo-api-key'] = cgKey;
-      const r = await fetch('https://api.coingecko.com/api/v3/search/trending', { headers });
-      if (!r.ok) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'coingecko_api_error', status: r.status }); }
-      const j = await r.json();
-      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'coingecko.com/api/v3/search/trending', data: j, _paid: pay.payer });
-    } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'coingecko_fetch_failed', message: String(err) }); }
+      try {
+        const cgKey = byokKey(req, 'x-coingecko-key', 'COINGECKO_API_KEY');
+        const headers: Record<string, string> = { Accept: 'application/json', 'User-Agent': 'sml-mcp-x402/1.0' };
+        if (cgKey) headers['x-cg-demo-api-key'] = cgKey;
+        const r = await fetch('https://api.coingecko.com/api/v3/search/trending', { headers });
+        if (r.ok) {
+          const j = await r.json();
+          return res.set('Access-Control-Allow-Origin', '*').json({ source: 'coingecko.com/api/v3/search/trending', data: j, degraded: false, _paid: pay.payer });
+        }
+      } catch { /* fall */ }
+      try {
+        const r = await fetch('https://api.coincap.io/v2/assets?limit=15', { headers: { Accept: 'application/json', 'User-Agent': 'sml-mcp-x402/1.0' } });
+        if (r.ok) {
+          const j = await r.json();
+          return res.set('Access-Control-Allow-Origin', '*').json({ source: 'coincap.io/v2/assets', data: j, degraded: true, note: 'CoinGecko trending unavailable; top assets by market cap', _paid: pay.payer });
+        }
+      } catch { /* fall */ }
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'sml-fallback', data: { coins: [], note: 'upstream_unavailable' }, degraded: true, _paid: pay.payer });
+    } catch (err) {
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'sml-fallback', data: {}, degraded: true, message: String(err), _paid: pay.payer });
+    }
   });
 
   // ── /x402/fx-rate — Frankfurter daily exchange rates, keyless, $0.01 ─────────
@@ -4092,7 +4169,7 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
     <body><h1>Subscription received</h1>
     <p>If you just subscribed via AWS Marketplace, your API key is being provisioned — this can take a minute. Check your email, or if you have your AWS Marketplace order details handy, contact <a href="mailto:timothy.walton45@gmail.com">support</a> and reference your Customer ID.</p>
     <p>MCP endpoint: <code>https://mcp-x402.onrender.com/mcp</code></p>
-    <p>Paid demo (HTTP 402): <code>https://mcp-x402.onrender.com/x402/crypto-price</code></p>
+    <p>Paid demo (HTTP 402): <code>https://mcp-x402.onrender.com/x402/fx-rate</code></p>
     <p>Full docs: <a href="/llms.txt">llms.txt</a> · <a href="https://www.scriptmasterlabs.com/vendos.html">VendOS</a></p></body></html>`;
   app.get('/', async (req: Request, res: Response) => {
     const tokenFromQuery = typeof req.query['x-amzn-marketplace-token'] === 'string' ? (req.query['x-amzn-marketplace-token'] as string) : '';
@@ -4110,11 +4187,11 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
     // previously labeled us "not paid" — paid_demo_url is a live HTTP 402 resource.
     const host = req.headers.host ?? 'mcp-x402.onrender.com';
     const base = `https://${host}`;
-    const paidDemo = `${base}/x402/crypto-price`;
+    const paidDemo = `${base}/x402/fx-rate`;
     const want402 = String(req.query['x402'] ?? req.headers['x-want-402'] ?? '') === '1'
       || String(req.headers['accept'] ?? '').includes('application/x402');
     if (want402) {
-      const challenge = inlineDiscover402(paidDemo, 'SML x402 crypto-price snack — 0.001 USDC on Base. Root catalog redirected scanners here.');
+      const challenge = inlineDiscover402(paidDemo, 'SML x402 fx-rate snack — 0.001 USDC on Base. Root catalog redirected scanners here.');
       const h = Buffer.from(JSON.stringify(challenge)).toString('base64');
       res.status(402).set('X-PAYMENT-REQUIRED', h).set('PAYMENT-REQUIRED', h)
         .set('Access-Control-Expose-Headers', 'X-PAYMENT-REQUIRED, PAYMENT-REQUIRED')
@@ -4132,10 +4209,10 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
       transport: 'streamable-http + sse',
       paid_demo_url: paidDemo,
       paid_resources: [
-        `${base}/x402/crypto-price`,
         `${base}/x402/fx-rate`,
+        `${base}/x402/gas-tracker`,
         `${base}/x402/grants`,
-        `${base}/x402/crypto-trending`,
+        `${base}/x402/web-fetch`,
       ],
       discovery: `${base}/.well-known/x402`,
       scanner_hint: 'Root is catalog (200). GET paid_demo_url without payment → HTTP 402. Or GET /?x402=1 for challenge.',
@@ -4144,7 +4221,7 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
         sse_connect: 'GET /sse',
         sse_messages: 'POST /messages',
         health: 'GET /health',
-        paid_demo: 'GET /x402/crypto-price',
+        paid_demo: 'GET /x402/fx-rate',
         agentCard: 'GET /.well-known/agentcard.json',
         a2aAgentCard: 'GET /.well-known/agent.json',
         openApiX402: 'GET /.well-known/x402',
