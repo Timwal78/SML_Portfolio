@@ -1,13 +1,22 @@
 /**
- * Integration tests target Base Sepolia testnet only (N10: max $0.10 test value).
- * Set TESTNET=true and CI_WALLET_SEED to run.
+ * Integration tests — read-only checks (wallet derivation, credit score,
+ * price cache), no on-chain transaction is ever sent by this file.
+ * Set INTEGRATION_TEST=true and CI_WALLET_SEED to run.
  * These tests are skipped in unit-only CI runs.
+ *
+ * Previously gated on TESTNET=true and documented as "targets Base Sepolia
+ * testnet only" — stale as of the 2026-08-01 mainnet-only hardening
+ * (facilitators.ts/verify-inbound.ts/lib/chains/base.ts no longer have a
+ * testnet code path at all, so that env var stopped meaning anything here).
+ * Renamed to avoid implying a testnet safety net that no longer exists —
+ * this file never transacted anyway, but the misleading claim shouldn't
+ * stick around now that it's provably false.
  */
 import { describe, it, expect } from 'vitest';
 
-const INTEGRATION = process.env['TESTNET'] === 'true' && !!process.env['CI_WALLET_SEED'];
+const INTEGRATION = process.env['INTEGRATION_TEST'] === 'true' && !!process.env['CI_WALLET_SEED'];
 
-describe.skipIf(!INTEGRATION)('E2E Integration (Base Sepolia)', () => {
+describe.skipIf(!INTEGRATION)('E2E Integration (read-only)', () => {
   it('WalletManager derives consistent address', async () => {
     const { WalletManager } = await import('../../src/server/payments/wallet.js');
     const w = await WalletManager.getInstance().getOrCreateWallet();

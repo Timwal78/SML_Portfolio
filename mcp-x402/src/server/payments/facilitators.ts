@@ -1,5 +1,5 @@
 import { createPublicClient, createWalletClient, http, verifyTypedData } from 'viem';
-import { base, baseSepolia } from 'viem/chains';
+import { base } from 'viem/chains';
 import { privateKeyToAccount } from 'viem/accounts';
 import { mnemonicToSeedSync } from 'bip39';
 import HDKey from 'hdkey';
@@ -25,7 +25,6 @@ import { X402Stats } from '../security/x402-stats.js';
 // ─────────────────────────────────────────────────────────────────────────────
 
 const USDC_BASE = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
-const USDC_BASE_SEPOLIA = '0x036CbD53842c5426634e7929541eC2318f3dCF7e';
 
 export interface Authorization {
   from: string;
@@ -62,14 +61,20 @@ export interface Facilitator {
   settle(payload: PaymentPayload, requirements: PaymentRequirements): Promise<SettleResult>;
 }
 
-function isTestnet(): boolean { return process.env['TESTNET'] === 'true'; }
+// Real-money guardrail (operator directive, 2026-08-01): this gateway settles
+// real customer USDC and must NEVER route verification/settlement to a
+// testnet, under any configuration. A stray TESTNET=true env var used to be
+// able to silently point this file's chain/RPC/USDC-address at Base Sepolia
+// while the REST discovery challenge (server/index.ts's buildAccepts()) stayed
+// hardcoded to mainnet regardless — a real agent paying real mainnet USDC
+// would have had their payment checked against the wrong chain and verified
+// as never having happened. Base mainnet is now hardcoded with no escape
+// hatch, closing that risk entirely rather than just documenting it.
 function rpcUrl(): string {
-  return isTestnet()
-    ? (process.env['BASE_SEPOLIA_RPC_URL'] ?? 'https://sepolia.base.org')
-    : (process.env['BASE_RPC_URL'] ?? 'https://mainnet.base.org');
+  return process.env['BASE_RPC_URL'] ?? 'https://mainnet.base.org';
 }
-export function usdcAddress(): string { return isTestnet() ? USDC_BASE_SEPOLIA : USDC_BASE; }
-function chainId(): number { return isTestnet() ? baseSepolia.id : base.id; }
+export function usdcAddress(): string { return USDC_BASE; }
+function chainId(): number { return base.id; }
 
 // ── Self-hosted facilitator: verify EIP-712 locally, settle via our own wallet ─
 const EIP3009_TYPES = {
@@ -110,7 +115,7 @@ let cachedDomain: { name: string; version: string } | null = null;
 async function tokenDomain(req: PaymentRequirements): Promise<{ name: string; version: string }> {
   if (req.extra?.name && req.extra?.version) return { name: req.extra.name, version: req.extra.version };
   if (cachedDomain) return cachedDomain;
-  const client = createPublicClient({ chain: isTestnet() ? baseSepolia : base, transport: http(rpcUrl()) });
+  const client = createPublicClient({ chain: base, transport: http(rpcUrl()) });
   try {
     const [name, version] = await Promise.all([
       (client as any).readContract({ address: usdcAddress() as `0x${string}`, abi: TOKEN_META_ABI, functionName: 'name' }),
@@ -166,7 +171,7 @@ export class SelfFacilitator implements Facilitator {
       const child = HDKey.fromMasterSeed(seed).derive("m/44'/60'/0'/0/0");
       if (!child.privateKey) return { success: false, errorReason: 'key_derivation_failed' };
       const account = privateKeyToAccount(`0x${child.privateKey.toString('hex')}`);
-      const chain = isTestnet() ? baseSepolia : base;
+      const chain = base;
       const wallet = createWalletClient({ account, chain, transport: http(rpcUrl()) });
       const pub = createPublicClient({ chain, transport: http(rpcUrl()) });
       const { v, r, s } = splitSig(payload.payload.signature);
@@ -209,9 +214,11 @@ export class SelfFacilitator implements Facilitator {
 // x402.org's own error ("No facilitator registered for network: base")
 // proves IT parses "base" as a valid network name fine — this conversion is
 // CDP-specific, not applied to other facilitators.
+// Mainnet only (operator directive, 2026-08-01) — see the mainnet guardrail
+// comment above usdcAddress()/rpcUrl(); nothing in this codebase can produce
+// a 'base-sepolia' network string anymore for this to ever convert.
 const CAIP2_BY_NETWORK: Record<string, string> = {
   base: 'eip155:8453',
-  'base-sepolia': 'eip155:84532',
 };
 
 function toCaip2Network(network: string): string {
