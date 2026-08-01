@@ -1,11 +1,24 @@
 import { createHash } from 'crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { dirname } from 'path';
+import { createClient, type RedisClientType } from 'redis';
 
 // Real-time counters for x402 payment activity — hooked into FacilitatorChain.
-// Counts are real, never seeded. Persists to disk when possible so redeploys
-// don't zero the proof counters (Render disk path via X402_STATS_FILE or
-// fallback /tmp/x402-stats.json which survives soft restarts only).
+// Counts are real, never seeded.
+//
+// Durability (fixed 2026-08-01): the previous local-JSON-only persistence
+// (/tmp/x402-stats.json by default) does NOT survive a Render redeploy — a
+// fresh container gets a fresh /tmp, and this repo redeploys on every merge
+// to main. That meant the operator could never actually answer "has a real
+// payment ever settled" from this endpoint: aiAgentsAllTime silently reset
+// on every deploy, same "local JSON fallback doesn't survive a redeploy"
+// gap already documented for equivalent modules elsewhere in this account
+// (paper_trade_ledger.py, iv_rank_tracker.py). Now uses Redis when
+// REDIS_URL is configured (survives redeploy) and falls back to the same
+// local-JSON behavior as before otherwise — snapshot() discloses which
+// backend actually answered so this is never silently ambiguous.
+
+const REDIS_KEY = 'x402stats:snapshot';
 
 interface SettledEvent {
   facilitator: string;
@@ -64,8 +77,13 @@ export class X402Stats {
   private recentFailed: FailedEvent[] = [];
   private aiAgentsAllTime = 0;
 
+  private redis: RedisClientType | null = null;
+  private redisReady = false;
+  private backend: 'redis' | 'local_json_ephemeral' = 'local_json_ephemeral';
+
   private constructor() {
-    this.load();
+    this.loadLocal();
+    void this.initRedis();
     // flush on interval
     setInterval(() => this.flush(false), 5000).unref?.();
     const flush = () => this.flush(true);
@@ -79,47 +97,79 @@ export class X402Stats {
     return X402Stats.instance;
   }
 
-  private load(): void {
+  private async initRedis(): Promise<void> {
+    const url = process.env.REDIS_URL;
+    if (!url) return;
+    try {
+      const client = createClient({ url }) as RedisClientType;
+      client.on('error', () => { /* stay on local fallback, don't crash the process */ });
+      await client.connect();
+      this.redis = client;
+      this.backend = 'redis';
+      const raw = await client.get(REDIS_KEY);
+      if (raw) this.applyPersisted(JSON.parse(raw) as PersistedShape, /* preferNewer */ true);
+      this.redisReady = true;
+    } catch {
+      this.redis = null;
+      this.backend = 'local_json_ephemeral';
+    }
+  }
+
+  private applyPersisted(data: PersistedShape, preferNewer: boolean): void {
+    // On Redis hydration we only adopt it if it's at least as complete as
+    // what's already in memory (guards against a slow Redis connect losing
+    // events recorded in the brief in-memory-only startup window).
+    if (preferNewer && (data.aiAgentsAllTime ?? 0) < this.aiAgentsAllTime) return;
+    if (data.startedAt) this.startedAt = data.startedAt;
+    if (data.requestsByRoute) this.requestsByRoute = new Map(Object.entries(data.requestsByRoute));
+    if (data.settledByFacilitator) this.settledByFacilitator = new Map(Object.entries(data.settledByFacilitator));
+    if (data.failedByFacilitatorStage) this.failedByFacilitatorStage = new Map(Object.entries(data.failedByFacilitatorStage));
+    if (Array.isArray(data.recentSettled)) this.recentSettled = data.recentSettled.slice(0, this.maxRecent);
+    if (Array.isArray(data.recentFailed)) this.recentFailed = data.recentFailed.slice(0, this.maxRecent);
+    if (typeof data.aiAgentsAllTime === 'number') this.aiAgentsAllTime = data.aiAgentsAllTime;
+  }
+
+  private loadLocal(): void {
     const path = statsPath();
     try {
       if (!existsSync(path)) return;
       const raw = readFileSync(path, 'utf8');
-      const data = JSON.parse(raw) as PersistedShape;
-      if (data.startedAt) this.startedAt = data.startedAt;
-      if (data.requestsByRoute) {
-        this.requestsByRoute = new Map(Object.entries(data.requestsByRoute));
-      }
-      if (data.settledByFacilitator) {
-        this.settledByFacilitator = new Map(Object.entries(data.settledByFacilitator));
-      }
-      if (data.failedByFacilitatorStage) {
-        this.failedByFacilitatorStage = new Map(Object.entries(data.failedByFacilitatorStage));
-      }
-      if (Array.isArray(data.recentSettled)) this.recentSettled = data.recentSettled.slice(0, this.maxRecent);
-      if (Array.isArray(data.recentFailed)) this.recentFailed = data.recentFailed.slice(0, this.maxRecent);
-      if (typeof data.aiAgentsAllTime === 'number') this.aiAgentsAllTime = data.aiAgentsAllTime;
+      this.applyPersisted(JSON.parse(raw) as PersistedShape, false);
     } catch {
       // corrupt or unreadable — start fresh
     }
+  }
+
+  private buildPayload(): PersistedShape {
+    return {
+      startedAt: this.startedAt,
+      requestsByRoute: Object.fromEntries(this.requestsByRoute),
+      settledByFacilitator: Object.fromEntries(this.settledByFacilitator),
+      failedByFacilitatorStage: Object.fromEntries(this.failedByFacilitatorStage),
+      recentSettled: this.recentSettled,
+      recentFailed: this.recentFailed,
+      aiAgentsAllTime: this.aiAgentsAllTime,
+    };
   }
 
   private flush(force: boolean): void {
     if (!this.dirty && !force) return;
     const now = Date.now();
     if (!force && now - this.lastPersist < this.persistEveryMs) return;
+    const payload = this.buildPayload();
+
+    if (this.redis && this.redisReady) {
+      // Fire-and-forget — never block the request path on Redis latency.
+      this.redis.set(REDIS_KEY, JSON.stringify(payload)).catch(() => { /* best-effort */ });
+      this.lastPersist = now;
+      this.dirty = false;
+      return;
+    }
+
     const path = statsPath();
     try {
       const dir = dirname(path);
       if (dir && dir !== '.' && !existsSync(dir)) mkdirSync(dir, { recursive: true });
-      const payload: PersistedShape = {
-        startedAt: this.startedAt,
-        requestsByRoute: Object.fromEntries(this.requestsByRoute),
-        settledByFacilitator: Object.fromEntries(this.settledByFacilitator),
-        failedByFacilitatorStage: Object.fromEntries(this.failedByFacilitatorStage),
-        recentSettled: this.recentSettled,
-        recentFailed: this.recentFailed,
-        aiAgentsAllTime: this.aiAgentsAllTime,
-      };
       writeFileSync(path, JSON.stringify(payload));
       this.lastPersist = now;
       this.dirty = false;
@@ -181,9 +231,12 @@ export class X402Stats {
     return {
       startedAt: new Date(this.startedAt).toISOString(),
       uptimeSeconds: Math.floor((Date.now() - this.startedAt) / 1000),
+      backend: this.backend,
       note:
-        'Persists to X402_STATS_FILE or /tmp/x402-stats.json when disk is writable. Real counts only — never simulated.',
-      statsFile: statsPath(),
+        this.backend === 'redis'
+          ? 'Persisted to Redis (REDIS_URL) — survives redeploys. Real counts only, never simulated.'
+          : 'REDIS_URL not configured — persisting to X402_STATS_FILE or /tmp/x402-stats.json, which does NOT survive a Render redeploy. Set REDIS_URL for durable all-time counts. Real counts only, never simulated.',
+      statsFile: this.backend === 'local_json_ephemeral' ? statsPath() : undefined,
       aiAgentsAllTime: this.aiAgentsAllTime,
       requestsByRoute: Object.fromEntries(this.requestsByRoute),
       settledByFacilitator: Object.fromEntries(this.settledByFacilitator),
