@@ -15,9 +15,9 @@ describe('Tool Catalog', () => {
     }
   });
 
-  it('leviathan is 0.05 USDC', () => {
+  it('leviathan is 0.01 USDC', () => {
     const t = getToolMeta('leviathan_signal');
-    expect(t?.price).toBe('0.05');
+    expect(t?.price).toBe('0.01');
     expect(t?.currency).toBe('USDC');
   });
 
@@ -31,9 +31,9 @@ describe('Tool Catalog', () => {
     expect(t?.freeTier).toBe('query_only');
   });
 
-  it('crawl is 0.005 USDC', () => {
+  it('crawl is 0.001 USDC', () => {
     const t = getToolMeta('crawl_paid_fetch');
-    expect(t?.price).toBe('0.005');
+    expect(t?.price).toBe('0.001');
   });
 
   it('getToolMeta returns undefined for unknown tool', () => {

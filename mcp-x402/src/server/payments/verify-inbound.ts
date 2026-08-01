@@ -1,9 +1,10 @@
 import { createPublicClient, http, getAddress } from 'viem';
-import { base, baseSepolia } from 'viem/chains';
+import { base } from 'viem/chains';
 
-// USDC contracts (6 decimals)
+// USDC contract (6 decimals) — Base mainnet only, hardcoded (operator
+// directive, 2026-08-01): this verifies real customer payments and must
+// never be routed to a testnet under any configuration.
 const USDC_BASE = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
-const USDC_BASE_SEPOLIA = '0x036CbD53842c5426634e7929541eC2318f3dCF7e';
 // keccak256("Transfer(address,address,uint256)")
 const TRANSFER_TOPIC = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
 
@@ -46,12 +47,9 @@ export async function verifyBaseUsdcPayment(params: VerifyParams): Promise<Verif
     return { ok: false, error: 'invalid_tx_hash_format' };
   }
 
-  const testnet = process.env['TESTNET'] === 'true';
-  const chain = testnet ? baseSepolia : base;
-  const rpcUrl = testnet
-    ? (process.env['BASE_SEPOLIA_RPC_URL'] ?? 'https://sepolia.base.org')
-    : (process.env['BASE_RPC_URL'] ?? 'https://mainnet.base.org');
-  const usdc = (testnet ? USDC_BASE_SEPOLIA : USDC_BASE).toLowerCase();
+  const chain = base;
+  const rpcUrl = process.env['BASE_RPC_URL'] ?? 'https://mainnet.base.org';
+  const usdc = USDC_BASE.toLowerCase();
   const payToLc = params.payTo.toLowerCase();
 
   const client = createPublicClient({ chain, transport: http(rpcUrl) });

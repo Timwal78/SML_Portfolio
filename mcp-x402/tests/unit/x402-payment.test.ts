@@ -37,7 +37,7 @@ describe('executeX402Payment — real-payment gate (no network reached in these 
     const registry = PriceRegistry.getInstance();
     registry.seedDefaults();
     await expect(
-      executeX402Payment({ price: '0.05', currency: 'USDC', toolName: 'leviathan_signal' }),
+      executeX402Payment({ price: '0.01', currency: 'USDC', toolName: 'leviathan_signal' }),
     ).rejects.toThrow(/Payment required/);
   });
 
@@ -45,7 +45,7 @@ describe('executeX402Payment — real-payment gate (no network reached in these 
     const registry = PriceRegistry.getInstance();
     registry.seedDefaults();
     await expect(
-      executeX402Payment({ price: '0.05', currency: 'RLUSD', toolName: 'leviathan_signal', paymentTxHash: '0x' + '1'.repeat(64) }),
+      executeX402Payment({ price: '0.01', currency: 'RLUSD', toolName: 'leviathan_signal', paymentTxHash: '0x' + '1'.repeat(64) }),
     ).rejects.toThrow(/unsupported_currency/);
   });
 
@@ -55,7 +55,7 @@ describe('executeX402Payment — real-payment gate (no network reached in these 
     const txHash = '0x' + '7'.repeat(64);
     markRedeemed(txHash);
     await expect(
-      executeX402Payment({ price: '0.05', currency: 'USDC', toolName: 'leviathan_signal', paymentTxHash: txHash }),
+      executeX402Payment({ price: '0.01', currency: 'USDC', toolName: 'leviathan_signal', paymentTxHash: txHash }),
     ).rejects.toThrow(/payment_already_redeemed/);
   });
 });

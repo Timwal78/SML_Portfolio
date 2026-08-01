@@ -37,10 +37,10 @@ describe('APM matcher', () => {
   });
 
   it('marks price fit false when over budget', () => {
-    const c: Constraints = { max_price_usd: 0.04 };
-    const council = CAPABILITIES.find((x) => x.tool === 'squeezeos_council')!; // 0.10
+    const c: Constraints = { max_price_usd: 0.015 };
+    const council = CAPABILITIES.find((x) => x.tool === 'squeezeos_council')!; // 0.02
     expect(evaluateFit(council, c).price).toBe(false);
-    const iwm = CAPABILITIES.find((x) => x.tool === 'squeezeos_iwm')!; // 0.03
+    const iwm = CAPABILITIES.find((x) => x.tool === 'squeezeos_iwm')!; // 0.01
     expect(evaluateFit(iwm, c).price).toBe(true);
   });
 

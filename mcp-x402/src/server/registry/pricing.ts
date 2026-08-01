@@ -3,6 +3,11 @@ const PRICE_CACHE_TTL = parseInt(process.env['PRICE_CACHE_TTL_MS'] ?? '60000', 1
 // Keys MUST match the toolName each tool passes to getPrice()/executeX402Payment().
 // Paid-tool prices MUST equal what sml_discover advertises (advertised == charged).
 // A drift-guard test (tests/unit/pricing-drift.test.ts) enforces both.
+//
+// Intro pricing (2026-08-01, operator directive): kept deliberately low —
+// this product is pre-first-sale (zero stranger purchases in 5 months) and
+// needs to stay competitive over margin while it builds a track record.
+// Raise these once there's real traction, not before.
 const BASE_PRICES: Record<string, string> = {
   // Discovery (free)
   sml_discover: '0.00',
@@ -10,11 +15,11 @@ const BASE_PRICES: Record<string, string> = {
   // APM — Agent Preference Manifest (free preview, paid contract)
   apm_negotiate: '0.001',
   // SqueezeOS signals
-  leviathan_signal: '0.05',
-  squeezeos_council: '0.10',
-  squeezeos_scan: '0.05',
-  squeezeos_options: '0.05',
-  squeezeos_iwm: '0.03',
+  leviathan_signal: '0.01',
+  squeezeos_council: '0.02',
+  squeezeos_scan: '0.01',
+  squeezeos_options: '0.01',
+  squeezeos_iwm: '0.01',
   squeezeos_preview: '0.00',
   squeezeos_status: '0.00',
   // Equities / Options heatmap (self-contained: Polygon.io + Claude swarm)
@@ -23,12 +28,12 @@ const BASE_PRICES: Record<string, string> = {
   options_delta_heatmap_preview: '0.00',
   options_delta_heatmap_full: '0.001',
   // SEC / Earnings
-  xmit_edgar_decode: '0.02',
-  xdeo_earnings_estimate: '0.02',
+  xmit_edgar_decode: '0.01',
+  xdeo_earnings_estimate: '0.01',
   // FTD
-  ftd_threshold_scan: '0.05',
+  ftd_threshold_scan: '0.01',
   // Crawl
-  crawl_paid_fetch: '0.005',
+  crawl_paid_fetch: '0.001',
   // Agent marketplace
   nexus_agent_hire: '0.00',
   // Ghost Layer (cross-chain)
