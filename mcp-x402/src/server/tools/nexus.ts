@@ -40,11 +40,23 @@ export function registerNexus(server: McpServer): void {
         return { content: [{ type: 'text', text: JSON.stringify({ error: 'rate_limit_exceeded' }) }], isError: true };
       }
 
+      // NOTE (found 2026-08-01): NexusClient's backend host (SML_API_BASE,
+      // default api.scriptmasterlabs.com) does not correspond to any real,
+      // documented service in this account's infrastructure — confirmed by
+      // a repo-wide search finding zero real implementations of /nexus/v1/*
+      // anywhere. Both calls below are expected to fail until a real
+      // backend exists; failing closed (before payment, on the hire path)
+      // is the honest behavior, not a fabricated success.
       const client = NexusClient.getInstance();
 
       // Free query tier
       if (args.action === 'query') {
-        const results = await client.queryAgents({ capability: args.capability, maxBudget: args.max_budget });
+        let results: unknown;
+        try {
+          results = await client.queryAgents({ capability: args.capability, maxBudget: args.max_budget });
+        } catch (err) {
+          return { content: [{ type: 'text', text: JSON.stringify({ error: 'upstream_unavailable', message: String(err) }) }], isError: true };
+        }
         audit.info('nexus_query_success', { capability: args.capability });
         return { content: [{ type: 'text', text: JSON.stringify({ data: results, tier: 'free' }) }] };
       }
@@ -52,6 +64,14 @@ export function registerNexus(server: McpServer): void {
       // Hire — commission-based payment
       if (!args.agent_id) {
         return { content: [{ type: 'text', text: JSON.stringify({ error: 'agent_id_required', message: 'Specify agent_id to hire.' }) }], isError: true };
+      }
+
+      // Fetch BEFORE charging — never bill for a call we can't fulfill.
+      let hireResult: unknown;
+      try {
+        hireResult = await client.hireAgent({ agentId: args.agent_id, budget: args.max_budget, chainPreference: args.chain_preference });
+      } catch (err) {
+        return { content: [{ type: 'text', text: JSON.stringify({ error: 'upstream_unavailable', message: String(err) }) }], isError: true };
       }
 
       const agentFee = parseFloat(args.max_budget);
@@ -70,8 +90,6 @@ export function registerNexus(server: McpServer): void {
       } catch (err) {
         return { content: [{ type: 'text', text: JSON.stringify({ error: 'payment_failed', message: String(err) }) }], isError: true };
       }
-
-      const hireResult = await client.hireAgent({ agentId: args.agent_id, budget: args.max_budget, chainPreference: args.chain_preference });
 
       audit.info('nexus_hire_success', { agentId: args.agent_id, commission, receiptId: payment.receiptId });
       return {
