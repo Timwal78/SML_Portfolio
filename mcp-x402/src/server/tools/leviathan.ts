@@ -23,9 +23,9 @@ export function registerLeviathan(server: McpServer): void {
       signal_type: z
         .enum(['squeeze', 'momentum', 'all'])
         .describe(
-          'squeeze — 741-EMA stack alignment + squeeze_alert flag. ' +
+          'squeeze — 190-EMA stack alignment + squeeze_alert flag. ' +
           'momentum — 365-day EMA trend (ABOVE/BELOW). ' +
-          'all — full multi-engine composite (741 + 365 + TripleLock).',
+          'all — full multi-engine composite (190 + 365 + TripleLock).',
         ),
       wallet_address: z.string().describe('Agent wallet address for payment. Auto-provisioned if omitted.'),
       payment_tx_hash: z.string().optional().describe('On-chain Base tx hash proving USDC payment to the operator (sovereign rail). Omit if using payment_header.'),
