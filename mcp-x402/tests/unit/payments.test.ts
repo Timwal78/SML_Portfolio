@@ -10,7 +10,7 @@ describe('PriceRegistry', () => {
     const registry = PriceRegistry.getInstance();
     registry.seedDefaults();
     const price = await registry.getPrice('leviathan_signal');
-    expect(price).toBe('0.05');
+    expect(price).toBe('0.01');
   });
 
   it('returns null for unknown tool when API unavailable', async () => {
@@ -19,31 +19,31 @@ describe('PriceRegistry', () => {
     expect(price).toBeNull();
   });
 
-  it('returns crawl price as 0.005', async () => {
+  it('returns crawl price as 0.001', async () => {
     const registry = PriceRegistry.getInstance();
     registry.seedDefaults();
     const price = await registry.getPrice('crawl_paid_fetch');
-    expect(price).toBe('0.005');
+    expect(price).toBe('0.001');
   });
 
-  it('returns xmit price as 0.02', async () => {
+  it('returns xmit price as 0.01', async () => {
     const registry = PriceRegistry.getInstance();
     registry.seedDefaults();
     const price = await registry.getPrice('xmit_edgar_decode');
-    expect(price).toBe('0.02');
+    expect(price).toBe('0.01');
   });
 
-  it('returns xdeo price as 0.02', async () => {
+  it('returns xdeo price as 0.01', async () => {
     const registry = PriceRegistry.getInstance();
     registry.seedDefaults();
     const price = await registry.getPrice('xdeo_earnings_estimate');
-    expect(price).toBe('0.02');
+    expect(price).toBe('0.01');
   });
 
-  it('returns ftd price as 0.05', async () => {
+  it('returns ftd price as 0.01', async () => {
     const registry = PriceRegistry.getInstance();
     registry.seedDefaults();
     const price = await registry.getPrice('ftd_threshold_scan');
-    expect(price).toBe('0.05');
+    expect(price).toBe('0.01');
   });
 });
