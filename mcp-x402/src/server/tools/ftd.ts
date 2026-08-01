@@ -4,7 +4,7 @@ import { executeX402Payment } from '../payments/x402.js';
 import { RateLimiter } from '../security/rate-limit.js';
 import { Sandbox } from '../security/sandbox.js';
 import { AuditLogger } from '../security/audit.js';
-import { FtdClient } from '../../lib/sml-api/ftd.js';
+import { SqueezeOSAPI } from '../../lib/sml-api/squeezeos.js';
 import { PriceRegistry } from '../registry/pricing.js';
 
 const CACHE_TTL_MS = 15 * 60 * 1000; // 15-min cache per spec
@@ -30,8 +30,8 @@ export function registerFtd(server: McpServer): void {
   server.tool(
     'ftd_threshold_scan',
     {
-      scan_type: z.enum(['alerts', 'full', 'spike_history']).describe('"alerts" is free. "full" and "spike_history" require 0.05 USDC.'),
-      ticker: z.string().describe('Filter by ticker. Optional.'),
+      scan_type: z.enum(['alerts', 'full', 'spike_history']).describe('"alerts" is free. "full" and "spike_history" require 0.05 USDC and a ticker.'),
+      ticker: z.string().describe('Filter by ticker. Optional for "alerts"; required for "full"/"spike_history".'),
       min_spike_multiplier: z.number().describe('Minimum FTD spike multiplier vs baseline. Default: 2x.'),
       wallet_address: z.string().describe('Agent wallet for paid scans.'),
       payment_tx_hash: z.string().optional().describe('On-chain Base tx hash proving USDC payment to the operator (sovereign rail). Omit if using payment_header.'),
@@ -48,24 +48,46 @@ export function registerFtd(server: McpServer): void {
       const cacheKey = `${args.scan_type}:${args.ticker ?? 'all'}:${args.min_spike_multiplier}`;
       const now = Date.now();
 
-      // Free tier: alerts only
+      // Free tier: alerts only — real SqueezeOS route, ticker/min_spike now
+      // honored server-side (fixed 2026-08-01 alongside this gateway fix).
       if (args.scan_type === 'alerts') {
         const cached = alertCache.get(cacheKey);
         if (cached && now - cached.ts < CACHE_TTL_MS) {
           return { content: [{ type: 'text', text: JSON.stringify({ data: cached.data, cached: true, tier: 'free' }) }] };
         }
 
-        const client = FtdClient.getInstance();
-        const data = await client.getAlerts({ ticker: args.ticker, minSpikeMultiplier: args.min_spike_multiplier ?? 2 });
+        let data: unknown;
+        try {
+          data = await SqueezeOSAPI.ftdAlerts(args.ticker, args.min_spike_multiplier ?? 2);
+        } catch (err) {
+          return { content: [{ type: 'text', text: JSON.stringify({ error: 'upstream_unavailable', message: String(err) }) }], isError: true };
+        }
         alertCache.set(cacheKey, { data, ts: now });
         audit.info('ftd_alert_success', { ticker: args.ticker ?? 'all' });
         return { content: [{ type: 'text', text: JSON.stringify({ data, tier: 'free' }) }] };
       }
 
-      // Paid tier: full data
+      // Paid tier ("full" / "spike_history"): both map to SqueezeOS's real
+      // settlement-cycle bundle (/api/ftd/cycle/<symbol>) — the only paid FTD
+      // route that's per-symbol and covers both spike stats and cycle
+      // markers. That route requires a symbol; there is no "all symbols"
+      // paid bulk endpoint, so a missing ticker is a real input error, not
+      // something to silently default.
+      if (!args.ticker) {
+        return { content: [{ type: 'text', text: JSON.stringify({ error: 'ticker_required', message: '"full" and "spike_history" require a ticker — there is no bulk paid scan.' }) }], isError: true };
+      }
+
       const cached = fullCache.get(cacheKey);
       if (cached && now - cached.ts < CACHE_TTL_MS) {
         return { content: [{ type: 'text', text: JSON.stringify({ data: cached.data, cached: true, tier: 'paid' }) }] };
+      }
+
+      // Fetch BEFORE charging — never bill for a call we can't fulfill.
+      let data: unknown;
+      try {
+        data = await SqueezeOSAPI.ftdSettlementCycle(args.ticker);
+      } catch (err) {
+        return { content: [{ type: 'text', text: JSON.stringify({ error: 'upstream_unavailable', message: String(err) }) }], isError: true };
       }
 
       await PriceRegistry.getInstance().seedDefaults();
@@ -81,11 +103,9 @@ export function registerFtd(server: McpServer): void {
         return { content: [{ type: 'text', text: JSON.stringify({ error: 'payment_failed', message: String(err) }) }], isError: true };
       }
 
-      const client = FtdClient.getInstance();
-      const data = await client.getFullScan({ ticker: args.ticker, scanType: args.scan_type, minSpikeMultiplier: args.min_spike_multiplier ?? 2 });
       fullCache.set(cacheKey, { data, ts: now });
 
-      audit.info('ftd_paid_success', { ticker: args.ticker ?? 'all', receiptId: payment.receiptId });
+      audit.info('ftd_paid_success', { ticker: args.ticker, receiptId: payment.receiptId });
       return { content: [{ type: 'text', text: JSON.stringify({ data, tier: 'paid', _meta: { receipt_id: payment.receiptId, tx_hash: payment.txHash, chain: payment.chain, amount_paid: `${payment.amountPaid} ${payment.currency}` } }) }] };
     },
   );

@@ -4,7 +4,7 @@ import { executeX402Payment } from '../payments/x402.js';
 import { RateLimiter } from '../security/rate-limit.js';
 import { Sandbox } from '../security/sandbox.js';
 import { AuditLogger } from '../security/audit.js';
-import { CrawlClient } from '../../lib/sml-api/crawl.js';
+import { CrawlClient, type CrawlResult } from '../../lib/sml-api/crawl.js';
 import { PriceRegistry } from '../registry/pricing.js';
 
 const InputSchema = z.object({
@@ -38,6 +38,24 @@ export function registerCrawl(server: McpServer): void {
         return { content: [{ type: 'text', text: JSON.stringify({ error: 'rate_limit_exceeded' }) }], isError: true };
       }
 
+      // Fetch BEFORE charging — never bill for a call we can't fulfill.
+      // NOTE (found 2026-08-01): CrawlClient's backend host (SML_API_BASE,
+      // default api.scriptmasterlabs.com) does not correspond to any real,
+      // documented service in this account's infrastructure — confirmed by
+      // a repo-wide search finding zero real implementations of
+      // /crawl/v1/fetch anywhere (CRAWLTOLL is a different, unrelated
+      // product — server-side middleware a publisher installs to charge
+      // crawlers, not a client for fetching other sites). This call is
+      // expected to fail until a real backend exists; failing closed here
+      // (before payment) is the honest behavior, not a fabricated success.
+      const client = CrawlClient.getInstance();
+      let data: CrawlResult;
+      try {
+        data = await client.fetch({ url: args.url, extract: args.extract ?? 'text', userAgent: args.user_agent });
+      } catch (err) {
+        return { content: [{ type: 'text', text: JSON.stringify({ error: 'upstream_unavailable', message: String(err) }) }], isError: true };
+      }
+
       await PriceRegistry.getInstance().seedDefaults();
       const price = await PriceRegistry.getInstance().getPrice('crawl_paid_fetch');
       if (!price) {
@@ -57,9 +75,6 @@ export function registerCrawl(server: McpServer): void {
       } catch (err) {
         return { content: [{ type: 'text', text: JSON.stringify({ error: 'payment_failed', message: String(err) }) }], isError: true };
       }
-
-      const client = CrawlClient.getInstance();
-      const data = await client.fetch({ url: args.url, extract: args.extract ?? 'text', userAgent: args.user_agent });
 
       // Sanitize response to prevent prompt injection
       const safeContent = typeof data.content === 'string'

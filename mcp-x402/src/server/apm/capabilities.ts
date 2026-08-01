@@ -34,25 +34,25 @@ const ALL_CHAINS = ['base', 'xrpl', 'solana'];
 export const CAPABILITIES: Capability[] = [
   // ── SqueezeOS (squeezeos-api.onrender.com) ────────────────────────────────
   {
-    tool: 'squeezeos_council', product: 'SqueezeOS', paid: true, basePrice: '0.001',
+    tool: 'squeezeos_council', product: 'SqueezeOS', paid: true, basePrice: '0.10',
     paymentChains: ALL_CHAINS, freshnessSec: 60, attribution: false,
     tags: ['squeeze', 'signal', 'equity', 'equities', 'stock', 'stocks', 'ticker', 'council', 'verdict', 'momentum', 'trading', 'ai', 'confidence'],
     summary: 'Multi-engine AI council verdict for any symbol — highest-confidence squeeze signal.',
   },
   {
-    tool: 'squeezeos_scan', product: 'SqueezeOS', paid: true, basePrice: '0.001',
+    tool: 'squeezeos_scan', product: 'SqueezeOS', paid: true, basePrice: '0.05',
     paymentChains: ALL_CHAINS, freshnessSec: 300, attribution: false,
     tags: ['scan', 'screener', 'candidates', 'squeeze', 'list', 'stocks', 'ranked', 'discover'],
     summary: 'Full $1–$50 squeeze candidate scanner — ranked by squeeze score.',
   },
   {
-    tool: 'squeezeos_options', product: 'SqueezeOS', paid: true, basePrice: '0.001',
+    tool: 'squeezeos_options', product: 'SqueezeOS', paid: true, basePrice: '0.05',
     paymentChains: ALL_CHAINS, freshnessSec: 60, attribution: false,
     tags: ['options', 'flow', 'darkpool', 'sweep', 'greeks', 'derivatives', 'unusual'],
     summary: 'Institutional options flow analysis — dark pool and sweep detection.',
   },
   {
-    tool: 'squeezeos_iwm', product: 'SqueezeOS', paid: true, basePrice: '0.001',
+    tool: 'squeezeos_iwm', product: 'SqueezeOS', paid: true, basePrice: '0.03',
     paymentChains: ALL_CHAINS, freshnessSec: 5, attribution: false,
     tags: ['iwm', '0dte', 'options', 'greeks', 'realtime', 'index', 'russell', 'probability'],
     summary: 'IWM 0DTE contract scorer — real-time Greeks and probability.',

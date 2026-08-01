@@ -10,11 +10,11 @@ const BASE_PRICES: Record<string, string> = {
   // APM — Agent Preference Manifest (free preview, paid contract)
   apm_negotiate: '0.001',
   // SqueezeOS signals
-  leviathan_signal: '0.001',
-  squeezeos_council: '0.001',
-  squeezeos_scan: '0.001',
-  squeezeos_options: '0.001',
-  squeezeos_iwm: '0.001',
+  leviathan_signal: '0.05',
+  squeezeos_council: '0.10',
+  squeezeos_scan: '0.05',
+  squeezeos_options: '0.05',
+  squeezeos_iwm: '0.03',
   squeezeos_preview: '0.00',
   squeezeos_status: '0.00',
   // Equities / Options heatmap (self-contained: Polygon.io + Claude swarm)
@@ -23,12 +23,12 @@ const BASE_PRICES: Record<string, string> = {
   options_delta_heatmap_preview: '0.00',
   options_delta_heatmap_full: '0.001',
   // SEC / Earnings
-  xmit_edgar_decode: '0.001',
-  xdeo_earnings_estimate: '0.001',
+  xmit_edgar_decode: '0.02',
+  xdeo_earnings_estimate: '0.02',
   // FTD
-  ftd_threshold_scan: '0.001',
+  ftd_threshold_scan: '0.05',
   // Crawl
-  crawl_paid_fetch: '0.001',
+  crawl_paid_fetch: '0.005',
   // Agent marketplace
   nexus_agent_hire: '0.00',
   // Ghost Layer (cross-chain)

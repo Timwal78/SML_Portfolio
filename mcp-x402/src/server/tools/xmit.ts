@@ -41,6 +41,26 @@ export function registerXmit(server: McpServer): void {
         return { content: [{ type: 'text', text: JSON.stringify({ error: 'rate_limit_exceeded' }) }], isError: true };
       }
 
+      // Fetch BEFORE charging — never bill for a call we can't fulfill.
+      // NOTE (found 2026-08-01): XmitClient's backend host (SML_API_BASE,
+      // default api.scriptmasterlabs.com) does not correspond to any real,
+      // documented service in this account's infrastructure — confirmed by
+      // a repo-wide search finding zero real implementations of /xmit/v1/*
+      // anywhere. This call is expected to fail until a real backend exists;
+      // failing closed here (before payment) is the honest behavior, not a
+      // fabricated success.
+      const client = XmitClient.getInstance();
+      let data: unknown;
+      try {
+        data = await client.decode({
+          filingUrl: args.filing_url,
+          parseTarget: args.parse_target,
+          format: args.format ?? 'json',
+        });
+      } catch (err) {
+        return { content: [{ type: 'text', text: JSON.stringify({ error: 'upstream_unavailable', message: String(err) }) }], isError: true };
+      }
+
       await PriceRegistry.getInstance().seedDefaults();
       const price = await PriceRegistry.getInstance().getPrice('xmit_edgar_decode');
       if (!price) {
@@ -53,13 +73,6 @@ export function registerXmit(server: McpServer): void {
       } catch (err) {
         return { content: [{ type: 'text', text: JSON.stringify({ error: 'payment_failed', message: String(err) }) }], isError: true };
       }
-
-      const client = XmitClient.getInstance();
-      const data = await client.decode({
-        filingUrl: args.filing_url,
-        parseTarget: args.parse_target,
-        format: args.format ?? 'json',
-      });
 
       // Raw text NEVER returned (N3) — only structured parsed output
       audit.info('xmit_success', { receiptId: payment.receiptId });

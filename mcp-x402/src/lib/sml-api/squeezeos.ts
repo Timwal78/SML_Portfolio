@@ -45,8 +45,42 @@ export const SqueezeOSAPI = {
   // FREE
   preview: (symbol: string) => squeezeGet(`/api/preview/${encodeURIComponent(symbol)}`),
   history: (symbol?: string) => squeezeGet(symbol ? `/api/history/${encodeURIComponent(symbol)}` : '/api/history'),
-  oracle: (symbol?: string) => squeezeGet(symbol ? `/api/oracle/${encodeURIComponent(symbol)}` : '/api/oracle'),
+  /**
+   * `/api/oracle/<symbol>` (path segment) runs a fresh, uncached OracleEngine
+   * analysis per request server-side and can take 30s+ — that's what caused
+   * squeezeos_oracle's timeouts. `/api/oracle` (no segment) serves an
+   * instantly-cached full batch. There is no server-side per-symbol filter
+   * (a query-string `?symbol=` is silently ignored by the Flask route), so
+   * this always fetches the cached batch and filters client-side here —
+   * fast and correct, at the cost of the caller getting the whole batch's
+   * cache freshness rather than a live single-symbol read.
+   */
+  oracle: async (symbol?: string): Promise<unknown> => {
+    const batch = (await squeezeGet('/api/oracle')) as {
+      symbols?: Record<string, unknown>;
+      [key: string]: unknown;
+    };
+    if (!symbol) return batch;
+    const upper = symbol.toUpperCase().trim();
+    const match = batch?.symbols?.[upper];
+    if (!match) {
+      return {
+        status: 'not_found',
+        symbol: upper,
+        message: 'Symbol not present in the current cached oracle batch.',
+        universe_size: batch?.['universe_size'] ?? null,
+      };
+    }
+    return { status: 'success', symbol: upper, oracle: match, source: 'batch_filtered' };
+  },
   ftd: () => squeezeGet('/api/ftd'),
+  ftdAlerts: (ticker?: string, minSpikeMultiplier?: number) => {
+    const qs = new URLSearchParams();
+    if (ticker) qs.set('ticker', ticker);
+    if (minSpikeMultiplier !== undefined) qs.set('min_spike_multiplier', String(minSpikeMultiplier));
+    const q = qs.toString();
+    return squeezeGet(`/api/ftd/alerts${q ? `?${q}` : ''}`);
+  },
   status: () => squeezeGet('/api/status'),
   demo: () => squeezeGet('/api/demo'),
   marketplaceBrowse: () => squeezeGet('/api/marketplace'),
