@@ -54,7 +54,11 @@ const BUYER_SIGNER_PRIVATE_KEY = (process.env['BUYER_SIGNER_PRIVATE_KEY'] ?? '')
 const SELLER_WALLET_ADDRESS = (
   process.env['SELLER_WALLET_ADDRESS'] ?? '0x72330994f379a71542e7bd5a4cf99a9d9743f4aa'
 );
-const OFFERING_NAME = process.env['OFFERING_NAME'] ?? 'SqueezeOS Squeeze Signal (741-EMA)';
+// Offering renamed 741-EMA→190-EMA 2026-08-01 (seller.ts's OFFERINGS catalog
+// — the underlying anchor changed on the SqueezeOS backend, see its
+// CLAUDE.md's "741 Pure Macro Matrix" section) — kept in sync here so this
+// bootstrap script still targets a real offering key instead of a stale one.
+const OFFERING_NAME = process.env['OFFERING_NAME'] ?? 'SqueezeOS Squeeze Signal (190-EMA)';
 const OFFERING_REQUIREMENT: Record<string, unknown> = JSON.parse(
   process.env['OFFERING_REQUIREMENT'] ?? '{"symbol":"SPY"}',
 );

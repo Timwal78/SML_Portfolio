@@ -72,13 +72,20 @@ export const OFFERINGS: Record<string, Offering> = {
   'SqueezeOS BeastMode Full Scan': {
     price: 0.001,
     description:
-      'SqueezeOS full multi-engine scan — 741-EMA stack + 365-EMA + TripleLock composite. ' +
+      'SqueezeOS full multi-engine scan — 190-EMA stack + 365-EMA + TripleLock composite. ' +
       'Req: { symbol: string }',
   },
-  'SqueezeOS Squeeze Signal (741-EMA)': {
+  // Anchor renamed 741→190 trading days on the SqueezeOS backend (operator
+  // directive, 2026-07-30, MACRO_STACK_CSV=30,60,90,120,190) — the route
+  // path (/api/signals/741) stays a stable identifier on that end, but this
+  // offering's own name/description are pure marketing copy, not a public
+  // API contract, and zero real ACP jobs have ever referenced this exact
+  // name (found 2026-08-01 alongside the "54 offerings, 0 jobs" investigation),
+  // so there is no live-callsite reason to keep advertising a stale anchor.
+  'SqueezeOS Squeeze Signal (190-EMA)': {
     price: 0.001,
     description:
-      'SqueezeOS 741-EMA stack alignment signal with squeeze_alert flag. ' +
+      'SqueezeOS 190-EMA stack alignment signal with squeeze_alert flag. ' +
       'Returns BULLISH HIGHWAY / BEARISH HIGHWAY / CONSOLIDATION. Req: { symbol: string }',
   },
   'SqueezeOS 365-Day EMA Signal': {
@@ -95,7 +102,7 @@ export const OFFERINGS: Record<string, Offering> = {
   'SqueezeOS Full Signal (Composite)': {
     price: 0.001,
     description:
-      'All three SqueezeOS engines in one sovereign verdict (741 + 365 + TripleLock). ' +
+      'All three SqueezeOS engines in one sovereign verdict (190 + 365 + TripleLock). ' +
       'Req: { symbol: string }',
   },
   // ── Federal Data Intelligence (this server's x402 routes) ─────────────────
@@ -225,7 +232,7 @@ export const OFFERINGS: Record<string, Offering> = {
   'SqueezeOS Full Scanner': {
     price: 0.001,
     description:
-      'SqueezeOS full $1–$50 squeeze scanner — 741-EMA, gamma walls, and pressure index. ' +
+      'SqueezeOS full $1–$50 squeeze scanner — 190-EMA, gamma walls, and pressure index. ' +
       'Req: {}',
   },
   // ── New x402 routes ───────────────────────────────────────────────────────────
@@ -452,7 +459,12 @@ async function routeOffering(offering: string, req: Requirement): Promise<unknow
     case 'SqueezeOS BeastMode Full Scan':
       return callSqueezeOSPost('/api/council', { symbol: str(req.symbol, 'SPY').toUpperCase() });
 
-    case 'SqueezeOS Squeeze Signal (741-EMA)':
+    case 'SqueezeOS Squeeze Signal (190-EMA)':
+      // Route path stays /api/signals/741 — SqueezeOS kept that as a stable
+      // public identifier on its own end even after renaming the anchor
+      // 741→190 (see SqueezeOS/CLAUDE.md's "741 Pure Macro Matrix" section).
+      // Only this offering's marketing name/description changed, not the
+      // real endpoint it calls.
       return callSqueezeOS(`/api/signals/741/${encodeURIComponent(str(req.symbol, 'SPY').toUpperCase())}`);
 
     case 'SqueezeOS 365-Day EMA Signal':
