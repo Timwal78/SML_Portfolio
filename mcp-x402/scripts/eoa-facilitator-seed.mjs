@@ -182,21 +182,22 @@ async function main() {
         fails++;
         log(`FAIL ${r.status} ${path.slice(0, 40)} ${r.body.slice(0, 180).replace(/\n/g, ' ')}`);
         results.push({ ok: false, path, status: r.status, body: r.body.slice(0, 300) });
-        if (fails >= 5) {
+        if (fails >= 25) {
           log('STOP consecutive fails');
           break;
         }
-        // brief pause on fail
-        await new Promise((x) => setTimeout(x, 1500));
+        // longer backoff on deploy 502 flaps
+        const wait = r.status === 502 || r.status === 503 ? 8000 : 2000;
+        await new Promise((x) => setTimeout(x, wait));
       }
     } catch (e) {
       fails++;
       log(`ERR ${e.message || e}`);
       results.push({ ok: false, error: String(e) });
-      if (fails >= 5) break;
-      await new Promise((x) => setTimeout(x, 2000));
+      if (fails >= 25) break;
+      await new Promise((x) => setTimeout(x, 5000));
     }
-    await new Promise((x) => setTimeout(x, 400));
+    await new Promise((x) => setTimeout(x, 700));
   }
 
   const bal1 = await usdcBal(pub, account.address);
