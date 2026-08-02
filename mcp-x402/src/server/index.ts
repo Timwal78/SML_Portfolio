@@ -5139,6 +5139,27 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
       },
     };
 
+    // Root cause of 4 rounds of "every endpoint still 402s on a subscribed
+    // plan" from marketplace reviewers: securitySchemes above were declared
+    // but never actually attached to any paid operation's `security` array —
+    // an OpenAPI operation with no `security` field and no document-level
+    // default is read by marketplace gateway generators as "no header to
+    // attach here", so their gateway never sent X-Api-Market-Key/X-API-Key
+    // even after the seller dashboard secret was configured. Declaring the
+    // scheme in components alone does nothing without this. Stamp every paid
+    // (x-payment-info) operation explicitly, plus a document-level default
+    // for tools that only look at the top-level `security` field.
+    docAny['security'] = [{ ApiMarketKey: [] }, { ApiKey: [] }];
+    for (const pathItem of Object.values(ordered) as Array<Record<string, Record<string, unknown>> | undefined>) {
+      if (!pathItem || typeof pathItem !== 'object') continue;
+      for (const op of Object.values(pathItem)) {
+        if (!op || typeof op !== 'object') continue;
+        if (!('x-payment-info' in op)) continue; // free/discovery routes already set security: [] explicitly
+        if (!('security' in op)) {
+          (op as Record<string, unknown>)['security'] = [{ ApiMarketKey: [] }, { ApiKey: [] }];
+        }
+      }
+    }
 
     const info = (OPENAPI_DOC as { info?: { description?: string } }).info;
     if (info) {
@@ -5367,6 +5388,17 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
       openapi: (OPENAPI_DOC as { openapi?: string }).openapi || '3.1.0',
       info: (OPENAPI_DOC as { info?: unknown }).info,
       servers: [{ url: base }, ...(((OPENAPI_DOC as { servers?: Array<{ url: string }> }).servers || []).filter((s) => s.url !== base))],
+      // Root cause of repeated "subscribed plan still gets 402 on every
+      // endpoint" marketplace reports: this response object used to omit
+      // `components`/`security` entirely, even though OPENAPI_DOC carries a
+      // real ApiMarketKey/ApiKey securitySchemes block (see above) and every
+      // paid operation now references it. A dangling `security` reference to
+      // an undeclared scheme is invisible to a marketplace's spec importer —
+      // it has no way to learn which header to attach. Must be forwarded
+      // here, not just mutated on OPENAPI_DOC, since this function (not
+      // OPENAPI_DOC directly) is what /openapi.json actually serves.
+      components: (OPENAPI_DOC as { components?: unknown }).components,
+      security: (OPENAPI_DOC as { security?: unknown }).security,
       paths,
       tags: (OPENAPI_DOC as { tags?: unknown }).tags,
       'x-service-info': xServiceInfo,
