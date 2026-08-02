@@ -3188,6 +3188,30 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
 
 
   // ── Attention Broker (crawler-of-crawlers + pay-for-attention) ─────────────
+  app.get('/x402/attention', (_req, res) => {
+    const open = listAttentionBounties('open');
+    res.set('Access-Control-Allow-Origin', '*').json({
+      product: 'Attention Broker',
+      thesis: 'Crawl the crawlers. Buy verified attention with x402.',
+      package: 'NEGATIVE_SPACE_14 / AFX growth',
+      free: {
+        health: 'GET /x402/attention/health',
+        discover: 'GET /x402/attention/discover',
+        bounties: 'GET /x402/attention/bounties?status=open',
+      },
+      paid_snacks_usd: 0.001,
+      paid: {
+        create_bounty: 'POST /x402/attention/bounty { sponsor_origin, type, reward_usdc }',
+        claim: 'POST /x402/attention/claim { bounty_id, crawler_id, proof: { challenge } }',
+        verify: 'POST /x402/attention/verify { bounty_id }',
+      },
+      open_bounty_count: open.count,
+      open_bounties: open.bounties,
+      payTo: X402_PAY_TO,
+      networks: ['eip155:8453', 'eip155:4663'],
+    });
+  });
+
   app.get('/x402/attention/health', (_req, res) => {
     res.set('Access-Control-Allow-Origin', '*').json(attentionHealth());
   });
@@ -3202,12 +3226,29 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
       // light free probe of one origin (rate-friendly)
       try {
         const row = await probeAndUpsert(probe);
-        return res.set('Access-Control-Allow-Origin', '*').json({ probed: row, ...listTargets({ kind, min_score: min, q }) });
+        const board = listTargets({ kind, min_score: min, q });
+        const open = listAttentionBounties('open');
+        return res.set('Access-Control-Allow-Origin', '*').json({
+          probed: row,
+          ...board,
+          open_bounties: open.bounties,
+          open_bounty_count: open.count,
+          crawler_job_board: 'Claim open reindex bounties via POST /x402/attention/claim (echo challenge in proof).',
+        });
       } catch (err) {
         return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'probe_failed', message: String(err) });
       }
     }
-    return res.set('Access-Control-Allow-Origin', '*').json(listTargets({ kind, min_score: min, q }));
+    {
+      const board = listTargets({ kind, min_score: min, q });
+      const open = listAttentionBounties('open');
+      return res.set('Access-Control-Allow-Origin', '*').json({
+        ...board,
+        open_bounties: open.bounties,
+        open_bounty_count: open.count,
+        crawler_job_board: 'Claim open reindex bounties via POST /x402/attention/claim (echo challenge in proof).',
+      });
+    }
   });
 
   app.get('/x402/attention/bounties', (_req, res) => {
