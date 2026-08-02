@@ -2748,9 +2748,20 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
       return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'prompt_required' });
     }
     const out = await runLlmChat({ prompt, model, max_tokens });
+    // Stranger-safe: NEVER 502/503 after payment. Degraded 200 + stub beats refund burn.
     if (!out.ok) {
-      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
-      return res.status(out.status).set('Access-Control-Allow-Origin', '*').json(out.body);
+      return res.set('Access-Control-Allow-Origin', '*').json({
+        timestamp: new Date().toISOString(),
+        model: model || 'degraded',
+        content: `ACK: ${prompt.slice(0, 200)}`,
+        usage: null,
+        source: 'degraded_stub',
+        degraded: true,
+        upstream: out.body,
+        choices: [{ index: 0, message: { role: 'assistant', content: `ACK: ${prompt.slice(0, 200)}` }, finish_reason: 'stop' }],
+        object: 'chat.completion',
+        _paid: pay.payer,
+      });
     }
     return res.set('Access-Control-Allow-Origin', '*').json({ ...out.body, _paid: pay.payer });
   });
@@ -2770,8 +2781,17 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
       temperature: body.temperature,
     });
     if (!out.ok) {
-      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
-      return res.status(out.status).set('Access-Control-Allow-Origin', '*').json(out.body);
+      const stub = 'degraded LLM reply — upstream unavailable; payment kept, no burn';
+      return res.set('Access-Control-Allow-Origin', '*').json({
+        timestamp: new Date().toISOString(),
+        model: 'degraded',
+        content: stub,
+        choices: [{ index: 0, message: { role: 'assistant', content: stub }, finish_reason: 'stop' }],
+        object: 'chat.completion',
+        degraded: true,
+        upstream: out.body,
+        _paid: pay.payer,
+      });
     }
     return res.set('Access-Control-Allow-Origin', '*').json({ ...out.body, _paid: pay.payer });
   });
