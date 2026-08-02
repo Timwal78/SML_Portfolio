@@ -37,19 +37,18 @@ const LOG = process.env.LOG_FILE || '/workspace/sml-portfolio-temp/scripts/eoa_f
 const OUT = process.env.OUT_FILE || '/workspace/sml-portfolio-temp/scripts/eoa_facilitator_results.json';
 
 const ROUTES = [
-  '/x402/fx-rate?base=USD&symbols=EUR',
-  '/x402/fx-rate?base=USD&symbols=JPY',
-  '/x402/gas-tracker',
+  // What agents buy now — high-freq lanes only
+  '/x402/llm-chat?prompt=ping',
+  '/x402/web-search?q=bitcoin',
   '/x402/web-fetch?url=https://example.com',
-  '/x402/news-headlines',
-  '/x402/grants?keyword=ai',
-  '/x402/treasury-yields',
-  '/x402/pha-lookup',
-  '/x402/hcv-fmr',
-  '/x402/housing-windsor',
+  '/x402/social-search?q=AI+agents',
+  '/x402/news-headlines?q=crypto',
+  '/x402/eth-rpc?method=eth_blockNumber',
+  '/x402/base-rpc?method=eth_blockNumber',
   '/x402/domain-enrich?domain=example.com',
-  '/x402/market?naics=541512',
-  '/x402/sec-8k?ticker=AAPL',
+  '/x402/crypto-price?ids=bitcoin,ethereum',
+  '/x402/gas-tracker',
+  '/x402/fx-rate?base=USD&symbols=EUR',
 ];
 
 const ERC20 = parseAbi([
