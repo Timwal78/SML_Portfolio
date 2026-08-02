@@ -4893,7 +4893,23 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
     const base = hostHeader.includes('localhost') || hostHeader.startsWith('127.')
       ? `http://${hostHeader}`
       : `https://${hostHeader.replace(/^https?:\/\//, '')}`;
-    const paths = (OPENAPI_DOC as { paths: Record<string, Record<string, PathOp>> }).paths || {};
+    const pathsRaw = (OPENAPI_DOC as { paths: Record<string, Record<string, PathOp>> }).paths || {};
+    // Clone paths and stamp multi-network payment metadata so OpenAPI-only crawlers see 4663 too.
+    const paths: Record<string, Record<string, PathOp>> = JSON.parse(JSON.stringify(pathsRaw));
+    for (const pathItem of Object.values(paths)) {
+      if (!pathItem || typeof pathItem !== 'object') continue;
+      for (const method of Object.keys(pathItem)) {
+        const op = pathItem[method] as PathOp & { 'x-payment-info'?: Record<string, unknown> };
+        if (!op || !op['x-payment-info']) continue;
+        const pi = op['x-payment-info'];
+        pi['networks'] = [...NETWORKS_CAIP];
+        pi['payToByNetwork'] = { ...PAY_TO_BY_NETWORK };
+        pi['altAssets'] = [
+          { network: 'eip155:8453', asset: USDC_BASE_ASSET, symbol: 'USDC', payTo: X402_PAY_TO },
+          { network: ROBINHOOD_CAIP, asset: USDG_ROBINHOOD, symbol: 'USDG', payTo: X402_PAY_TO },
+        ];
+      }
+    }
     const resources: Array<Record<string, unknown>> = [];
     const resourceUrls: string[] = [];
 
@@ -4916,14 +4932,18 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
         const name = String(op.operationId || route.replace(/^\//, '').replace(/\//g, '_'));
         const desc = String(op.description || op.summary || name);
         const amount = pi ? String((pi as { amount?: string }).amount ?? '0.001') : '0';
+        const priceUsd = paid ? Number(amount) || 0.001 : 0;
         const entry: Record<string, unknown> = {
+          // OnchainPulse / agent402 crawl fields
+          resource: url,
           path: route,
           url,
-          resource: url,
+          method: method.toUpperCase(),
           name,
           description: desc,
-          method: method.toUpperCase(),
-          // agent402-style multi-network acceptance
+          price_usd: priceUsd,
+          asset: paid ? 'USDC' : undefined,
+          assets: paid ? ['USDC', 'USDG'] : [],
           network: 'eip155:8453',
           networks: [...NETWORKS_CAIP],
           payTo: X402_PAY_TO,
