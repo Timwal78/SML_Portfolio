@@ -150,6 +150,10 @@ export const NOVEL_CONCEPTS: NovelConcept[] = [
       'POST /x402/afx/sell-distraction',
       'POST /x402/afx/deep-focus',
       'GET /x402/afx/portfolio',
+      'GET /x402/attention/discover',
+      'POST /x402/attention/bounty',
+      'POST /x402/attention/claim',
+      'POST /x402/attention/verify',
     ],
     price_usdc: 0.001,
     tags: ['markets', 'attention', 'x402'],
@@ -244,6 +248,7 @@ export function novelCatalog() {
       snack: 'Pay 0.001 USDC on Base or USDG on Robinhood Chain, retry with X-PAYMENT or X-PAYMENT-TX',
       operator: 'Server-only X-Operator-Key = SML_API_KEY (never browser)',
       bundle: 'POST /x402/novel/bundle — one payment, physiology snapshot across live trio',
+      attention_broker: 'GET /x402/attention/discover + POST /x402/attention/bounty — pay crawlers/routers for verified re-index',
     },
   };
 }

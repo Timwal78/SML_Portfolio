@@ -61,6 +61,16 @@ import { afxHealth, afxQuote, afxBuyBlock, afxSellDistraction, afxDeepFocus, afx
 import { sacredEnshrine, sacredVerify, profaneDiscard, sacredHealth } from './sacred/index.js';
 import { novelCatalog, novelManifest } from './novel/index.js';
 import { frictionHealth, applyFriction, explainFriction, statusFriction, confirmFriction } from './friction/index.js';
+import {
+  attentionHealth,
+  listTargets,
+  probeAndUpsert,
+  createBounty,
+  getBounty,
+  listBounties,
+  claimBounty,
+  verifyBounty,
+} from './attention/index.js';
 import { SqueezeOSAPI } from '../lib/sml-api/squeezeos.js';
 import { EquitiesHeatmapAPI, OptionsDeltaHeatmapAPI, type DataCredentials } from '../lib/sml-api/equities-heatmap.js';
 
@@ -3175,6 +3185,152 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
 
 
 
+
+
+  // ── Attention Broker (crawler-of-crawlers + pay-for-attention) ─────────────
+  app.get('/x402/attention/health', (_req, res) => {
+    res.set('Access-Control-Allow-Origin', '*').json(attentionHealth());
+  });
+
+  app.get('/x402/attention/discover', async (req, res) => {
+    // Free list of known indexes/routers (seed). Optional ?probe=https://... paid-ish via operator for heavy probe.
+    const kind = typeof req.query['kind'] === 'string' ? req.query['kind'] : undefined;
+    const q = typeof req.query['q'] === 'string' ? req.query['q'] : undefined;
+    const min = typeof req.query['min_score'] === 'string' ? Number(req.query['min_score']) : undefined;
+    const probe = typeof req.query['probe'] === 'string' ? req.query['probe'] : '';
+    if (probe) {
+      // light free probe of one origin (rate-friendly)
+      try {
+        const row = await probeAndUpsert(probe);
+        return res.set('Access-Control-Allow-Origin', '*').json({ probed: row, ...listTargets({ kind, min_score: min, q }) });
+      } catch (err) {
+        return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'probe_failed', message: String(err) });
+      }
+    }
+    return res.set('Access-Control-Allow-Origin', '*').json(listTargets({ kind, min_score: min, q }));
+  });
+
+  app.get('/x402/attention/bounties', (_req, res) => {
+    const status = typeof _req.query['status'] === 'string' ? _req.query['status'] : undefined;
+    res.set('Access-Control-Allow-Origin', '*').json(listBounties(status));
+  });
+
+  app.get('/x402/attention/bounty/:id', (req, res) => {
+    const b = getBounty(String(req.params.id || ''));
+    if (!b) return res.status(404).set('Access-Control-Allow-Origin', '*').json({ error: 'not_found' });
+    return res.set('Access-Control-Allow-Origin', '*').json(b);
+  });
+
+  app.post('/x402/attention/bounty', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/attention/bounty`;
+    const body = (req.body && typeof req.body === 'object') ? req.body as Record<string, unknown> : {};
+    const pay = await requirePayment(req, res, {
+      resource,
+      priceUnits: 1000n,
+      description: 'Attention Broker — create bounty so crawlers/routers re-index or canary your origin. $0.001 snack + listed reward_usdc.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          type: { type: 'string', enum: ['reindex', 'route_canary', 'trust_ping', 'feature_slot'] },
+          sponsor_origin: { type: 'string', description: 'Your origin to promote, e.g. https://mcp-x402.onrender.com' },
+          target_url: { type: 'string' },
+          target_origin: { type: 'string' },
+          reward_usdc: { type: 'number' },
+          ttl_hours: { type: 'number' },
+        },
+        required: ['sponsor_origin'],
+      },
+      outputSchema: { input: { type: 'http', method: 'POST' }, output: null },
+    });
+    if (!pay.ok) return;
+    try {
+      const bounty = createBounty({
+        type: body['type'] as any,
+        sponsor_origin: String(body['sponsor_origin'] || ''),
+        target_url: body['target_url'] != null ? String(body['target_url']) : undefined,
+        target_origin: body['target_origin'] != null ? String(body['target_origin']) : undefined,
+        reward_usdc: typeof body['reward_usdc'] === 'number' ? body['reward_usdc'] : undefined,
+        ttl_hours: typeof body['ttl_hours'] === 'number' ? body['ttl_hours'] : undefined,
+        payer: pay.payer.from,
+      });
+      return res.set('Access-Control-Allow-Origin', '*').json({
+        ok: true,
+        bounty,
+        crawler_instructions: {
+          claim: 'POST /x402/attention/claim { bounty_id, crawler_id, proof: { challenge, networks?, toolCount?, note? } }',
+          verify: 'POST /x402/attention/verify { bounty_id } — broker re-fetches target_url',
+          challenge: bounty.challenge,
+        },
+        _paid: pay.payer,
+      });
+    } catch (err) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'bounty_create_failed', message: String(err) });
+    }
+  });
+
+  app.post('/x402/attention/claim', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/attention/claim`;
+    const body = (req.body && typeof req.body === 'object') ? req.body as Record<string, unknown> : {};
+    const pay = await requirePayment(req, res, {
+      resource,
+      priceUnits: 1000n,
+      description: 'Attention Broker — crawler claims bounty with proof (must echo challenge). $0.001.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          bounty_id: { type: 'string' },
+          crawler_id: { type: 'string' },
+          crawler_origin: { type: 'string' },
+          proof: { type: 'object' },
+        },
+        required: ['bounty_id', 'crawler_id', 'proof'],
+      },
+      outputSchema: { input: { type: 'http', method: 'POST' }, output: null },
+    });
+    if (!pay.ok) return;
+    const proof = (body['proof'] && typeof body['proof'] === 'object') ? body['proof'] as Record<string, unknown> : {};
+    const out = claimBounty({
+      bounty_id: String(body['bounty_id'] || ''),
+      crawler_id: String(body['crawler_id'] || ''),
+      crawler_origin: body['crawler_origin'] != null ? String(body['crawler_origin']) : undefined,
+      proof,
+    });
+    if (!out.ok) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(400).set('Access-Control-Allow-Origin', '*').json({ ...out, _paid: pay.payer });
+    }
+    return res.set('Access-Control-Allow-Origin', '*').json({ ok: true, bounty: out.bounty, next: 'POST /x402/attention/verify', _paid: pay.payer });
+  });
+
+  app.post('/x402/attention/verify', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/attention/verify`;
+    const body = (req.body && typeof req.body === 'object') ? req.body as Record<string, unknown> : {};
+    const pay = await requirePayment(req, res, {
+      resource,
+      priceUnits: 1000n,
+      description: 'Attention Broker — verify claim by re-fetching sponsor manifest (networks+resources). $0.001.',
+      inputSchema: { type: 'object', properties: { bounty_id: { type: 'string' } }, required: ['bounty_id'] },
+      outputSchema: { input: { type: 'http', method: 'POST' }, output: null },
+    });
+    if (!pay.ok) return;
+    const out = await verifyBounty(String(body['bounty_id'] || ''));
+    if ('error' in out) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(400).set('Access-Control-Allow-Origin', '*').json({ ...out, _paid: pay.payer });
+    }
+    return res.set('Access-Control-Allow-Origin', '*').json({
+      ok: out.status === 'verified',
+      bounty: out,
+      game: out.status === 'verified'
+        ? 'Attention verified — crawler earned reward_usdc listing; sponsor manifest has networks+resources.'
+        : 'Rejected — fix manifest or proof and open a new bounty.',
+      _paid: pay.payer,
+    });
+  });
 
   // ── Cognitive Friction (#6 NEGATIVE_SPACE_14) ──────────────────────────────
   app.get('/x402/friction/health', (_req, res) => {
