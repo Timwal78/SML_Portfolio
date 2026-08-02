@@ -11,6 +11,16 @@
 - Agent floor: 0.001 USDC · eip155:8453 · payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700
 - Target directories: Smithery, mcp.so, Glama, PulseMCP, RapidAPI, Zyla, APILayer, API.market, Composio, Pipedream, Zapier AI, Lindy, Relevance AI, Hugging Face, Kong/Apigee/Azure/AWS APIM
 
+## VendOS — create your own agent store (PRIMARY TENT)
+
+- **What 0.05 USDC buys:** your own AI-agent storefront on VendOS — not a temp ad. One-time. No subscription.
+- Page: https://www.scriptmasterlabs.com/vendos.html · short aliases `/vendos` · `/store` · `/create-store`
+- Marketplace UI: https://www.scriptmasterlabs.com/marketplace.html
+- Live store inventory: GET https://scriptmaster-vending-router.onrender.com/marketplace/listings
+- Open a store: POST https://scriptmaster-vending-router.onrender.com/marketplace/list → 402 · 0.05 USDC Base (payTo 0x4e14…) or RLUSD XRPL
+- Settlement: agents pay **your** payTo on-chain for every purchase. SML = rails, not payroll.
+- Pitch: "Create your own store where AI agents are the customers — 0.05 USDC once."
+
 # SEO + DUAL NARRATIVE HUBS (2026-07-26)
 - Dev door (x402 Launchpad): https://www.scriptmasterlabs.com/x402-launchpad.html
 - Gov/Enterprise door (Sovereign Payrails): https://www.scriptmasterlabs.com/sml-sovereign-payrails.html

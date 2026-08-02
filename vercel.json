@@ -38,6 +38,21 @@
       "permanent": false
     },
     {
+      "source": "/vendos",
+      "destination": "/vendos.html",
+      "permanent": true
+    },
+    {
+      "source": "/store",
+      "destination": "/vendos.html",
+      "permanent": true
+    },
+    {
+      "source": "/create-store",
+      "destination": "/vendos.html#list",
+      "permanent": false
+    },
+    {
       "source": "/agent-wallet",
       "destination": "/agent-wallet.html",
       "permanent": false
@@ -162,11 +177,6 @@
       "source": "/stack/xah_portal",
       "destination": "/stack.html",
       "permanent": false
-    },
-    {
-      "source": "/store",
-      "destination": "/",
-      "permanent": true
     },
     {
       "source": "/apps/exo-brain",
