@@ -97,3 +97,11 @@ Root `/` is discovery catalog only. Point scanners at paid snacks above.
 - AFX Attention Futures: GET /x402/afx/quote · POST /x402/afx/buy-block · POST /x402/afx/sell-distraction · POST /x402/afx/deep-focus · GET /x402/afx/portfolio · GET /x402/afx/health
 - Sacred/Profane Boundary: POST /x402/sacred/enshrine · GET /x402/sacred/verify · POST /x402/profane/discard · GET /x402/sacred/health
 - All paid snacks $0.001 — Base USDC or Robinhood USDG (X-PAYMENT / X-PAYMENT-TX)
+
+
+## Novel Package — NEGATIVE_SPACE_14
+14 outside-the-box agent infrastructure concepts as one product line.
+- FREE catalog: GET /x402/novel · GET /x402/novel/catalog · GET /x402/novel/manifest · GET /x402/novel/health
+- LIVE (3/14): Sleep MCP · AFX Attention Futures · Sacred/Profane Boundary
+- Bundle snack: POST /x402/novel/bundle { agent_id, depth?, attention_ms?, enshrine_object_id?, enshrine_hash? } — $0.001
+- Roadmap 11: EaaS, RMP, Synchronicity, Thanatology, Friction, Taboo, Unlearning, NCP, Shadow, Phase, Mimicry

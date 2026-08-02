@@ -59,6 +59,7 @@ import {
 import { runSleepCycle, listDreams, runNightmare, sleepHealth } from './sleep/index.js';
 import { afxHealth, afxQuote, afxBuyBlock, afxSellDistraction, afxDeepFocus, afxPortfolio } from './afx/index.js';
 import { sacredEnshrine, sacredVerify, profaneDiscard, sacredHealth } from './sacred/index.js';
+import { novelCatalog, novelManifest } from './novel/index.js';
 import { SqueezeOSAPI } from '../lib/sml-api/squeezeos.js';
 import { EquitiesHeatmapAPI, OptionsDeltaHeatmapAPI, type DataCredentials } from '../lib/sml-api/equities-heatmap.js';
 
@@ -3048,6 +3049,88 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
 
 
 
+
+
+  // ── Novel package (14 negative-space concepts) ────────────────────────────
+  app.get('/x402/novel', (_req, res) => {
+    res.set('Access-Control-Allow-Origin', '*').json(novelCatalog());
+  });
+  app.get('/x402/novel/catalog', (_req, res) => {
+    res.set('Access-Control-Allow-Origin', '*').json(novelCatalog());
+  });
+  app.get('/x402/novel/manifest', (_req, res) => {
+    res.set('Access-Control-Allow-Origin', '*').json(novelManifest());
+  });
+  app.get('/x402/novel/health', (_req, res) => {
+    res.set('Access-Control-Allow-Origin', '*').json({
+      ok: true,
+      package: novelManifest().id,
+      live: novelCatalog().counts.live,
+      total: novelCatalog().counts.total,
+      product: 'novel-agent-infra',
+    });
+  });
+
+  app.post('/x402/novel/bundle', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/novel/bundle`;
+    const body = (req.body && typeof req.body === 'object') ? req.body as Record<string, unknown> : {};
+    const inputSchema = {
+      type: 'object',
+      properties: {
+        agent_id: { type: 'string' },
+        depth: { type: 'string', enum: ['REM', 'deep', 'lucid'] },
+        enshrine_object_id: { type: 'string' },
+        enshrine_hash: { type: 'string' },
+        attention_ms: { type: 'integer' },
+      },
+      required: ['agent_id'],
+    };
+    const outputSchema = { input: { type: 'http', method: 'POST' }, output: null };
+    const pay = await requirePayment(req, res, {
+      resource,
+      priceUnits: 1000n,
+      description: 'Novel Package bundle — one snack runs Sleep cycle + AFX deep-focus quote/block + optional Sacred enshrine snapshot. Pay 0.001 USDC/USDG.',
+      inputSchema,
+      outputSchema,
+    });
+    if (!pay.ok) return;
+    try {
+      const agent_id = String(body['agent_id'] ?? pay.payer.from ?? 'agent').slice(0, 128);
+      const sleep = runSleepCycle({
+        agent_id,
+        depth: body['depth'] as 'REM' | 'deep' | 'lucid' | undefined,
+        recent_actions: Array.isArray(body['recent_actions']) ? body['recent_actions'].map(String) : ['novel.bundle'],
+        open_loops: Array.isArray(body['open_loops']) ? body['open_loops'].map(String) : undefined,
+      });
+      const ms = typeof body['attention_ms'] === 'number' ? body['attention_ms'] : 5000;
+      const focus = afxDeepFocus({ agent_id, window_ms: ms, payer: pay.payer.from });
+      let sacred: Record<string, unknown> | null = null;
+      if (typeof body['enshrine_object_id'] === 'string' && typeof body['enshrine_hash'] === 'string') {
+        sacred = sacredEnshrine({
+          object_id: String(body['enshrine_object_id']).slice(0, 128),
+          content_hash: String(body['enshrine_hash']).slice(0, 128),
+          owner_id: agent_id,
+          required_consensus: 3,
+          reason: 'novel.bundle',
+          payer: pay.payer.from,
+        });
+      }
+      return res.set('Access-Control-Allow-Origin', '*').json({
+        package: 'sml-novel-agent-infra',
+        codename: 'NEGATIVE_SPACE_14',
+        agent_id,
+        sleep,
+        afx: focus,
+        sacred,
+        catalog_live: novelCatalog().live,
+        _paid: pay.payer,
+      });
+    } catch (err) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'novel_bundle_failed', message: String(err) });
+    }
+  });
 
   // ── Agent physiology + markets: Sleep MCP / AFX / Sacred-Profane ───────────
   app.get('/x402/sleep/health', (_req, res) => {
