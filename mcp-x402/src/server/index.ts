@@ -136,6 +136,44 @@ async function runSSE(): Promise<void> {
   // application/json, so this route needs `type: '*/*'` to force-parse
   // regardless of the declared content-type. Registered ahead of the global
   // parser for the same reason the Stripe webhook is.
+  // GET: browsers/console health checks used to see Express "Cannot GET".
+  // AWS SNS only POSTs; bare GET is a docs/status landing, not a failed deploy.
+  app.get('/aws/marketplace/sns', (req: Request, res: Response) => {
+    const acceptsHtml = typeof req.headers['accept'] === 'string' && req.headers['accept'].includes('text/html');
+    const payload = {
+      ok: true,
+      method: 'GET',
+      message: 'AWS Marketplace SNS webhook. AWS POSTs subscription/entitlement notifications here. A bare GET in a browser is normal — it is not a failed deploy.',
+      post_only: true,
+      endpoint: 'https://mcp-x402.onrender.com/aws/marketplace/sns',
+      product_id: 'prod-lop2m2yjjcs76',
+      product_code: 'c6g8c5zsvgof5a4rpp6eqlzn',
+      expected_topics: [
+        'aws-mp-subscription-notification-c6g8c5zsvgof5a4rpp6eqlzn',
+        'aws-mp-entitlement-notification-c6g8c5zsvgof5a4rpp6eqlzn',
+      ],
+      status: '/aws/marketplace/status',
+      resolve: '/aws/marketplace/resolve',
+    };
+    if (acceptsHtml) {
+      res.type('html').send(`<!doctype html><html><head><meta charset="utf-8"><title>SML — AWS Marketplace SNS</title>
+<style>body{background:#050508;color:#e2e8f0;font-family:system-ui,sans-serif;max-width:720px;margin:3rem auto;padding:0 1.25rem;line-height:1.55}
+h1{color:#a78bfa;font-size:1.5rem}code,pre{background:#0d0d14;border:1px solid #1e1e2e;border-radius:8px;padding:.55rem .75rem;color:#10b981;display:block;overflow:auto}
+a{color:#a78bfa}.muted{color:#64748b;font-size:.9rem}.card{border:1px solid #1e1e2e;border-radius:12px;padding:1rem 1.1rem;margin:.6rem 0;background:#0a0a10}</style></head><body>
+<h1>AWS Marketplace SNS webhook</h1>
+<p><strong>This endpoint is POST-only for AWS.</strong> A bare browser GET is normal — it does <em>not</em> mean fulfillment is broken.</p>
+<div class="card">AWS SNS → <code style="display:inline;padding:.1rem .35rem">POST /aws/marketplace/sns</code> with signed subscription/entitlement JSON</div>
+<div class="card">Product <code style="display:inline;padding:.1rem .35rem">prod-lop2m2yjjcs76</code> · code <code style="display:inline;padding:.1rem .35rem">c6g8c5zsvgof5a4rpp6eqlzn</code></div>
+<pre>POST https://mcp-x402.onrender.com/aws/marketplace/sns
+GET  https://mcp-x402.onrender.com/aws/marketplace/status
+GET  https://mcp-x402.onrender.com/aws/marketplace/resolve</pre>
+<p class="muted">Status: <a href="/aws/marketplace/status">/aws/marketplace/status</a> · Fulfillment: <a href="/aws/marketplace/resolve">/aws/marketplace/resolve</a></p>
+</body></html>`);
+      return;
+    }
+    res.set('Access-Control-Allow-Origin', '*').json(payload);
+  });
+
   app.post('/aws/marketplace/sns', express.json({ type: '*/*', limit: '256kb' }), async (req: Request, res: Response) => {
     try {
       const result = await handleSnsMessage(req.body);
