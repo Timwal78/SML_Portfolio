@@ -29,9 +29,10 @@ ACP = "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa"
 
 # Rotate daily across wedge routes (cheap + high-signal)
 JOBS = [
-    (MCP, "https://mcp-x402.onrender.com/x402/attention/bounties?status=open"),
-    (MCP, "https://mcp-x402.onrender.com/x402/novel/catalog"),
+    (MCP, "https://mcp-x402.onrender.com/x402/attention/bounty"),  # POST not in GET loop — keep GET paid snacks
+    (MCP, "https://mcp-x402.onrender.com/x402/afx/quote?product=attention_block"),
     (MCP, "https://mcp-x402.onrender.com/x402/sleep/dreams?agent_id=daily-seed"),
+    (MCP, "https://mcp-x402.onrender.com/x402/friction/status?session_id=daily"),
 
     (MCP, "https://mcp-x402.onrender.com/x402/crypto-price?ids=bitcoin"),
     (MCP, "https://mcp-x402.onrender.com/x402/fx-rate?base=USD&symbols=EUR"),
@@ -82,6 +83,20 @@ if usdc < 0.02:
 
 ok = 0
 for pay, url in JOBS:
+    # skip free routes (don't burn USDC on 200s)
+    try:
+        req0 = urllib.request.Request(url, headers={"Accept":"application/json","User-Agent":"sml-x402-daily-seed/1.1"})
+        try:
+            with urllib.request.urlopen(req0, timeout=25) as r0:
+                code0 = r0.status
+        except urllib.error.HTTPError as e0:
+            code0 = e0.code
+        if code0 != 402:
+            print(f"[seed] skip http={code0} {url}")
+            continue
+    except Exception as e:
+        print(f"[seed] skip probe_err {e} {url}")
+        continue
     try:
         tx = xfer(pay)
         print(f"[seed] tx={tx[:18]}… {url.split('.com')[-1][:48]}")
