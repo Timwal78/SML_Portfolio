@@ -65,11 +65,11 @@ import {
   attentionHealth,
   listTargets,
   probeAndUpsert,
-  createBounty,
-  getBounty,
-  listBounties,
-  claimBounty,
-  verifyBounty,
+  createBounty as createAttentionBounty,
+  getBounty as getAttentionBounty,
+  listBounties as listAttentionBounties,
+  claimBounty as claimAttentionBounty,
+  verifyBounty as verifyAttentionBounty,
 } from './attention/index.js';
 import { SqueezeOSAPI } from '../lib/sml-api/squeezeos.js';
 import { EquitiesHeatmapAPI, OptionsDeltaHeatmapAPI, type DataCredentials } from '../lib/sml-api/equities-heatmap.js';
@@ -3212,11 +3212,11 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
 
   app.get('/x402/attention/bounties', (_req, res) => {
     const status = typeof _req.query['status'] === 'string' ? _req.query['status'] : undefined;
-    res.set('Access-Control-Allow-Origin', '*').json(listBounties(status));
+    res.set('Access-Control-Allow-Origin', '*').json(listAttentionBounties(status));
   });
 
   app.get('/x402/attention/bounty/:id', (req, res) => {
-    const b = getBounty(String(req.params.id || ''));
+    const b = getAttentionBounty(String(req.params.id || ''));
     if (!b) return res.status(404).set('Access-Control-Allow-Origin', '*').json({ error: 'not_found' });
     return res.set('Access-Control-Allow-Origin', '*').json(b);
   });
@@ -3245,7 +3245,7 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
     });
     if (!pay.ok) return;
     try {
-      const bounty = createBounty({
+      const bounty = createAttentionBounty({
         type: body['type'] as any,
         sponsor_origin: String(body['sponsor_origin'] || ''),
         target_url: body['target_url'] != null ? String(body['target_url']) : undefined,
@@ -3292,7 +3292,7 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
     });
     if (!pay.ok) return;
     const proof = (body['proof'] && typeof body['proof'] === 'object') ? body['proof'] as Record<string, unknown> : {};
-    const out = claimBounty({
+    const out = claimAttentionBounty({
       bounty_id: String(body['bounty_id'] || ''),
       crawler_id: String(body['crawler_id'] || ''),
       crawler_origin: body['crawler_origin'] != null ? String(body['crawler_origin']) : undefined,
@@ -3317,7 +3317,7 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
       outputSchema: { input: { type: 'http', method: 'POST' }, output: null },
     });
     if (!pay.ok) return;
-    const out = await verifyBounty(String(body['bounty_id'] || ''));
+    const out = await verifyAttentionBounty(String(body['bounty_id'] || ''));
     if ('error' in out) {
       if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
       return res.status(400).set('Access-Control-Allow-Origin', '*').json({ ...out, _paid: pay.payer });
