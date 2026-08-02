@@ -1,4 +1,4 @@
-ScriptMasterLabs x402: ALL paid calls **$0.001 USDC** on Base. Volume war. No API key.
+ScriptMasterLabs x402: ALL paid calls **$0.001** — primary **USDC on Base** (eip155:8453). Also accepts **USDG on Robinhood Chain** (eip155:4663) via X-PAYMENT-TX. Volume war. No API key.
 
 # mcp-x402 — ScriptMasterLabs Autonomous Payment MCP Server
 # MCP server for agents with autonomous USDC/RLUSD payments
@@ -84,3 +84,9 @@ Root `/` is discovery catalog only. Point scanners at paid snacks above.
 - POST /x402/bounties (paid listing)
 - www: https://www.scriptmasterlabs.com/echonet.html
 
+
+
+## Payment rails
+- accepts[0]: Base USDC eip155:8453 · X-PAYMENT (CDP/facilitator) or X-PAYMENT-TX (sovereign)
+- accepts[1]: Robinhood Chain USDG eip155:4663 · X-PAYMENT-TX sovereign (asset 0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168)
+- Discovery: GET /.well-known/x402 · GET /x402/facilitators · list on agent402.tools/sell

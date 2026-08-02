@@ -16,7 +16,12 @@ const SML_API_KEY = process.env['SML_API_KEY'] ?? '';
  */
 async function squeezeGet(path: string): Promise<unknown> {
   const headers: Record<string, string> = { 'Accept': 'application/json' };
-  if (SML_API_KEY) headers['X-API-Key'] = SML_API_KEY;
+  // SqueezeOS x402_guard accepts X-API-Key / X-Owner-Key / Bearer against
+  // OPERATOR_API_KEY | OWNER_API_KEY | AGENT_API_KEYS. Send both common aliases.
+  if (SML_API_KEY) {
+    headers['X-API-Key'] = SML_API_KEY;
+    headers['X-Operator-Key'] = SML_API_KEY;
+  }
   const res = await fetch(`${SQUEEZEOS_BASE}${path}`, {
     headers,
     signal: AbortSignal.timeout(15_000),
@@ -30,7 +35,10 @@ async function squeezePost(path: string, body: unknown): Promise<unknown> {
     'Accept': 'application/json',
     'Content-Type': 'application/json',
   };
-  if (SML_API_KEY) headers['X-API-Key'] = SML_API_KEY;
+  if (SML_API_KEY) {
+    headers['X-API-Key'] = SML_API_KEY;
+    headers['X-Operator-Key'] = SML_API_KEY;
+  }
   const res = await fetch(`${SQUEEZEOS_BASE}${path}`, {
     method: 'POST',
     headers,
@@ -104,9 +112,21 @@ export const SqueezeOSAPI = {
   // above, not anything derived from the wallet address.
   council: (symbol: string, _walletAddress: string) => squeezePost('/api/council', { symbol }),
   scan: (_walletAddress: string) => squeezeGet('/api/scan'),
-  options: (_walletAddress: string) => squeezeGet('/api/options'),
+  options: (symbolOrWallet: string, maybeWallet?: string) => {
+    // Back-compat: options(wallet) OR options(symbol, wallet)
+    let symbol = 'IWM';
+    if (maybeWallet !== undefined) {
+      symbol = symbolOrWallet || 'IWM';
+    } else {
+      const s = (symbolOrWallet || '').trim();
+      // ticker-like single arg (not wallet/did)
+      if (s && !s.includes(':') && !s.startsWith('0x') && s.length <= 10) symbol = s;
+    }
+    const sym = String(symbol || 'IWM').toUpperCase().replace(/[^A-Z0-9.]/g, '').slice(0, 10) || 'IWM';
+    return squeezeGet(`/api/options?symbol=${encodeURIComponent(sym)}`);
+  },
   iwm: (_walletAddress: string) => squeezeGet('/api/iwm'),
-  marketplaceRead: (listingId: string, _walletAddress: string) => squeezePost('/api/marketplace/read', { listing_id: listingId }),
+    marketplaceRead: (listingId: string, _walletAddress: string) => squeezePost('/api/marketplace/read', { listing_id: listingId }),
 
   // PAID — FTD series (SEC Reg SHO fails-to-deliver)
   ftdThresholdList: () => squeezeGet('/api/ftd/threshold-list'),
