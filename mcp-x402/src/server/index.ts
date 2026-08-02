@@ -4831,10 +4831,230 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
     }
   }
 
-  app.get('/.well-known/x402', (_req, res) => { res.set('Access-Control-Allow-Origin', '*').json(OPENAPI_DOC); });
-  app.get('/openapi.json', (_req, res) => { res.set('Access-Control-Allow-Origin', '*').json(OPENAPI_DOC); });
-  app.get('/x402/.well-known/x402', (_req, res) => { res.set('Access-Control-Allow-Origin', '*').json(OPENAPI_DOC); });
-  app.get('/x402/openapi.json', (_req, res) => { res.set('Access-Control-Allow-Origin', '*').json(OPENAPI_DOC); });
+  // Agent402 / crawler-native discovery envelope.
+  // Keep full OpenAPI `paths` (x402scan) AND add resources[] + networks +
+  // payToByNetwork so open index crawlers stop reporting networks:[].
+  const NETWORKS_CAIP = ['eip155:8453', 'eip155:4663'] as const;
+  const PAY_TO_BY_NETWORK: Record<string, string> = {
+    'eip155:8453': X402_PAY_TO,
+    'eip155:4663': X402_PAY_TO,
+    base: X402_PAY_TO,
+    robinhood: X402_PAY_TO,
+  };
+  const DISCOVERY_RAILS = [
+    {
+      id: 'base-usdc',
+      name: 'Base / USDC (x402 standard)',
+      network: 'eip155:8453',
+      asset: USDC_BASE_ASSET,
+      assetSymbol: 'USDC',
+      payTo: X402_PAY_TO,
+      scheme: 'exact',
+      settlement: 'facilitator',
+      paymentHeader: 'X-PAYMENT',
+    },
+    {
+      id: 'base-usdc-sovereign',
+      name: 'Base / USDC (sovereign X-PAYMENT-TX)',
+      network: 'eip155:8453',
+      asset: USDC_BASE_ASSET,
+      assetSymbol: 'USDC',
+      payTo: X402_PAY_TO,
+      scheme: 'exact',
+      settlement: 'onchain-tx',
+      paymentHeader: 'X-PAYMENT-TX',
+    },
+    {
+      id: 'robinhood-usdg',
+      name: 'Robinhood Chain / USDG (sovereign X-PAYMENT-TX)',
+      network: ROBINHOOD_CAIP,
+      asset: USDG_ROBINHOOD,
+      assetSymbol: 'USDG',
+      payTo: X402_PAY_TO,
+      scheme: 'exact',
+      settlement: 'sovereign-tx',
+      paymentHeader: 'X-PAYMENT-TX',
+      chainId: 4663,
+      rpc: 'https://rpc.mainnet.chain.robinhood.com',
+      explorer: 'https://robinhoodchain.blockscout.com',
+    },
+  ];
+
+  type PathOp = {
+    operationId?: string;
+    summary?: string;
+    description?: string;
+    'x-payment-info'?: Record<string, unknown>;
+    tags?: string[];
+  };
+
+  const buildDiscoveryDoc = (reqHost?: string): Record<string, unknown> => {
+    const hostHeader = (reqHost || 'mcp-x402.onrender.com').split(',')[0]?.trim() || 'mcp-x402.onrender.com';
+    const base = hostHeader.includes('localhost') || hostHeader.startsWith('127.')
+      ? `http://${hostHeader}`
+      : `https://${hostHeader.replace(/^https?:\/\//, '')}`;
+    const paths = (OPENAPI_DOC as { paths: Record<string, Record<string, PathOp>> }).paths || {};
+    const resources: Array<Record<string, unknown>> = [];
+    const resourceUrls: string[] = [];
+
+    for (const [route, pathItem] of Object.entries(paths)) {
+      if (!pathItem || typeof pathItem !== 'object') continue;
+      // Skip pure discovery aliases from paid resource list noise (still in paths)
+      const isDiscoveryMeta = route.includes('.well-known') || route.endsWith('/openapi.json') || route === '/openapi.json';
+      for (const method of ['get', 'post', 'put', 'patch', 'delete'] as const) {
+        const op = pathItem[method];
+        if (!op || typeof op !== 'object') continue;
+        const pi = op['x-payment-info'];
+        const paid = Boolean(pi && (pi as { method?: string }).method === 'x402');
+        if (!paid && isDiscoveryMeta) continue;
+        if (!paid && route.startsWith('/x402/playground')) {
+          // free playground — still list as free resource for marketplaces
+        } else if (!paid && !route.startsWith('/x402/')) {
+          continue;
+        }
+        const url = `${base}${route}`;
+        const name = String(op.operationId || route.replace(/^\//, '').replace(/\//g, '_'));
+        const desc = String(op.description || op.summary || name);
+        const amount = pi ? String((pi as { amount?: string }).amount ?? '0.001') : '0';
+        const entry: Record<string, unknown> = {
+          path: route,
+          url,
+          resource: url,
+          name,
+          description: desc,
+          method: method.toUpperCase(),
+          // agent402-style multi-network acceptance
+          network: 'eip155:8453',
+          networks: [...NETWORKS_CAIP],
+          payTo: X402_PAY_TO,
+          payToByNetwork: { ...PAY_TO_BY_NETWORK },
+          scheme: 'exact',
+          price: paid
+            ? { amount, currency: 'USD', assets: ['USDC', 'USDG'], mode: 'fixed' }
+            : { amount: '0', currency: 'USD', assets: [], mode: 'free' },
+          accepts: paid
+            ? [
+                {
+                  scheme: 'exact',
+                  network: 'eip155:8453',
+                  asset: USDC_BASE_ASSET,
+                  assetSymbol: 'USDC',
+                  payTo: X402_PAY_TO,
+                  maxAmountRequired: String((pi as { amountUnits?: string }).amountUnits ?? '1000'),
+                  paymentHeader: 'X-PAYMENT',
+                },
+                {
+                  scheme: 'exact',
+                  network: ROBINHOOD_CAIP,
+                  asset: USDG_ROBINHOOD,
+                  assetSymbol: 'USDG',
+                  payTo: X402_PAY_TO,
+                  maxAmountRequired: String((pi as { amountUnits?: string }).amountUnits ?? '1000'),
+                  paymentHeader: 'X-PAYMENT-TX',
+                  settlement: 'sovereign-tx',
+                },
+              ]
+            : [],
+          paid,
+        };
+        if (pi) {
+          entry['x-payment-info'] = pi;
+          entry.facilitator = (pi as { facilitator?: string }).facilitator;
+        }
+        resources.push(entry);
+        if (paid) resourceUrls.push(url);
+        break; // one entry per path (primary method)
+      }
+    }
+
+    const svc = (OPENAPI_DOC as Record<string, unknown>)['x-service-info'] as Record<string, unknown> | undefined;
+    const xServiceInfo = {
+      ...(svc || {}),
+      operator: 'ScriptMasterLabs',
+      agent: 'scriptmasterlabs',
+      discoverable: true,
+      networks: [...NETWORKS_CAIP],
+      payToByNetwork: { ...PAY_TO_BY_NETWORK },
+      payment: {
+        ...((svc?.payment as object) || {}),
+        protocol: 'x402',
+        networks: [...NETWORKS_CAIP],
+        payTo: X402_PAY_TO,
+        payToByNetwork: { ...PAY_TO_BY_NETWORK },
+        rails: DISCOVERY_RAILS,
+      },
+    };
+
+    return {
+      // OpenAPI core (x402scan / marketplace OpenAPI import)
+      openapi: (OPENAPI_DOC as { openapi?: string }).openapi || '3.1.0',
+      info: (OPENAPI_DOC as { info?: unknown }).info,
+      servers: [{ url: base }, ...(((OPENAPI_DOC as { servers?: Array<{ url: string }> }).servers || []).filter((s) => s.url !== base))],
+      paths,
+      tags: (OPENAPI_DOC as { tags?: unknown }).tags,
+      'x-service-info': xServiceInfo,
+
+      // agent402 / open-index native fields (#1 resources, #2 networks)
+      spec: 'x402-service-manifest/1',
+      version: 1,
+      x402Version: 2,
+      name: 'Script Master Labs — x402 Data API',
+      summary: 'Pay-per-call federal, crypto, novel agent-physiology APIs. Base USDC + Robinhood USDG.',
+      description: (OPENAPI_DOC as { info?: { description?: string } }).info?.description,
+      homepage: 'https://www.scriptmasterlabs.com',
+      discoverable: true,
+      operator: 'ScriptMasterLabs',
+      origin: base,
+      network: 'eip155:8453',
+      networks: [...NETWORKS_CAIP],
+      payTo: X402_PAY_TO,
+      payToByNetwork: { ...PAY_TO_BY_NETWORK },
+      rails: DISCOVERY_RAILS,
+      // Full resource objects (OnchainPulse / ACP style)
+      resources,
+      // URL-only list (Agent402 host style) for crawlers that only want strings
+      resourceUrls,
+      toolCount: resources.filter((r) => r.paid).length,
+      paidToolCount: resources.filter((r) => r.paid).length,
+      health: 1,
+      routable: true,
+      llms: `${base}/llms.txt`,
+      openapiUrl: `${base}/openapi.json`,
+    };
+  };
+
+  const sendDiscovery = (req: { headers: { host?: string } }, res: { set: (k: string, v: string) => { json: (b: unknown) => void } }) => {
+    res.set('Access-Control-Allow-Origin', '*').json(buildDiscoveryDoc(req.headers.host));
+  };
+
+  app.get('/.well-known/x402', (req, res) => sendDiscovery(req, res));
+  app.get('/openapi.json', (req, res) => sendDiscovery(req, res));
+  app.get('/x402/.well-known/x402', (req, res) => sendDiscovery(req, res));
+  app.get('/x402/openapi.json', (req, res) => sendDiscovery(req, res));
+
+  // Explicit agent402-friendly alias (some crawlers probe /api/index on origin)
+  app.get('/api/x402-index', (req, res) => {
+    const doc = buildDiscoveryDoc(req.headers.host);
+    res.set('Access-Control-Allow-Origin', '*').json({
+      spec: 'x402-index/1',
+      asOf: new Date().toISOString(),
+      sellers: [{
+        origin: doc.origin,
+        displayName: 'mcp-x402 — ScriptMasterLabs',
+        homepage: 'https://www.scriptmasterlabs.com',
+        network: 'eip155:8453',
+        networks: doc.networks,
+        toolCount: doc.toolCount,
+        paidToolCount: doc.paidToolCount,
+        originResponded: true,
+        health: 1,
+        routable: true,
+        source: 'manifest',
+        payToByNetwork: doc.payToByNetwork,
+        local: false,
+      }],
+    });
+  });
 
   // ── A2A Protocol Agent Card (/.well-known/agent.json) ─────────────────────
   // Spec: A2A Protocol (Google/Linux Foundation) agent-card shape. Generated
