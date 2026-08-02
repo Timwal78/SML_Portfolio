@@ -70,6 +70,7 @@ import {
   listBounties as listAttentionBounties,
   claimBounty as claimAttentionBounty,
   verifyBounty as verifyAttentionBounty,
+  ensureSmlJobBoard,
 } from './attention/index.js';
 import { SqueezeOSAPI } from '../lib/sml-api/squeezeos.js';
 import { EquitiesHeatmapAPI, OptionsDeltaHeatmapAPI, type DataCredentials } from '../lib/sml-api/equities-heatmap.js';
@@ -3188,6 +3189,13 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
 
 
   // ── Attention Broker (crawler-of-crawlers + pay-for-attention) ─────────────
+  try {
+    const jb = ensureSmlJobBoard();
+    console.log('[AttentionBroker] job board', jb);
+  } catch (err) {
+    console.warn('[AttentionBroker] job board seed failed', err);
+  }
+
   app.get('/x402/attention', (_req, res) => {
     const open = listAttentionBounties('open');
     res.set('Access-Control-Allow-Origin', '*').json({
@@ -5235,6 +5243,12 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
       paidToolCount: resources.filter((r) => r.paid).length,
       health: 1,
       routable: true,
+      attentionBroker: {
+        url: `${base}/x402/attention`,
+        discover: `${base}/x402/attention/discover`,
+        openBounties: `${base}/x402/attention/bounties?status=open`,
+        thesis: 'Crawl the crawlers. Buy verified re-index with x402.',
+      },
       llms: `${base}/llms.txt`,
       openapiUrl: `${base}/openapi.json`,
     };

@@ -113,7 +113,7 @@ Root `/` is discovery catalog only. Point scanners at paid snacks above.
 - GET /x402/friction/status?session_id=
 - POST /x402/friction/confirm { session_id, reconfirm_token, accept_risk: true }
 
-## Attention Broker (LIVE) — crawler-of-crawlers
+## Attention Broker (LIVE) — crawler-of-crawlers (Redis-durable job board)
 Pay indexes/routers for **verified** attention (re-index, canary), not vibes.
 - FREE: GET /x402/attention/health · GET /x402/attention/discover · GET /x402/attention/bounties
 - PAID $0.001: POST /x402/attention/bounty { sponsor_origin }

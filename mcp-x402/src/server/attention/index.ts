@@ -7,4 +7,5 @@ export {
   listBounties,
   claimBounty,
   verifyBounty,
+  ensureSmlJobBoard,
 } from './store.js';
