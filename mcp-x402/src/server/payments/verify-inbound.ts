@@ -43,9 +43,15 @@ export interface VerifyResult {
   from?: string;
   amountUnits?: bigint;
   error?: string;
-  chain?: 'base' | 'robinhood';
+  chain?: 'base' | 'robinhood' | 'solana';
   asset?: string;
 }
+
+// SPL USDC mint — Solana mainnet (Circle).
+export const USDC_SOLANA_MINT = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v';
+// CAIP-2 style id used by multi-chain x402 sellers / agent402 (mainnet).
+export const SOLANA_CAIP = 'solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp';
+export const SOLANA_PAY_TO_DEFAULT = 'E4d3JwcTjeqTRkkQS4moszcfa4R7G1NMgPSew4KBNFrB';
 
 // Replay protection. In-memory: resets on redeploy (acceptable for micropayments;
 // a worst case lets a single tx be reused only across a deploy boundary).
@@ -153,12 +159,204 @@ export async function verifyRobinhoodUsdgPayment(params: VerifyParams): Promise<
   });
 }
 
-/** Try Base USDC first, then Robinhood USDG (same payTo EOA on both chains). */
-export async function verifySovereignPayment(params: VerifyParams): Promise<VerifyResult> {
+/**
+ * Verify SPL USDC transfer to payTo on Solana mainnet via RPC getTransaction.
+ * txHash = base58 signature. payTo = Solana base58 owner address (not ATA).
+ * Accepts token balance changes on the payTo owner for the USDC mint.
+ */
+export async function verifySolanaUsdcPayment(params: {
+  txHash: string;
+  payTo: string;
+  minAmountUnits: bigint;
+}): Promise<VerifyResult> {
+  const sig = params.txHash.trim();
+  // Solana sigs are base58, typically 87-88 chars; reject 0x EVM hashes here.
+  if (!sig || sig.startsWith('0x') || sig.length < 64 || sig.length > 128) {
+    return { ok: false, error: 'invalid_solana_sig_format' };
+  }
+  if (!/^[1-9A-HJ-NP-Za-km-z]+$/.test(sig)) {
+    return { ok: false, error: 'invalid_solana_sig_charset' };
+  }
+  const payTo = params.payTo.trim();
+  if (!payTo || payTo.startsWith('0x')) {
+    return { ok: false, error: 'invalid_solana_payTo' };
+  }
+
+  const rpc = process.env['SOLANA_RPC_URL'] ?? 'https://api.mainnet-beta.solana.com';
+  const body = {
+    jsonrpc: '2.0',
+    id: 1,
+    method: 'getTransaction',
+    params: [
+      sig,
+      {
+        encoding: 'jsonParsed',
+        commitment: 'confirmed',
+        maxSupportedTransactionVersion: 0,
+      },
+    ],
+  };
+
+  let tx: any;
+  try {
+    const res = await fetch(rpc, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'User-Agent': 'mcp-x402-sol-verify/1.0' },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(15_000),
+    });
+    if (!res.ok) return { ok: false, error: `solana_rpc_http_${res.status}` };
+    const j = (await res.json()) as { result?: any; error?: { message?: string } };
+    if (j.error) return { ok: false, error: `solana_rpc_${j.error.message ?? 'error'}` };
+    tx = j.result;
+  } catch (err) {
+    return { ok: false, error: `solana_rpc_fetch_${String(err).slice(0, 80)}` };
+  }
+
+  if (!tx) return { ok: false, error: 'solana_tx_not_found_or_pending' };
+  if (tx.meta?.err) return { ok: false, error: 'solana_tx_failed' };
+
+  const meta = tx.meta || {};
+  const message = tx.transaction?.message || {};
+  const accountKeys: string[] = [];
+  const keys = message.accountKeys || [];
+  for (const k of keys) {
+    if (typeof k === 'string') accountKeys.push(k);
+    else if (k && typeof k === 'object' && typeof k.pubkey === 'string') accountKeys.push(k.pubkey);
+  }
+
+  // Path 1: pre/post token balances (most reliable for SPL transfers)
+  const pre: any[] = meta.preTokenBalances || [];
+  const post: any[] = meta.postTokenBalances || [];
+  // Map accountIndex -> balance info for USDC mint
+  type Bal = { owner?: string; amount: bigint; accountIndex: number };
+  const toBal = (rows: any[]): Bal[] => {
+    const out: Bal[] = [];
+    for (const r of rows) {
+      if (!r || String(r.mint) !== USDC_SOLANA_MINT) continue;
+      const amt = BigInt(r.uiTokenAmount?.amount ?? r.uiTokenAmount?.uiAmountString ?? '0');
+      out.push({ owner: r.owner, amount: amt, accountIndex: Number(r.accountIndex) });
+    }
+    return out;
+  };
+  const preB = toBal(pre);
+  const postB = toBal(post);
+
+  // Find post balance for payTo owner that increased vs pre
+  for (const pb of postB) {
+    if (pb.owner !== payTo) continue;
+    const prev = preB.find((x) => x.owner === payTo && x.accountIndex === pb.accountIndex)
+      || preB.find((x) => x.owner === payTo);
+    const before = prev ? prev.amount : 0n;
+    const delta = pb.amount - before;
+    if (delta >= params.minAmountUnits) {
+      // try find sender: largest decrease
+      let from = '';
+      let bestDec = 0n;
+      for (const a of preB) {
+        if (a.owner === payTo) continue;
+        const after = postB.find((x) => x.owner === a.owner && x.accountIndex === a.accountIndex)
+          || postB.find((x) => x.owner === a.owner);
+        const afterAmt = after ? after.amount : 0n;
+        const dec = a.amount - afterAmt;
+        if (dec > bestDec) {
+          bestDec = dec;
+          from = a.owner || '';
+        }
+      }
+      return {
+        ok: true,
+        from,
+        amountUnits: delta,
+        chain: 'solana',
+        asset: USDC_SOLANA_MINT,
+      };
+    }
+  }
+
+  // Path 2: parsed instructions transfer / transferChecked
+  const insGroups: any[] = [];
+  if (Array.isArray(message.instructions)) insGroups.push(message.instructions);
+  if (Array.isArray(meta.innerInstructions)) {
+    for (const inner of meta.innerInstructions) {
+      if (Array.isArray(inner.instructions)) insGroups.push(inner.instructions);
+    }
+  }
+  for (const group of insGroups) {
+    for (const ix of group) {
+      const parsed = ix.parsed;
+      if (!parsed || typeof parsed !== 'object') continue;
+      const typ = String(parsed.type || '');
+      const info = parsed.info || {};
+      if (typ !== 'transfer' && typ !== 'transferChecked') continue;
+      const mint = info.mint ? String(info.mint) : USDC_SOLANA_MINT;
+      if (mint !== USDC_SOLANA_MINT && typ === 'transferChecked') continue;
+      // transferChecked has tokenAmount.amount; transfer has amount
+      let amount = 0n;
+      try {
+        if (info.tokenAmount?.amount != null) amount = BigInt(info.tokenAmount.amount);
+        else if (info.amount != null) amount = BigInt(info.amount);
+      } catch { continue; }
+      if (amount < params.minAmountUnits) continue;
+      const dest = String(info.destination || '');
+      const auth = String(info.authority || info.source || '');
+      // destination may be ATA — check post token balances owner mapping
+      const destOwner = postB.find((b) => accountKeys[b.accountIndex] === dest)?.owner
+        || postB.find((b) => b.owner === payTo)?.owner;
+      if (dest === payTo || destOwner === payTo || info.destinationOwner === payTo) {
+        return {
+          ok: true,
+          from: auth,
+          amountUnits: amount,
+          chain: 'solana',
+          asset: USDC_SOLANA_MINT,
+        };
+      }
+      // If destination ATA belongs to payTo via post balances
+      for (const pb of postB) {
+        if (pb.owner === payTo && accountKeys[pb.accountIndex] === dest && amount >= params.minAmountUnits) {
+          return {
+            ok: true,
+            from: auth,
+            amountUnits: amount,
+            chain: 'solana',
+            asset: USDC_SOLANA_MINT,
+          };
+        }
+      }
+    }
+  }
+
+  return { ok: false, error: 'no_matching_solana_usdc_transfer' };
+}
+
+/** Try Base USDC, Robinhood USDG, then Solana USDC (tx hash / sig in X-PAYMENT-TX). */
+export async function verifySovereignPayment(
+  params: VerifyParams & { solanaPayTo?: string },
+): Promise<VerifyResult> {
+  const sig = params.txHash.trim();
+  // Fast path: Solana signatures are never 0x-prefixed 32-byte hashes
+  if (!sig.startsWith('0x')) {
+    const solPayTo = params.solanaPayTo || process.env['SOLANA_PAYMENT_RECEIVER'] || SOLANA_PAY_TO_DEFAULT;
+    const solHit = await verifySolanaUsdcPayment({
+      txHash: sig,
+      payTo: solPayTo,
+      minAmountUnits: params.minAmountUnits,
+    });
+    if (solHit.ok) return solHit;
+    // fall through to EVM only if it looks like it could be hex without 0x — still try sol error return mixed
+    if (sig.length >= 64 && !/^[0-9a-fA-F]+$/.test(sig)) {
+      // clearly base58-ish — don't bother EVM
+      return solHit;
+    }
+  }
+
   const baseHit = await verifyBaseUsdcPayment(params);
   if (baseHit.ok) return baseHit;
   const rhHit = await verifyRobinhoodUsdgPayment(params);
   if (rhHit.ok) return rhHit;
+
+  // Last resort: solana if 0x was wrong guess? skip
   return {
     ok: false,
     error: `sovereign_unverified base=${baseHit.error ?? '?'} robinhood=${rhHit.error ?? '?'}`,

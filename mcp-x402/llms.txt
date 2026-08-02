@@ -119,3 +119,8 @@ Pay indexes/routers for **verified** attention (re-index, canary), not vibes.
 - PAID $0.001: POST /x402/attention/bounty { sponsor_origin }
 - PAID: POST /x402/attention/claim { bounty_id, crawler_id, proof: { challenge } }
 - PAID: POST /x402/attention/verify { bounty_id } — broker re-fetches /.well-known/x402
+
+## Payment rails (LIVE)
+1. Base USDC — eip155:8453 — payTo EVM 0x7233… — X-PAYMENT or X-PAYMENT-TX
+2. Robinhood USDG — eip155:4663 — payTo EVM 0x7233… — X-PAYMENT-TX
+3. Solana USDC — solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp — payTo E4d3Jwc… — X-PAYMENT-TX=<base58 sig>

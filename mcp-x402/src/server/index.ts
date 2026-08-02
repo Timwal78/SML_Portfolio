@@ -36,6 +36,9 @@ import {
   releaseRedeem,
   USDG_ROBINHOOD,
   ROBINHOOD_CAIP,
+  USDC_SOLANA_MINT,
+  SOLANA_CAIP,
+  SOLANA_PAY_TO_DEFAULT,
 } from './payments/verify-inbound.js';
 import { facilitatorChain, decodePaymentHeader, type PaymentRequirements } from './payments/facilitators.js';
 import { X402Stats } from './security/x402-stats.js';
@@ -620,8 +623,11 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
   // Public crawlable HTTP 402 challenges so x402scan / 402 Index / Bazaar can
   // detect and index this server. Authoritative per-tool pricing lives in the
   // sml_discover MCP tool; these emit a spec-correct x402 V2 PaymentRequirements.
-  const X402_PAY_TO = process.env['SML_PAYMENT_RECEIVER'] ?? '0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700';
+  const X402_PAY_TO = process.env['SML_PAYMENT_RECEIVER'] ?? '0x72330994f379a71542e7bd5a4cf99a9d9743f4aa';
   const USDC_BASE_ASSET = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
+  // Sol x402 rail — SPL USDC to ACP Sol address (not the EVM payTo).
+  const SOLANA_X402_PAY_TO = process.env['SOLANA_PAYMENT_RECEIVER'] ?? SOLANA_PAY_TO_DEFAULT;
+
 
   // ── Dual-rail x402 payment gate (institution-grade) ─────────────────────────
   // Rail A (standard x402 "exact" / EIP-3009): client sends `X-PAYMENT`; verified
@@ -679,6 +685,25 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
           paymentHeader: 'X-PAYMENT-TX',
           rpc: 'https://rpc.mainnet.chain.robinhood.com',
           explorer: 'https://robinhoodchain.blockscout.com',
+        },
+      },
+      // Slot 2 = Solana SPL USDC (sovereign X-PAYMENT-TX = base58 sig). Never replace Base slot 0.
+      {
+        scheme: 'exact', network: SOLANA_CAIP,
+        amount: units, maxAmountRequired: units,
+        asset: USDC_SOLANA_MINT, payTo: SOLANA_X402_PAY_TO, maxTimeoutSeconds,
+        resource, description, mimeType: 'application/json',
+        extra: {
+          name: 'USD Coin',
+          symbol: 'USDC',
+          version: '2',
+          decimals: 6,
+          settlement: 'sovereign-tx',
+          paymentHeader: 'X-PAYMENT-TX',
+          chain: 'solana-mainnet',
+          rpc: process.env['SOLANA_RPC_URL'] ?? 'https://api.mainnet-beta.solana.com',
+          explorer: 'https://solscan.io',
+          note: 'Pay SPL USDC on Solana mainnet to payTo, then retry with X-PAYMENT-TX=<base58 signature>.',
         },
       },
     ];
@@ -926,10 +951,18 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
     // Rail B — sovereign on-chain tx-hash (Base USDC first, then Robinhood USDG)
     if (txHash) {
       if (alreadyRedeemed(txHash)) { send402(res, challenge, header402, { error: 'payment_already_redeemed', detail: 'This transaction hash was already used. Send a new payment.' }); return { ok: false }; }
-      const v = await verifySovereignPayment({ txHash, payTo: X402_PAY_TO, minAmountUnits: opts.priceUnits });
+      const v = await verifySovereignPayment({
+        txHash,
+        payTo: X402_PAY_TO,
+        minAmountUnits: opts.priceUnits,
+        solanaPayTo: SOLANA_X402_PAY_TO,
+      });
       if (!v.ok) { send402(res, challenge, header402, { error: 'payment_unverified', detail: v.error ?? '' }); return { ok: false }; }
       markRedeemed(txHash);
-      const rail = v.chain === 'robinhood' ? 'sovereign:robinhood-usdg' : 'sovereign:base-usdc';
+      const rail =
+        v.chain === 'solana' ? 'sovereign:solana-usdc'
+        : v.chain === 'robinhood' ? 'sovereign:robinhood-usdg'
+        : 'sovereign:base-usdc';
       return finishPaid({ rail, from: v.from ?? '', tx: txHash });
     }
 
@@ -5131,12 +5164,15 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
   // Agent402 / crawler-native discovery envelope.
   // Keep full OpenAPI `paths` (x402scan) AND add resources[] + networks +
   // payToByNetwork so open index crawlers stop reporting networks:[].
-  const NETWORKS_CAIP = ['eip155:8453', 'eip155:4663'] as const;
+  const NETWORKS_CAIP = ['eip155:8453', 'eip155:4663', SOLANA_CAIP] as const;
   const PAY_TO_BY_NETWORK: Record<string, string> = {
     'eip155:8453': X402_PAY_TO,
     'eip155:4663': X402_PAY_TO,
     base: X402_PAY_TO,
     robinhood: X402_PAY_TO,
+    [SOLANA_CAIP]: SOLANA_X402_PAY_TO,
+    solana: SOLANA_X402_PAY_TO,
+    'solana-mainnet': SOLANA_X402_PAY_TO,
   };
   const DISCOVERY_RAILS = [
     {
@@ -5175,6 +5211,19 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
       rpc: 'https://rpc.mainnet.chain.robinhood.com',
       explorer: 'https://robinhoodchain.blockscout.com',
     },
+    {
+      id: 'solana-usdc',
+      name: 'Solana / USDC (sovereign X-PAYMENT-TX)',
+      network: SOLANA_CAIP,
+      asset: USDC_SOLANA_MINT,
+      assetSymbol: 'USDC',
+      payTo: SOLANA_X402_PAY_TO,
+      scheme: 'exact',
+      settlement: 'sovereign-tx',
+      paymentHeader: 'X-PAYMENT-TX',
+      rpc: process.env['SOLANA_RPC_URL'] ?? 'https://api.mainnet-beta.solana.com',
+      explorer: 'https://solscan.io',
+    },
   ];
 
   type PathOp = {
@@ -5204,6 +5253,7 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
         pi['altAssets'] = [
           { network: 'eip155:8453', asset: USDC_BASE_ASSET, symbol: 'USDC', payTo: X402_PAY_TO },
           { network: ROBINHOOD_CAIP, asset: USDG_ROBINHOOD, symbol: 'USDG', payTo: X402_PAY_TO },
+          { network: SOLANA_CAIP, asset: USDC_SOLANA_MINT, symbol: 'USDC', payTo: SOLANA_X402_PAY_TO },
         ];
       }
     }
@@ -5240,14 +5290,14 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
           description: desc,
           price_usd: priceUsd,
           asset: paid ? 'USDC' : undefined,
-          assets: paid ? ['USDC', 'USDG'] : [],
+          assets: paid ? ['USDC', 'USDG', 'USDC-SOL'] : [],
           network: 'eip155:8453',
           networks: [...NETWORKS_CAIP],
           payTo: X402_PAY_TO,
           payToByNetwork: { ...PAY_TO_BY_NETWORK },
           scheme: 'exact',
           price: paid
-            ? { amount, currency: 'USD', assets: ['USDC', 'USDG'], mode: 'fixed' }
+            ? { amount, currency: 'USD', assets: ['USDC', 'USDG', 'USDC-SOL'], mode: 'fixed' }
             : { amount: '0', currency: 'USD', assets: [], mode: 'free' },
           accepts: paid
             ? [
@@ -5266,6 +5316,16 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
                   asset: USDG_ROBINHOOD,
                   assetSymbol: 'USDG',
                   payTo: X402_PAY_TO,
+                  maxAmountRequired: String((pi as { amountUnits?: string }).amountUnits ?? '1000'),
+                  paymentHeader: 'X-PAYMENT-TX',
+                  settlement: 'sovereign-tx',
+                },
+                {
+                  scheme: 'exact',
+                  network: SOLANA_CAIP,
+                  asset: USDC_SOLANA_MINT,
+                  assetSymbol: 'USDC',
+                  payTo: SOLANA_X402_PAY_TO,
                   maxAmountRequired: String((pi as { amountUnits?: string }).amountUnits ?? '1000'),
                   paymentHeader: 'X-PAYMENT-TX',
                   settlement: 'sovereign-tx',
