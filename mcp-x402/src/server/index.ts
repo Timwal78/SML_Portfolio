@@ -28,7 +28,15 @@ import { RateLimiter } from './security/rate-limit.js';
 import { tryZylaBypass, zylaCatalogPublic, ZYLA_ALLOWLIST } from './security/zyla.js';
 import { rapidApiGuard } from './security/rapidapi.js';
 import { healthHandler } from './health.js';
-import { verifyBaseUsdcPayment, alreadyRedeemed, markRedeemed, releaseRedeem } from './payments/verify-inbound.js';
+import {
+  verifyBaseUsdcPayment,
+  verifySovereignPayment,
+  alreadyRedeemed,
+  markRedeemed,
+  releaseRedeem,
+  USDG_ROBINHOOD,
+  ROBINHOOD_CAIP,
+} from './payments/verify-inbound.js';
 import { facilitatorChain, decodePaymentHeader, type PaymentRequirements } from './payments/facilitators.js';
 import { X402Stats } from './security/x402-stats.js';
 import {
@@ -629,15 +637,35 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
   const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v);
   const buildAccepts = (resource: string, priceUnits: bigint, description: string, maxTimeoutSeconds = 300): unknown[] => {
     const units = priceUnits.toString();
-    // CAIP-2 only — x402scan rejects any accepts[] entry with plain 'base' (2026-07-25).
-    // RWA host (eip155:8453 only) registers cleanly; dual [base, caip2] fails parse on the base twin.
-    return [{
-      scheme: 'exact', network: 'eip155:8453',
-      amount: units, maxAmountRequired: units,
-      asset: USDC_BASE_ASSET, payTo: X402_PAY_TO, maxTimeoutSeconds,
-      resource, description, mimeType: 'application/json',
-      extra: { name: 'USD Coin', version: '2' },
-    }];
+    // Slot 0 = Base USDC (CDP-clean, facilitator settle). Slot 1 = Robinhood USDG
+    // (non-CDP discovery + sovereign X-PAYMENT-TX). Same payTo EOA on both chains.
+    // Never replace Base — CDP / x402scan / Bazaar depend on accepts[0].
+    return [
+      {
+        scheme: 'exact', network: 'eip155:8453',
+        amount: units, maxAmountRequired: units,
+        asset: USDC_BASE_ASSET, payTo: X402_PAY_TO, maxTimeoutSeconds,
+        resource, description, mimeType: 'application/json',
+        extra: { name: 'USD Coin', version: '2' },
+      },
+      {
+        scheme: 'exact', network: ROBINHOOD_CAIP,
+        amount: units, maxAmountRequired: units,
+        asset: USDG_ROBINHOOD, payTo: X402_PAY_TO, maxTimeoutSeconds,
+        resource, description, mimeType: 'application/json',
+        extra: {
+          name: 'Global Dollar',
+          symbol: 'USDG',
+          version: '1',
+          decimals: 6,
+          chainId: 4663,
+          settlement: 'sovereign-tx',
+          paymentHeader: 'X-PAYMENT-TX',
+          rpc: 'https://rpc.mainnet.chain.robinhood.com',
+          explorer: 'https://robinhoodchain.blockscout.com',
+        },
+      },
+    ];
   };
   // extensions.bazaar.schema — the v2 location the crawler reads input/output from.
   // `discoverable: true` is what actually opts a route into CDP's Bazaar index —
@@ -864,13 +892,14 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
       return finishPaid({ rail: `standard:${result.facilitator ?? ''}`, from: result.payer ?? payload.payload.authorization.from, tx: result.transaction ?? '' });
     }
 
-    // Rail B — sovereign on-chain tx-hash
+    // Rail B — sovereign on-chain tx-hash (Base USDC first, then Robinhood USDG)
     if (txHash) {
       if (alreadyRedeemed(txHash)) { send402(res, challenge, header402, { error: 'payment_already_redeemed', detail: 'This transaction hash was already used. Send a new payment.' }); return { ok: false }; }
-      const v = await verifyBaseUsdcPayment({ txHash, payTo: X402_PAY_TO, minAmountUnits: opts.priceUnits });
+      const v = await verifySovereignPayment({ txHash, payTo: X402_PAY_TO, minAmountUnits: opts.priceUnits });
       if (!v.ok) { send402(res, challenge, header402, { error: 'payment_unverified', detail: v.error ?? '' }); return { ok: false }; }
       markRedeemed(txHash);
-      return finishPaid({ rail: 'sovereign', from: v.from ?? '', tx: txHash });
+      const rail = v.chain === 'robinhood' ? 'sovereign:robinhood-usdg' : 'sovereign:base-usdc';
+      return finishPaid({ rail, from: v.from ?? '', tx: txHash });
     }
 
     send402(res, challenge, header402);
