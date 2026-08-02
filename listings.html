@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>List ScriptMasterLabs Everywhere | Agent + Enterprise Distribution</title>
-  <meta name="description" content="Canonical discovery URLs for ScriptMasterLabs mcp-x402: OpenAPI, MCP, A2A, llms.txt, npm, AWS seat $599, x402 0.001 USDC on Base. Paste-ready for Smithery, RapidAPI, Glama, Zapier, Composio, HF." />
+  <meta name="description" content="Canonical discovery URLs for ScriptMasterLabs mcp-x402: OpenAPI, MCP, A2A, llms.txt, npm, AWS seat $599, x402 0.001 — Base USDC + Robinhood USDG (eip155:4663) + Solana USDC. Paste-ready for every agent directory." />
   <link rel="canonical" href="https://www.scriptmasterlabs.com/listings.html" />
   <meta name="robots" content="index,follow" />
   <style>
@@ -34,15 +34,45 @@
 <body>
 <main>
   <div class="hero">
-    <div><span class="pill">Canonical catalog</span><span class="pill">0.001 USDC · Base</span><span class="pill">$599/mo seat</span></div>
+    <div><span class="pill">Canonical catalog</span><span class="pill">0.001 · Base USDC</span><span class="pill">RH USDG LIVE</span><span class="pill">Sol USDC</span><span class="pill">$599/mo seat</span></div>
     <h1>List ScriptMasterLabs on every agent + API surface</h1>
-    <p>One source of truth for humans and autonomous agents. Import OpenAPI, connect MCP, or pay per call with x402. No testnet. Network <code>eip155:8453</code>. PayTo rails <code>0x4e14…7700</code>.</p>
+    <p>One source of truth for humans and autonomous agents. Import OpenAPI, connect MCP, or pay per call with x402. No testnet. <strong>Triple rail:</strong> Base USDC <code>eip155:8453</code> · Robinhood <strong>USDG</strong> <code>eip155:4663</code> · Solana USDC. ACP payTo <code>0x7233…f4aa</code> (EVM) · Sol <code>E4d3…</code>.</p>
     <div class="grid">
       <div class="card"><strong>OpenAPI / x402</strong><a href="https://mcp-x402.onrender.com/.well-known/x402">/.well-known/x402</a><br/><a href="https://mcp-x402.onrender.com/openapi.json">/openapi.json</a></div>
       <div class="card"><strong>Remote MCP</strong><a href="https://mcp-x402.onrender.com/mcp">mcp-x402 /mcp</a><br/><a href="https://squeezeos-api.onrender.com/mcp">SqueezeOS /mcp</a></div>
       <div class="card"><strong>Agent card / llms</strong><a href="https://mcp-x402.onrender.com/.well-known/agent.json">A2A agent.json</a><br/><a href="https://mcp-x402.onrender.com/llms.txt">llms.txt</a></div>
+      <div class="card"><strong>RH USDG rail</strong><a href="https://www.scriptmasterlabs.com/rh-usdg.html">rh-usdg.html</a><br/><a href="https://robinhoodchain.blockscout.com/token/0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168">USDG token 4663</a></div>
       <div class="card"><strong>npm</strong><a href="https://www.npmjs.com/package/@scriptmasterlabs/mcp-x402">@scriptmasterlabs/mcp-x402</a><br/><a href="https://www.npmjs.com/package/@scriptmasterlabs/mcp-x402-sdk">mcp-x402-sdk</a></div>
+      <div class="card"><strong>Swarm MM</strong><a href="https://www.scriptmasterlabs.com/swarm-market-making.html">swarm-market-making.html</a><br/>Monthly + PPC in USDC/USDG</div>
     </div>
+  </div>
+
+  <h2>Payment rails (list on every hub)</h2>
+  <div class="card">
+    <table>
+      <thead><tr><th>#</th><th>Network</th><th>Asset</th><th>payTo</th><th>Header</th></tr></thead>
+      <tbody>
+        <tr><td>0</td><td><code>eip155:8453</code> Base</td><td>USDC <code>0x8335…2913</code></td><td><code>0x72330994f379a71542e7bd5a4cf99a9d9743f4aa</code></td><td>X-PAYMENT / X-PAYMENT-TX</td></tr>
+        <tr><td>1</td><td><code>eip155:4663</code> Robinhood</td><td><strong>USDG</strong> <code>0x5fc5…d168</code></td><td><code>0x72330994f379a71542e7bd5a4cf99a9d9743f4aa</code></td><td>X-PAYMENT-TX</td></tr>
+        <tr><td>2</td><td>Solana mainnet</td><td>SPL USDC <code>EPjF…</code></td><td><code>E4d3JwcTjeqTRkkQS4moszcfa4R7G1NMgPSew4KBNFrB</code></td><td>X-PAYMENT-TX (base58 sig)</td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top:10px">Floor <strong>0.001</strong> per call. Alias: <strong>USCG = USDG</strong>. Explorer: <a href="https://robinhoodchain.blockscout.com">robinhoodchain.blockscout.com</a>. Register origins: <a href="https://www.x402scan.com/resources/register">x402scan.com/resources/register</a>.</p>
+    <pre>{
+  "networks": ["eip155:8453", "eip155:4663", "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"],
+  "payToByNetwork": {
+    "eip155:8453": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
+    "eip155:4663": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
+    "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp": "E4d3JwcTjeqTRkkQS4moszcfa4R7G1NMgPSew4KBNFrB"
+  },
+  "usdg": {
+    "symbol": "USDG",
+    "asset": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+    "chainId": 4663,
+    "decimals": 6,
+    "page": "https://www.scriptmasterlabs.com/rh-usdg.html"
+  }
+}</pre>
   </div>
 
   <h2>Tier 2 — AI agent ecosystem (paste these)</h2>

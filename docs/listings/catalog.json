@@ -9,7 +9,7 @@
   "network": "eip155:8453",
   "asset": "USDC",
   "price_usdc": "0.001",
-  "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+  "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
   "enterprise_seat_usd_mo": 599,
   "paid_routes": [
     {
@@ -24,7 +24,13 @@
         "Agent-Reputation",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/base-rpc",
@@ -39,7 +45,13 @@
         "Base",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/bounties",
@@ -51,7 +63,13 @@
       "tags": [
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/cascade-signal",
@@ -65,7 +83,13 @@
         "Signals",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/chat/completions",
@@ -79,7 +103,13 @@
         "LLM",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/clinical-trials",
@@ -93,7 +123,13 @@
         "Federal",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/cms-providers",
@@ -108,7 +144,13 @@
         "Federal",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/compliance-anomaly",
@@ -122,7 +164,13 @@
         "AML",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/compliance-audit",
@@ -136,7 +184,13 @@
         "AML",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/compliance-regulator-query",
@@ -150,7 +204,13 @@
         "Federal",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/congress-bills",
@@ -164,7 +224,13 @@
         "Congress",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/content-trust-score",
@@ -178,7 +244,13 @@
         "Content-Trust",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/crypto-price",
@@ -194,7 +266,13 @@
         "Agent-Snack",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/crypto-trending",
@@ -209,7 +287,13 @@
         "High-Frequency",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/domain-enrich",
@@ -223,7 +307,13 @@
         "OSINT",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/drug-adverse-events",
@@ -238,7 +328,13 @@
         "Federal",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/drug-label",
@@ -253,7 +349,13 @@
         "Federal",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/drug-recall",
@@ -268,7 +370,13 @@
         "Federal",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/entity-compliance",
@@ -283,7 +391,13 @@
         "SAM",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/epa-violations",
@@ -297,7 +411,13 @@
         "Environmental",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/equities-heatmap",
@@ -311,7 +431,13 @@
         "Market-Screener",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/eth-rpc",
@@ -325,7 +451,13 @@
         "Crypto",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/fact-check",
@@ -339,7 +471,13 @@
         "Content-Trust",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/fda-510k",
@@ -354,7 +492,13 @@
         "Federal",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/fda-warnings",
@@ -370,7 +514,13 @@
         "Federal",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/fec-finance",
@@ -384,7 +534,13 @@
         "Campaign-Finance",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/finra-broker",
@@ -398,7 +554,13 @@
         "Compliance",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/firms",
@@ -413,7 +575,13 @@
         "Procurement",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/fred",
@@ -428,7 +596,13 @@
         "Treasury",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/ftd-etf-basket",
@@ -444,7 +618,13 @@
         "Federal",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/ftd-ratio",
@@ -460,7 +640,13 @@
         "Federal",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/ftd-settlement-cycle",
@@ -476,7 +662,13 @@
         "Federal",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/ftd-threshold-list",
@@ -493,7 +685,13 @@
         "Federal",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/ftd-time-series",
@@ -509,7 +707,13 @@
         "Federal",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/fx-rate",
@@ -525,7 +729,13 @@
         "Agent-Snack",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/gas-tracker",
@@ -542,7 +752,13 @@
         "Agent-Snack",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/grants",
@@ -557,7 +773,13 @@
         "Government",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/graph",
@@ -569,7 +791,13 @@
       "tags": [
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/graph/agent",
@@ -581,7 +809,13 @@
       "tags": [
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/hcv-fmr",
@@ -598,7 +832,13 @@
         "Federal",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/housing-landlord-checklist",
@@ -615,7 +855,13 @@
         "Federal",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/housing-windsor",
@@ -632,7 +878,13 @@
         "Federal",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/hud-vash-contacts",
@@ -649,7 +901,13 @@
         "Federal",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/hunters/report",
@@ -661,7 +919,13 @@
       "tags": [
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/iam-model",
@@ -673,7 +937,13 @@
       "tags": [
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/insider-trades",
@@ -689,7 +959,13 @@
         "Federal",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/llm-chat",
@@ -703,7 +979,13 @@
         "LLM",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/lobbying",
@@ -717,7 +999,13 @@
         "Lobbying",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/market",
@@ -732,7 +1020,13 @@
         "Market-Intelligence",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/max-conviction-signal",
@@ -746,7 +1040,13 @@
         "Signals",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/news-headlines",
@@ -762,7 +1062,13 @@
         "Agent-Snack",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/nih-grants",
@@ -777,7 +1083,13 @@
         "Research",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/npi",
@@ -791,7 +1103,13 @@
         "Federal",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/options-delta-heatmap",
@@ -806,7 +1124,13 @@
         "Greeks",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/options-flow",
@@ -820,7 +1144,13 @@
         "Options",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/osha",
@@ -834,7 +1164,13 @@
         "Labor-Safety",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/patents",
@@ -848,7 +1184,13 @@
         "Patents",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/pha-lookup",
@@ -865,7 +1207,13 @@
         "PHA",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/restricted-party-screen",
@@ -879,7 +1227,13 @@
         "Federal",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/sbir-grants",
@@ -894,7 +1248,13 @@
         "SDVOSB",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/sec-10k",
@@ -910,7 +1270,13 @@
         "Trading",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/sec-10q",
@@ -926,7 +1292,13 @@
         "Trading",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/sec-13dg",
@@ -942,7 +1314,13 @@
         "Trading",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/sec-13f",
@@ -958,7 +1336,13 @@
         "Trading",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/sec-8k",
@@ -974,7 +1358,13 @@
         "Trading",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/social-search",
@@ -990,7 +1380,13 @@
         "Web",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/trade-leads",
@@ -1004,7 +1400,13 @@
         "Trade",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/treasury-yields",
@@ -1019,7 +1421,13 @@
         "Finance",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/web-fetch",
@@ -1036,7 +1444,13 @@
         "Search",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/web-markdown",
@@ -1051,7 +1465,13 @@
         "Search",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     },
     {
       "path": "/x402/web-search",
@@ -1067,7 +1487,13 @@
         "Agent-Snack",
         "x402",
         "Paid"
-      ]
+      ],
+      "networks": [
+        "eip155:8453",
+        "eip155:4663",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+      ],
+      "accepts_usdg": true
     }
   ],
   "npm": [
@@ -1078,5 +1504,36 @@
     "squeezeos_mcp": "https://squeezeos-api.onrender.com/mcp",
     "rwa": "https://sml-rwa-api.onrender.com",
     "acp_x402": "https://acp-x402-scriptmasterlabs.onrender.com"
-  }
+  },
+  "payTo_seed_historical": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+  "networks": [
+    "eip155:8453",
+    "eip155:4663",
+    "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+  ],
+  "assets": {
+    "eip155:8453": {
+      "symbol": "USDC",
+      "address": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    },
+    "eip155:4663": {
+      "symbol": "USDG",
+      "name": "Global Dollar",
+      "address": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "aliases": [
+        "USCG"
+      ],
+      "page": "https://www.scriptmasterlabs.com/rh-usdg.html",
+      "explorer": "https://robinhoodchain.blockscout.com/token/0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168"
+    },
+    "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp": {
+      "symbol": "USDC",
+      "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      "payTo": "E4d3JwcTjeqTRkkQS4moszcfa4R7G1NMgPSew4KBNFrB"
+    }
+  },
+  "price_floor_usd": "0.001",
+  "usdg_live": true,
+  "rh_usdg_page": "https://www.scriptmasterlabs.com/rh-usdg.html",
+  "updated": "2026-08-02"
 }

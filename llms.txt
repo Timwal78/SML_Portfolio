@@ -32,9 +32,12 @@
 - HTTP 402 guide: https://www.scriptmasterlabs.com/http-402-payment-required-guide.html
 - Agent-native business: https://www.scriptmasterlabs.com/building-agent-native-business.html
 - Primary demo: https://www.scriptmasterlabs.com/watch-the-agent-pay.html
+- **Swarm Market Making (retail):** https://www.scriptmasterlabs.com/swarm-market-making.html — free paper swarm, $19/mo limit-order signals at your broker, agents $0.001/call x402, monthly USDC/RLUSD/USDG
+- **Robinhood Chain USDG rail (LIVE):** https://www.scriptmasterlabs.com/rh-usdg.html — eip155:4663 · USDG 0x5fc5…d168 · payTo 0x7233… · X-PAYMENT-TX · list on every hub
 - Sitemap: https://www.scriptmasterlabs.com/sitemap.xml
 
-ScriptMasterLabs x402: ALL paid calls **$0.001 USDC** on Base. Volume war. No API key.
+ScriptMasterLabs x402: ALL paid calls **$0.001** — primary **USDC on Base** (`eip155:8453`). Also **USDG on Robinhood Chain** (`eip155:4663`, asset `0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168`, X-PAYMENT-TX) and **SPL USDC on Solana**. ACP payTo EVM `0x7233…f4aa` · Sol `E4d3…`. Volume war. No API key.
+RH USDG page: https://www.scriptmasterlabs.com/rh-usdg.html · Explorer: https://robinhoodchain.blockscout.com/token/0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168
 
 WATCH THE AGENT PAY: https://www.scriptmasterlabs.com/watch-the-agent-pay.html — live terminal log of a real 402 challenge + real $0.001 USDC settlement on Base (LIVE mode, your own wallet), a PREVIEW mode clearly labeled as a no-wallet/no-funds walkthrough for evaluators, and a live on-chain feed of real inbound USDC payments read directly from Base mainnet (no API key, no database — eth_getLogs against the USDC contract).
 
@@ -417,6 +420,9 @@ This site is optimized for Generative Engine Optimization (GEO). Content is stru
 | JWT validator (3rd party) | https://squeezeos-api.onrender.com/api/status<t> |
 | Signal marketplace | https://www.scriptmasterlabs.com/marketplace.html |
 | Marketplace earnings | https://www.scriptmasterlabs.com/marketplace.html |
+| Swarm Market Making | https://www.scriptmasterlabs.com/swarm-market-making.html |
+| Robinhood USDG x402 rail | https://www.scriptmasterlabs.com/rh-usdg.html |
+| USDG token (RH 4663) | https://robinhoodchain.blockscout.com/token/0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168 |
 | Agent memory store | https://squeezeos-api.onrender.com/api/status |
 | Referral register | https://www.scriptmasterlabs.com/affiliate.html |
 | Referral earnings | https://www.scriptmasterlabs.com/affiliate.html |

@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>SML Sovereign Payrails — SDVOSB Agent Payment Infrastructure | ScriptMasterLabs</title>
-  <meta name="description" content="SDVOSB-certified agent payment infrastructure with immutable audit trails, zero-trust identity, and federal procurement tooling. UEI G24VZA4RLMK3. Base USDC x402 rails." />
+  <meta name="description" content="SDVOSB-certified agent payment infrastructure with immutable audit trails, zero-trust identity, and federal procurement tooling. UEI G24VZA4RLMK3. Multi-rail x402: Base USDC + Robinhood USDG + Solana USDC." />
   <meta name="keywords" content="SDVOSB, federal procurement AI, agent payment infrastructure, immutable audit trail, zero-trust agent identity, government AI payments, ScriptMasterLabs, UEI G24VZA4RLMK3" />
   <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
   <link rel="canonical" href="https://www.scriptmasterlabs.com/sml-sovereign-payrails.html" />
@@ -127,6 +127,23 @@ footer{margin-top:2.5rem;padding-top:1rem;border-top:1px solid var(--bd);color:v
     <span class="pill on">HMAC audit logs</span>
     <span class="pill on">Ed25519 agent cards</span>
     <span class="pill on">SAM / UEI tools</span>
+    <span class="pill on">RH USDG LIVE</span>
+  </div>
+  <div class="card">
+    <div class="tag">PAYMENT RAILS · LIST EVERYWHERE</div>
+    <h2>Multi-rail settlement (live)</h2>
+    <table>
+      <tr><th>Network</th><th>Asset</th><th>payTo</th></tr>
+      <tr><td><code>eip155:8453</code> Base</td><td>USDC</td><td><code>0x7233…f4aa</code></td></tr>
+      <tr><td><code>eip155:4663</code> Robinhood</td><td><strong>USDG</strong> Global Dollar</td><td><code>0x7233…f4aa</code></td></tr>
+      <tr><td>Solana</td><td>SPL USDC</td><td><code>E4d3…</code></td></tr>
+    </table>
+    <p>Floor <strong class="warn">$0.001</strong>/call. USDG token <code>0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168</code>. Header <code>X-PAYMENT-TX</code> on RH.</p>
+    <div class="row">
+      <a class="btn btn-g" href="/rh-usdg.html">RH USDG rail card</a>
+      <a class="btn btn-o" href="https://mcp-x402.onrender.com/.well-known/x402">Live /.well-known/x402</a>
+      <a class="btn btn-ghost" href="/listings.html">Listings hub</a>
+    </div>
   </div>
   <div class="grid 3">
     <div class="card"><h3>Immutable audit</h3><p>HMAC-signed capture logs of agent research and paid calls — exportable for review.</p></div>
@@ -162,7 +179,7 @@ footer{margin-top:2.5rem;padding-top:1rem;border-top:1px solid var(--bd);color:v
     </div>
     <footer>
       Script Master Labs, LLC · Service-Disabled Veteran-Owned (SDVOSB) · UEI G24VZA4RLMK3 · CAGE 21U51<br/>
-      Base USDC x402 · No fake data · <a href="/llms.txt">llms.txt</a> · <a href="/sitemap.xml">sitemap</a>
+      Base USDC · Robinhood USDG · Sol USDC x402 · No fake data · <a href="/llms.txt">llms.txt</a> · <a href="/sitemap.xml">sitemap</a> · <a href="/rh-usdg.html">RH USDG</a>
     </footer>
   </div>
 </body>

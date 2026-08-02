@@ -1,0 +1,85 @@
+{
+  "x402Version": 1,
+  "product": "ScriptMasterLabs multi-rail x402",
+  "company": "Script Master Labs, LLC",
+  "homepage": "https://www.scriptmasterlabs.com",
+  "usdg_page": "https://www.scriptmasterlabs.com/rh-usdg.html",
+  "listings": "https://www.scriptmasterlabs.com/listings.html",
+  "openapi": "https://mcp-x402.onrender.com/openapi.json",
+  "x402": "https://mcp-x402.onrender.com/.well-known/x402",
+  "mcp": "https://mcp-x402.onrender.com/mcp",
+  "acp_x402": "https://acp-x402-scriptmasterlabs.onrender.com/.well-known/x402",
+  "price_floor_usd": "0.001",
+  "networks": [
+    "eip155:8453",
+    "eip155:4663",
+    "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+  ],
+  "payToByNetwork": {
+    "eip155:8453": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
+    "eip155:4663": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
+    "base": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
+    "robinhood": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
+    "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp": "E4d3JwcTjeqTRkkQS4moszcfa4R7G1NMgPSew4KBNFrB",
+    "solana": "E4d3JwcTjeqTRkkQS4moszcfa4R7G1NMgPSew4KBNFrB"
+  },
+  "acceptsAsset": {
+    "eip155:8453": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+    "eip155:4663": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+    "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+  },
+  "rails": [
+    {
+      "id": "base_usdc",
+      "slot": 0,
+      "network": "eip155:8453",
+      "symbol": "USDC",
+      "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
+      "decimals": 6,
+      "headers": ["X-PAYMENT", "X-PAYMENT-TX"],
+      "status": "live"
+    },
+    {
+      "id": "robinhood_usdg",
+      "slot": 1,
+      "network": "eip155:4663",
+      "chainId": 4663,
+      "symbol": "USDG",
+      "aliases": ["USCG"],
+      "name": "Global Dollar",
+      "asset": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
+      "decimals": 6,
+      "headers": ["X-PAYMENT-TX"],
+      "settlement": "sovereign-tx",
+      "rpc": "https://rpc.mainnet.chain.robinhood.com",
+      "explorer": "https://robinhoodchain.blockscout.com",
+      "token_page": "https://robinhoodchain.blockscout.com/token/0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "docs": "https://www.scriptmasterlabs.com/rh-usdg.html",
+      "status": "live",
+      "note": "Non-CDP. Same ACP EOA as Base on chain 4663."
+    },
+    {
+      "id": "solana_usdc",
+      "slot": 2,
+      "network": "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
+      "symbol": "USDC",
+      "asset": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      "payTo": "E4d3JwcTjeqTRkkQS4moszcfa4R7G1NMgPSew4KBNFrB",
+      "decimals": 6,
+      "headers": ["X-PAYMENT-TX"],
+      "settlement": "sovereign-tx",
+      "status": "live"
+    }
+  ],
+  "enterprise_seat_usd_mo": 599,
+  "list_everywhere": [
+    "https://www.scriptmasterlabs.com/listings.html",
+    "https://www.scriptmasterlabs.com/rh-usdg.html",
+    "https://www.x402scan.com/resources/register",
+    "https://mcp-x402.onrender.com/.well-known/x402",
+    "https://acp-x402-scriptmasterlabs.onrender.com/.well-known/x402"
+  ],
+  "updated": "2026-08-02"
+}

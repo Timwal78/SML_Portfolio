@@ -36,7 +36,19 @@ Product-description: 33-tool institutional market intelligence MCP server. Counc
 
 Product: mcp-x402
 Product-url: https://mcp-x402.onrender.com
-Product-description: 85+ MCP tools for AI agents. Pay-per-call USDC on Base/Polygon/Solana.
+Product-description: 85+ MCP tools for AI agents. Pay-per-call $0.001 — Base USDC (eip155:8453), Robinhood USDG (eip155:4663), Solana USDC.
+Product-usdg: https://www.scriptmasterlabs.com/rh-usdg.html
+Product-usdg-asset: 0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168
+Product-payTo-evm: 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa
+Product-networks: eip155:8453, eip155:4663, solana
+
+Product: Swarm Market Making
+Product-url: https://www.scriptmasterlabs.com/swarm-market-making.html
+Product-description: Retail swarm limit-order signals. Free paper tier. $19/mo live. Agents $0.001. Monthly crypto USDC/USDG/RLUSD.
+
+Product: Robinhood Chain USDG Rail
+Product-url: https://www.scriptmasterlabs.com/rh-usdg.html
+Product-description: LIVE x402 settlement in USDG on Robinhood Chain 4663. X-PAYMENT-TX sovereign verify.
 
 # ── AI DISCOVERY FILES ────────────────────────────────────────────────────
 
