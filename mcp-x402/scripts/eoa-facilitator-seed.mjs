@@ -37,18 +37,19 @@ const LOG = process.env.LOG_FILE || '/workspace/sml-portfolio-temp/scripts/eoa_f
 const OUT = process.env.OUT_FILE || '/workspace/sml-portfolio-temp/scripts/eoa_facilitator_results.json';
 
 const ROUTES = [
-  // What agents buy now — high-freq lanes only
-  '/x402/llm-chat?prompt=ping',
+  // Proven 200-after-pay hot demand (skip llm until Anthropic credits)
   '/x402/web-search?q=bitcoin',
+  '/x402/web-search?q=ethereum',
   '/x402/web-fetch?url=https://example.com',
   '/x402/social-search?q=AI+agents',
   '/x402/news-headlines?q=crypto',
   '/x402/eth-rpc?method=eth_blockNumber',
   '/x402/base-rpc?method=eth_blockNumber',
   '/x402/domain-enrich?domain=example.com',
-  '/x402/crypto-price?ids=bitcoin,ethereum',
   '/x402/gas-tracker',
   '/x402/fx-rate?base=USD&symbols=EUR',
+  '/x402/fx-rate?base=USD&symbols=JPY',
+  '/x402/crypto-price?ids=bitcoin',
 ];
 
 const ERC20 = parseAbi([

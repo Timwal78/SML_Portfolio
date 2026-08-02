@@ -4207,11 +4207,11 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
     // previously labeled us "not paid" — paid_demo_url is a live HTTP 402 resource.
     const host = req.headers.host ?? 'mcp-x402.onrender.com';
     const base = `https://${host}`;
-    const paidDemo = `${base}/x402/llm-chat`;
+    const paidDemo = `${base}/x402/web-search?q=bitcoin`;
     const want402 = String(req.query['x402'] ?? req.headers['x-want-402'] ?? '') === '1'
       || String(req.headers['accept'] ?? '').includes('application/x402');
     if (want402) {
-      const challenge = inlineDiscover402(paidDemo, 'SML x402 llm-chat snack — 0.001 USDC on Base. What agents buy now.');
+      const challenge = inlineDiscover402(paidDemo, 'SML x402 web-search snack — 0.001 USDC on Base. What agents buy now.');
       const h = Buffer.from(JSON.stringify(challenge)).toString('base64');
       res.status(402).set('X-PAYMENT-REQUIRED', h).set('PAYMENT-REQUIRED', h)
         .set('Access-Control-Expose-Headers', 'X-PAYMENT-REQUIRED, PAYMENT-REQUIRED')
@@ -4229,12 +4229,14 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
       transport: 'streamable-http + sse',
       paid_demo_url: paidDemo,
       paid_resources: [
-        `${base}/x402/llm-chat`,
         `${base}/x402/web-search`,
         `${base}/x402/web-fetch`,
         `${base}/x402/social-search`,
         `${base}/x402/eth-rpc`,
+        `${base}/x402/base-rpc`,
+        `${base}/x402/gas-tracker`,
         `${base}/x402/crypto-price`,
+        `${base}/x402/llm-chat`,
       ],
       discovery: `${base}/.well-known/x402`,
       scanner_hint: 'Root is catalog (200). GET paid_demo_url without payment → HTTP 402. Or GET /?x402=1 for challenge.',
@@ -4243,7 +4245,7 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
         sse_connect: 'GET /sse',
         sse_messages: 'POST /messages',
         health: 'GET /health',
-        paid_demo: 'GET /x402/llm-chat',
+        paid_demo: 'GET /x402/web-search',
         agentCard: 'GET /.well-known/agentcard.json',
         a2aAgentCard: 'GET /.well-known/agent.json',
         openApiX402: 'GET /.well-known/x402',
