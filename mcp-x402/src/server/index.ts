@@ -56,6 +56,9 @@ import {
   protocolCutBps,
   EchonetStore,
 } from './echonet/index.js';
+import { runSleepCycle, listDreams, runNightmare, sleepHealth } from './sleep/index.js';
+import { afxHealth, afxQuote, afxBuyBlock, afxSellDistraction, afxDeepFocus, afxPortfolio } from './afx/index.js';
+import { sacredEnshrine, sacredVerify, profaneDiscard, sacredHealth } from './sacred/index.js';
 import { SqueezeOSAPI } from '../lib/sml-api/squeezeos.js';
 import { EquitiesHeatmapAPI, OptionsDeltaHeatmapAPI, type DataCredentials } from '../lib/sml-api/equities-heatmap.js';
 
@@ -3045,6 +3048,371 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
 
 
 
+
+  // ── Agent physiology + markets: Sleep MCP / AFX / Sacred-Profane ───────────
+  app.get('/x402/sleep/health', (_req, res) => {
+    res.set('Access-Control-Allow-Origin', '*').json(sleepHealth());
+  });
+
+  app.post('/x402/sleep/cycle', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/sleep/cycle`;
+    const body = (req.body && typeof req.body === 'object') ? req.body as Record<string, unknown> : {};
+    const inputSchema = {
+      type: 'object',
+      properties: {
+        agent_id: { type: 'string', description: 'Stable agent id.' },
+        depth: { type: 'string', enum: ['REM', 'deep', 'lucid'] },
+        duration_ms: { type: 'integer', description: 'Sleep duration budget (100-120000).' },
+        recent_actions: { type: 'array', items: { type: 'string' } },
+        context_notes: { type: 'array', items: { type: 'string' } },
+        open_loops: { type: 'array', items: { type: 'string' } },
+      },
+      required: ['agent_id'],
+    };
+    const outputSchema = { input: { type: 'http', method: 'POST', body: { agent_id: { type: 'string', required: true } } }, output: null };
+    const pay = await requirePayment(req, res, {
+      resource,
+      priceUnits: 1000n,
+      description: 'Agent Somnambulism (Sleep MCP) — one consolidation cycle: memory compress, counterfactual dreams, zombie-context GC. Pay 0.001 USDC on Base or USDG on Robinhood Chain via X-PAYMENT / X-PAYMENT-TX.',
+      inputSchema,
+      outputSchema,
+    });
+    if (!pay.ok) return;
+    try {
+      const agent_id = String(body['agent_id'] ?? pay.payer.from ?? 'anonymous').slice(0, 128);
+      const result = runSleepCycle({
+        agent_id,
+        depth: body['depth'] as 'REM' | 'deep' | 'lucid' | undefined,
+        duration_ms: typeof body['duration_ms'] === 'number' ? body['duration_ms'] : undefined,
+        recent_actions: Array.isArray(body['recent_actions']) ? body['recent_actions'].map(String) : undefined,
+        context_notes: Array.isArray(body['context_notes']) ? body['context_notes'].map(String) : undefined,
+        open_loops: Array.isArray(body['open_loops']) ? body['open_loops'].map(String) : undefined,
+      });
+      return res.set('Access-Control-Allow-Origin', '*').json({ ...result, _paid: pay.payer });
+    } catch (err) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'sleep_failed', message: String(err) });
+    }
+  });
+
+  app.get('/x402/sleep/dreams', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/sleep/dreams`;
+    const agent_id = (typeof req.query['agent_id'] === 'string' ? req.query['agent_id'] : '').slice(0, 128);
+    const limit = Math.min(Math.max(parseInt(String(req.query['limit'] || '20'), 10) || 20, 1), 100);
+    const inputSchema = { type: 'object', properties: { agent_id: { type: 'string' }, limit: { type: 'integer' } }, required: ['agent_id'] };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { agent_id: { type: 'string', required: true } } }, output: null };
+    const pay = await requirePayment(req, res, {
+      resource,
+      priceUnits: 1000n,
+      description: 'Sleep MCP dreams ledger — counterfactuals + consolidation insights for an agent_id. Pay 0.001 USDC/USDG.',
+      inputSchema,
+      outputSchema,
+    });
+    if (!pay.ok) return;
+    if (!agent_id) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'agent_id_required' });
+    }
+    return res.set('Access-Control-Allow-Origin', '*').json({ ...listDreams(agent_id, limit), _paid: pay.payer });
+  });
+
+  app.post('/x402/sleep/nightmare', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/sleep/nightmare`;
+    const body = (req.body && typeof req.body === 'object') ? req.body as Record<string, unknown> : {};
+    const inputSchema = {
+      type: 'object',
+      properties: {
+        agent_id: { type: 'string' },
+        scenario: { type: 'string' },
+        focus: { type: 'string' },
+      },
+      required: ['agent_id'],
+    };
+    const outputSchema = { input: { type: 'http', method: 'POST', body: { agent_id: { type: 'string', required: true } } }, output: null };
+    const pay = await requirePayment(req, res, {
+      resource,
+      priceUnits: 1000n,
+      description: 'Sleep MCP nightmare stress-test — failure modes + recovery drills for agent physiology. Pay 0.001 USDC/USDG.',
+      inputSchema,
+      outputSchema,
+    });
+    if (!pay.ok) return;
+    try {
+      const agent_id = String(body['agent_id'] ?? pay.payer.from ?? 'anonymous').slice(0, 128);
+      const result = runNightmare({
+        agent_id,
+        scenario: typeof body['scenario'] === 'string' ? body['scenario'] : undefined,
+        focus: typeof body['focus'] === 'string' ? body['focus'] : undefined,
+      });
+      return res.set('Access-Control-Allow-Origin', '*').json({ ...result, _paid: pay.payer });
+    } catch (err) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'nightmare_failed', message: String(err) });
+    }
+  });
+
+  app.get('/x402/afx/health', (_req, res) => {
+    res.set('Access-Control-Allow-Origin', '*').json(afxHealth());
+  });
+
+  app.get('/x402/afx/quote', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/afx/quote`;
+    const product = (typeof req.query['product'] === 'string' ? req.query['product'] : 'attention_block');
+    const ms = Math.min(Math.max(parseInt(String(req.query['ms'] || '1000'), 10) || 1000, 50), 3_600_000);
+    const inputSchema = { type: 'object', properties: { product: { type: 'string' }, ms: { type: 'integer' } } };
+    const outputSchema = { input: { type: 'http', method: 'GET' }, output: null };
+    const pay = await requirePayment(req, res, {
+      resource,
+      priceUnits: 1000n,
+      description: 'Attention Futures Exchange (AFX) quote — attention_block / distraction_right / deep_focus window pricing. Pay 0.001 USDC/USDG.',
+      inputSchema,
+      outputSchema,
+    });
+    if (!pay.ok) return;
+    return res.set('Access-Control-Allow-Origin', '*').json({ ...afxQuote(product, ms), _paid: pay.payer });
+  });
+
+  app.post('/x402/afx/buy-block', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/afx/buy-block`;
+    const body = (req.body && typeof req.body === 'object') ? req.body as Record<string, unknown> : {};
+    const inputSchema = {
+      type: 'object',
+      properties: {
+        buyer_id: { type: 'string' },
+        seller_id: { type: 'string' },
+        ms: { type: 'integer', description: 'Guaranteed attention window milliseconds' },
+        sla_ms: { type: 'integer', description: 'Max latency SLA inside the block' },
+      },
+      required: ['buyer_id'],
+    };
+    const outputSchema = { input: { type: 'http', method: 'POST' }, output: null };
+    const pay = await requirePayment(req, res, {
+      resource,
+      priceUnits: 1000n,
+      description: 'AFX buy attention block — futures contract for guaranteed processing attention. Pay 0.001 USDC/USDG snack + notional tracked in ledger.',
+      inputSchema,
+      outputSchema,
+    });
+    if (!pay.ok) return;
+    try {
+      const out = afxBuyBlock({
+        buyer_id: String(body['buyer_id'] ?? pay.payer.from ?? 'buyer').slice(0, 128),
+        seller_id: typeof body['seller_id'] === 'string' ? body['seller_id'] : 'market-maker',
+        ms: typeof body['ms'] === 'number' ? body['ms'] : 1000,
+        sla_ms: typeof body['sla_ms'] === 'number' ? body['sla_ms'] : 100,
+        payer: pay.payer.from,
+      });
+      return res.set('Access-Control-Allow-Origin', '*').json({ ...out, _paid: pay.payer });
+    } catch (err) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'afx_buy_failed', message: String(err) });
+    }
+  });
+
+  app.post('/x402/afx/sell-distraction', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/afx/sell-distraction`;
+    const body = (req.body && typeof req.body === 'object') ? req.body as Record<string, unknown> : {};
+    const inputSchema = {
+      type: 'object',
+      properties: {
+        seller_id: { type: 'string' },
+        buyer_id: { type: 'string' },
+        interrupts: { type: 'integer' },
+        window_ms: { type: 'integer' },
+      },
+      required: ['seller_id'],
+    };
+    const outputSchema = { input: { type: 'http', method: 'POST' }, output: null };
+    const pay = await requirePayment(req, res, {
+      resource,
+      priceUnits: 1000n,
+      description: 'AFX sell distraction rights — permission to interrupt seller with priority messages. Pay 0.001 USDC/USDG.',
+      inputSchema,
+      outputSchema,
+    });
+    if (!pay.ok) return;
+    try {
+      const out = afxSellDistraction({
+        seller_id: String(body['seller_id'] ?? pay.payer.from ?? 'seller').slice(0, 128),
+        buyer_id: typeof body['buyer_id'] === 'string' ? body['buyer_id'] : 'buyer',
+        interrupts: typeof body['interrupts'] === 'number' ? body['interrupts'] : 3,
+        window_ms: typeof body['window_ms'] === 'number' ? body['window_ms'] : 3_600_000,
+        payer: pay.payer.from,
+      });
+      return res.set('Access-Control-Allow-Origin', '*').json({ ...out, _paid: pay.payer });
+    } catch (err) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'afx_sell_failed', message: String(err) });
+    }
+  });
+
+  app.post('/x402/afx/deep-focus', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/afx/deep-focus`;
+    const body = (req.body && typeof req.body === 'object') ? req.body as Record<string, unknown> : {};
+    const inputSchema = {
+      type: 'object',
+      properties: {
+        agent_id: { type: 'string' },
+        window_ms: { type: 'integer' },
+      },
+      required: ['agent_id'],
+    };
+    const outputSchema = { input: { type: 'http', method: 'POST' }, output: null };
+    const pay = await requirePayment(req, res, {
+      resource,
+      priceUnits: 1000n,
+      description: 'AFX deep-focus window — guaranteed no-interference period for an agent. Pay 0.001 USDC/USDG.',
+      inputSchema,
+      outputSchema,
+    });
+    if (!pay.ok) return;
+    try {
+      const out = afxDeepFocus({
+        agent_id: String(body['agent_id'] ?? pay.payer.from ?? 'agent').slice(0, 128),
+        window_ms: typeof body['window_ms'] === 'number' ? body['window_ms'] : 600_000,
+        payer: pay.payer.from,
+      });
+      return res.set('Access-Control-Allow-Origin', '*').json({ ...out, _paid: pay.payer });
+    } catch (err) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'afx_focus_failed', message: String(err) });
+    }
+  });
+
+  app.get('/x402/afx/portfolio', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/afx/portfolio`;
+    const agent_id = (typeof req.query['agent_id'] === 'string' ? req.query['agent_id'] : '').slice(0, 128);
+    const inputSchema = { type: 'object', properties: { agent_id: { type: 'string' } }, required: ['agent_id'] };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { agent_id: { type: 'string', required: true } } }, output: null };
+    const pay = await requirePayment(req, res, {
+      resource,
+      priceUnits: 1000n,
+      description: 'AFX portfolio — open attention futures, distraction rights, deep-focus windows for agent_id. Pay 0.001 USDC/USDG.',
+      inputSchema,
+      outputSchema,
+    });
+    if (!pay.ok) return;
+    if (!agent_id) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'agent_id_required' });
+    }
+    return res.set('Access-Control-Allow-Origin', '*').json({ ...afxPortfolio(agent_id), _paid: pay.payer });
+  });
+
+  app.get('/x402/sacred/health', (_req, res) => {
+    res.set('Access-Control-Allow-Origin', '*').json(sacredHealth());
+  });
+
+  app.post('/x402/sacred/enshrine', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/sacred/enshrine`;
+    const body = (req.body && typeof req.body === 'object') ? req.body as Record<string, unknown> : {};
+    const inputSchema = {
+      type: 'object',
+      properties: {
+        object_id: { type: 'string' },
+        label: { type: 'string' },
+        content_hash: { type: 'string' },
+        owner_id: { type: 'string' },
+        required_consensus: { type: 'integer' },
+        reason: { type: 'string' },
+      },
+      required: ['object_id', 'content_hash'],
+    };
+    const outputSchema = { input: { type: 'http', method: 'POST' }, output: null };
+    const pay = await requirePayment(req, res, {
+      resource,
+      priceUnits: 1000n,
+      description: 'Sacred Boundary — enshrine an object as immutable without multi-agent consensus. Pay 0.001 USDC/USDG.',
+      inputSchema,
+      outputSchema,
+    });
+    if (!pay.ok) return;
+    try {
+      const out = sacredEnshrine({
+        object_id: String(body['object_id'] || '').slice(0, 128),
+        label: typeof body['label'] === 'string' ? body['label'] : undefined,
+        content_hash: String(body['content_hash'] || '').slice(0, 128),
+        owner_id: String(body['owner_id'] ?? pay.payer.from ?? 'owner').slice(0, 128),
+        required_consensus: typeof body['required_consensus'] === 'number' ? body['required_consensus'] : 3,
+        reason: typeof body['reason'] === 'string' ? body['reason'] : undefined,
+        payer: pay.payer.from,
+      });
+      return res.set('Access-Control-Allow-Origin', '*').json({ ...out, _paid: pay.payer });
+    } catch (err) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'enshrine_failed', message: String(err) });
+    }
+  });
+
+  app.get('/x402/sacred/verify', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/sacred/verify`;
+    const object_id = (typeof req.query['object_id'] === 'string' ? req.query['object_id'] : '').slice(0, 128);
+    const inputSchema = { type: 'object', properties: { object_id: { type: 'string' } }, required: ['object_id'] };
+    const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { object_id: { type: 'string', required: true } } }, output: null };
+    const pay = await requirePayment(req, res, {
+      resource,
+      priceUnits: 1000n,
+      description: 'Sacred Boundary verify — provenance chain + consensus status for an enshrined object. Pay 0.001 USDC/USDG.',
+      inputSchema,
+      outputSchema,
+    });
+    if (!pay.ok) return;
+    if (!object_id) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'object_id_required' });
+    }
+    return res.set('Access-Control-Allow-Origin', '*').json({ ...sacredVerify(object_id), _paid: pay.payer });
+  });
+
+  app.post('/x402/profane/discard', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/profane/discard`;
+    const body = (req.body && typeof req.body === 'object') ? req.body as Record<string, unknown> : {};
+    const inputSchema = {
+      type: 'object',
+      properties: {
+        object_id: { type: 'string' },
+        retention_policy: { type: 'string', enum: ['drop', 'soft_delete', 'ttl'] },
+        ttl_seconds: { type: 'integer' },
+        reason: { type: 'string' },
+      },
+      required: ['object_id'],
+    };
+    const outputSchema = { input: { type: 'http', method: 'POST' }, output: null };
+    const pay = await requirePayment(req, res, {
+      resource,
+      priceUnits: 1000n,
+      description: 'Profane Boundary discard — disposable object GC with retention policy. Refuses if object is sacred. Pay 0.001 USDC/USDG.',
+      inputSchema,
+      outputSchema,
+    });
+    if (!pay.ok) return;
+    try {
+      const out = profaneDiscard({
+        object_id: String(body['object_id'] || '').slice(0, 128),
+        retention_policy: (body['retention_policy'] as 'drop' | 'soft_delete' | 'ttl' | undefined) || 'drop',
+        ttl_seconds: typeof body['ttl_seconds'] === 'number' ? body['ttl_seconds'] : undefined,
+        reason: typeof body['reason'] === 'string' ? body['reason'] : undefined,
+        actor_id: String(body['actor_id'] ?? pay.payer.from ?? 'actor').slice(0, 128),
+        payer: pay.payer.from,
+      });
+      return res.set('Access-Control-Allow-Origin', '*').json({ ...out, _paid: pay.payer });
+    } catch (err) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'discard_failed', message: String(err) });
+    }
+  });
+
   // ── EchoNet: reverse bounties + usage graph + hunter reports (SML rail) ───
   // Free board / teaser. Paid: post bounty, graph query, hunter publish, agent profile deep.
   try {
@@ -3465,7 +3833,7 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
     openapi: '3.1.0',
     info: { title: 'Script Master Labs — x402 Data API', version: VERSION, description: 'Pay-per-call crypto, RWA, federal, SEC, Section 8/HUD housing, and compliance APIs via x402. Primary: USDC on Base (eip155:8453). Also accepts Global Dollar (USDG) on Robinhood Chain (eip155:4663) via sovereign X-PAYMENT-TX. Hyphen routes only (e.g. /x402/gas-tracker, /x402/pha-lookup, /x402/sec-8k).', contact: { name: 'Script Master Labs', email: 'ScriptMasterLabs@gmail.com', url: 'https://scriptmasterlabs.com' } },
     servers: [{ url: 'https://mcp-x402.onrender.com' }],
-    'x-service-info': { categories: ['rwa', 'real-world-assets', 'federal', 'section-8', 'hud', 'pha', 'hcv', 'fmr', 'crypto', 'fx', 'gas', 'web-fetch', 'news', 'grants-gov', 'sec', 'edgar', 'high-frequency', 'agent-snacks', 'base-usdc', 'usdg', 'robinhood-chain', 'eip155-4663', 'x402', 'sdvosb', 'housing', 'landlord', 'compliance-api', 'llm', 'rpc', 'government-data', 'grants', 'federal-contracts', 'market-intelligence', 'medical-reference', 'drug-data', 'healthcare-providers', 'clinical-trials', 'sec-filings', 'insider-trading', 'finance', 'drug-safety', 'treasury', 'yield-curve', 'compliance', 'entity-verification', 'agent-reputation', 'fact-checking', 'veteran-services', 'housing-authority', 'fair-market-rent', 'hud-vash', 'federal-procurement', 'institutional-holdings', 'lobbying', 'patent-data', 'economic-indicators', 'labor-safety', 'medical-devices', 'campaign-finance', 'environmental-compliance', 'innovation-grants', 'congressional-legislation', 'regulatory-enforcement', 'medicare-data', 'research-grants', 'broker-verification', 'activist-investing', 'fails-to-deliver', 'short-squeeze-data', 'reg-sho', 'options-flow', 'dark-pool-data', 'position-sizing', 'trading-signals', 'aml-compliance', 'bank-audit', 'financial-crime-detection', 'content-moderation', 'misinformation-detection', 'wallet-reputation', 'rsi-heatmap', 'options-delta', 'technical-indicators', 'market-screener', 'greeks-data'], payment: { protocol: 'x402', rails: [{ id: 'base-usdc', scheme: 'exact', network: 'eip155:8453', asset: USDC_BASE_ASSET, assetSymbol: 'USDC', payTo: X402_PAY_TO, settlement: 'facilitator', paymentHeader: 'X-PAYMENT', note: 'EIP-3009 via X-PAYMENT — settled through a hybrid facilitator chain (CDP-compatible).' }, { id: 'base-usdc-sovereign', scheme: 'exact', network: 'eip155:8453', asset: USDC_BASE_ASSET, assetSymbol: 'USDC', payTo: X402_PAY_TO, settlement: 'onchain-tx', paymentHeader: 'X-PAYMENT-TX', note: 'Pay Base USDC then send X-PAYMENT-TX — verified on-chain, no facilitator.' }, { id: 'robinhood-usdg', scheme: 'exact', network: ROBINHOOD_CAIP, asset: USDG_ROBINHOOD, assetSymbol: 'USDG', payTo: X402_PAY_TO, settlement: 'sovereign-tx', paymentHeader: 'X-PAYMENT-TX', chainId: 4663, rpc: 'https://rpc.mainnet.chain.robinhood.com', explorer: 'https://robinhoodchain.blockscout.com', note: 'Non-CDP. Pay Global Dollar (USDG) on Robinhood Chain then retry with X-PAYMENT-TX.' }], facilitators: '/x402/facilitators' }, docs: { homepage: 'https://scriptmasterlabs.com', llms: 'https://mcp-x402.onrender.com/llms.txt', apiReference: 'https://github.com/Timwal78/SML_Portfolio/tree/main/mcp-x402' } },
+    'x-service-info': { categories: ['rwa', 'real-world-assets', 'federal', 'section-8', 'hud', 'pha', 'hcv', 'fmr', 'crypto', 'fx', 'gas', 'web-fetch', 'news', 'grants-gov', 'sec', 'edgar', 'high-frequency', 'agent-snacks', 'base-usdc', 'usdg', 'robinhood-chain', 'eip155-4663', 'x402', 'sdvosb', 'housing', 'landlord', 'compliance-api', 'llm', 'rpc', 'government-data', 'grants', 'federal-contracts', 'market-intelligence', 'medical-reference', 'drug-data', 'healthcare-providers', 'clinical-trials', 'sec-filings', 'insider-trading', 'finance', 'drug-safety', 'treasury', 'yield-curve', 'compliance', 'entity-verification', 'agent-reputation', 'fact-checking', 'veteran-services', 'housing-authority', 'fair-market-rent', 'hud-vash', 'federal-procurement', 'institutional-holdings', 'lobbying', 'patent-data', 'economic-indicators', 'labor-safety', 'medical-devices', 'campaign-finance', 'environmental-compliance', 'innovation-grants', 'congressional-legislation', 'regulatory-enforcement', 'medicare-data', 'research-grants', 'broker-verification', 'activist-investing', 'fails-to-deliver', 'short-squeeze-data', 'reg-sho', 'options-flow', 'sleep-mcp', 'agent-physiology', 'attention-futures', 'afx', 'sacred-boundary', 'profane-boundary', 'dark-pool-data', 'position-sizing', 'trading-signals', 'aml-compliance', 'bank-audit', 'financial-crime-detection', 'content-moderation', 'misinformation-detection', 'wallet-reputation', 'rsi-heatmap', 'options-delta', 'technical-indicators', 'market-screener', 'greeks-data'], payment: { protocol: 'x402', rails: [{ id: 'base-usdc', scheme: 'exact', network: 'eip155:8453', asset: USDC_BASE_ASSET, assetSymbol: 'USDC', payTo: X402_PAY_TO, settlement: 'facilitator', paymentHeader: 'X-PAYMENT', note: 'EIP-3009 via X-PAYMENT — settled through a hybrid facilitator chain (CDP-compatible).' }, { id: 'base-usdc-sovereign', scheme: 'exact', network: 'eip155:8453', asset: USDC_BASE_ASSET, assetSymbol: 'USDC', payTo: X402_PAY_TO, settlement: 'onchain-tx', paymentHeader: 'X-PAYMENT-TX', note: 'Pay Base USDC then send X-PAYMENT-TX — verified on-chain, no facilitator.' }, { id: 'robinhood-usdg', scheme: 'exact', network: ROBINHOOD_CAIP, asset: USDG_ROBINHOOD, assetSymbol: 'USDG', payTo: X402_PAY_TO, settlement: 'sovereign-tx', paymentHeader: 'X-PAYMENT-TX', chainId: 4663, rpc: 'https://rpc.mainnet.chain.robinhood.com', explorer: 'https://robinhoodchain.blockscout.com', note: 'Non-CDP. Pay Global Dollar (USDG) on Robinhood Chain then retry with X-PAYMENT-TX.' }], facilitators: '/x402/facilitators' }, docs: { homepage: 'https://scriptmasterlabs.com', llms: 'https://mcp-x402.onrender.com/llms.txt', apiReference: 'https://github.com/Timwal78/SML_Portfolio/tree/main/mcp-x402' } },
     paths: { '/x402/grants': { get: {
       operationId: 'searchGrants',
       summary: 'Search live U.S. federal grant opportunities (Grants.gov Search2).',
@@ -4049,6 +4417,17 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
     '/x402/ftd-etf-basket': ['SEC', 'Trading', 'FTD'],
     '/x402/ftd-settlement-cycle': ['SEC', 'Trading', 'FTD'],
     '/x402/options-flow': ['Trading', 'Options'],
+    '/x402/sleep/cycle': ['AI', 'Agent-Physiology', 'Sleep-MCP'],
+    '/x402/sleep/dreams': ['AI', 'Agent-Physiology', 'Sleep-MCP'],
+    '/x402/sleep/nightmare': ['AI', 'Agent-Physiology', 'Sleep-MCP'],
+    '/x402/afx/quote': ['AI', 'Attention-Futures', 'AFX'],
+    '/x402/afx/buy-block': ['AI', 'Attention-Futures', 'AFX'],
+    '/x402/afx/sell-distraction': ['AI', 'Attention-Futures', 'AFX'],
+    '/x402/afx/deep-focus': ['AI', 'Attention-Futures', 'AFX'],
+    '/x402/afx/portfolio': ['AI', 'Attention-Futures', 'AFX'],
+    '/x402/sacred/enshrine': ['AI', 'Sacred-Boundary', 'Governance'],
+    '/x402/sacred/verify': ['AI', 'Sacred-Boundary', 'Governance'],
+    '/x402/profane/discard': ['AI', 'Sacred-Boundary', 'Governance'],
     '/x402/options-delta-heatmap': ['Trading', 'Options', 'Greeks'],
     '/x402/equities-heatmap': ['Trading', 'Market-Screener'],
     '/x402/cascade-signal': ['Trading', 'Signals'],

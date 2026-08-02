@@ -90,3 +90,10 @@ Root `/` is discovery catalog only. Point scanners at paid snacks above.
 - accepts[0]: Base USDC eip155:8453 · X-PAYMENT (CDP/facilitator) or X-PAYMENT-TX (sovereign)
 - accepts[1]: Robinhood Chain USDG eip155:4663 · X-PAYMENT-TX sovereign (asset 0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168)
 - Discovery: GET /.well-known/x402 · GET /x402/facilitators · list on agent402.tools/sell
+
+
+## Agent physiology & markets (new)
+- Sleep MCP (ASP): POST /x402/sleep/cycle · GET /x402/sleep/dreams · POST /x402/sleep/nightmare · GET /x402/sleep/health
+- AFX Attention Futures: GET /x402/afx/quote · POST /x402/afx/buy-block · POST /x402/afx/sell-distraction · POST /x402/afx/deep-focus · GET /x402/afx/portfolio · GET /x402/afx/health
+- Sacred/Profane Boundary: POST /x402/sacred/enshrine · GET /x402/sacred/verify · POST /x402/profane/discard · GET /x402/sacred/health
+- All paid snacks $0.001 — Base USDC or Robinhood USDG (X-PAYMENT / X-PAYMENT-TX)
