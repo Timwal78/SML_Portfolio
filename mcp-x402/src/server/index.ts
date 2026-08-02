@@ -3312,7 +3312,7 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
       package: novelManifest().id,
       live: novelCatalog().counts.live,
       total: novelCatalog().counts.total,
-      product: 'novel-agent-infra', 'cognitive-friction',
+      product: 'novel-agent-infra',
     });
   });
 
