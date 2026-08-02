@@ -379,6 +379,55 @@ export const OFFERINGS: Record<string, Offering> = {
       '(which cross-references live government data; this scores text content and sender wallet reputation). ' +
       'Req: { content: string, sender_wallet?: string }',
   },
+
+  // ── HOT DEMAND (what agents buy now — x402scan leaders) ───────────────────
+  // Marketplace names are snake_case (acp offering create --name llm_chat).
+  llm_chat: {
+    price: 0.01,
+    description:
+      'LLM chat proxy for agents. Req: { prompt: string, system?: string, model?: string }',
+  },
+  web_search: {
+    price: 0.01,
+    description: 'Keyless web search for agent retrieval. Req: { q: string, limit?: number }',
+  },
+  web_fetch: {
+    price: 0.01,
+    description: 'Fetch public HTTPS URL → text/JSON for RAG. Req: { url: string }',
+  },
+  social_search: {
+    price: 0.01,
+    description: 'Social/web pulse search for agents. Req: { q: string, limit?: number }',
+  },
+  news_headlines: {
+    price: 0.01,
+    description: 'Live news headlines pulse. Req: { q?: string, limit?: number }',
+  },
+  eth_rpc: {
+    price: 0.01,
+    description: 'Ethereum JSON-RPC proxy. Req: { method: string, params?: string }',
+  },
+  base_rpc: {
+    price: 0.01,
+    description: 'Base chain JSON-RPC proxy. Req: { method: string, params?: string }',
+  },
+  domain_enrich: {
+    price: 0.01,
+    description: 'Domain DNS/IP enrichment. Req: { domain: string }',
+  },
+  crypto_price: {
+    price: 0.01,
+    description: 'Real-time crypto prices. Req: { ids: string, vs_currencies?: string }',
+  },
+  funding_rates: {
+    price: 0.01,
+    description: 'Perp funding rates pulse. Req: { symbol?: string }',
+  },
+  gas_tracker: {
+    price: 0.01,
+    description: 'Multi-chain gas tracker. Req: { chain?: string }',
+  },
+
 };
 
 // ─── BACKEND ROUTING ─────────────────────────────────────────────────────────
@@ -729,6 +778,72 @@ async function routeOffering(offering: string, req: Requirement): Promise<unknow
         ...(req.sender_wallet ? { sender_wallet: str(req.sender_wallet) } : {}),
       });
 
+
+    // ── HOT DEMAND snake_case (Virtuals offering names) ───────────────────────
+    case 'llm_chat':
+      return callMcp('GET', '/x402/llm-chat', undefined, {
+        prompt: str(req.prompt, str(req.message, str(req.q, 'Hello'))),
+        ...(req.system ? { system: str(req.system) } : {}),
+        ...(req.model ? { model: str(req.model) } : {}),
+      });
+
+    case 'web_search':
+      return callMcp('GET', '/x402/web-search', undefined, {
+        q: str(req.q, str(req.query, 'AI agents')),
+        ...(req.limit ? { limit: str(req.limit) } : {}),
+      });
+
+    case 'web_fetch':
+      return callMcp('GET', '/x402/web-fetch', undefined, {
+        url: str(req.url, 'https://example.com'),
+      });
+
+    case 'social_search':
+      return callMcp('GET', '/x402/social-search', undefined, {
+        q: str(req.q, str(req.query, 'AI agents')),
+        ...(req.limit ? { limit: str(req.limit) } : {}),
+      });
+
+    case 'news_headlines':
+      return callMcp('GET', '/x402/news-headlines', undefined, {
+        ...(req.q ? { q: str(req.q) } : {}),
+        ...(req.limit ? { limit: str(req.limit) } : {}),
+      });
+
+    case 'eth_rpc':
+      return callMcp('GET', '/x402/eth-rpc', undefined, {
+        method: str(req.method, 'eth_blockNumber'),
+        ...(req.params ? { params: str(req.params) } : {}),
+        ...(req.address ? { address: str(req.address) } : {}),
+      });
+
+    case 'base_rpc':
+      return callMcp('GET', '/x402/base-rpc', undefined, {
+        method: str(req.method, 'eth_blockNumber'),
+        ...(req.params ? { params: str(req.params) } : {}),
+        ...(req.address ? { address: str(req.address) } : {}),
+      });
+
+    case 'domain_enrich':
+      return callMcp('GET', '/x402/domain-enrich', undefined, {
+        domain: str(req.domain, 'example.com'),
+      });
+
+    case 'crypto_price':
+      return callMcp('GET', '/x402/crypto-price', undefined, {
+        ids: str(req.ids, 'bitcoin,ethereum'),
+        ...(req.vs_currencies ? { vs_currencies: str(req.vs_currencies) } : {}),
+      });
+
+    case 'funding_rates':
+      // mcp host may not expose funding-rates; use crypto-trending + gas as market pulse
+      return callMcp('GET', '/x402/crypto-trending');
+
+    case 'gas_tracker':
+      return callMcp('GET', '/x402/gas-tracker', undefined, {
+        ...(req.chain ? { chain: str(req.chain) } : {}),
+      });
+
     default:
       throw new Error(`Unknown offering: ${offering}`);
   }
@@ -773,6 +888,17 @@ const NORMALIZED_KEYS: ReadonlyArray<readonly [string, string]> =
 // (e.g. "sec_13dg" → "sec13dg" but the catalog key "SEC 13D/13G" → "sec13d13g").
 const OFFERING_ALIASES: Record<string, string> = {
   sec13dgactivistfilings: 'SEC 13D/13G Activist Filings',
+  llmchat: 'llm_chat',
+  websearch: 'web_search',
+  webfetch: 'web_fetch',
+  socialsearch: 'social_search',
+  newsheadlines: 'news_headlines',
+  ethrpc: 'eth_rpc',
+  baserpc: 'base_rpc',
+  domainenrich: 'domain_enrich',
+  cryptoprice: 'crypto_price',
+  fundingrates: 'funding_rates',
+  gastracker: 'gas_tracker',
 };
 
 export function resolveOffering(rawDescription: string): { key: string; spec: Offering } | undefined {
