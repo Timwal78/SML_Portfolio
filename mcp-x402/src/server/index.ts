@@ -5027,6 +5027,98 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
     }
   }
   (OPENAPI_DOC as Record<string, unknown>)['tags'] = Array.from(tagSet).sort().map((name) => ({ name }));
+
+  // Free playground paths MUST appear in OpenAPI so {API}Market / marketplace
+  // playgrounds do not only probe paid /x402/* routes (which correctly 402).
+  {
+    const paths = (OPENAPI_DOC as { paths: Record<string, unknown> }).paths;
+    const freePlay: Record<string, unknown> = {
+      '/x402/playground': {
+        get: {
+          operationId: 'playgroundRoot',
+          summary: 'API Market / marketplace free playground index (no payment, no API key).',
+          description: 'Free. Use this for listing review. Production paid routes require x402 or X-Api-Market-Key.',
+          security: [],
+          tags: ['Playground', 'Free', 'Discovery'],
+          responses: { '200': { description: 'Playground index + links' } },
+        },
+      },
+      '/x402/playground/demo': {
+        get: {
+          operationId: 'playgroundDemo',
+          summary: 'Free demo payload for marketplace testers (no payment, no API key).',
+          security: [],
+          tags: ['Playground', 'Free'],
+          responses: { '200': { description: 'Demo JSON' } },
+        },
+      },
+      '/x402/playground/grants': {
+        get: {
+          operationId: 'playgroundGrants',
+          summary: 'Free Grants.gov sample for API playground (no payment, no API key).',
+          description: 'Marketplace review path. Production equivalent is paid GET /x402/grants.',
+          security: [],
+          tags: ['Playground', 'Free', 'Federal'],
+          parameters: [
+            { name: 'keyword', in: 'query', required: false, schema: { type: 'string', default: 'veteran' } },
+          ],
+          responses: { '200': { description: 'Live grants sample' } },
+        },
+      },
+      '/x402/playground/fred': {
+        get: {
+          operationId: 'playgroundFred',
+          summary: 'Free FRED sample for API playground (no payment, no API key).',
+          security: [],
+          tags: ['Playground', 'Free', 'Federal'],
+          parameters: [
+            { name: 'series_id', in: 'query', required: false, schema: { type: 'string', default: 'GDP' } },
+          ],
+          responses: { '200': { description: 'FRED sample' } },
+        },
+      },
+    };
+    Object.assign(paths, freePlay);
+    // Reorder: put playground paths first so marketplace "first endpoint" probes are free
+    const ordered: Record<string, unknown> = { ...freePlay };
+    for (const [k, v] of Object.entries(paths)) {
+      if (!(k in ordered)) ordered[k] = v;
+    }
+    (OPENAPI_DOC as { paths: Record<string, unknown> }).paths = ordered;
+    const docAny = OPENAPI_DOC as Record<string, unknown>;
+    docAny['components'] = {
+      ...((docAny['components'] as object) || {}),
+      securitySchemes: {
+        ApiMarketKey: {
+          type: 'apiKey',
+          in: 'header',
+          name: 'X-Api-Market-Key',
+          description:
+            'Optional marketplace gateway key (seller dashboard). Not required for /x402/playground/*. ' +
+            'When set on production routes, bypasses x402 micropayment. Do not put the secret in the public listing body.',
+        },
+        ApiKey: {
+          type: 'apiKey',
+          in: 'header',
+          name: 'X-API-Key',
+          description: 'Alias for marketplace/operator gateway key on production routes.',
+        },
+      },
+    };
+
+
+    const info = (OPENAPI_DOC as { info?: { description?: string } }).info;
+    if (info) {
+      const note =
+        ' MARKETPLACE REVIEW: use free /x402/playground/* (no key, no payment). ' +
+        'Production /x402/* returns 402 unless paid via x402 or X-Api-Market-Key / X-API-Key from seller dashboard.';
+      if (info.description && !info.description.includes('MARKETPLACE REVIEW')) {
+        info.description = info.description + note;
+      }
+    }
+  }
+
+
   {
     const svc = (OPENAPI_DOC as Record<string, unknown>)['x-service-info'] as { categories?: string[] };
     if (svc && Array.isArray(svc.categories)) {
