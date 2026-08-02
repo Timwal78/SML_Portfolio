@@ -105,3 +105,10 @@ Root `/` is discovery catalog only. Point scanners at paid snacks above.
 - LIVE (3/14): Sleep MCP · AFX Attention Futures · Sacred/Profane Boundary
 - Bundle snack: POST /x402/novel/bundle { agent_id, depth?, attention_ms?, enshrine_object_id?, enshrine_hash? } — $0.001
 - Roadmap 11: EaaS, RMP, Synchronicity, Thanatology, Friction, Taboo, Unlearning, NCP, Shadow, Phase, Mimicry
+
+### #6 Cognitive Friction (LIVE)
+- GET /x402/friction/health (free)
+- POST /x402/friction/apply { agent_id, action, intensity?, amount_usd? }
+- POST /x402/friction/explain { session_id, explanation }
+- GET /x402/friction/status?session_id=
+- POST /x402/friction/confirm { session_id, reconfirm_token, accept_risk: true }

@@ -60,6 +60,7 @@ import { runSleepCycle, listDreams, runNightmare, sleepHealth } from './sleep/in
 import { afxHealth, afxQuote, afxBuyBlock, afxSellDistraction, afxDeepFocus, afxPortfolio } from './afx/index.js';
 import { sacredEnshrine, sacredVerify, profaneDiscard, sacredHealth } from './sacred/index.js';
 import { novelCatalog, novelManifest } from './novel/index.js';
+import { frictionHealth, applyFriction, explainFriction, statusFriction, confirmFriction } from './friction/index.js';
 import { SqueezeOSAPI } from '../lib/sml-api/squeezeos.js';
 import { EquitiesHeatmapAPI, OptionsDeltaHeatmapAPI, type DataCredentials } from '../lib/sml-api/equities-heatmap.js';
 
@@ -3174,6 +3175,127 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
 
 
 
+
+  // ── Cognitive Friction (#6 NEGATIVE_SPACE_14) ──────────────────────────────
+  app.get('/x402/friction/health', (_req, res) => {
+    res.set('Access-Control-Allow-Origin', '*').json(frictionHealth());
+  });
+
+  app.post('/x402/friction/apply', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/friction/apply`;
+    const body = (req.body && typeof req.body === 'object') ? req.body as Record<string, unknown> : {};
+    const inputSchema = {
+      type: 'object',
+      properties: {
+        agent_id: { type: 'string' },
+        action: { type: 'string', description: 'High-stakes action label, e.g. authorize_payment' },
+        friction_type: { type: 'string', enum: ['deliberation_ritual', 'cooling', 'ceremonial', 'devil_advocate'] },
+        intensity: { type: 'string', enum: ['light', 'standard', 'ceremonial'] },
+        amount_usd: { type: 'number' },
+      },
+      required: ['agent_id', 'action'],
+    };
+    const pay = await requirePayment(req, res, {
+      resource,
+      priceUnits: 1000n,
+      description: 'Cognitive Friction apply — start deliberation/cooling ritual before high-stakes act. $0.001 USDC/USDG.',
+      inputSchema,
+      outputSchema: { input: { type: 'http', method: 'POST' }, output: null },
+    });
+    if (!pay.ok) return;
+    try {
+      const out = applyFriction({
+        agent_id: String(body['agent_id'] ?? pay.payer.from ?? 'agent'),
+        action: String(body['action'] ?? 'unspecified'),
+        friction_type: body['friction_type'] as any,
+        intensity: body['intensity'] as any,
+        amount_usd: typeof body['amount_usd'] === 'number' ? body['amount_usd'] : undefined,
+        payer: pay.payer.from,
+      });
+      // Return reconfirm_token only after pay (needed for confirm step)
+      const full = statusFriction(out.session_id);
+      return res.set('Access-Control-Allow-Origin', '*').json({ ...out, _paid: pay.payer });
+    } catch (err) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'friction_apply_failed', message: String(err) });
+    }
+  });
+
+  app.post('/x402/friction/explain', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/friction/explain`;
+    const body = (req.body && typeof req.body === 'object') ? req.body as Record<string, unknown> : {};
+    const pay = await requirePayment(req, res, {
+      resource,
+      priceUnits: 1000n,
+      description: 'Cognitive Friction explain — record deliberation rationale. $0.001.',
+      inputSchema: { type: 'object', properties: { session_id: { type: 'string' }, explanation: { type: 'string' }, agent_id: { type: 'string' } }, required: ['session_id', 'explanation'] },
+      outputSchema: { input: { type: 'http', method: 'POST' }, output: null },
+    });
+    if (!pay.ok) return;
+    const out = explainFriction({
+      session_id: String(body['session_id'] ?? ''),
+      explanation: String(body['explanation'] ?? ''),
+      agent_id: body['agent_id'] != null ? String(body['agent_id']) : undefined,
+    });
+    if ('error' in out) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(400).set('Access-Control-Allow-Origin', '*').json({ ...out, _paid: pay.payer });
+    }
+    return res.set('Access-Control-Allow-Origin', '*').json({ ...out, _paid: pay.payer });
+  });
+
+  app.get('/x402/friction/status', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/friction/status`;
+    const session_id = typeof req.query['session_id'] === 'string' ? req.query['session_id'] : '';
+    const pay = await requirePayment(req, res, {
+      resource,
+      priceUnits: 1000n,
+      description: 'Cognitive Friction status — cooling remaining / ready. $0.001.',
+      inputSchema: { type: 'object', properties: { session_id: { type: 'string' } }, required: ['session_id'] },
+      outputSchema: { input: { type: 'http', method: 'GET' }, output: null },
+    });
+    if (!pay.ok) return;
+    if (!session_id) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_session_id' });
+    }
+    const out = statusFriction(session_id);
+    if ('error' in out) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(404).set('Access-Control-Allow-Origin', '*').json({ ...out, _paid: pay.payer });
+    }
+    return res.set('Access-Control-Allow-Origin', '*').json({ ...out, _paid: pay.payer });
+  });
+
+  app.post('/x402/friction/confirm', async (req, res) => {
+    const host = req.headers.host ?? 'mcp-x402.onrender.com';
+    const resource = `https://${host}/x402/friction/confirm`;
+    const body = (req.body && typeof req.body === 'object') ? req.body as Record<string, unknown> : {};
+    const pay = await requirePayment(req, res, {
+      resource,
+      priceUnits: 1000n,
+      description: 'Cognitive Friction confirm — non-default reconfirm after cooling. $0.001.',
+      inputSchema: { type: 'object', properties: { session_id: { type: 'string' }, reconfirm_token: { type: 'string' }, accept_risk: { type: 'boolean' }, agent_id: { type: 'string' } }, required: ['session_id', 'reconfirm_token', 'accept_risk'] },
+      outputSchema: { input: { type: 'http', method: 'POST' }, output: null },
+    });
+    if (!pay.ok) return;
+    const out = confirmFriction({
+      session_id: String(body['session_id'] ?? ''),
+      reconfirm_token: String(body['reconfirm_token'] ?? ''),
+      agent_id: body['agent_id'] != null ? String(body['agent_id']) : undefined,
+      accept_risk: body['accept_risk'] === true,
+    });
+    if ('error' in out) {
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      const code = out.error === 'still_cooling' ? 425 : 400;
+      return res.status(code).set('Access-Control-Allow-Origin', '*').json({ ...out, _paid: pay.payer });
+    }
+    return res.set('Access-Control-Allow-Origin', '*').json({ ...out, _paid: pay.payer });
+  });
+
   // ── Novel package (14 negative-space concepts) ────────────────────────────
   app.get('/x402/novel', (_req, res) => {
     res.set('Access-Control-Allow-Origin', '*').json(novelCatalog());
@@ -3190,7 +3312,7 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
       package: novelManifest().id,
       live: novelCatalog().counts.live,
       total: novelCatalog().counts.total,
-      product: 'novel-agent-infra',
+      product: 'novel-agent-infra', 'cognitive-friction',
     });
   });
 
