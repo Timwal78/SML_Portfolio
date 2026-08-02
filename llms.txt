@@ -520,3 +520,9 @@ Agent-facing directory + listing surface for machine commerce.
 - Price floor: 0.001 USDC on Base (eip155:8453)
 - Root `/` is catalog (200). Scanners must hit paid paths above.
 
+
+## Swarm MM live API
+- Origin: https://swarm-mm.onrender.com
+- Discovery: https://swarm-mm.onrender.com/.well-known/x402
+- agent402.tools: listed/routable (register origin swarm-mm.onrender.com)
+- Free: /v1/sim/* · Paid PPC: /v1/signal/levels @ 0.001 · Monthly: $19 signal
