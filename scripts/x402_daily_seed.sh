@@ -24,11 +24,15 @@ python3 << 'PY'
 import json, subprocess, urllib.request, urllib.error, time, os, sys
 
 USDC = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
-MCP = "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700"
+MCP = "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa"
 ACP = "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa"
 
 # Rotate daily across wedge routes (cheap + high-signal)
 JOBS = [
+    (MCP, "https://mcp-x402.onrender.com/x402/attention/bounties?status=open"),
+    (MCP, "https://mcp-x402.onrender.com/x402/novel/catalog"),
+    (MCP, "https://mcp-x402.onrender.com/x402/sleep/dreams?agent_id=daily-seed"),
+
     (MCP, "https://mcp-x402.onrender.com/x402/crypto-price?ids=bitcoin"),
     (MCP, "https://mcp-x402.onrender.com/x402/fx-rate?base=USD&symbols=EUR"),
     (MCP, "https://mcp-x402.onrender.com/x402/grants?keyword=ai"),
