@@ -2482,11 +2482,19 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
     } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'trade_leads_fetch_failed', message: String(err) }); }
   });
 
-  // ── /x402/crypto-price — multi-source token price (never burn stranger on CG 502) ──
+  // ── /x402/crypto-price — multi-source token price ──
   app.get('/x402/crypto-price', async (req, res) => {
     const host = req.headers.host ?? 'mcp-x402.onrender.com';
     const resource = `https://${host}/x402/crypto-price`;
-    const ids = cleanTerm(typeof req.query['ids'] === 'string' ? req.query['ids'] : '');
+    // NOTE: ids is a comma-separated list of CoinGecko coin IDs (e.g.
+    // "bitcoin,ethereum") -- do NOT run the raw string through cleanTerm()
+    // before splitting. cleanTerm() strips any character outside
+    // [a-zA-Z0-9 .-], which includes the comma itself, so "bitcoin,ethereum"
+    // silently became the single invalid id "bitcoinethereum". Split first,
+    // then sanitize each id individually (CoinGecko ids are lowercase
+    // alphanumeric + hyphens, e.g. "usd-coin", "matic-network").
+    const rawIds = typeof req.query['ids'] === 'string' ? req.query['ids'] : '';
+    const ids = rawIds.trim();
     const vs_currencies = typeof req.query['vs_currencies'] === 'string' ? req.query['vs_currencies'] : 'usd';
     const include_market_cap = req.query['include_market_cap'] === 'true';
     const include_24hr_vol = req.query['include_24hr_vol'] === 'true';
@@ -2496,7 +2504,8 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
     const pay = await requirePayment(req, res, { resource, priceUnits: 1000n, description: 'Real-time crypto prices (multi-source: CoinGecko + CoinCap + Binance). Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
     if (!pay.ok) return;
     if (!ids) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_ids', detail: 'Payment verified. Add ?ids= and retry with the same payment.' }); }
-    const idList = ids.split(',').map((s) => s.trim().toLowerCase()).filter(Boolean).slice(0, 20);
+    const idList = ids.split(',').map((s) => s.trim().toLowerCase().replace(/[^a-z0-9-]/g, '')).filter(Boolean).slice(0, 20);
+    if (idList.length === 0) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'invalid_ids', detail: 'Payment verified. ids must be comma-separated CoinGecko coin IDs and retry with the same payment.' }); }
     const vs = (vs_currencies || 'usd').toLowerCase().split(',')[0] || 'usd';
     // Common id → ticker map for non-CG sources
     const ID_TO_SYM: Record<string, string> = {
@@ -2560,19 +2569,23 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
         return res.set('Access-Control-Allow-Origin', '*').json({ source, data, degraded: true, note: 'CoinGecko/CoinCap unavailable; Binance fallback', _paid: pay.payer });
       }
 
-      // 4) Hard 200 stub so stranger never burns — points at free public pages
-      const stub: Record<string, Record<string, unknown>> = {};
-      for (const id of idList) {
-        stub[id] = { [vs]: null, lookup: `https://www.coingecko.com/en/coins/${encodeURIComponent(id)}`, error: 'upstream_unavailable' };
-      }
-      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'sml-fallback', data: stub, degraded: true, note: 'All price upstreams unavailable; payment kept; retry shortly', _paid: pay.payer });
+      // All three real sources (CoinGecko, CoinCap, Binance) failed -- per
+      // AGENT_STANDARDS/SOVEREIGN_DATA_POLICY.md section 4: no fabricated
+      // fallback data, no 200 with a stub. Refund the sovereign-rail payment
+      // (there is no real data to sell) and return 502.
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(502).set('Access-Control-Allow-Origin', '*').json({
+        error: 'upstream_error',
+        detail: 'CoinGecko, CoinCap, and Binance were all unavailable for the requested ids. No payment was kept.',
+        lookup: idList.map((id) => `https://www.coingecko.com/en/coins/${encodeURIComponent(id)}`),
+      });
     } catch (err) {
-      // Still 200 after pay — never 502 stranger-burn
-      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'sml-fallback', data: {}, degraded: true, error: 'price_fetch_degraded', message: String(err), _paid: pay.payer });
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'price_fetch_failed', message: String(err) });
     }
   });
 
-  // ── /x402/crypto-trending — multi-source trending (never 502 after pay) ──
+  // ── /x402/crypto-trending — multi-source trending ──
   app.get('/x402/crypto-trending', async (req, res) => {
     const host = req.headers.host ?? 'mcp-x402.onrender.com';
     const resource = `https://${host}/x402/crypto-trending`;
@@ -2598,9 +2611,13 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
           return res.set('Access-Control-Allow-Origin', '*').json({ source: 'coincap.io/v2/assets', data: j, degraded: true, note: 'CoinGecko trending unavailable; top assets by market cap', _paid: pay.payer });
         }
       } catch { /* fall */ }
-      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'sml-fallback', data: { coins: [], note: 'upstream_unavailable' }, degraded: true, _paid: pay.payer });
+      // Both real sources failed -- no fabricated fallback, refund + 502
+      // (AGENT_STANDARDS/SOVEREIGN_DATA_POLICY.md section 4).
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'upstream_error', detail: 'CoinGecko and CoinCap were both unavailable. No payment was kept.' });
     } catch (err) {
-      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'sml-fallback', data: {}, degraded: true, message: String(err), _paid: pay.payer });
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'trending_fetch_failed', message: String(err) });
     }
   });
 
@@ -2989,20 +3006,14 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
       return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'prompt_required' });
     }
     const out = await runLlmChat({ prompt, model, max_tokens });
-    // Stranger-safe: NEVER 502/503 after payment. Degraded 200 + stub beats refund burn.
     if (!out.ok) {
-      return res.set('Access-Control-Allow-Origin', '*').json({
-        timestamp: new Date().toISOString(),
-        model: model || 'degraded',
-        content: `ACK: ${prompt.slice(0, 200)}`,
-        usage: null,
-        source: 'degraded_stub',
-        degraded: true,
-        upstream: out.body,
-        choices: [{ index: 0, message: { role: 'assistant', content: `ACK: ${prompt.slice(0, 200)}` }, finish_reason: 'stop' }],
-        object: 'chat.completion',
-        _paid: pay.payer,
-      });
+      // Never fabricate a fake assistant reply and label it 'chat.completion'
+      // -- a caller (agent or human) could reasonably act on that content as
+      // if a real model produced it. Real upstream error, real status code,
+      // refund the sovereign-rail payment (AGENT_STANDARDS/SOVEREIGN_DATA_POLICY.md
+      // section 4).
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(out.status).set('Access-Control-Allow-Origin', '*').json(out.body);
     }
     return res.set('Access-Control-Allow-Origin', '*').json({ ...out.body, _paid: pay.payer });
   });
@@ -3022,17 +3033,10 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
       temperature: body.temperature,
     });
     if (!out.ok) {
-      const stub = 'degraded LLM reply — upstream unavailable; payment kept, no burn';
-      return res.set('Access-Control-Allow-Origin', '*').json({
-        timestamp: new Date().toISOString(),
-        model: 'degraded',
-        content: stub,
-        choices: [{ index: 0, message: { role: 'assistant', content: stub }, finish_reason: 'stop' }],
-        object: 'chat.completion',
-        degraded: true,
-        upstream: out.body,
-        _paid: pay.payer,
-      });
+      // Same rule as /x402/llm-chat above: no fabricated assistant content
+      // labeled as a real chat.completion. Real status, refund on sovereign rail.
+      if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+      return res.status(out.status).set('Access-Control-Allow-Origin', '*').json(out.body);
     }
     return res.set('Access-Control-Allow-Origin', '*').json({ ...out.body, _paid: pay.payer });
   });
