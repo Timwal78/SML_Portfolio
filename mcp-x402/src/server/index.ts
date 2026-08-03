@@ -344,17 +344,26 @@ GET  https://mcp-x402.onrender.com/aws/marketplace/resolve</pre>
   });
 
   // Agent traffic stats — polled by dashboard every 60s
-  app.get('/api/stats', (_req, res) => {
+  app.get('/api/stats', (req, res) => {
     let persistedAllTime = _agentCounts.allTime;
     try {
       const snap = X402Stats.getInstance().getAiAgentsAllTime();
       if (snap > persistedAllTime) persistedAllTime = snap;
     } catch { /* ignore */ }
+    // endpoint_count used to be a hardcoded `44` — stale the moment a route
+    // was added or removed. buildDiscoveryDoc() is the same manifest builder
+    // that powers /.well-known/x402, so this now reports this host's real,
+    // current paid-endpoint count instead of a frozen guess.
+    let endpointCount = 0;
+    try {
+      const doc = buildDiscoveryDoc(req.headers.host) as { paidToolCount?: number };
+      endpointCount = doc.paidToolCount ?? 0;
+    } catch { /* ignore — falls back to 0, never a fabricated number */ }
     res.set('Access-Control-Allow-Origin', '*').json({
       aiAgentsToday: _agentCounts.today,
       aiAgentsAllTime: persistedAllTime,
       uptime_seconds: Math.floor((Date.now() - _statsStartMs) / 1000),
-      endpoint_count: 44,
+      endpoint_count: endpointCount,
       version: VERSION,
       persistent: true,
     });
