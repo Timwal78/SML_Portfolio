@@ -44,6 +44,8 @@ interface PersistedShape {
   recentSettled: SettledEvent[];
   recentFailed: FailedEvent[];
   aiAgentsAllTime?: number;
+  paidToday?: number;
+  paidTodayDate?: string;
 }
 
 function hashWallet(address: string): string {
@@ -76,6 +78,14 @@ export class X402Stats {
   private recentSettled: SettledEvent[] = [];
   private recentFailed: FailedEvent[] = [];
   private aiAgentsAllTime = 0;
+  // Dashboard tooltip on agentswarm-seo.html has always claimed to show
+  // "X paid x402 hits today", but this field never existed server-side —
+  // /api/stats only ever sent aiAgentsToday (a UA-string match, not a
+  // verified payment) and the dashboard's data.paidAgentsToday read was
+  // silently always undefined. Real, day-resetting counter, same pattern
+  // as index.ts's _agentCounts.today.
+  private paidToday = 0;
+  private paidTodayDate = new Date().toDateString();
 
   private redis: RedisClientType | null = null;
   private redisReady = false;
@@ -127,6 +137,12 @@ export class X402Stats {
     if (Array.isArray(data.recentSettled)) this.recentSettled = data.recentSettled.slice(0, this.maxRecent);
     if (Array.isArray(data.recentFailed)) this.recentFailed = data.recentFailed.slice(0, this.maxRecent);
     if (typeof data.aiAgentsAllTime === 'number') this.aiAgentsAllTime = data.aiAgentsAllTime;
+    // Only adopt a persisted paidToday if it's still the same calendar day —
+    // otherwise a stale count from yesterday would survive a restart and
+    // silently overstate today's real total.
+    if (data.paidTodayDate === this.paidTodayDate && typeof data.paidToday === 'number') {
+      this.paidToday = data.paidToday;
+    }
   }
 
   private loadLocal(): void {
@@ -149,6 +165,8 @@ export class X402Stats {
       recentSettled: this.recentSettled,
       recentFailed: this.recentFailed,
       aiAgentsAllTime: this.aiAgentsAllTime,
+      paidToday: this.paidToday,
+      paidTodayDate: this.paidTodayDate,
     };
   }
 
@@ -192,6 +210,9 @@ export class X402Stats {
   recordSettled(facilitator: string, payer: string, tx: string, resource: string): void {
     this.settledByFacilitator.set(facilitator, (this.settledByFacilitator.get(facilitator) ?? 0) + 1);
     this.aiAgentsAllTime += 1;
+    const today = new Date().toDateString();
+    if (today !== this.paidTodayDate) { this.paidToday = 0; this.paidTodayDate = today; }
+    this.paidToday += 1;
     this.recentSettled.unshift({
       facilitator,
       payerHash: hashWallet(payer),
@@ -227,7 +248,22 @@ export class X402Stats {
     return this.aiAgentsAllTime;
   }
 
+  getPaidToday(): number {
+    const today = new Date().toDateString();
+    if (today !== this.paidTodayDate) return 0; // day rolled over since last recordSettled
+    return this.paidToday;
+  }
+
   snapshot(): Record<string, unknown> {
+    // Distinct-payer count over the visible recentSettled window — added
+    // after discovering (2026-08-03) that a self-run seeding script can
+    // make settledByFacilitator/aiAgentsAllTime climb entirely from ONE
+    // wallet paying itself, with no way to tell from the raw counts alone.
+    // This doesn't replace checking payerHash values directly, and it is
+    // NOT an all-time distinct-payer count (recentSettled is capped at
+    // maxRecent=50) — it's disclosed as exactly what it is: a same-wallet
+    // vs multi-wallet signal for the most recent settled calls only.
+    const distinctRecentPayers = new Set(this.recentSettled.map((e) => e.payerHash)).size;
     return {
       startedAt: new Date(this.startedAt).toISOString(),
       uptimeSeconds: Math.floor((Date.now() - this.startedAt) / 1000),
@@ -238,11 +274,19 @@ export class X402Stats {
           : 'REDIS_URL not configured — persisting to X402_STATS_FILE or /tmp/x402-stats.json, which does NOT survive a Render redeploy. Set REDIS_URL for durable all-time counts. Real counts only, never simulated.',
       statsFile: this.backend === 'local_json_ephemeral' ? statsPath() : undefined,
       aiAgentsAllTime: this.aiAgentsAllTime,
+      paidToday: this.getPaidToday(),
       requestsByRoute: Object.fromEntries(this.requestsByRoute),
       settledByFacilitator: Object.fromEntries(this.settledByFacilitator),
       failedByFacilitatorStage: Object.fromEntries(this.failedByFacilitatorStage),
       recentSettled: this.recentSettled,
       recentFailed: this.recentFailed,
+      distinctRecentPayers,
+      distinctRecentPayersNote:
+        this.recentSettled.length === 0
+          ? 'no settled payments yet'
+          : distinctRecentPayers === 1
+          ? `all ${this.recentSettled.length} of the most recent settled calls came from the SAME wallet — likely one payer (self-seeding or a single agent), not diverse organic traffic. This is a window signal (last ${this.maxRecent} max), not an all-time count.`
+          : `${distinctRecentPayers} distinct wallets across the most recent ${this.recentSettled.length} settled calls. This is a window signal (last ${this.maxRecent} max), not an all-time count.`,
     };
   }
 }

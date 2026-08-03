@@ -295,7 +295,7 @@ GET  https://mcp-x402.onrender.com/aws/marketplace/resolve</pre>
   // FREE public status endpoint — no payment or auth required.
   // Listed as the free-tier offering on api.market so reviewers and
   // subscribers can immediately verify the service is live.
-  app.get('/x402/status', (_req, res) => {
+  app.get('/x402/status', (req, res) => {
     const now = new Date();
     const dayOfWeek = now.getUTCDay(); // 0=Sun, 6=Sat
     const hourUTC = now.getUTCHours();
@@ -304,6 +304,16 @@ GET  https://mcp-x402.onrender.com/aws/marketplace/resolve</pre>
       dayOfWeek >= 1 && dayOfWeek <= 5 &&
       (hourUTC > 13 || (hourUTC === 13 && now.getUTCMinutes() >= 30)) &&
       hourUTC < 20;
+    // total/description used to be hardcoded literals that didn't even agree
+    // with each other (53 vs "54" in the prose) and were both stale against
+    // the real route count. This is the marketplace-reviewer-facing free
+    // endpoint (see comment above) — it should be the LAST place serving a
+    // frozen guess. Same buildDiscoveryDoc() source of truth as /api/stats.
+    let totalEndpoints = 53;
+    try {
+      const doc = buildDiscoveryDoc(req.headers.host) as { paidToolCount?: number };
+      if (doc.paidToolCount) totalEndpoints = doc.paidToolCount;
+    } catch { /* fall back to the prior static figure, never a bigger guess */ }
     res.set('Access-Control-Allow-Origin', '*').json({
       service: 'Script Master Labs x402 Data API',
       status: 'operational',
@@ -312,14 +322,14 @@ GET  https://mcp-x402.onrender.com/aws/marketplace/resolve</pre>
         name: 'Script Master Labs, LLC',
         sdvosb: true,
         samGovRegistered: true,
-        description: '54 pay-per-call U.S. federal, financial, and compliance data endpoints settled in USDC on Base via x402.',
+        description: `${totalEndpoints} pay-per-call U.S. federal, financial, and compliance data endpoints settled in USDC on Base via x402.`,
       },
       market: {
         nyse: marketOpen ? 'open' : 'closed',
         timestamp: now.toISOString(),
       },
       endpoints: {
-        total: 53,
+        total: totalEndpoints,
         categories: [
           'SEC Filings (10-K, 10-Q, 8-K, 13F, 13D/G)',
           'FDA (drug labels, recalls, adverse events, 510k, warnings)',
@@ -359,9 +369,18 @@ GET  https://mcp-x402.onrender.com/aws/marketplace/resolve</pre>
       const doc = buildDiscoveryDoc(req.headers.host) as { paidToolCount?: number };
       endpointCount = doc.paidToolCount ?? 0;
     } catch { /* ignore — falls back to 0, never a fabricated number */ }
+    // paidAgentsToday — the dashboard has always read this field and its
+    // tooltip has always described it as "paid x402 hits today", but the
+    // server never sent it, so it silently always displayed as absent.
+    // Real, day-resetting count of actually-settled payments, distinct from
+    // aiAgentsToday (which only matches a User-Agent string and never
+    // verifies a payment happened at all).
+    let paidToday = 0;
+    try { paidToday = X402Stats.getInstance().getPaidToday(); } catch { /* ignore */ }
     res.set('Access-Control-Allow-Origin', '*').json({
       aiAgentsToday: _agentCounts.today,
       aiAgentsAllTime: persistedAllTime,
+      paidAgentsToday: paidToday,
       uptime_seconds: Math.floor((Date.now() - _statsStartMs) / 1000),
       endpoint_count: endpointCount,
       version: VERSION,
