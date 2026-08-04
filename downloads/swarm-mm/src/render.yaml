@@ -1,0 +1,31 @@
+# Swarm MM — Render Blueprint
+# SEO: attach custom www domain only (never *.onrender.com for GSC).
+
+services:
+  - type: web
+    name: swarm-mm
+    runtime: python
+    plan: starter
+    region: oregon
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn swarm_mm.api.app:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.0"
+      - key: SWARM_MM_DEV_OPEN
+        value: "0"
+      - key: SWARM_MM_PAYMENT_VERIFY
+        value: soft
+      - key: SML_PAYMENT_RECEIVER
+        value: "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa"
+      - key: SML_API_KEY
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: SWARM_MM_QUOTE_URL
+        sync: false
+      - key: SWARM_MM_CORS
+        value: "*"
+      - key: SOLANA_PAYMENT_RECEIVER
+        sync: false

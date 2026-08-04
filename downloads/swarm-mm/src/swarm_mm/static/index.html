@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Swarm Market Making — Script Master Labs</title>
+  <meta name="description" content="4-variant swarm market-making suite: Simulated, Signal, B2B, Crypto. x402-native. No pooled capital on Signal path." />
+  <meta name="robots" content="index,follow" />
+  <style>
+    :root {
+      --bg: #070b12;
+      --panel: #0f1624;
+      --line: #1e2a3f;
+      --text: #e8eef9;
+      --muted: #8b9bb8;
+      --accent: #3dff9a;
+      --accent2: #4da3ff;
+      --warn: #ffb020;
+      --danger: #ff5d6c;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background: radial-gradient(1200px 600px at 10% -10%, #12203a 0%, var(--bg) 55%), var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 32px 20px 80px; }
+    header { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; flex-wrap: wrap; margin-bottom: 28px; }
+    .brand { font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+    h1 { margin: 6px 0 8px; font-size: clamp(28px, 4vw, 42px); line-height: 1.1; }
+    .sub { color: var(--muted); max-width: 60ch; }
+    .pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      border: 1px solid var(--line); background: rgba(61,255,154,.08);
+      color: var(--accent); border-radius: 999px; padding: 8px 14px; font-size: 13px;
+    }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; margin: 28px 0; }
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,.03), transparent 40%), var(--panel);
+      border: 1px solid var(--line); border-radius: 16px; padding: 18px;
+      min-height: 180px;
+    }
+    .card h3 { margin: 0 0 8px; font-size: 18px; }
+    .tag { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent2); margin-bottom: 8px; }
+    .muted { color: var(--muted); font-size: 14px; }
+    .price { margin-top: 12px; font-weight: 700; color: var(--accent); }
+    .panel {
+      border: 1px solid var(--line); border-radius: 16px; background: var(--panel);
+      padding: 18px; margin-top: 18px;
+    }
+    code, pre {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12.5px;
+    }
+    pre {
+      background: #05080f; border: 1px solid var(--line); border-radius: 12px;
+      padding: 14px; overflow: auto; color: #cfe0ff;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
+    .ok { color: var(--accent); }
+    .med { color: var(--warn); }
+    .low { color: var(--accent2); }
+    footer { margin-top: 36px; color: var(--muted); font-size: 13px; }
+    a { color: var(--accent2); }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+    .btn {
+      display: inline-block; text-decoration: none; border-radius: 10px; padding: 10px 14px;
+      border: 1px solid var(--line); color: var(--text); background: #121b2c; font-size: 14px;
+    }
+    .btn.primary { background: rgba(61,255,154,.12); border-color: rgba(61,255,154,.35); color: var(--accent); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <div class="brand">Script Master Labs · SDVOSB</div>
+        <h1>Swarm Market Making</h1>
+        <p class="sub">
+          Coordinated limit-order intelligence across four deployment modes.
+          Build once. Ship Simulated → Signal → B2B → Crypto.
+          Signal path: <strong>no capital pooling</strong>, user broker execution only.
+        </p>
+        <div class="actions">
+          <a class="btn primary" href="/docs">OpenAPI Docs</a>
+          <a class="btn" href="/.well-known/x402">x402 Catalog</a>
+          <a class="btn" href="/mcp/tools">MCP Tools</a>
+          <a class="btn" href="/health">Health</a>
+        </div>
+      </div>
+      <div class="pill">x402 · Base USDC · payTo 0x7233…f4aa</div>
+    </header>
+
+    <div class="grid">
+      <div class="card">
+        <div class="tag">Variant D · Ship first</div>
+        <h3>Simulated Swarm</h3>
+        <p class="muted">Paper capital, real ladder math, leaderboards, upgrade funnel to A/B/C.</p>
+        <div class="price">Free · Premium $9/mo</div>
+      </div>
+      <div class="card">
+        <div class="tag">Variant A · Low risk</div>
+        <h3>Signal Swarm</h3>
+        <p class="muted">Levels, venue map, rebate tracker, broker order previews. You place orders.</p>
+        <div class="price">$19/mo · $0.001/call</div>
+      </div>
+      <div class="card">
+        <div class="tag">Variant C · Enterprise</div>
+        <h3>B2B Engine</h3>
+        <p class="muted">White-label for licensed BDs/prop firms. Customer owns regulatory burden.</p>
+        <div class="price">$5K/mo + 2% lift</div>
+      </div>
+      <div class="card">
+        <div class="tag">Variant B · Geofenced</div>
+        <h3>Crypto-Only</h3>
+        <p class="muted">DEX maker scaffold. US blocked. Vault contracts are a separate audit gate.</p>
+        <div class="price">0.5% rebate share</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2 style="margin-top:0">Comparison</h2>
+      <table>
+        <thead>
+          <tr>
+            <th></th><th>A Signal</th><th>B Crypto</th><th>C B2B</th><th>D Sim</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Regulatory risk</td><td class="low">LOW</td><td class="med">MEDIUM</td><td class="ok">VERY LOW</td><td class="ok">ZERO</td></tr>
+          <tr><td>Capital pooling</td><td>None</td><td>Non-custodial vault</td><td>Customer</td><td>Paper only</td></tr>
+          <tr><td>Time to market</td><td>4 wks</td><td>8 wks</td><td>6 wks</td><td>2 wks</td></tr>
+          <tr><td>Monetization</td><td>SaaS</td><td>Rebate share</td><td>License + lift</td><td>Freemium</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel">
+      <h2 style="margin-top:0">Quickstart</h2>
+<pre>curl -s localhost:8088/v1/sim/join -H 'content-type: application/json' \
+  -d '{"user_id":"alpha","starting_balance":100000}'
+
+curl -s -X POST localhost:8088/mcp/call -H 'content-type: application/json' \
+  -d '{"tool":"sim_swarm.trade","params":{"user_id":"alpha","ticker":"SPY","side":"buy","price":9999,"size":5}}'
+
+curl -s 'localhost:8088/v1/signal/levels?ticker=SPY&side=both&confidence_threshold=0.7'
+
+# WebSocket
+# wscat -c ws://localhost:8088/ws/signals
+# > {"op":"subscribe","ticker":"SPY"}</pre>
+    </div>
+
+    <div class="panel">
+      <h2 style="margin-top:0">Regulatory posture</h2>
+      <p class="muted">
+        Educational / research signals only. Not investment advice.
+        Not a broker-dealer, ATS, or investment adviser.
+        Variant A users place orders through their own licensed brokerage accounts.
+        Past simulated performance is not indicative of future results.
+      </p>
+    </div>
+
+    <footer>
+      Script Master Labs · Swarm Market Making v0.1 ·
+      MCP + x402 + FastAPI · Build sequence D → A → C → B
+    </footer>
+  </div>
+</body>
+</html>

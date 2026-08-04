@@ -83,7 +83,7 @@ export default function handler(req, res) {
       "demo": "https://four02proof.onrender.com",
       "settlement_chains": ["Base", "XRPL", "Xahau"],
       "accepted_tokens": ["USDC", "RLUSD"],
-      "pay_to_wallet": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700"
+      "pay_to_wallet": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa"
     },
     "llms_txt": "https://www.scriptmasterlabs.com/llms.txt",
     "sitemap": "https://www.scriptmasterlabs.com/sitemap.xml",

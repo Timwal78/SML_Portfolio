@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Script Master Labs \u2014 x402 Data API",
-    "description": "Live collection generated 2026-07-29 from https://mcp-x402.onrender.com/openapi.json.\n\n**Script Master Labs, LLC**\n- SAM.gov UEI: G24VZA4RLMK3\n- CAGE: 21U51\n- SDVOSB: Service-Disabled Veteran-Owned Small Business\n- Settlement: USDC on Base (eip155:8453) via x402\n- payTo: 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700\n- Floor: $0.001 USDC / call\n- Contact: ScriptMasterLabs@gmail.com\n- Site: https://www.scriptmasterlabs.com",
+    "description": "Live collection generated 2026-07-29 from https://mcp-x402.onrender.com/openapi.json.\n\n**Script Master Labs, LLC**\n- SAM.gov UEI: G24VZA4RLMK3\n- CAGE: 21U51\n- SDVOSB: Service-Disabled Veteran-Owned Small Business\n- Settlement: USDC on Base (eip155:8453) via x402\n- payTo: 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa\n- Floor: $0.001 USDC / call\n- Contact: ScriptMasterLabs@gmail.com\n- Site: https://www.scriptmasterlabs.com",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_postman_id": "sml-x402-20260729"
   },
@@ -36,7 +36,7 @@
                 "agent-score"
               ]
             },
-            "description": "AI agent FICO-style reputation score (300\u2013850).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "AI agent FICO-style reputation score (300\u2013850).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -67,7 +67,7 @@
                 "fact-check"
               ]
             },
-            "description": "Grounding oracle: fact-checks a claim against live government/FDA/SEC/Treasury data.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "Grounding oracle: fact-checks a claim against live government/FDA/SEC/Treasury data.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -98,7 +98,7 @@
                 "content-trust-score"
               ]
             },
-            "description": "Content misinformation trust scoring plus on-chain wallet trust ledger.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "Content misinformation trust scoring plus on-chain wallet trust ledger.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -129,7 +129,7 @@
                 "llm-chat"
               ]
             },
-            "description": "Cheap LLM chat completion proxy for agents.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "Cheap LLM chat completion proxy for agents.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -161,7 +161,7 @@
                 "completions"
               ]
             },
-            "description": "OpenAI-compatible POST chat completions proxy.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "OpenAI-compatible POST chat completions proxy.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         }
@@ -197,7 +197,7 @@
                 "compliance-anomaly"
               ]
             },
-            "description": "Submit a bank compliance anomaly for scoring.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "Submit a bank compliance anomaly for scoring.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -228,7 +228,7 @@
                 "compliance-audit"
               ]
             },
-            "description": "Full Leviathan Matrix compliance audit cycle for a bank.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "Full Leviathan Matrix compliance audit cycle for a bank.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -259,7 +259,7 @@
                 "compliance-regulator-query"
               ]
             },
-            "description": "Real-time regulator compliance dashboard query for a bank.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "Real-time regulator compliance dashboard query for a bank.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -290,7 +290,7 @@
                 "restricted-party-screen"
               ]
             },
-            "description": "Screen a name against all 11 US export-control and sanctions lists.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "Screen a name against all 11 US export-control and sanctions lists.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         }
@@ -326,7 +326,7 @@
                 "crypto-price"
               ]
             },
-            "description": "Real-time token price, market cap, and 24h volume/change.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "Real-time token price, market cap, and 24h volume/change.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -357,7 +357,7 @@
                 "crypto-trending"
               ]
             },
-            "description": "Top trending coins, NFTs, and categories in the last 24h.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "Top trending coins, NFTs, and categories in the last 24h.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -388,7 +388,7 @@
                 "gas-tracker"
               ]
             },
-            "description": "Multi-chain gas tracker snack.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "Multi-chain gas tracker snack.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         }
@@ -424,7 +424,7 @@
                 "grants"
               ]
             },
-            "description": "Search live U.S. federal grant opportunities (Grants.gov Search2).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "Search live U.S. federal grant opportunities (Grants.gov Search2).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -455,7 +455,7 @@
                 "firms"
               ]
             },
-            "description": "Find self-certified SDVOSB/WOSB/SDB/minority firms by NAICS + state (SAM.gov).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "Find self-certified SDVOSB/WOSB/SDB/minority firms by NAICS + state (SAM.gov).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -486,7 +486,7 @@
                 "market"
               ]
             },
-            "description": "Federal contract market intelligence by NAICS (USAspending).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "Federal contract market intelligence by NAICS (USAspending).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -517,7 +517,7 @@
                 "treasury-yields"
               ]
             },
-            "description": "Daily US Treasury yield curve rates (1M\u201330Y).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "Daily US Treasury yield curve rates (1M\u201330Y).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -548,7 +548,7 @@
                 "entity-compliance"
               ]
             },
-            "description": "SAM entity compliance bundle: registration + exclusion + set-asides + NAICS.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "SAM entity compliance bundle: registration + exclusion + set-asides + NAICS.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -579,7 +579,7 @@
                 "lobbying"
               ]
             },
-            "description": "Senate LDA lobbying disclosure filings \u2014 client, registrant, issues, and amounts.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "Senate LDA lobbying disclosure filings \u2014 client, registrant, issues, and amounts.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -610,7 +610,7 @@
                 "patents"
               ]
             },
-            "description": "USPTO PatentsView patent search \u2014 title, abstract, assignee, CPC class, grant date.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "USPTO PatentsView patent search \u2014 title, abstract, assignee, CPC class, grant date.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -641,7 +641,7 @@
                 "fred"
               ]
             },
-            "description": "FRED economic indicator series (Federal Reserve Bank of St. Louis).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "FRED economic indicator series (Federal Reserve Bank of St. Louis).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -672,7 +672,7 @@
                 "osha"
               ]
             },
-            "description": "OSHA workplace inspection and violation records (DOL enforcement data).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "OSHA workplace inspection and violation records (DOL enforcement data).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -703,7 +703,7 @@
                 "fec-finance"
               ]
             },
-            "description": "FEC campaign finance \u2014 candidates, committees, and contribution totals.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "FEC campaign finance \u2014 candidates, committees, and contribution totals.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -734,7 +734,7 @@
                 "epa-violations"
               ]
             },
-            "description": "EPA ECHO environmental enforcement and violation records.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "EPA ECHO environmental enforcement and violation records.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -765,7 +765,7 @@
                 "sbir-grants"
               ]
             },
-            "description": "SBIR/STTR small business innovation research grants.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "SBIR/STTR small business innovation research grants.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -796,7 +796,7 @@
                 "congress-bills"
               ]
             },
-            "description": "Congress.gov bill search \u2014 legislation by keyword and congress number.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "Congress.gov bill search \u2014 legislation by keyword and congress number.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -827,7 +827,7 @@
                 "nih-grants"
               ]
             },
-            "description": "NIH Reporter research grant database.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "NIH Reporter research grant database.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -858,7 +858,7 @@
                 "trade-leads"
               ]
             },
-            "description": "Search live overseas trade leads for US exporters.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "Search live overseas trade leads for US exporters.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         }
@@ -894,7 +894,7 @@
                 "finra-broker"
               ]
             },
-            "description": "FINRA BrokerCheck broker/advisor registration and disclosure history.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "FINRA BrokerCheck broker/advisor registration and disclosure history.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         }
@@ -930,7 +930,7 @@
                 "fx-rate"
               ]
             },
-            "description": "Latest or historical exchange rate for a base currency.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "Latest or historical exchange rate for a base currency.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         }
@@ -966,7 +966,7 @@
                 "drug-label"
               ]
             },
-            "description": "FDA drug label lookup (openFDA).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "FDA drug label lookup (openFDA).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -997,7 +997,7 @@
                 "drug-recall"
               ]
             },
-            "description": "FDA drug recall/enforcement search (openFDA).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "FDA drug recall/enforcement search (openFDA).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -1028,7 +1028,7 @@
                 "npi"
               ]
             },
-            "description": "NPPES provider (NPI) lookup.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "NPPES provider (NPI) lookup.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -1059,7 +1059,7 @@
                 "clinical-trials"
               ]
             },
-            "description": "Clinical trial search (ClinicalTrials.gov APIv2).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "Clinical trial search (ClinicalTrials.gov APIv2).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -1090,7 +1090,7 @@
                 "drug-adverse-events"
               ]
             },
-            "description": "FDA adverse event reports (openFDA FAERS).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "FDA adverse event reports (openFDA FAERS).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -1121,7 +1121,7 @@
                 "fda-510k"
               ]
             },
-            "description": "FDA 510(k) medical device premarket clearances (openFDA).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "FDA 510(k) medical device premarket clearances (openFDA).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -1152,7 +1152,7 @@
                 "fda-warnings"
               ]
             },
-            "description": "FDA warning letters \u2014 regulatory enforcement actions.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "FDA warning letters \u2014 regulatory enforcement actions.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -1183,7 +1183,7 @@
                 "cms-providers"
               ]
             },
-            "description": "CMS Medicare hospital quality data and physician provider information.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "CMS Medicare hospital quality data and physician provider information.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         }
@@ -1219,7 +1219,7 @@
                 "news-headlines"
               ]
             },
-            "description": "Google News RSS headlines.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "Google News RSS headlines.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         }
@@ -1255,7 +1255,7 @@
                 "eth-rpc"
               ]
             },
-            "description": "Ethereum JSON-RPC read helper.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "Ethereum JSON-RPC read helper.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -1286,7 +1286,7 @@
                 "base-rpc"
               ]
             },
-            "description": "Base mainnet JSON-RPC read helper.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "Base mainnet JSON-RPC read helper.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         }
@@ -1322,7 +1322,7 @@
                 "web-search"
               ]
             },
-            "description": "Keyless web search for agents.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "Keyless web search for agents.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -1353,7 +1353,7 @@
                 "social-search"
               ]
             },
-            "description": "Public web social pulse search (not official X API).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "Public web social pulse search (not official X API).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         }
@@ -1389,7 +1389,7 @@
                 "insider-trades"
               ]
             },
-            "description": "SEC EDGAR Form 4 insider trades by ticker.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "SEC EDGAR Form 4 insider trades by ticker.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -1420,7 +1420,7 @@
                 "sec-8k"
               ]
             },
-            "description": "SEC EDGAR 8-K material event filings by ticker.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "SEC EDGAR 8-K material event filings by ticker.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -1451,7 +1451,7 @@
                 "sec-13f"
               ]
             },
-            "description": "SEC EDGAR 13F institutional holdings \u2014 hedge fund quarterly positions.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "SEC EDGAR 13F institutional holdings \u2014 hedge fund quarterly positions.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -1482,7 +1482,7 @@
                 "sec-10k"
               ]
             },
-            "description": "SEC EDGAR 10-K annual report filings by ticker.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "SEC EDGAR 10-K annual report filings by ticker.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -1513,7 +1513,7 @@
                 "sec-10q"
               ]
             },
-            "description": "SEC EDGAR 10-Q quarterly report filings by ticker.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "SEC EDGAR 10-Q quarterly report filings by ticker.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -1544,7 +1544,7 @@
                 "sec-13dg"
               ]
             },
-            "description": "SEC EDGAR 13D/13G activist investor filings by ticker.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "SEC EDGAR 13D/13G activist investor filings by ticker.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -1575,7 +1575,7 @@
                 "ftd-threshold-list"
               ]
             },
-            "description": "SEC Reg SHO Threshold Securities List \u2014 persistent fails-to-deliver names.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "SEC Reg SHO Threshold Securities List \u2014 persistent fails-to-deliver names.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -1606,7 +1606,7 @@
                 "ftd-time-series"
               ]
             },
-            "description": "Historical SEC Reg SHO fails-to-deliver time series for a symbol.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "Historical SEC Reg SHO fails-to-deliver time series for a symbol.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -1637,7 +1637,7 @@
                 "ftd-ratio"
               ]
             },
-            "description": "Latest FTD ratio and percentile rank for a symbol.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "Latest FTD ratio and percentile rank for a symbol.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -1668,7 +1668,7 @@
                 "ftd-etf-basket"
               ]
             },
-            "description": "ETF constituents ranked by FTD notional concentration.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "ETF constituents ranked by FTD notional concentration.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -1699,7 +1699,7 @@
                 "ftd-settlement-cycle"
               ]
             },
-            "description": "Settlement-cycle bundle \u2014 FTD stats, T+21/T+35 markers, Reg SHO 204 marker.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "Settlement-cycle bundle \u2014 FTD stats, T+21/T+35 markers, Reg SHO 204 marker.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         }
@@ -1735,7 +1735,7 @@
                 "pha-lookup"
               ]
             },
-            "description": "Public Housing Authority (PHA) lookup by ZIP/city/county.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "Public Housing Authority (PHA) lookup by ZIP/city/county.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -1766,7 +1766,7 @@
                 "hcv-fmr"
               ]
             },
-            "description": "HUD Fair Market Rent + estimated payment-standard band.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "HUD Fair Market Rent + estimated payment-standard band.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -1797,7 +1797,7 @@
                 "hud-vash-contacts"
               ]
             },
-            "description": "HUD-VASH veteran housing contact guidance.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "HUD-VASH veteran housing contact guidance.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -1828,7 +1828,7 @@
                 "housing-landlord-checklist"
               ]
             },
-            "description": "Section 8 / HCV landlord checklist + HQS hotspots.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "Section 8 / HCV landlord checklist + HQS hotspots.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -1859,7 +1859,7 @@
                 "housing-windsor"
               ]
             },
-            "description": "Kinston 4BR landlord bundle (PHA + FMR + call script + income worksheet).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "Kinston 4BR landlord bundle (PHA + FMR + call script + income worksheet).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         }
@@ -1895,7 +1895,7 @@
                 "options-flow"
               ]
             },
-            "description": "Institutional options flow \u2014 sweeps, whale detection, dark-pool prints.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "Institutional options flow \u2014 sweeps, whale detection, dark-pool prints.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -1926,7 +1926,7 @@
                 "cascade-signal"
               ]
             },
-            "description": "CASCADE ACCUMULATOR directive \u2014 ACCUMULATE/PYRAMID/EXIT/STOP.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "CASCADE ACCUMULATOR directive \u2014 ACCUMULATE/PYRAMID/EXIT/STOP.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -1957,7 +1957,7 @@
                 "max-conviction-signal"
               ]
             },
-            "description": "TRIPLE_LOCK_VERDICT \u2014 max-conviction rare signal, distinct from the standard squeeze signal.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "TRIPLE_LOCK_VERDICT \u2014 max-conviction rare signal, distinct from the standard squeeze signal.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -1988,7 +1988,7 @@
                 "equities-heatmap"
               ]
             },
-            "description": "Equities RSI(14) heatmap across up to 20 tickers, with a real 4-agent Claude swarm verdict.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "Equities RSI(14) heatmap across up to 20 tickers, with a real 4-agent Claude swarm verdict.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -2019,7 +2019,7 @@
                 "options-delta-heatmap"
               ]
             },
-            "description": "Options Delta heatmap across up to 40 contracts, with a real 4-agent Claude swarm verdict.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "Options Delta heatmap across up to 40 contracts, with a real 4-agent Claude swarm verdict.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         }
@@ -2055,7 +2055,7 @@
                 "domain-enrich"
               ]
             },
-            "description": "Domain enrichment: DNS + RDAP + geo.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "Domain enrichment: DNS + RDAP + geo.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -2086,7 +2086,7 @@
                 "bounties"
               ]
             },
-            "description": "EchoNet reverse-bounty board (free teaser).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "EchoNet reverse-bounty board (free teaser).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -2117,7 +2117,7 @@
                 "hunters"
               ]
             },
-            "description": "EchoNet hunter leaderboard teaser (free).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "EchoNet hunter leaderboard teaser (free).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -2148,7 +2148,7 @@
                 "echonet"
               ]
             },
-            "description": "EchoNet manifest (free).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "EchoNet manifest (free).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -2179,7 +2179,7 @@
                 "x402"
               ]
             },
-            "description": "OpenAPI/x402 discovery document (free).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "OpenAPI/x402 discovery document (free).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -2209,7 +2209,7 @@
                 "openapi.json"
               ]
             },
-            "description": "OpenAPI spec (free).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "OpenAPI spec (free).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -2241,7 +2241,7 @@
                 "x402"
               ]
             },
-            "description": "OpenAPI/x402 discovery document (free).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "OpenAPI/x402 discovery document (free).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -2272,7 +2272,7 @@
                 "openapi.json"
               ]
             },
-            "description": "OpenAPI spec (free).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "OpenAPI spec (free).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         }
@@ -2308,7 +2308,7 @@
                 "web-fetch"
               ]
             },
-            "description": "Fetch a public URL and return text/json for agents.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "Fetch a public URL and return text/json for agents.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -2339,7 +2339,7 @@
                 "web-markdown"
               ]
             },
-            "description": "URL to simplified markdown/text.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "URL to simplified markdown/text.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         }
@@ -2375,7 +2375,7 @@
                 "iam-model"
               ]
             },
-            "description": "Inevitable Action Model \u2014 obligation committee verdict and mandatory action.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "Inevitable Action Model \u2014 obligation committee verdict and mandatory action.\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -2406,7 +2406,7 @@
                 "bounties"
               ]
             },
-            "description": "Post a reverse bounty (paid listing fee).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "Post a reverse bounty (paid listing fee).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -2437,7 +2437,7 @@
                 "graph"
               ]
             },
-            "description": "EchoNet usage graph query (paid).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "EchoNet usage graph query (paid).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -2469,7 +2469,7 @@
                 "agent"
               ]
             },
-            "description": "EchoNet agent reputation profile (paid).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "EchoNet agent reputation profile (paid).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         },
@@ -2501,7 +2501,7 @@
                 "report"
               ]
             },
-            "description": "Publish hunter report (paid).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
+            "description": "Publish hunter report (paid).\n\nPricing: $0.001 USDC (x402) on Base. payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa.\nVendor: Script Master Labs, LLC \u00b7 SAM UEI G24VZA4RLMK3 \u00b7 CAGE 21U51 \u00b7 SDVOSB"
           },
           "response": []
         }
@@ -2515,7 +2515,7 @@
     },
     {
       "key": "payTo",
-      "value": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700"
+      "value": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa"
     },
     {
       "key": "sam_uei",

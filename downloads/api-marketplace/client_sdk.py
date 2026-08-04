@@ -3,7 +3,7 @@
 Generated 2026-07-29 from live OpenAPI (77 paths)
 SAM UEI G24VZA4RLMK3 · CAGE 21U51 · SDVOSB
 Base: https://mcp-x402.onrender.com
-x402 payTo: 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700 (eip155:8453 USDC)
+x402 payTo: 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa (eip155:8453 USDC)
 """
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ import urllib.request
 from typing import Any, Dict, Optional
 
 DEFAULT_BASE = "https://mcp-x402.onrender.com"
-PAY_TO = "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700"
+PAY_TO = "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa"
 SAM_UEI = "G24VZA4RLMK3"
 CAGE = "21U51"
 

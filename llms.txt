@@ -8,7 +8,7 @@
 - A2A card: https://mcp-x402.onrender.com/.well-known/agent.json
 - npm: @scriptmasterlabs/mcp-x402 · @scriptmasterlabs/mcp-x402-sdk
 - AWS company seat: $599/mo · 151+ APIs (resubmitted)
-- Agent floor: 0.001 USDC · eip155:8453 · payTo 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700
+- Agent floor: 0.001 USDC · eip155:8453 · payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa
 - Target directories: Smithery, mcp.so, Glama, PulseMCP, RapidAPI, Zyla, APILayer, API.market, Composio, Pipedream, Zapier AI, Lindy, Relevance AI, Hugging Face, Kong/Apigee/Azure/AWS APIM
 
 ## VendOS — create your own agent store (PRIMARY TENT)
@@ -17,7 +17,7 @@
 - Page: https://www.scriptmasterlabs.com/vendos.html · short aliases `/vendos` · `/store` · `/create-store`
 - Marketplace UI: https://www.scriptmasterlabs.com/marketplace.html
 - Live store inventory: GET https://scriptmaster-vending-router.onrender.com/marketplace/listings
-- Open a store: POST https://scriptmaster-vending-router.onrender.com/marketplace/list → 402 · 0.05 USDC Base (payTo 0x4e14…) or RLUSD XRPL
+- Open a store: POST https://scriptmaster-vending-router.onrender.com/marketplace/list → 402 · 0.05 USDC Base (payTo 0x7233…f4aa) or RLUSD XRPL
 - Settlement: agents pay **your** payTo on-chain for every purchase. SML = rails, not payroll.
 - Pitch: "Create your own store where AI agents are the customers — 0.05 USDC once."
 
@@ -57,7 +57,7 @@ Host: https://acp-x402-scriptmasterlabs.onrender.com
 - GET /x402/gas-tracker · /x402/btc-price · /x402/fear-greed-index · /x402/fx-rate
 Also: https://mcp-x402.onrender.com (federal/FTD/cascade/options @ $0.001)
 RWA: https://sml-rwa-api.onrender.com @ $0.001
-x402scan: https://www.x402scan.com/recipient/0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700
+x402scan: https://www.x402scan.com/recipient/0x72330994f379a71542e7bd5a4cf99a9d9743f4aa
 x402scan ACP: https://www.x402scan.com/recipient/0x72330994f379A71542e7bd5a4CF99A9d9743F4aA
 Registered origins: mcp-x402 (51) · acp-x402 (83) · sml-rwa-api (5)
 
@@ -230,7 +230,7 @@ No hardcoded trading signals, confidence scores, or fabricated data may appear i
 All SML products support autonomous M2M payments via the x402 / HTTP 402 standard. When an AI agent hits a gated endpoint it receives HTTP 402 + a signed invoice. Pay → get JWT → retry with X-Payment-Token. No keys, no subscriptions.
 
 ### Supported chains
-- **USDC on Base** — primary x402 rail; CDP facilitator; merchant: `0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700`
+- **USDC on Base** — primary x402 rail; CDP facilitator; merchant: `0x72330994f379a71542e7bd5a4cf99a9d9743f4aa`
 - **RLUSD on XRPL** — secondary rail; payments verified at `https://four02proof.onrender.com/`
 - **XAH on Xahau** — Xahau Hooks-based routing; remittance and notary via `https://www.scriptmasterlabs.com/central-bank.html`
 
@@ -492,7 +492,7 @@ Kill ranking theater. Visibility = stranger x402 settle volume on the SML rail o
 - Paid post bounty: POST https://mcp-x402.onrender.com/x402/bounties (listing fee ~0.01 USDC)
 - Bootstrap reverse bounties on: /x402/llm-chat, /x402/web-search, /x402/web-fetch, /x402/social-search, /x402/base-rpc
 - Snack floor: 0.001 USDC Base (eip155:8453), header X-PAYMENT-TX or X-PAYMENT
-- payTo: 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700
+- payTo: 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa
 - Rules: self-seed/operator wallets excluded from bounty + reputation; forks without this ledger have zero rep
 - Money: snack fee + listing fee + protocol cut + metered graph/hunter — not a free graduation API for competitors
 - OpenAPI: https://mcp-x402.onrender.com/openapi.json

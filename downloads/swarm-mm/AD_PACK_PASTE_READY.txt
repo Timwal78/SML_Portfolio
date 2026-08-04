@@ -1,0 +1,169 @@
+# SWARM MM — PASTE-READY AD PACK
+# Mechanism → Free → Prices → Rails → Agent PPC
+# Rule: max 1 $cashtag per X post
+
+================================================================================
+MECHANISM (use this in every long-form)
+================================================================================
+
+Coordination without custody.
+
+Thousands of traders broadcast intent. The swarm compresses that into shared
+maker price levels + venue weights. You keep your broker. You keep your capital.
+The swarm sells coordination — not a pooled book.
+
+Steps:
+1. Intent in — size/side pressure across the cohort (live or paper)
+2. Ladder engine — resting limits around mid; confidence decays with depth
+3. Venue map — weight maker-rebate venues (IEX / MEMX / …)
+4. Signal out — HTTP + WebSocket + MCP + broker-native order PREVIEWS
+5. You execute — Variant A never holds funds and never submits for you
+
+Not: dark pool · PFOF · “send us your money” · broker-dealer
+Is: shared microstructure math · you place the order
+
+================================================================================
+FREE PORTION
+================================================================================
+
+$0 Sim Swarm (forever free to start)
+• Join with virtual capital ($10K–$1M paper)
+• Simulated maker limit orders
+• Leaderboard + track record
+• Upgrade path to Signal / B2B / Crypto
+• Open pricing, MCP catalog, health, WS snapshots
+
+No card. No wallet required to paper trade.
+
+Endpoints:
+  POST /v1/sim/join
+  POST /v1/sim/trade
+  GET  /v1/sim/leaderboard
+  WS   /ws/signals
+
+================================================================================
+PRICES
+================================================================================
+
+MONTHLY (crypto stablecoins)
+• Sim Free .............. $0
+• Sim Premium ........... $9 / mo
+• Signal Swarm .......... $19 / mo   ← default retail
+• B2B Platform .......... $5,000 / mo  + 2% incremental rebate lift
+
+AGENT PAY-PER-CALL (x402, no seat)
+• levels / venue / rebate / broker preview ... $0.001 / call
+• b2b optimize ............................... $0.05 / call
+• b2b report ................................. $0.10 / call
+
+VARIANT B (crypto vault, US geofenced)
+• 0.5% of gross maker rebate (not flat monthly)
+
+PAY MONTHLY IN
+• USDC on Base (8453) — primary
+• USDC on Solana
+• USDG on Robinhood Chain 4663  (slang: “USCG” = USDG)
+• RLUSD on XRPL (when XRPL_PAYMENT_RECEIVER set)
+
+payTo EVM:  0x72330994f379a71542e7bd5a4cf99a9d9743f4aa
+payTo Sol:  E4d3JwcTjeqTRkkQS4moszcfa4R7G1NMgPSew4KBNFrB
+
+================================================================================
+X POSTS (paste-ready, ≤1 cashtag)
+================================================================================
+
+--- POST 1 ---
+Most 'swarm trading' wants your capital.
+
+Ours sells the ladder:
+intent in → shared maker levels + venue weights → YOU submit at your broker.
+
+Coordination. Not custody.
+
+Free paper swarm live. $USDC
+
+--- POST 2 ---
+FREE: paper swarm, leaderboard, track record.
+
+Paid when it hurts less than bad fills:
+• 9/mo sim premium
+• 19/mo signal swarm (default)
+• agents: 0.001/call
+
+Monthly in $USDC · SOL · RLUSD · USDG
+
+--- POST 3 ---
+AI agents don't need a seat license.
+
+They hit 402 → pay 0.001 USDC → get limit levels + venue map.
+
+Human monthly optional. Agent PPC always on.
+
+#x402
+
+--- POST 4 ---
+The gamechanger isn't another signal Discord.
+
+It's compressing crowd intent into resting prices the market already pays makers to provide.
+
+You keep the broker. Swarm keeps the math.
+
+Start free.
+
+--- POST 5 ---
+Brokers: license the swarm engine.
+You keep KYC, capital, filings.
+We ship levels + rebate lift.
+
+5K/mo + 2% of incremental rebate capture.
+
+Software vendor. Not your competitor.
+
+================================================================================
+LINKEDIN (paste-ready)
+================================================================================
+
+--- LI 1 ---
+What if market-making coordination didn't require a new broker?
+
+Swarm Market Making (Script Master Labs):
+1) Aggregate trader intent
+2) Publish optimal resting limit levels + venue weights
+3) Each user executes in their own brokerage account
+
+Free tier: full paper swarm + leaderboard.
+Retail: $19/mo signals (crypto stablecoins).
+Agents: $0.001/call via HTTP 402.
+
+No pooled capital on the signal path. No PFOF story.
+
+Educational / research signals only. Not investment advice. Not a broker-dealer, ATS, or investment adviser. Users place orders through their own licensed brokerage accounts. Past simulated performance is not indicative of future results. Script Master Labs — SDVOSB.
+
+--- LI 2 ---
+Builders shipping autonomous agents: billing is the missing primitive.
+
+Swarm MM exposes MCP tools with x402 pay-per-call ($0.001 floor) settleable in USDC, Solana USDC, RLUSD, or USDG.
+
+Humans can still pay monthly. Agents don't wait for invoices.
+
+================================================================================
+15s / 45s
+================================================================================
+
+15s:
+Swarm MM turns crowd trading intent into shared maker price levels. You keep your broker and your money. Free paper tier; $19/mo signals; agents pay a tenth of a cent per call in stablecoins.
+
+45s:
+Thousands of traders broadcast intent. The swarm compresses that into shared maker price levels + venue weights. You keep your broker. You keep your capital. The swarm sells coordination — not custody. Free: join the simulated swarm, trade paper size, climb the leaderboard. Sim Premium $9/mo. Signal Swarm $19/mo for live levels, venue maps, rebate estimates, and broker-native order previews you submit yourself. Agents skip seats and pay $0.001/call over x402. B2B is $5K/mo for licensed firms who want the engine without building it. Monthly crypto: USDC, SOL USDC, RLUSD, USDG.
+
+================================================================================
+API HOOKS
+================================================================================
+
+GET  /landing
+GET  /v1/pricing              ← mechanism + free + monthly + ppc + rails
+GET  /v1/ads/beastmode        ← full JSON pack
+GET  /v1/ads/x
+GET  /v1/ads/linkedin
+POST /v1/billing/subscribe/signal?user_id=YOU   → 402 multi-rail monthly
+GET  /.well-known/x402

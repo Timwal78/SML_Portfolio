@@ -78,7 +78,7 @@ Price cuts mean nothing if x402scan / agents never hit us.
 - At least 3 resources registered/visible on x402scan
 
 ## PayTo / rails
-- Base USDC payTo (mcp-x402): `0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700`
+- Base USDC payTo (mcp-x402): `0x72330994f379a71542e7bd5a4cf99a9d9743f4aa`
 - Keep Coinbase CDP facilitator + sovereign X-PAYMENT-TX path
 
 ## One-liner for agents
@@ -141,5 +141,5 @@ Price cuts mean nothing if x402scan / agents never hit us.
 - Agents: `https://acp-x402-scriptmasterlabs.onrender.com`
 - Federal: `https://mcp-x402.onrender.com`
 - RWA: `https://sml-rwa-api.onrender.com`
-- Scan: `https://www.x402scan.com/recipient/0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700`
+- Scan: `https://www.x402scan.com/recipient/0x72330994f379a71542e7bd5a4cf99a9d9743f4aa`
 - Quickstart: `https://www.scriptmasterlabs.com/agent-start.html`

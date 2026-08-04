@@ -20,7 +20,7 @@
 | RWA API | https://sml-rwa-api.onrender.com |
 | Health | https://mcp-x402.onrender.com/health |
 | Rails payTo (ACP live) | `0x72330994f379a71542e7bd5a4cf99a9d9743f4aa` |
-| Rails payTo (seed/listings historical) | `0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700` |
+| Rails payTo (seed/listings historical) | `0x72330994f379a71542e7bd5a4cf99a9d9743f4aa` |
 | Networks | `eip155:8453` Base USDC · **`eip155:4663` Robinhood USDG** · Solana USDC |
 | USDG asset | `0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168` (6 decimals) |
 | USDG page | https://www.scriptmasterlabs.com/rh-usdg.html |
@@ -233,7 +233,7 @@ sdk: @scriptmasterlabs/mcp-x402-sdk
 - Server: https://www.x402scan.com (add OpenAPI URL)
 - Register: https://www.x402scan.com/resources/register
 - OpenAPI / x402: https://mcp-x402.onrender.com/.well-known/x402
-- Recipient rails (seed): https://www.x402scan.com/recipient/0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700
+- Recipient rails (seed): https://www.x402scan.com/recipient/0x72330994f379a71542e7bd5a4cf99a9d9743f4aa
 - ACP payTo (live snacks): `0x72330994f379a71542e7bd5a4cf99a9d9743f4aa`
 - **RH USDG LIVE:** network `eip155:4663` · asset `0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168` · page https://www.scriptmasterlabs.com/rh-usdg.html
 - Sol USDC: payTo `E4d3JwcTjeqTRkkQS4moszcfa4R7G1NMgPSew4KBNFrB`

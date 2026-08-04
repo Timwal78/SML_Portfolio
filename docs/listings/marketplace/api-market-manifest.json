@@ -4,7 +4,7 @@
   "openapi": "https://mcp-x402.onrender.com/openapi.json",
   "pricing": {
     "per_call_usdc": 0.001,
-    "pay_to": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+    "pay_to": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
     "chain": "base"
   },
   "vendor": {

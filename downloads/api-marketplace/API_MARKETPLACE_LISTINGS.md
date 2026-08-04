@@ -4,7 +4,7 @@
 
 **Vendor:** Script Master Labs, LLC  
 **SAM.gov UEI:** `G24VZA4RLMK3` · **CAGE:** `21U51` · **SDVOSB**  
-**x402 payTo:** `0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700` · **chain:** `eip155:8453` · **floor:** `$0.001 USDC`
+**x402 payTo:** `0x72330994f379a71542e7bd5a4cf99a9d9743f4aa` · **chain:** `eip155:8453` · **floor:** `$0.001 USDC`
 
 ## Files (this folder + /downloads/api-marketplace/)
 

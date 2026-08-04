@@ -1,0 +1,28 @@
+{
+  "x402Version": 1,
+  "product": "swarm-mm",
+  "company": "Script Master Labs",
+  "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
+  "networks": ["eip155:8453"],
+  "payToByNetwork": {
+    "eip155:8453": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa"
+  },
+  "acceptsAsset": {
+    "eip155:8453": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+  },
+  "resources": [
+    {"resource": "/v1/sim/join", "description": "Join simulated swarm", "price_usd": 0.0, "variant": "D"},
+    {"resource": "/v1/sim/trade", "description": "Paper trade", "price_usd": 0.0, "variant": "D"},
+    {"resource": "/v1/sim/leaderboard", "description": "Sim leaderboard", "price_usd": 0.0, "variant": "D"},
+    {"resource": "/v1/sim/premium", "description": "Premium sim analytics", "price_usd": 9.0, "variant": "D", "interval": "month"},
+    {"resource": "/v1/signal/levels", "description": "Signal swarm limit-order levels", "price_usd": 0.001, "variant": "A"},
+    {"resource": "/v1/signal/venue-map", "description": "Venue allocation map", "price_usd": 0.001, "variant": "A"},
+    {"resource": "/v1/signal/rebate-tracker", "description": "Maker rebate estimate", "price_usd": 0.001, "variant": "A"},
+    {"resource": "/v1/signal/subscribe", "description": "Signal Swarm subscription", "price_usd": 19.0, "variant": "A", "interval": "month"},
+    {"resource": "/v1/b2b/configure", "description": "B2B tenant configure", "price_usd": 0.0, "variant": "C"},
+    {"resource": "/v1/b2b/optimize", "description": "B2B optimize pass", "price_usd": 0.05, "variant": "C"},
+    {"resource": "/v1/b2b/report", "description": "B2B performance report", "price_usd": 0.10, "variant": "C"},
+    {"resource": "/v1/crypto/deposit", "description": "Crypto vault deposit (US geofenced)", "price_usd": 0.0, "variant": "B"},
+    {"resource": "/v1/crypto/positions", "description": "Crypto swarm positions", "price_usd": 0.001, "variant": "B"}
+  ]
+}

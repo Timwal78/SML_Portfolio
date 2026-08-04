@@ -19,7 +19,7 @@
  *   QUERY=naics=541512          (query string, no leading ?)
  *   PRICE=0.03                  (USDC — must match what the server charges)
  *   API_BASE=https://mcp-x402.onrender.com
- *   PAY_TO=0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700
+ *   PAY_TO=0x72330994f379a71542e7bd5a4cf99a9d9743f4aa
  *   BASE_RPC_URL=https://mainnet.base.org
  */
 
@@ -31,7 +31,7 @@ import { randomBytes } from 'crypto';
 // ─── Config ──────────────────────────────────────────────────────────────────
 
 const USDC_BASE        = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
-const PAY_TO           = process.env.PAY_TO           ?? '0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700';
+const PAY_TO           = process.env.PAY_TO           ?? '0x72330994f379a71542e7bd5a4cf99a9d9743f4aa';
 const API_BASE         = process.env.API_BASE         ?? 'https://mcp-x402.onrender.com';
 const ENDPOINT         = process.env.ENDPOINT         ?? '/x402/firms';
 const QUERY            = process.env.QUERY            ?? 'naics=541512';

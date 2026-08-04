@@ -15,7 +15,7 @@ describe('payment receiver', () => {
     delete process.env['SML_PAYMENT_RECEIVER'];
     const receiver = getPaymentReceiver();
     expect(receiver).toMatch(/^0x[0-9a-fA-F]{40}$/);
-    expect(receiver).toBe('0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700');
+    expect(receiver).toBe('0x72330994f379a71542e7bd5a4cf99a9d9743f4aa');
   });
 
   it('honors an explicit env override', () => {

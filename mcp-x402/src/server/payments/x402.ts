@@ -41,7 +41,7 @@ const DAILY_SPEND_CAP = parseFloat(
 // SML's published Base USDC receiving address (public — see agents.json, llms.txt,
 // x402-paywall.html). Used as the default so the gateway COLLECTS even when
 // SML_PAYMENT_RECEIVER isn't set in the environment.
-const SML_DEFAULT_RECEIVER = '0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700';
+const SML_DEFAULT_RECEIVER = '0x72330994f379a71542e7bd5a4cf99a9d9743f4aa';
 
 /** Resolve the address that collects USDC for paid tool calls. */
 export function getPaymentReceiver(): string {

@@ -2,7 +2,7 @@ import express from 'express';
 import { x402 } from '../src/index.js';
 
 const app = express();
-const PAY_TO = process.env.PAY_TO || '0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700';
+const PAY_TO = process.env.PAY_TO || '0x72330994f379a71542e7bd5a4cf99a9d9743f4aa';
 
 // Humans free, agents/bots pay $0.001 (CRAWLTOLL mode)
 app.use(

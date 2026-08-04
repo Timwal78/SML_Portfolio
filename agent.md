@@ -38,7 +38,7 @@
 
 - **Protocol:** x402/1.0 (HTTP-402), scheme `exact`. Compatible with Google Agent Payments Protocol (AP2) via the A2A x402 extension.
 - **Primary rail (SqueezeOS MCP):** RLUSD on XRPL mainnet. Issuer: `rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De`.
-- **Secondary rail:** USDC on Base. Pay-to: `0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700`.
+- **Secondary rail:** USDC on Base. Pay-to: `0x72330994f379a71542e7bd5a4cf99a9d9743f4aa`.
 - **USDC pay-to (Solana):** `C9rk2tzM92WxSoMWD32A5wZLgL3z1uN7FSVDExioahfF`
 - **Xahau (XAH):** Hooks-based payment routing (XahPay — in development).
 

@@ -1,0 +1,10 @@
+Approve within 5 min of generation (re-run add-signer if expired):
+
+https://app.virtuals.io/acp/agents/019f19a6-a03a-786b-9f9a-e12da7dcd9e7?action=add-signer&requestId=9a92ace9f6cb339306197ac1ed5375f4&policy=unrestricted&publicKey=MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAENgjGgkZVQt5GV7K010H//ICQEhQB0U6POpvap4UfUN4Mn6GnUABVbi8s4PC+Z7EsPc3o3x2Gl3a6O4F/xAkNPA==
+
+requestId: 9a92ace9f6cb339306197ac1ed5375f4
+agent: zzz000_archived_empty 019f19a6-a03a-786b-9f9a-e12da7dcd9e7
+wallet: 0x0f035c36c4ce65a6f1bf4370f779bac722d59004 (~$1.87 USDC stranded)
+After approve:
+  acp agent signer-status --request-id 9a92ace9f6cb339306197ac1ed5375f4 --public-key 'MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAENgjGgkZVQt5GV7K010H//ICQEhQB0U6POpvap4UfUN4Mn6GnUABVbi8s4PC+Z7EsPc3o3x2Gl3a6O4F/xAkNPA==' --agent-id 019f19a6-a03a-786b-9f9a-e12da7dcd9e7 --wait
+  Then send USDC to EOA 0x523512A2Ab8aD92d16e6A6eB939811eC9914fA16 and re-run seed bot.

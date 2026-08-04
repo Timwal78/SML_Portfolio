@@ -18,7 +18,7 @@
       "summary": "AI agent FICO-style reputation score (300\u2013850).",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "AI",
         "Agent-Reputation",
@@ -38,7 +38,7 @@
       "summary": "Base mainnet JSON-RPC read helper.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "RPC",
         "Crypto",
@@ -59,7 +59,7 @@
       "summary": "Post a reverse bounty (paid listing fee).",
       "amount": "0.01",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "x402",
         "Paid"
@@ -77,7 +77,7 @@
       "summary": "CASCADE ACCUMULATOR directive \u2014 ACCUMULATE/PYRAMID/EXIT/STOP.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Trading",
         "Signals",
@@ -97,7 +97,7 @@
       "summary": "OpenAI-compatible POST chat completions proxy.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "AI",
         "LLM",
@@ -117,7 +117,7 @@
       "summary": "Clinical trial search (ClinicalTrials.gov APIv2).",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Healthcare",
         "Federal",
@@ -137,7 +137,7 @@
       "summary": "CMS Medicare hospital quality data and physician provider information.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Healthcare",
         "Medicare",
@@ -158,7 +158,7 @@
       "summary": "Submit a bank compliance anomaly for scoring.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Compliance",
         "AML",
@@ -178,7 +178,7 @@
       "summary": "Full Leviathan Matrix compliance audit cycle for a bank.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Compliance",
         "AML",
@@ -198,7 +198,7 @@
       "summary": "Real-time regulator compliance dashboard query for a bank.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Compliance",
         "Federal",
@@ -218,7 +218,7 @@
       "summary": "Congress.gov bill search \u2014 legislation by keyword and congress number.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Federal",
         "Congress",
@@ -238,7 +238,7 @@
       "summary": "Content misinformation trust scoring plus on-chain wallet trust ledger.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "AI",
         "Content-Trust",
@@ -258,7 +258,7 @@
       "summary": "Real-time token price, market cap, and 24h volume/change.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Crypto",
         "Price",
@@ -280,7 +280,7 @@
       "summary": "Top trending coins, NFTs, and categories in the last 24h.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Crypto",
         "Market",
@@ -301,7 +301,7 @@
       "summary": "Domain enrichment: DNS + RDAP + geo.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Utility",
         "OSINT",
@@ -321,7 +321,7 @@
       "summary": "FDA adverse event reports (openFDA FAERS).",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Healthcare",
         "FDA",
@@ -342,7 +342,7 @@
       "summary": "FDA drug label lookup (openFDA).",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Healthcare",
         "FDA",
@@ -363,7 +363,7 @@
       "summary": "FDA drug recall/enforcement search (openFDA).",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Healthcare",
         "FDA",
@@ -384,7 +384,7 @@
       "summary": "SAM entity compliance bundle: registration + exclusion + set-asides + NAICS.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Federal",
         "Compliance",
@@ -405,7 +405,7 @@
       "summary": "EPA ECHO environmental enforcement and violation records.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Federal",
         "Environmental",
@@ -425,7 +425,7 @@
       "summary": "Equities RSI(14) heatmap across up to 20 tickers, with a real 4-agent Claude swarm verdict.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Trading",
         "Market-Screener",
@@ -445,7 +445,7 @@
       "summary": "Ethereum JSON-RPC read helper.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "RPC",
         "Crypto",
@@ -465,7 +465,7 @@
       "summary": "Grounding oracle: fact-checks a claim against live government/FDA/SEC/Treasury data.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "AI",
         "Content-Trust",
@@ -485,7 +485,7 @@
       "summary": "FDA 510(k) medical device premarket clearances (openFDA).",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Healthcare",
         "FDA",
@@ -506,7 +506,7 @@
       "summary": "FDA warning letters \u2014 regulatory enforcement actions.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Healthcare",
         "FDA",
@@ -528,7 +528,7 @@
       "summary": "FEC campaign finance \u2014 candidates, committees, and contribution totals.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Federal",
         "Campaign-Finance",
@@ -548,7 +548,7 @@
       "summary": "FINRA BrokerCheck broker/advisor registration and disclosure history.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Finance",
         "Compliance",
@@ -568,7 +568,7 @@
       "summary": "Find self-certified SDVOSB/WOSB/SDB/minority firms by NAICS + state (SAM.gov).",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Federal",
         "SDVOSB",
@@ -589,7 +589,7 @@
       "summary": "FRED economic indicator series (Federal Reserve Bank of St. Louis).",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Federal",
         "Economic-Indicators",
@@ -610,7 +610,7 @@
       "summary": "ETF constituents ranked by FTD notional concentration.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "SEC",
         "Trading",
@@ -632,7 +632,7 @@
       "summary": "Latest FTD ratio and percentile rank for a symbol.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "SEC",
         "Trading",
@@ -654,7 +654,7 @@
       "summary": "Settlement-cycle bundle \u2014 FTD stats, T+21/T+35 markers, Reg SHO 204 marker.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "SEC",
         "Trading",
@@ -676,7 +676,7 @@
       "summary": "SEC Reg SHO Threshold Securities List \u2014 persistent fails-to-deliver names.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "SEC",
         "Trading",
@@ -699,7 +699,7 @@
       "summary": "Historical SEC Reg SHO fails-to-deliver time series for a symbol.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "SEC",
         "Trading",
@@ -721,7 +721,7 @@
       "summary": "Latest or historical exchange rate for a base currency.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "FX",
         "Finance",
@@ -743,7 +743,7 @@
       "summary": "Multi-chain gas tracker snack.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Crypto",
         "Gas",
@@ -766,7 +766,7 @@
       "summary": "Search live U.S. federal grant opportunities (Grants.gov Search2).",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Federal",
         "Grants",
@@ -787,7 +787,7 @@
       "summary": "EchoNet usage graph query (paid).",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "x402",
         "Paid"
@@ -805,7 +805,7 @@
       "summary": "EchoNet agent reputation profile (paid).",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "x402",
         "Paid"
@@ -823,7 +823,7 @@
       "summary": "HUD Fair Market Rent + estimated payment-standard band.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Section-8",
         "HUD",
@@ -846,7 +846,7 @@
       "summary": "Section 8 / HCV landlord checklist + HQS hotspots.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Section-8",
         "HUD",
@@ -869,7 +869,7 @@
       "summary": "Kinston 4BR landlord bundle (PHA + FMR + call script + income worksheet).",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Section-8",
         "HUD",
@@ -892,7 +892,7 @@
       "summary": "HUD-VASH veteran housing contact guidance.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Section-8",
         "HUD",
@@ -915,7 +915,7 @@
       "summary": "Publish hunter report (paid).",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "x402",
         "Paid"
@@ -933,7 +933,7 @@
       "summary": "Inevitable Action Model \u2014 obligation committee verdict and mandatory action.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "x402",
         "Paid"
@@ -951,7 +951,7 @@
       "summary": "SEC EDGAR Form 4 insider trades by ticker.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "SEC",
         "Trading",
@@ -973,7 +973,7 @@
       "summary": "Cheap LLM chat completion proxy for agents.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "AI",
         "LLM",
@@ -993,7 +993,7 @@
       "summary": "Senate LDA lobbying disclosure filings \u2014 client, registrant, issues, and amounts.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Federal",
         "Lobbying",
@@ -1013,7 +1013,7 @@
       "summary": "Federal contract market intelligence by NAICS (USAspending).",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Federal",
         "Procurement",
@@ -1034,7 +1034,7 @@
       "summary": "TRIPLE_LOCK_VERDICT \u2014 max-conviction rare signal, distinct from the standard squeeze signal.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Trading",
         "Signals",
@@ -1054,7 +1054,7 @@
       "summary": "Google News RSS headlines.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "News",
         "Search",
@@ -1076,7 +1076,7 @@
       "summary": "NIH Reporter research grant database.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Federal",
         "Grants",
@@ -1097,7 +1097,7 @@
       "summary": "NPPES provider (NPI) lookup.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Healthcare",
         "Federal",
@@ -1117,7 +1117,7 @@
       "summary": "Options Delta heatmap across up to 40 contracts, with a real 4-agent Claude swarm verdict.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Trading",
         "Options",
@@ -1138,7 +1138,7 @@
       "summary": "Institutional options flow \u2014 sweeps, whale detection, dark-pool prints.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Trading",
         "Options",
@@ -1158,7 +1158,7 @@
       "summary": "OSHA workplace inspection and violation records (DOL enforcement data).",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Federal",
         "Labor-Safety",
@@ -1178,7 +1178,7 @@
       "summary": "USPTO PatentsView patent search \u2014 title, abstract, assignee, CPC class, grant date.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Federal",
         "Patents",
@@ -1198,7 +1198,7 @@
       "summary": "Public Housing Authority (PHA) lookup by ZIP/city/county.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Section-8",
         "HUD",
@@ -1221,7 +1221,7 @@
       "summary": "Screen a name against all 11 US export-control and sanctions lists.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Compliance",
         "Federal",
@@ -1241,7 +1241,7 @@
       "summary": "SBIR/STTR small business innovation research grants.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Federal",
         "Grants",
@@ -1262,7 +1262,7 @@
       "summary": "SEC EDGAR 10-K annual report filings by ticker.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "SEC",
         "Federal",
@@ -1284,7 +1284,7 @@
       "summary": "SEC EDGAR 10-Q quarterly report filings by ticker.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "SEC",
         "Federal",
@@ -1306,7 +1306,7 @@
       "summary": "SEC EDGAR 13D/13G activist investor filings by ticker.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "SEC",
         "Federal",
@@ -1328,7 +1328,7 @@
       "summary": "SEC EDGAR 13F institutional holdings \u2014 hedge fund quarterly positions.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "SEC",
         "Federal",
@@ -1350,7 +1350,7 @@
       "summary": "SEC EDGAR 8-K material event filings by ticker.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "SEC",
         "Federal",
@@ -1372,7 +1372,7 @@
       "summary": "Public web social pulse search (not official X API).",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Search",
         "Social",
@@ -1394,7 +1394,7 @@
       "summary": "Search live overseas trade leads for US exporters.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Federal",
         "Trade",
@@ -1414,7 +1414,7 @@
       "summary": "Daily US Treasury yield curve rates (1M\u201330Y).",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Federal",
         "Treasury",
@@ -1435,7 +1435,7 @@
       "summary": "Fetch a public URL and return text/json for agents.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Web",
         "Utility",
@@ -1458,7 +1458,7 @@
       "summary": "URL to simplified markdown/text.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Web",
         "Utility",
@@ -1479,7 +1479,7 @@
       "summary": "Keyless web search for agents.",
       "amount": "0.001",
       "network": "eip155:8453",
-      "payTo": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+      "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "tags": [
         "Search",
         "Web",
@@ -1505,7 +1505,7 @@
     "rwa": "https://sml-rwa-api.onrender.com",
     "acp_x402": "https://acp-x402-scriptmasterlabs.onrender.com"
   },
-  "payTo_seed_historical": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+  "payTo_seed_historical": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
   "networks": [
     "eip155:8453",
     "eip155:4663",

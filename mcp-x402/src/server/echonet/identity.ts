@@ -6,7 +6,7 @@ const ENV_SELF = (process.env['ECHONET_SELF_WALLETS'] || '')
   .filter(Boolean);
 
 const HARDCODED_SELF = [
-  '0x4e14b249d9a4c9c9352d780eceb508a8eb7a7700', // MCP payTo
+  '0x72330994f379a71542e7bd5a4cf99a9d9743f4aa', // MCP payTo
   '0x72330994f379a71542e7bd5a4cf99a9d9743f4aa', // ACP agent
   '0x25f2c8a0c6e1d8b5f3a7e9d1c4b8a6f0e2d369ea', // owner prefix-safe? full if known
 ].map((s) => s.toLowerCase());
@@ -32,7 +32,7 @@ export function isSelfWallet(addr: string): boolean {
 }
 
 export function payToIdentity(): string {
-  return normalizeAddr(process.env['SML_PAYMENT_RECEIVER'] || process.env['X402_PAY_TO'] || '0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700');
+  return normalizeAddr(process.env['SML_PAYMENT_RECEIVER'] || process.env['X402_PAY_TO'] || '0x72330994f379a71542e7bd5a4cf99a9d9743f4aa');
 }
 
 export function taskTypeFromResource(resource: string): string {

@@ -14,7 +14,7 @@
     "polygon"
   ],
   "payment_asset": "USDC / RLUSD",
-  "pay_to_base": "0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700",
+  "pay_to_base": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
   "pay_to_solana": "C9rk2tzM92WxSoMWD32A5wZLgL3z1uN7FSVDExioahfF",
   "xrpl_gateway": "rUJhaK2ibfTFVdAn8m9jMCcJQ1xo6FmNPZ",
   "rlusd_issuer": "rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De",

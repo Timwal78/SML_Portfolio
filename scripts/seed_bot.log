@@ -1,0 +1,38 @@
+payer=0x72330994f379a71542e7bd5a4cf99a9d9743f4aa USDC=1.090421 max_pays=900 leave=0.12
+PAY 1 tx=0x43fc2ce7aa… → 0x4e14B2… /x402/fx-rate?base=USD&symbols=EUR
+  redeem 200 {"source":"frankfurter.dev/v2/rates","data":[{"date":"2026-07-28","base":"USD","quote":"AED","rate":3.6725},{"date":"202
+PAY 2 tx=0xceacd5d719… → 0x4e14B2… /x402/fx-rate?base=USD&symbols=JPY
+  redeem 200 {"source":"frankfurter.dev/v2/rates","data":[{"date":"2026-07-28","base":"USD","quote":"AED","rate":3.6725},{"date":"202
+PAY 3 tx=0x1edf520689… → 0x4e14B2… /x402/gas-tracker
+  redeem 200 {"timestamp":"2026-07-28T16:40:58.324Z","chains":[{"chain":"ethereum","gas_gwei":2.164524849,"source":"public_rpc"}],"so
+PAY 4 tx=0x69d5b8743b… → 0x4e14B2… 
+  redeem 200 {"timestamp":"2026-07-28T16:41:16.753Z","url":"https://example.com","status":200,"content_type":"text/html","bytes":559,
+PAY 5 tx=0x57cb514572… → 0x4e14B2… /x402/news-headlines
+  redeem 200 {"timestamp":"2026-07-28T16:41:33.922Z","q":"crypto OR bitcoin OR AI agents","count":15,"headlines":[{"title":"The futur
+PAY 6 tx=0x38de64faa5… → 0x4e14B2… /x402/grants?keyword=ai
+  redeem 200 {"source":"grants.gov/search2","total":136,"results":[{"id":"363121","number":"PAS-ALG-FY26-02","title":"Freedom250 Adva
+PAY 7 tx=0x56e4cb78ba… → 0x4e14B2… /x402/treasury-yields
+  redeem 200 {"source":"home.treasury.gov/yield-curve","month":"202607","latest":{"date":"2026-07-01T00:00:00","1M":"3.67","3M":"3.85
+PAY 8 tx=0xa8e9004644… → 0x4e14B2… /x402/fred?series_id=GDP
+  redeem 503 {"error":"upstream_not_configured","detail":"FRED_API_KEY not configured on this server."}
+PAY 8 tx=0x78e71225c4… → 0x4e14B2… /x402/fred?series_id=UNRATE
+  redeem 503 {"error":"upstream_not_configured","detail":"FRED_API_KEY not configured on this server."}
+PAY 8 tx=0xb214f1e695… → 0x4e14B2… /x402/pha-lookup
+  redeem 200 {"matches":[{"id":"nc-kinston-kha","name":"Kinston Housing Authority","hud_code":"NC004","city":"Kinston","county":"Leno
+PAY 9 tx=0x86f5775b4a… → 0x723309… /x402/gas-tracker
+  redeem 200 {"result":"{\"timestamp\": \"2026-07-28T16:43:09.665901+00:00\", \"chains\": [{\"chain\": \"ethereum\", \"gas_gwei\": 20
+payer=0x72330994f379a71542e7bd5a4cf99a9d9743f4aa USDC=1.015507 max_pays=900 leave=0.12
+PAY 1 tx=0x85371877db… → 0x4e14B2… /x402/fx-rate?base=USD&symbols=EUR
+  redeem 200 {"source":"frankfurter.dev/v2/rates","data":[{"date":"2026-07-28","base":"USD","quote":"AED","rate":3.6725},{"date":"202
+PAY 2 tx=0x748b8490bc… → 0x4e14B2… /x402/fx-rate?base=USD&symbols=JPY
+  redeem 200 {"source":"frankfurter.dev/v2/rates","data":[{"date":"2026-07-28","base":"USD","quote":"AED","rate":3.6725},{"date":"202
+PAY 3 tx=0x1f090ff35a… → 0x4e14B2… /x402/gas-tracker
+  redeem 200 {"timestamp":"2026-07-28T16:44:30.659Z","chains":[{"chain":"ethereum","gas_gwei":2.170184107,"source":"public_rpc"}],"so
+PAY 4 tx=0x68251674ab… → 0x4e14B2… 
+  redeem 200 {"timestamp":"2026-07-28T16:44:44.777Z","url":"https://example.com","status":200,"content_type":"text/html","bytes":559,
+PAY 5 tx=0x5ec92447c3… → 0x4e14B2… /x402/news-headlines
+  redeem 200 {"timestamp":"2026-07-28T16:44:59.740Z","q":"crypto OR bitcoin OR AI agents","count":15,"headlines":[{"title":"The futur
+PAY 6 tx=0xfd64898061… → 0x4e14B2… /x402/grants?keyword=ai
+  redeem 200 {"source":"grants.gov/search2","total":137,"results":[{"id":"363121","number":"PAS-ALG-FY26-02","title":"Freedom250 Adva
+PAY 7 tx=0x2c3eb0481d… → 0x4e14B2… /x402/treasury-yields
+  redeem 200 {"source":"home.treasury.gov/yield-curve","month":"202607","latest":{"date":"2026-07-01T00:00:00","1M":"3.67","3M":"3.85

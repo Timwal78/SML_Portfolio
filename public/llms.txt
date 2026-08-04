@@ -72,7 +72,7 @@ Kill ranking theater. Visibility = stranger x402 settle volume on the SML rail o
 - Paid post bounty: POST https://mcp-x402.onrender.com/x402/bounties (listing fee ~0.01 USDC)
 - Bootstrap reverse bounties on: /x402/llm-chat, /x402/web-search, /x402/web-fetch, /x402/social-search, /x402/base-rpc
 - Snack floor: 0.001 USDC Base (eip155:8453), header X-PAYMENT-TX or X-PAYMENT
-- payTo: 0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700
+- payTo: 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa
 - Rules: self-seed/operator wallets excluded from bounty + reputation; forks without this ledger have zero rep
 - Money: snack fee + listing fee + protocol cut + metered graph/hunter — not a free graduation API for competitors
 - OpenAPI: https://mcp-x402.onrender.com/openapi.json

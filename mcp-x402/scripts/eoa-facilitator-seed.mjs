@@ -8,7 +8,7 @@
  * Fix (closed-loop):
  *   1. Fund self-settler EOA (0x5235…) with USDC from ACP
  *   2. EOA signs real EIP-3009 (viem, not acp smart wallet)
- *   3. Server SelfFacilitator settles on-chain → USDC to rails 0x4e14
+ *   3. Server SelfFacilitator settles on-chain → USDC to rails 0x7233
  *   4. Money stays in SML treasury; facilitator rail = what Bazaar/x402scan counts
  *
  * Usage (from mcp-x402/):
@@ -27,7 +27,7 @@ import { randomBytes } from 'crypto';
 import { readFileSync, writeFileSync, appendFileSync } from 'fs';
 
 const USDC = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
-const RAILS = '0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700';
+const RAILS = '0x72330994f379a71542e7bd5a4cf99a9d9743f4aa';
 const API = process.env.API_BASE || 'https://mcp-x402.onrender.com';
 const SEED_FILE = process.env.SEED_FILE || '/home/hermes/.hermes/home/SML_SELF_SETTLER_SEED.txt';
 const MAX_PAYS = Number(process.env.MAX_PAYS || 500);

@@ -39,7 +39,7 @@
 - 402 sample: https://mcp-x402.onrender.com/x402/grants?keyword=ai
 - ACP snacks: https://acp-x402-scriptmasterlabs.onrender.com/.well-known/x402
 - Token explorer: https://robinhoodchain.blockscout.com/token/0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168
-- Recipient (rails seed, historical): https://www.x402scan.com/recipient/0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700
+- Recipient (rails seed, historical): https://www.x402scan.com/recipient/0x72330994f379a71542e7bd5a4cf99a9d9743f4aa
 - ACP payTo scan: use explorer for `0x72330994f379a71542e7bd5a4cf99a9d9743f4aa` on chain 4663
 
 ## List everywhere (paste)

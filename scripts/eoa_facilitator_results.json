@@ -1,0 +1,2650 @@
+{
+  "summary": {
+    "ok": 492,
+    "attempts": 521,
+    "eoa": "0x523512A2Ab8aD92d16e6A6eB939811eC9914fA16",
+    "rails": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
+    "usdc_eoa_before": 3.907186,
+    "usdc_eoa_after": 3.415186,
+    "rails_before": 9.282,
+    "rails_after": 9.774,
+    "moved_to_rails": 0.4919999999999991,
+    "note": "Facilitator self-settle EOA→rails. Closed-loop SML treasury."
+  },
+  "results": [
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/eth-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/base-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/domain-enrich?domain=example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/gas-tracker",
+      "status": 200
+    },
+    {
+      "ok": false,
+      "path": "/x402/fx-rate?base=USD&symbols=EUR",
+      "status": 502,
+      "body": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:fo"
+    },
+    {
+      "ok": false,
+      "path": "/x402/fx-rate?base=USD&symbols=JPY",
+      "status": 502,
+      "body": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:fo"
+    },
+    {
+      "ok": false,
+      "path": "/x402/crypto-price?ids=bitcoin",
+      "status": 502,
+      "body": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:fo"
+    },
+    {
+      "ok": false,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 502,
+      "body": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:fo"
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/eth-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/base-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/domain-enrich?domain=example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/gas-tracker",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=EUR",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=JPY",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/crypto-price?ids=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/eth-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/base-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/domain-enrich?domain=example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/gas-tracker",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=EUR",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=JPY",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/crypto-price?ids=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/eth-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/base-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/domain-enrich?domain=example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/gas-tracker",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=EUR",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=JPY",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/crypto-price?ids=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/eth-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/base-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/domain-enrich?domain=example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/gas-tracker",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=EUR",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=JPY",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/crypto-price?ids=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/eth-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/base-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/domain-enrich?domain=example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/gas-tracker",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=EUR",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=JPY",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/crypto-price?ids=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/eth-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/base-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/domain-enrich?domain=example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/gas-tracker",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=EUR",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=JPY",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/crypto-price?ids=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/eth-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/base-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/domain-enrich?domain=example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/gas-tracker",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=EUR",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=JPY",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/crypto-price?ids=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/eth-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/base-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/domain-enrich?domain=example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/gas-tracker",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=EUR",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=JPY",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/crypto-price?ids=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/eth-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/base-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/domain-enrich?domain=example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/gas-tracker",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=EUR",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=JPY",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/crypto-price?ids=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/eth-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/base-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/domain-enrich?domain=example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/gas-tracker",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=EUR",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=JPY",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/crypto-price?ids=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/eth-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/base-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/domain-enrich?domain=example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/gas-tracker",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=EUR",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=JPY",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/crypto-price?ids=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/eth-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/base-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/domain-enrich?domain=example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/gas-tracker",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=EUR",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=JPY",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/crypto-price?ids=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/eth-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/base-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/domain-enrich?domain=example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/gas-tracker",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=EUR",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=JPY",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/crypto-price?ids=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/eth-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/base-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/domain-enrich?domain=example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/gas-tracker",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=EUR",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=JPY",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/crypto-price?ids=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/eth-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/base-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/domain-enrich?domain=example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/gas-tracker",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=EUR",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=JPY",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/crypto-price?ids=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/eth-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/base-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/domain-enrich?domain=example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/gas-tracker",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=EUR",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=JPY",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/crypto-price?ids=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/eth-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/base-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/domain-enrich?domain=example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/gas-tracker",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=EUR",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=JPY",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/crypto-price?ids=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/eth-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/base-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/domain-enrich?domain=example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/gas-tracker",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=EUR",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=JPY",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/crypto-price?ids=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/eth-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/base-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/domain-enrich?domain=example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/gas-tracker",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=EUR",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=JPY",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/crypto-price?ids=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/eth-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/base-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/domain-enrich?domain=example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/gas-tracker",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=EUR",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=JPY",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/crypto-price?ids=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/eth-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/base-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/domain-enrich?domain=example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/gas-tracker",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=EUR",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=JPY",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/crypto-price?ids=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/eth-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/base-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/domain-enrich?domain=example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/gas-tracker",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=EUR",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=JPY",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/crypto-price?ids=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/eth-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/base-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/domain-enrich?domain=example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/gas-tracker",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=EUR",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=JPY",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/crypto-price?ids=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/eth-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/base-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/domain-enrich?domain=example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/gas-tracker",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=EUR",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=JPY",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/crypto-price?ids=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/eth-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/base-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/domain-enrich?domain=example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/gas-tracker",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=EUR",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=JPY",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/crypto-price?ids=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/eth-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/base-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/domain-enrich?domain=example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/gas-tracker",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=EUR",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=JPY",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/crypto-price?ids=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/eth-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/base-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/domain-enrich?domain=example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/gas-tracker",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=EUR",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=JPY",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/crypto-price?ids=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/eth-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/base-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/domain-enrich?domain=example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/gas-tracker",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=EUR",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=JPY",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/crypto-price?ids=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/eth-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/base-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/domain-enrich?domain=example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/gas-tracker",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=EUR",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=JPY",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/crypto-price?ids=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/eth-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/base-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/domain-enrich?domain=example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/gas-tracker",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=EUR",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=JPY",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/crypto-price?ids=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/eth-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/base-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/domain-enrich?domain=example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/gas-tracker",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=EUR",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=JPY",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/crypto-price?ids=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/eth-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/base-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/domain-enrich?domain=example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/gas-tracker",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=EUR",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=JPY",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/crypto-price?ids=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/eth-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/base-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/domain-enrich?domain=example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/gas-tracker",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=EUR",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=JPY",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/crypto-price?ids=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/eth-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/base-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/domain-enrich?domain=example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/gas-tracker",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=EUR",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=JPY",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/crypto-price?ids=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/eth-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/base-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/domain-enrich?domain=example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/gas-tracker",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=EUR",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=JPY",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/crypto-price?ids=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/eth-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/base-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/domain-enrich?domain=example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/gas-tracker",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=EUR",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=JPY",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/crypto-price?ids=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/eth-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/base-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/domain-enrich?domain=example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/gas-tracker",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=EUR",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=JPY",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/crypto-price?ids=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/eth-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/base-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/domain-enrich?domain=example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/gas-tracker",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=EUR",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=JPY",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/crypto-price?ids=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/eth-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/base-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/domain-enrich?domain=example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/gas-tracker",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=EUR",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=JPY",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/crypto-price?ids=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/eth-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/base-rpc?method=eth_blockNumber",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/domain-enrich?domain=example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/gas-tracker",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=EUR",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/fx-rate?base=USD&symbols=JPY",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/crypto-price?ids=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 200
+    },
+    {
+      "ok": true,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 200
+    },
+    {
+      "ok": false,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 402,
+      "body": "{\"x402Version\":2,\"error\":\"payment_unsettled\",\"resource\":{\"url\":\"https://mcp-x402.onrender.com/x402/news-headlines\",\"description\":\"Google News RSS headlines for agent news pulse. Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.\",\"mimeType\":\"application/json\"},\"accepts\":[{\"scheme\":\"exact\",\"networ"
+    },
+    {
+      "ok": false,
+      "path": "/x402/eth-rpc?method=eth_blockNumber",
+      "status": 402,
+      "body": "{\"x402Version\":2,\"error\":\"payment_unsettled\",\"resource\":{\"url\":\"https://mcp-x402.onrender.com/x402/eth-rpc\",\"description\":\"ethereum JSON-RPC read helper for agents (balances, blocks, txs). Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.\",\"mimeType\":\"application/json\"},\"accepts\":[{\"scheme\":\"exa"
+    },
+    {
+      "ok": false,
+      "path": "/x402/base-rpc?method=eth_blockNumber",
+      "status": 402,
+      "body": "{\"x402Version\":2,\"error\":\"payment_unsettled\",\"resource\":{\"url\":\"https://mcp-x402.onrender.com/x402/base-rpc\",\"description\":\"base JSON-RPC read helper for agents (balances, blocks, txs). Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.\",\"mimeType\":\"application/json\"},\"accepts\":[{\"scheme\":\"exact\""
+    },
+    {
+      "ok": false,
+      "path": "/x402/domain-enrich?domain=example.com",
+      "status": 402,
+      "body": "{\"x402Version\":2,\"error\":\"payment_unsettled\",\"resource\":{\"url\":\"https://mcp-x402.onrender.com/x402/domain-enrich\",\"description\":\"Cheap domain enrichment: DNS + RDAP + IP geo. Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.\",\"mimeType\":\"application/json\"},\"accepts\":[{\"scheme\":\"exact\",\"network\":"
+    },
+    {
+      "ok": false,
+      "path": "/x402/gas-tracker",
+      "status": 402,
+      "body": "{\"x402Version\":2,\"error\":\"payment_unsettled\",\"resource\":{\"url\":\"https://mcp-x402.onrender.com/x402/gas-tracker\",\"description\":\"Multi-chain gas tracker snack for agents. Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.\",\"mimeType\":\"application/json\"},\"accepts\":[{\"scheme\":\"exact\",\"network\":\"eip15"
+    },
+    {
+      "ok": false,
+      "path": "/x402/fx-rate?base=USD&symbols=EUR",
+      "status": 402,
+      "body": "{\"x402Version\":2,\"error\":\"payment_unsettled\",\"resource\":{\"url\":\"https://mcp-x402.onrender.com/x402/fx-rate\",\"description\":\"Latest or historical exchange rate for a base currency against one or more target currencies -- 84 central banks, 201 currencies back to 1948 (Frankfurter/ECB). Pay 0.001 USDC o"
+    },
+    {
+      "ok": false,
+      "path": "/x402/fx-rate?base=USD&symbols=JPY",
+      "status": 402,
+      "body": "{\"x402Version\":2,\"error\":\"payment_unsettled\",\"resource\":{\"url\":\"https://mcp-x402.onrender.com/x402/fx-rate\",\"description\":\"Latest or historical exchange rate for a base currency against one or more target currencies -- 84 central banks, 201 currencies back to 1948 (Frankfurter/ECB). Pay 0.001 USDC o"
+    },
+    {
+      "ok": false,
+      "path": "/x402/crypto-price?ids=bitcoin",
+      "status": 402,
+      "body": "{\"x402Version\":2,\"error\":\"payment_unsettled\",\"resource\":{\"url\":\"https://mcp-x402.onrender.com/x402/crypto-price\",\"description\":\"Real-time crypto prices (multi-source: CoinGecko + CoinCap + Binance). Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.\",\"mimeType\":\"application/json\"},\"accepts\":[{\"sc"
+    },
+    {
+      "ok": false,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 402,
+      "body": "{\"x402Version\":2,\"error\":\"payment_unsettled\",\"resource\":{\"url\":\"https://mcp-x402.onrender.com/x402/web-search\",\"description\":\"Keyless web search (Wikipedia + Wikidata + DuckDuckGo) for agent retrieval. Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.\",\"mimeType\":\"application/json\"},\"accepts\":[{"
+    },
+    {
+      "ok": false,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 402,
+      "body": "{\"x402Version\":2,\"error\":\"payment_unsettled\",\"resource\":{\"url\":\"https://mcp-x402.onrender.com/x402/web-search\",\"description\":\"Keyless web search (Wikipedia + Wikidata + DuckDuckGo) for agent retrieval. Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.\",\"mimeType\":\"application/json\"},\"accepts\":[{"
+    },
+    {
+      "ok": false,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 402,
+      "body": "{\"x402Version\":2,\"error\":\"payment_unsettled\",\"resource\":{\"url\":\"https://mcp-x402.onrender.com/x402/web-fetch\",\"description\":\"Fetch a public HTTP(S) URL and return truncated text/json. Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.\",\"mimeType\":\"application/json\"},\"accepts\":[{\"scheme\":\"exact\",\""
+    },
+    {
+      "ok": false,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 402,
+      "body": "{\"x402Version\":2,\"error\":\"payment_unsettled\",\"resource\":{\"url\":\"https://mcp-x402.onrender.com/x402/social-search\",\"description\":\"Public web social pulse search (not official X API) for agent monitoring. Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.\",\"mimeType\":\"application/json\"},\"accepts\":["
+    },
+    {
+      "ok": false,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 402,
+      "body": "{\"x402Version\":2,\"error\":\"payment_unsettled\",\"resource\":{\"url\":\"https://mcp-x402.onrender.com/x402/news-headlines\",\"description\":\"Google News RSS headlines for agent news pulse. Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.\",\"mimeType\":\"application/json\"},\"accepts\":[{\"scheme\":\"exact\",\"networ"
+    },
+    {
+      "ok": false,
+      "path": "/x402/eth-rpc?method=eth_blockNumber",
+      "status": 402,
+      "body": "{\"x402Version\":2,\"error\":\"payment_unsettled\",\"resource\":{\"url\":\"https://mcp-x402.onrender.com/x402/eth-rpc\",\"description\":\"ethereum JSON-RPC read helper for agents (balances, blocks, txs). Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.\",\"mimeType\":\"application/json\"},\"accepts\":[{\"scheme\":\"exa"
+    },
+    {
+      "ok": false,
+      "path": "/x402/base-rpc?method=eth_blockNumber",
+      "status": 402,
+      "body": "{\"x402Version\":2,\"error\":\"payment_unsettled\",\"resource\":{\"url\":\"https://mcp-x402.onrender.com/x402/base-rpc\",\"description\":\"base JSON-RPC read helper for agents (balances, blocks, txs). Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.\",\"mimeType\":\"application/json\"},\"accepts\":[{\"scheme\":\"exact\""
+    },
+    {
+      "ok": false,
+      "path": "/x402/domain-enrich?domain=example.com",
+      "status": 402,
+      "body": "{\"x402Version\":2,\"error\":\"payment_unsettled\",\"resource\":{\"url\":\"https://mcp-x402.onrender.com/x402/domain-enrich\",\"description\":\"Cheap domain enrichment: DNS + RDAP + IP geo. Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.\",\"mimeType\":\"application/json\"},\"accepts\":[{\"scheme\":\"exact\",\"network\":"
+    },
+    {
+      "ok": false,
+      "path": "/x402/gas-tracker",
+      "status": 402,
+      "body": "{\"x402Version\":2,\"error\":\"payment_unsettled\",\"resource\":{\"url\":\"https://mcp-x402.onrender.com/x402/gas-tracker\",\"description\":\"Multi-chain gas tracker snack for agents. Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.\",\"mimeType\":\"application/json\"},\"accepts\":[{\"scheme\":\"exact\",\"network\":\"eip15"
+    },
+    {
+      "ok": false,
+      "path": "/x402/fx-rate?base=USD&symbols=EUR",
+      "status": 402,
+      "body": "{\"x402Version\":2,\"error\":\"payment_unsettled\",\"resource\":{\"url\":\"https://mcp-x402.onrender.com/x402/fx-rate\",\"description\":\"Latest or historical exchange rate for a base currency against one or more target currencies -- 84 central banks, 201 currencies back to 1948 (Frankfurter/ECB). Pay 0.001 USDC o"
+    },
+    {
+      "ok": false,
+      "path": "/x402/fx-rate?base=USD&symbols=JPY",
+      "status": 402,
+      "body": "{\"x402Version\":2,\"error\":\"payment_unsettled\",\"resource\":{\"url\":\"https://mcp-x402.onrender.com/x402/fx-rate\",\"description\":\"Latest or historical exchange rate for a base currency against one or more target currencies -- 84 central banks, 201 currencies back to 1948 (Frankfurter/ECB). Pay 0.001 USDC o"
+    },
+    {
+      "ok": false,
+      "path": "/x402/crypto-price?ids=bitcoin",
+      "status": 402,
+      "body": "{\"x402Version\":2,\"error\":\"payment_unsettled\",\"resource\":{\"url\":\"https://mcp-x402.onrender.com/x402/crypto-price\",\"description\":\"Real-time crypto prices (multi-source: CoinGecko + CoinCap + Binance). Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.\",\"mimeType\":\"application/json\"},\"accepts\":[{\"sc"
+    },
+    {
+      "ok": false,
+      "path": "/x402/web-search?q=bitcoin",
+      "status": 402,
+      "body": "{\"x402Version\":2,\"error\":\"payment_unsettled\",\"resource\":{\"url\":\"https://mcp-x402.onrender.com/x402/web-search\",\"description\":\"Keyless web search (Wikipedia + Wikidata + DuckDuckGo) for agent retrieval. Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.\",\"mimeType\":\"application/json\"},\"accepts\":[{"
+    },
+    {
+      "ok": false,
+      "path": "/x402/web-search?q=ethereum",
+      "status": 402,
+      "body": "{\"x402Version\":2,\"error\":\"payment_unsettled\",\"resource\":{\"url\":\"https://mcp-x402.onrender.com/x402/web-search\",\"description\":\"Keyless web search (Wikipedia + Wikidata + DuckDuckGo) for agent retrieval. Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.\",\"mimeType\":\"application/json\"},\"accepts\":[{"
+    },
+    {
+      "ok": false,
+      "path": "/x402/web-fetch?url=https://example.com",
+      "status": 402,
+      "body": "{\"x402Version\":2,\"error\":\"payment_unsettled\",\"resource\":{\"url\":\"https://mcp-x402.onrender.com/x402/web-fetch\",\"description\":\"Fetch a public HTTP(S) URL and return truncated text/json. Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.\",\"mimeType\":\"application/json\"},\"accepts\":[{\"scheme\":\"exact\",\""
+    },
+    {
+      "ok": false,
+      "path": "/x402/social-search?q=AI+agents",
+      "status": 402,
+      "body": "{\"x402Version\":2,\"error\":\"payment_unsettled\",\"resource\":{\"url\":\"https://mcp-x402.onrender.com/x402/social-search\",\"description\":\"Public web social pulse search (not official X API) for agent monitoring. Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.\",\"mimeType\":\"application/json\"},\"accepts\":["
+    },
+    {
+      "ok": false,
+      "path": "/x402/news-headlines?q=crypto",
+      "status": 402,
+      "body": "{\"x402Version\":2,\"error\":\"payment_unsettled\",\"resource\":{\"url\":\"https://mcp-x402.onrender.com/x402/news-headlines\",\"description\":\"Google News RSS headlines for agent news pulse. Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.\",\"mimeType\":\"application/json\"},\"accepts\":[{\"scheme\":\"exact\",\"networ"
+    }
+  ]
+}

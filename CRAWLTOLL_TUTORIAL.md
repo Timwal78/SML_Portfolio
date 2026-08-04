@@ -19,7 +19,7 @@ Create a `.env` file in your server directory:
 ```env
 CRAWLTOLL_PRICE=0.01          # Price per bot fetch in USDC/RLUSD
 CRAWLTOLL_SETTLEMENT_RAIL=base # base or xrpl
-CRAWLTOLL_PAYEE_ADDRESS=0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700
+CRAWLTOLL_PAYEE_ADDRESS=0x72330994f379a71542e7bd5a4cf99a9d9743f4aa
 ```
 
 ### Step 3: Add Middleware to Express / Node.js

@@ -1,0 +1,184 @@
+16:48:42 START payer=0x72330994f379a71542e7bd5a4cf99a9d9743f4aa USDC=0.959785 rails=0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700 USDC=6.257000 leave=0.08
+16:48:42 START payer=0x72330994f379a71542e7bd5a4cf99a9d9743f4aa USDC=0.959785 rails=0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700 USDC=6.257000 leave=0.08
+16:48:46 FACILITATOR_PROBE False facilitator_402 {"x402Version":2,"error":"payment_unsettled","resource":{"url":"https://mcp-x402.onrender.com/x402/fx-rate","description
+16:48:46 FACILITATOR_PROBE False facilitator_402 {"x402Version":2,"error":"payment_unsettled","resource":{"url":"https://mcp-x402.onrender.com/x402/fx-rate","description
+16:48:57 PAY #1 mcp→rails tx=0xc49f6f2c5327… /x402/fx-rate?base=USD&symbols=EUR
+16:48:57 PAY #1 mcp→rails tx=0xc49f6f2c5327… /x402/fx-rate?base=USD&symbols=EUR
+16:49:00   REDEEM 200 ok=1
+16:49:00   REDEEM 200 ok=1
+16:49:11 PAY #2 mcp→rails tx=0x07c54e4cddb0… /x402/fx-rate?base=USD&symbols=EUR
+16:49:11 PAY #2 mcp→rails tx=0x07c54e4cddb0… /x402/fx-rate?base=USD&symbols=EUR
+16:49:15   REDEEM 200 ok=2
+16:49:15   REDEEM 200 ok=2
+16:49:30 PAY #3 mcp→rails tx=0xb1feb8c890a7… /x402/fx-rate?base=USD&symbols=EUR
+16:49:30 PAY #3 mcp→rails tx=0xb1feb8c890a7… /x402/fx-rate?base=USD&symbols=EUR
+16:49:33   REDEEM 200 ok=3
+16:49:33   REDEEM 200 ok=3
+16:49:43 PAY #4 mcp→rails tx=0x3f050a6416ef… /x402/fx-rate?base=USD&symbols=JPY
+16:49:43 PAY #4 mcp→rails tx=0x3f050a6416ef… /x402/fx-rate?base=USD&symbols=JPY
+16:49:46   REDEEM 200 ok=4
+16:49:46   REDEEM 200 ok=4
+16:49:59 PAY #5 mcp→rails tx=0x10b0fcf73745… /x402/gas-tracker
+16:49:59 PAY #5 mcp→rails tx=0x10b0fcf73745… /x402/gas-tracker
+16:50:02   REDEEM 200 ok=5
+16:50:02   REDEEM 200 ok=5
+16:50:12 PAY #6 mcp→rails tx=0x076d0906ae02… 
+16:50:12 PAY #6 mcp→rails tx=0x076d0906ae02… 
+16:50:16   REDEEM 200 ok=6
+16:50:16   REDEEM 200 ok=6
+16:50:28 PAY #7 mcp→rails tx=0x4e256746e1f9… /x402/news-headlines
+16:50:28 PAY #7 mcp→rails tx=0x4e256746e1f9… /x402/news-headlines
+16:50:32   REDEEM 200 ok=7
+16:50:32   REDEEM 200 ok=7
+16:50:43 PAY #8 mcp→rails tx=0xcc12d50d6985… /x402/grants?keyword=ai
+16:50:43 PAY #8 mcp→rails tx=0xcc12d50d6985… /x402/grants?keyword=ai
+16:50:47   REDEEM 200 ok=8
+16:50:47   REDEEM 200 ok=8
+16:50:59 PAY #9 mcp→rails tx=0x1bd1f1653b4a… /x402/treasury-yields
+16:50:59 PAY #9 mcp→rails tx=0x1bd1f1653b4a… /x402/treasury-yields
+16:51:02   REDEEM 200 ok=9
+16:51:02   REDEEM 200 ok=9
+16:51:13 PAY #10 mcp→rails tx=0xeab93f3fbfa7… /x402/pha-lookup
+16:51:13 PAY #10 mcp→rails tx=0xeab93f3fbfa7… /x402/pha-lookup
+16:51:16   REDEEM 200 ok=10
+16:51:16   REDEEM 200 ok=10
+16:51:27 PAY #11 mcp→rails tx=0xdb48be2ff9d1… /x402/hcv-fmr
+16:51:27 PAY #11 mcp→rails tx=0xdb48be2ff9d1… /x402/hcv-fmr
+16:51:30   REDEEM 200 ok=11
+16:51:30   REDEEM 200 ok=11
+16:56:28 START payer=0x72330994f379a71542e7bd5a4cf99a9d9743f4aa USDC=0.883397 rails=0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700 USDC=6.268000 leave=0.08
+16:56:28 START payer=0x72330994f379a71542e7bd5a4cf99a9d9743f4aa USDC=0.883397 rails=0x4e14B249D9A4c9c9352D780eCEB508A8eB7a7700 USDC=6.268000 leave=0.08
+16:56:33 FACILITATOR_PROBE False facilitator_402 {"x402Version":2,"error":"payment_unsettled","resource":{"url":"https://mcp-x402.onrender.com/x402/fx-rate","description
+16:56:33 FACILITATOR_PROBE False facilitator_402 {"x402Version":2,"error":"payment_unsettled","resource":{"url":"https://mcp-x402.onrender.com/x402/fx-rate","description
+16:56:47 PAY #1 mcp→rails tx=0x324099784591… /x402/fx-rate?base=USD&symbols=EUR
+16:56:47 PAY #1 mcp→rails tx=0x324099784591… /x402/fx-rate?base=USD&symbols=EUR
+16:56:50   REDEEM 200 ok=1
+16:56:50   REDEEM 200 ok=1
+16:57:03 PAY #2 mcp→rails tx=0xbed00f8acb32… /x402/fx-rate?base=USD&symbols=EUR
+16:57:03 PAY #2 mcp→rails tx=0xbed00f8acb32… /x402/fx-rate?base=USD&symbols=EUR
+16:57:07   REDEEM 200 ok=2
+16:57:07   REDEEM 200 ok=2
+16:57:22 PAY #3 mcp→rails tx=0x72db60d97219… /x402/fx-rate?base=USD&symbols=EUR
+16:57:22 PAY #3 mcp→rails tx=0x72db60d97219… /x402/fx-rate?base=USD&symbols=EUR
+16:57:25   REDEEM 200 ok=3
+16:57:25   REDEEM 200 ok=3
+16:57:37 PAY #4 mcp→rails tx=0xadd5530a423d… /x402/fx-rate?base=USD&symbols=JPY
+16:57:37 PAY #4 mcp→rails tx=0xadd5530a423d… /x402/fx-rate?base=USD&symbols=JPY
+16:57:41   REDEEM 200 ok=4
+16:57:41   REDEEM 200 ok=4
+16:57:51 PAY #5 mcp→rails tx=0xd02494a4c63e… /x402/gas-tracker
+16:57:51 PAY #5 mcp→rails tx=0xd02494a4c63e… /x402/gas-tracker
+16:57:55   REDEEM 200 ok=5
+16:57:55   REDEEM 200 ok=5
+16:58:07 PAY #6 mcp→rails tx=0x1e490d6e9780… 
+16:58:07 PAY #6 mcp→rails tx=0x1e490d6e9780… 
+16:58:10   REDEEM 200 ok=6
+16:58:10   REDEEM 200 ok=6
+16:58:20 PAY #7 mcp→rails tx=0x5cf1880da337… /x402/news-headlines
+16:58:20 PAY #7 mcp→rails tx=0x5cf1880da337… /x402/news-headlines
+16:58:24   REDEEM 200 ok=7
+16:58:24   REDEEM 200 ok=7
+16:58:35 PAY #8 mcp→rails tx=0x16a1f7d5b324… /x402/grants?keyword=ai
+16:58:35 PAY #8 mcp→rails tx=0x16a1f7d5b324… /x402/grants?keyword=ai
+16:58:38   REDEEM 200 ok=8
+16:58:38   REDEEM 200 ok=8
+16:58:49 PAY #9 mcp→rails tx=0xdb48aebacaa5… /x402/treasury-yields
+16:58:49 PAY #9 mcp→rails tx=0xdb48aebacaa5… /x402/treasury-yields
+16:58:52   REDEEM 200 ok=9
+16:58:52   REDEEM 200 ok=9
+16:59:01 PAY #10 mcp→rails tx=0x8f14a8d79658… /x402/pha-lookup
+16:59:01 PAY #10 mcp→rails tx=0x8f14a8d79658… /x402/pha-lookup
+16:59:04   REDEEM 200 ok=10
+16:59:04   REDEEM 200 ok=10
+16:59:15 PAY #11 mcp→rails tx=0x1a6f5517f7b9… /x402/hcv-fmr
+16:59:15 PAY #11 mcp→rails tx=0x1a6f5517f7b9… /x402/hcv-fmr
+16:59:18   REDEEM 200 ok=11
+16:59:18   REDEEM 200 ok=11
+16:59:29 PAY #12 mcp→rails tx=0x6c9aeb5930eb… /x402/housing-windsor
+16:59:29 PAY #12 mcp→rails tx=0x6c9aeb5930eb… /x402/housing-windsor
+16:59:33   REDEEM 200 ok=12
+16:59:33   REDEEM 200 ok=12
+16:59:47 PAY #13 mcp→rails tx=0x98f89818f1e7… 
+16:59:47 PAY #13 mcp→rails tx=0x98f89818f1e7… 
+16:59:51   REDEEM 200 ok=13
+16:59:51   REDEEM 200 ok=13
+17:00:01 PAY #14 mcp→rails tx=0xcf2f9d2aa51a… /x402/sec-8k?ticker=AAPL
+17:00:01 PAY #14 mcp→rails tx=0xcf2f9d2aa51a… /x402/sec-8k?ticker=AAPL
+17:00:20   REDEEM 200 ok=14
+17:00:20   REDEEM 200 ok=14
+17:00:31 PAY #15 mcp→rails tx=0x190d25f47d90… /x402/market?naics=541512
+17:00:31 PAY #15 mcp→rails tx=0x190d25f47d90… /x402/market?naics=541512
+17:00:35   REDEEM 200 ok=15
+17:00:35   REDEEM 200 ok=15
+17:00:47 PAY #16 acp→acp tx=0x93baf43c236a… /x402/gas-tracker
+17:00:47 PAY #16 acp→acp tx=0x93baf43c236a… /x402/gas-tracker
+17:00:51   REDEEM 200 ok=16
+17:00:51   REDEEM 200 ok=16
+17:01:07 PAY #17 acp→acp tx=0xb9718819e2ce… /x402/fear-greed-index
+17:01:07 PAY #17 acp→acp tx=0xb9718819e2ce… /x402/fear-greed-index
+17:01:11   REDEEM 200 ok=17
+17:01:11   REDEEM 200 ok=17
+17:01:21 PAY #18 acp→acp tx=0x8c1121ad9b47… /x402/funding-rates
+17:01:21 PAY #18 acp→acp tx=0x8c1121ad9b47… /x402/funding-rates
+17:01:24   REDEEM 200 ok=18
+17:01:24   REDEEM 200 ok=18
+17:01:35 PAY #19 acp→acp tx=0xdad6feb32fdb… /x402/stablecoin-watch
+17:01:35 PAY #19 acp→acp tx=0xdad6feb32fdb… /x402/stablecoin-watch
+17:01:38   REDEEM 200 ok=19
+17:01:38   REDEEM 200 ok=19
+17:01:49 PAY #20 acp→acp tx=0x2d6303f5064f… /x402/defi-analytics
+17:01:49 PAY #20 acp→acp tx=0x2d6303f5064f… /x402/defi-analytics
+17:01:53   REDEEM 200 ok=20
+17:01:53   REDEEM 200 ok=20
+17:02:03 PAY #21 mcp→rails tx=0xfb0f90b7535c… /x402/fx-rate?base=USD&symbols=EUR
+17:02:03 PAY #21 mcp→rails tx=0xfb0f90b7535c… /x402/fx-rate?base=USD&symbols=EUR
+17:02:24   REDEEM 502 <!DOCTYPE html> <html lang="en">   <head>     <meta charset="utf-8">     <meta name="viewport" conte
+17:02:24   REDEEM 502 <!DOCTYPE html> <html lang="en">   <head>     <meta charset="utf-8">     <meta name="viewport" conte
+17:02:32 PAY #21 mcp→rails tx=0x4b5cbb3c186d… /x402/fx-rate?base=USD&symbols=EUR
+17:02:32 PAY #21 mcp→rails tx=0x4b5cbb3c186d… /x402/fx-rate?base=USD&symbols=EUR
+17:02:42   REDEEM 200 ok=21
+17:02:42   REDEEM 200 ok=21
+17:02:55 PAY #22 mcp→rails tx=0xa60b83680cc6… /x402/fx-rate?base=USD&symbols=EUR
+17:02:55 PAY #22 mcp→rails tx=0xa60b83680cc6… /x402/fx-rate?base=USD&symbols=EUR
+17:02:59   REDEEM 200 ok=22
+17:02:59   REDEEM 200 ok=22
+17:03:09 PAY #23 mcp→rails tx=0xfe482533d750… /x402/fx-rate?base=USD&symbols=JPY
+17:03:09 PAY #23 mcp→rails tx=0xfe482533d750… /x402/fx-rate?base=USD&symbols=JPY
+17:03:12   REDEEM 200 ok=23
+17:03:12   REDEEM 200 ok=23
+17:03:23 PAY #24 mcp→rails tx=0xda467742a1bc… /x402/gas-tracker
+17:03:23 PAY #24 mcp→rails tx=0xda467742a1bc… /x402/gas-tracker
+17:03:27   REDEEM 200 ok=24
+17:03:27   REDEEM 200 ok=24
+17:03:36 PAY #25 mcp→rails tx=0x94321557b067… 
+17:03:36 PAY #25 mcp→rails tx=0x94321557b067… 
+17:03:40   REDEEM 200 ok=25
+17:03:40   REDEEM 200 ok=25
+17:03:50 PAY #26 mcp→rails tx=0x433c9528467f… /x402/news-headlines
+17:03:50 PAY #26 mcp→rails tx=0x433c9528467f… /x402/news-headlines
+17:03:54   REDEEM 200 ok=26
+17:03:54   REDEEM 200 ok=26
+17:04:05 PAY #27 mcp→rails tx=0x4a82d3b44b73… /x402/grants?keyword=ai
+17:04:05 PAY #27 mcp→rails tx=0x4a82d3b44b73… /x402/grants?keyword=ai
+17:04:09   REDEEM 200 ok=27
+17:04:09   REDEEM 200 ok=27
+17:04:25 PAY #28 mcp→rails tx=0xf5582331bc29… /x402/treasury-yields
+17:04:25 PAY #28 mcp→rails tx=0xf5582331bc29… /x402/treasury-yields
+17:04:28   REDEEM 200 ok=28
+17:04:28   REDEEM 200 ok=28
+17:04:38 PAY #29 mcp→rails tx=0x7700a207fdb7… /x402/pha-lookup
+17:04:38 PAY #29 mcp→rails tx=0x7700a207fdb7… /x402/pha-lookup
+17:04:42   REDEEM 200 ok=29
+17:04:42   REDEEM 200 ok=29
+17:04:53 PAY #30 mcp→rails tx=0x3154a7812773… /x402/hcv-fmr
+17:04:53 PAY #30 mcp→rails tx=0x3154a7812773… /x402/hcv-fmr
+17:04:56   REDEEM 200 ok=30
+17:04:56   REDEEM 200 ok=30
+17:05:07 PAY #31 mcp→rails tx=0xbf3609a65e51… /x402/housing-windsor
+17:05:07 PAY #31 mcp→rails tx=0xbf3609a65e51… /x402/housing-windsor
+17:05:10   REDEEM 200 ok=31
+17:05:10   REDEEM 200 ok=31
+17:05:21 PAY #32 mcp→rails tx=0xd3681757c97e… 
+17:05:21 PAY #32 mcp→rails tx=0xd3681757c97e… 
+17:05:24   REDEEM 200 ok=32
+17:05:24   REDEEM 200 ok=32
