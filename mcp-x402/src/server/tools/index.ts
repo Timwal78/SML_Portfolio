@@ -8,6 +8,7 @@ import { registerCopyTrader } from './copytrader.js';
 import { registerCrawl } from './crawl.js';
 import { registerCryptoMarket } from './crypto-market.js';
 import { registerDiscovery } from './discovery.js';
+import { registerMagnets } from './magnets.js';
 import { registerEquitiesHeatmap } from './equities-heatmap.js';
 import { registerFederal } from './federal.js';
 import { registerForge } from './forge.js';
@@ -29,6 +30,7 @@ import { registerXmit } from './xmit.js';
 
 export async function registerTools(server: McpServer): Promise<void> {
   registerDiscovery(server);
+  registerMagnets(server);
   registerApm(server);
   registerApmExecute(server);
   registerAgentCard(server);

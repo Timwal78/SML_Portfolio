@@ -12,6 +12,8 @@ const BASE_PRICES: Record<string, string> = {
   // Discovery (free)
   sml_discover: '0.00',
   sml_status: '0.00',
+  list_magnets: '0.00',
+  get_agent_magnet_beacons: '0.00',
   // APM — Agent Preference Manifest (free preview, paid contract)
   apm_negotiate: '0.001',
   // SqueezeOS signals

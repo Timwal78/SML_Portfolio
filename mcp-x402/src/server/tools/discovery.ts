@@ -174,6 +174,15 @@ const CATALOG = {
       ],
     },
     {
+      product: 'Agent Magnet Beacons (AMB)',
+      description: 'FREE discovery magnets — ranked live beacons for all ScriptMasterLabs paid capabilities. Multi-rail x402: Base USDC, RH USDG, Sol USDC, XRPL RLUSD. payTo ACP 0x7233.',
+      backend: 'https://mcp-x402.onrender.com/.well-known/amb.json',
+      tools: [
+        { name: 'list_magnets', type: 'FREE', description: 'List Agent Magnet Beacons ranked by magnet_strength — free' },
+        { name: 'get_agent_magnet_beacons', type: 'FREE', description: 'Full AMB document for scriptmasterlabs — free' },
+      ],
+    },
+    {
       product: 'agentcard',
       description: 'Ed25519 A2A agent identity cards — mint, lookup, verify agent signatures',
       backend: 'configurable via AGENTCARD_URL env var',

@@ -22,6 +22,7 @@ import { handleSnsMessage } from './aws/sns-entitlement.js';
 import { handleStripeWebhookEvent, getApiKeyForCheckoutSession, isEntitledStripeKey } from './stripe/entitlement.js';
 import { runCommunityScan } from './marketing/community.js';
 import { registerTools } from './tools/index.js';
+import { mountAMBRoutes, refreshBeacons } from './amb/amb-routes.js';
 import { lookupPha, lookupFmr, landlordChecklist, windsorBundle, VASH_CONTACTS, section8GeoLookup, section8FmrNational, section8IncomeLimits, phaOpportunities, phaSearch } from './tools/housing.js';
 import { AuditLogger } from './security/audit.js';
 import { RateLimiter } from './security/rate-limit.js';
@@ -618,6 +619,10 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
   app.get('/.well-known/agentcard.json', (_req, res) => {
     res.sendFile('.well-known/agentcard.json', { root: process.cwd() });
   });
+
+  // Agent Magnet Beacons — multi-rail payTo ACP 0x7233 (never 0x4e14)
+  mountAMBRoutes(app);
+  try { refreshBeacons(); } catch (e) { console.warn('[AMB] initial refresh failed', e); }
 
   // ── x402 discovery resources ──────────────────────────────────────────────
   // Public crawlable HTTP 402 challenges so x402scan / 402 Index / Bazaar can
