@@ -38,12 +38,12 @@ import { type Request, type Response, type NextFunction } from 'express';
 // /api/marketing/community is free public read data (real HN search-hit
 // counts for the agentswarm-seo.html dashboard) — same tier as /api/stats,
 // no payment or secret involved either way.
-const PUBLIC_PREFIXES = ['/health', '/api/stats', '/api/marketing/community', '/api/checkout/', '/api/stripe/webhook', '/aws/marketplace/', '/.well-known/', '/openapi.json', '/llms.txt', '/agents.json', '/favicon.ico', '/x402/', '/mcp', '/sse', '/messages'];
+const PUBLIC_PREFIXES = ['/health', '/api/stats', '/api/marketing/community', '/api/checkout/', '/api/stripe/webhook', '/aws/marketplace/', '/.well-known/', '/openapi.json', '/llms.txt', '/agents.json', '/favicon.ico', '/x402/', '/mcp', '/sse', '/messages', '/v1/health', '/v1/plans', '/v1/openapi.json', '/v1/checkout/'];
 
 export function rapidApiGuard(req: Request, res: Response, next: NextFunction): void {
   const secret = process.env['RAPIDAPI_PROXY_SECRET'];
   if (!secret) { next(); return; }  // disabled if env var not set
-  if (req.path === '/' || PUBLIC_PREFIXES.some((p) => req.path.startsWith(p))) { next(); return; }
+  if (req.path === '/' || req.path === '/v1' || PUBLIC_PREFIXES.some((p) => req.path.startsWith(p))) { next(); return; }
   if (req.headers['x-rapidapi-proxy-secret'] === secret) { next(); return; }
   res.status(403).json({ error: 'Forbidden' });
 }

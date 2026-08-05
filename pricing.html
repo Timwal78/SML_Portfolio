@@ -99,6 +99,7 @@
     .card ul { margin:4px 0 0; padding-left:18px; font-size:.9rem; }
     .card.featured { border-color:#3d6fd8; box-shadow:0 0 0 1px rgba(91,140,255,.25); }
     .cta { display:inline-block; text-decoration:none; font-weight:700; padding:10px 14px; border-radius:10px; background:var(--acc); color:#fff; margin-top:auto; text-align:center; }
+    button.cta { width:100%; border:0; cursor:pointer; font:inherit; }
     .cta.secondary { background:transparent; border:1px solid var(--line); color:var(--txt); }
     .cta.ghost { background:transparent; border:1px solid #2a5a3c; color:var(--ok); }
     .table-wrap { overflow:auto; border:1px solid var(--line); border-radius:12px; background:var(--card); }
@@ -168,7 +169,8 @@
         <li>Email support</li>
         <li>Limited advanced filters</li>
       </ul>
-      <a class="cta" href="mailto:timothy.walton45@gmail.com?subject=Starter%20Hosted%20%2449%20Capability%20Index">Start Starter</a>
+      <button class="cta" type="button" data-checkout-tier="premium_starter" data-checkout-product="premium-index">Start Starter — $49/mo</button>
+      <p class="fine" style="margin-top:8px;font-size:0.85rem;color:var(--mut)">Opens Stripe Checkout · key delivered on success page</p>
     </div>
     <div class="card featured">
       <h3>Pro Provider</h3>
@@ -183,7 +185,8 @@
         <li>Stronger AMB propagation</li>
         <li>Priority support</li>
       </ul>
-      <a class="cta" href="mailto:timothy.walton45@gmail.com?subject=Pro%20Provider%20%24199%20Capability%20Index">Start Pro</a>
+      <button class="cta" type="button" data-checkout-tier="premium_pro" data-checkout-product="premium-index">Start Pro — $199/mo</button>
+      <p class="fine" style="margin-top:8px;font-size:0.85rem;color:var(--mut)">Opens Stripe Checkout · priority ranking included</p>
     </div>
     <div class="card">
       <h3>Enterprise / Federal</h3>
@@ -357,5 +360,50 @@
     <p><a href="https://www.scriptmasterlabs.com/">Home</a> · <a href="https://www.scriptmasterlabs.com/listings.html">Listings</a> · <a href="https://www.scriptmasterlabs.com/gov-procurement.html">Gov procurement</a></p>
   </footer>
 </main>
+
+<script>
+(function () {
+  var BASE = 'https://mcp-x402.onrender.com';
+  function goCheckout(tier, product, btn) {
+    if (btn) { btn.disabled = true; btn.textContent = 'Redirecting to Stripe…'; }
+    fetch(BASE + '/api/checkout/create-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ tier: tier, product: product || 'premium-index' })
+    })
+      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, status: r.status, body: j }; }); })
+      .then(function (res) {
+        if (res.body && res.body.checkout_url) {
+          window.location.href = res.body.checkout_url;
+          return;
+        }
+        var msg = (res.body && (res.body.detail || res.body.error || res.body.message)) || ('Checkout unavailable (' + res.status + ')');
+        alert(msg + '\n\nIf prices are not configured, set STRIPE_PRICE_PREMIUM_STARTER / STRIPE_PRICE_PREMIUM_PRO (or STARTER/ELITE fallbacks) on mcp-x402.');
+        if (btn) { btn.disabled = false; btn.textContent = btn.getAttribute('data-label') || 'Try again'; }
+      })
+      .catch(function (e) {
+        alert('Checkout request failed: ' + e);
+        if (btn) { btn.disabled = false; btn.textContent = btn.getAttribute('data-label') || 'Try again'; }
+      });
+  }
+  document.querySelectorAll('[data-checkout-tier]').forEach(function (btn) {
+    btn.setAttribute('data-label', btn.textContent);
+    btn.addEventListener('click', function () {
+      goCheckout(btn.getAttribute('data-checkout-tier'), btn.getAttribute('data-checkout-product'), btn);
+    });
+  });
+  // cancelled banner
+  try {
+    var q = new URLSearchParams(location.search);
+    if (q.get('payment') === 'cancelled') {
+      var n = document.createElement('div');
+      n.style.cssText = 'max-width:1100px;margin:12px auto;padding:10px 14px;border:1px solid #5b3b14;background:#1a1408;color:#fbbf24;border-radius:10px;';
+      n.textContent = 'Checkout cancelled — no charge. You can try Starter or Pro again anytime.';
+      document.body.insertBefore(n, document.body.firstChild);
+    }
+  } catch (e) {}
+})();
+</script>
+
 </body>
 </html>

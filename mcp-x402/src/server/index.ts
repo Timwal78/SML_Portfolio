@@ -395,6 +395,14 @@ GET  https://mcp-x402.onrender.com/aws/marketplace/resolve</pre>
   const STRIPE_PRICE_BY_TIER: Record<string, string | undefined> = {
     starter: process.env['STRIPE_PRICE_STARTER'],
     elite: process.env['STRIPE_PRICE_ELITE'],
+    // Premium Index Match API (pricing.html) — prefer dedicated price IDs, fall back to STARTER/ELITE
+    premium_starter:
+      process.env['STRIPE_PRICE_PREMIUM_STARTER']?.trim() ||
+      process.env['STRIPE_PRICE_STARTER']?.trim(),
+    premium_pro:
+      process.env['STRIPE_PRICE_PREMIUM_PRO']?.trim() ||
+      process.env['STRIPE_PRICE_ELITE']?.trim() ||
+      process.env['STRIPE_PRICE_PRO']?.trim(),
   };
   app.post('/api/checkout/create-session', async (req: Request, res: Response) => {
     const stripeSecret = process.env['STRIPE_SECRET_KEY']?.trim();
@@ -402,14 +410,49 @@ GET  https://mcp-x402.onrender.com/aws/marketplace/resolve</pre>
       res.status(503).set('Access-Control-Allow-Origin', '*').json({ error: 'stripe_not_configured', detail: 'Operator must set STRIPE_SECRET_KEY.' });
       return;
     }
-    const tier = typeof req.body?.['tier'] === 'string' && req.body['tier'].toLowerCase() === 'starter' ? 'starter' : 'elite';
+    const rawTier = typeof req.body?.['tier'] === 'string' ? String(req.body['tier']).toLowerCase().trim() : 'elite';
+    const productHint = typeof req.body?.['product'] === 'string' ? String(req.body['product']).toLowerCase().trim() : '';
+    // Map pricing page plans → internal tier keys
+    let tier = rawTier;
+    let product = productHint || 'agentswarm';
+    let plan = 'starter';
+    if (rawTier === 'premium_starter' || rawTier === 'premium-starter' || (productHint === 'premium-index' && rawTier === 'starter')) {
+      tier = 'premium_starter';
+      product = 'premium-index';
+      plan = 'starter';
+    } else if (rawTier === 'premium_pro' || rawTier === 'premium-pro' || rawTier === 'pro' || (productHint === 'premium-index' && (rawTier === 'pro' || rawTier === 'elite'))) {
+      tier = 'premium_pro';
+      product = 'premium-index';
+      plan = 'pro';
+    } else if (rawTier === 'starter') {
+      tier = 'starter';
+      plan = 'starter';
+    } else {
+      tier = 'elite';
+      plan = 'elite';
+    }
     const priceId = STRIPE_PRICE_BY_TIER[tier];
     if (!priceId) {
-      res.status(503).set('Access-Control-Allow-Origin', '*').json({ error: 'price_not_configured', detail: `Operator must set STRIPE_PRICE_${tier.toUpperCase()}.` });
+      res.status(503).set('Access-Control-Allow-Origin', '*').json({
+        error: 'price_not_configured',
+        detail:
+          tier.startsWith('premium_')
+            ? `Set STRIPE_PRICE_PREMIUM_${plan.toUpperCase()} or fallback STRIPE_PRICE_STARTER / STRIPE_PRICE_ELITE.`
+            : `Operator must set STRIPE_PRICE_${tier.toUpperCase()}.`,
+        tier,
+        product,
+      });
       return;
     }
     try {
       const stripe = new Stripe(stripeSecret);
+      const isPremium = product === 'premium-index';
+      const successUrl = isPremium
+        ? 'https://www.scriptmasterlabs.com/premium-success.html?session_id={CHECKOUT_SESSION_ID}'
+        : 'https://www.scriptmasterlabs.com/agentswarm-seo.html?payment=success&session_id={CHECKOUT_SESSION_ID}';
+      const cancelUrl = isPremium
+        ? 'https://www.scriptmasterlabs.com/pricing.html?payment=cancelled'
+        : 'https://www.scriptmasterlabs.com/agentswarm-seo.html?payment=cancelled';
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
         line_items: [{ price: priceId, quantity: 1 }],
@@ -418,11 +461,21 @@ GET  https://mcp-x402.onrender.com/aws/marketplace/resolve</pre>
         // GET /api/checkout/session/:id below — the webhook is what actually
         // provisions the key server-side; this is just how the buyer's browser
         // learns about it.
-        success_url: 'https://www.scriptmasterlabs.com/agentswarm-seo.html?payment=success&session_id={CHECKOUT_SESSION_ID}',
-        cancel_url: 'https://www.scriptmasterlabs.com/agentswarm-seo.html?payment=cancelled',
-        metadata: { tier, source: 'agentswarm-seo' },
+        success_url: successUrl,
+        cancel_url: cancelUrl,
+        metadata: {
+          tier,
+          plan: isPremium ? plan : tier,
+          product,
+          source: isPremium ? 'pricing.html' : 'agentswarm-seo',
+        },
       });
-      res.set('Access-Control-Allow-Origin', '*').json({ checkout_url: session.url });
+      res.set('Access-Control-Allow-Origin', '*').json({
+        checkout_url: session.url,
+        tier,
+        product,
+        plan: isPremium ? plan : tier,
+      });
     } catch (err) {
       // Stripe.errors.StripeConnectionError wraps the real network failure in
       // `.detail`/`.cause` — String(err) alone was only ever showing the generic

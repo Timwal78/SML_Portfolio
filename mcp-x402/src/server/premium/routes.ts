@@ -443,6 +443,91 @@ function gateQuota(rec: AuthRec, res: Response): boolean {
   return true;
 }
 
+
+/** Checkout session → pidx_ key (file-backed; survives until redeploy; Supabase optional later). */
+type SessionRec = {
+  api_key: string;
+  plan: string;
+  created_at: string;
+  stripe_customer_id?: string | null;
+  stripe_subscription_id?: string | null;
+};
+
+function sessionsPath(): string {
+  return (
+    process.env['PREMIUM_SESSIONS_FILE'] ||
+    process.env['X402_STATS_FILE']?.replace(/[^/]+$/, 'premium-sessions.json') ||
+    '/tmp/premium-sessions.json'
+  );
+}
+
+function readSessions(): Record<string, SessionRec> {
+  try {
+    const pth = sessionsPath();
+    if (!existsSync(pth)) return {};
+    return JSON.parse(readFileSync(pth, 'utf8')) as Record<string, SessionRec>;
+  } catch {
+    return {};
+  }
+}
+
+function writeSessions(data: Record<string, SessionRec>): void {
+  const pth = sessionsPath();
+  try {
+    mkdirSync(dirname(pth), { recursive: true });
+  } catch {
+    /* */
+  }
+  writeFileSync(pth, JSON.stringify(data, null, 2) + '\n');
+}
+
+export function recordPremiumCheckoutSession(
+  sessionId: string,
+  apiKey: string,
+  plan: string,
+  meta?: { stripe_customer_id?: string | null; stripe_subscription_id?: string | null },
+): void {
+  if (!sessionId || !apiKey) return;
+  const all = readSessions();
+  all[sessionId] = {
+    api_key: apiKey,
+    plan,
+    created_at: new Date().toISOString(),
+    stripe_customer_id: meta?.stripe_customer_id ?? null,
+    stripe_subscription_id: meta?.stripe_subscription_id ?? null,
+  };
+  writeSessions(all);
+}
+
+export function getPremiumKeyForCheckoutSession(
+  sessionId: string,
+): { apiKey: string; plan: string; product: string } | null {
+  if (!sessionId) return null;
+  const rec = readSessions()[sessionId];
+  if (!rec?.api_key) return null;
+  return { apiKey: rec.api_key, plan: rec.plan, product: 'premium-index' };
+}
+
+export function provisionPremiumFromStripe(opts: {
+  sessionId: string;
+  plan: string;
+  customerId?: string | null;
+  subscriptionId?: string | null;
+  label?: string;
+}): { api_key: string; plan: string } {
+  const plan = (opts.plan || 'starter').toLowerCase();
+  const safePlan = plan === 'pro' || plan === 'enterprise' ? plan : 'starter';
+  // Idempotent: if session already provisioned, return existing key
+  const existing = getPremiumKeyForCheckoutSession(opts.sessionId);
+  if (existing) return { api_key: existing.apiKey, plan: existing.plan };
+  const minted = mintPremiumKey(safePlan, opts.label || `stripe:${opts.sessionId.slice(0, 12)}`);
+  recordPremiumCheckoutSession(opts.sessionId, minted.api_key, safePlan, {
+    stripe_customer_id: opts.customerId,
+    stripe_subscription_id: opts.subscriptionId,
+  });
+  return { api_key: minted.api_key, plan: safePlan };
+}
+
 export function mountPremiumIndexRoutes(app: Express): void {
   app.get('/v1/health', (_req, res) => {
     res.set('Access-Control-Allow-Origin', '*').json({
@@ -594,6 +679,30 @@ export function mountPremiumIndexRoutes(app: Express): void {
       imp_version: IMP_VERSION,
       usage,
       results,
+    });
+  });
+
+  // Success page polls this (also aliased under /api/checkout for premium)
+  app.get('/v1/checkout/session/:sessionId', (req, res) => {
+    const id = String(req.params.sessionId || '');
+    const result = getPremiumKeyForCheckoutSession(id);
+    if (!result) {
+      res
+        .status(202)
+        .set('Access-Control-Allow-Origin', '*')
+        .json({
+          status: 'processing',
+          detail: 'Payment received, provisioning your pidx_ key — retry shortly.',
+        });
+      return;
+    }
+    res.set('Access-Control-Allow-Origin', '*').json({
+      status: 'ready',
+      product: 'premium-index',
+      apiKey: result.apiKey,
+      plan: result.plan,
+      match: 'https://mcp-x402.onrender.com/v1/match',
+      docs: 'https://mcp-x402.onrender.com/v1',
     });
   });
 

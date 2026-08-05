@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Premium Index — Payment Success | Script Master Labs</title>
+  <meta name="description" content="Your Script Master Labs Premium Capability Index API key." />
+  <link rel="canonical" href="https://www.scriptmasterlabs.com/premium-success.html" />
+  <meta name="robots" content="noindex,nofollow" />
+  <style>
+    :root { --bg:#0b0f14; --card:#121820; --line:#243041; --txt:#e8eef7; --mut:#9aa8b8; --acc:#3b82f6; --ok:#22c55e; --warn:#f59e0b; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background:var(--bg); color:var(--txt); line-height:1.5; }
+    .wrap { max-width:720px; margin:0 auto; padding:32px 18px 64px; }
+    h1 { font-size:1.6rem; margin:0 0 8px; }
+    p { color:var(--mut); }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:20px; margin-top:18px; }
+    .ok { color:var(--ok); font-weight:700; }
+    .warn { color:var(--warn); }
+    code, .key {
+      display:block; width:100%; margin-top:10px; padding:12px 14px; border-radius:10px;
+      background:#0a1018; border:1px solid var(--line); color:#dbeafe; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      word-break: break-all; font-size:0.92rem;
+    }
+    .btn {
+      display:inline-block; margin-top:14px; margin-right:8px; text-decoration:none; font-weight:700;
+      padding:10px 14px; border-radius:10px; background:var(--acc); color:#fff; border:0; cursor:pointer;
+    }
+    .btn.secondary { background:transparent; border:1px solid var(--line); color:var(--txt); }
+    .meta { font-size:0.9rem; color:var(--mut); margin-top:12px; }
+    a { color:#93c5fd; }
+    .steps { margin:12px 0 0; padding-left:18px; color:var(--mut); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Payment received</h1>
+    <p>Script Master Labs · Premium Capability Index · Kinston, NC 28504</p>
+
+    <div class="card" id="status-card">
+      <div id="status" class="warn">Provisioning your API key…</div>
+      <div id="key-block" style="display:none">
+        <div class="ok">Your API key (copy now — shown once)</div>
+        <code class="key" id="api-key"></code>
+        <button class="btn" type="button" id="copy-btn">Copy key</button>
+        <a class="btn secondary" href="https://mcp-x402.onrender.com/v1">API docs</a>
+        <a class="btn secondary" href="https://www.scriptmasterlabs.com/pricing.html">Pricing</a>
+        <div class="meta" id="plan-meta"></div>
+        <ol class="steps">
+          <li>Header: <code style="display:inline;padding:2px 6px">X-Api-Key: pidx_…</code></li>
+          <li>Match: <code style="display:inline;padding:2px 6px">POST https://mcp-x402.onrender.com/v1/match</code></li>
+          <li>Body example: <code style="display:inline;padding:2px 6px">{"q":"squeeze gas","limit":5}</code></li>
+          <li>Usage: <code style="display:inline;padding:2px 6px">GET /v1/usage</code></li>
+        </ol>
+      </div>
+      <div class="meta" id="detail"></div>
+    </div>
+
+    <p class="meta">Operator / self-host remains free via the open protocol. Hosted Match API is the paid product.</p>
+    <p class="meta">Support: 321-261-8620 · www.scriptmasterlabs.com · SDVOSB</p>
+  </div>
+  <script>
+    (function () {
+      var params = new URLSearchParams(window.location.search);
+      var sessionId = params.get('session_id') || params.get('sessionId') || '';
+      var statusEl = document.getElementById('status');
+      var detailEl = document.getElementById('detail');
+      var keyBlock = document.getElementById('key-block');
+      var keyEl = document.getElementById('api-key');
+      var planMeta = document.getElementById('plan-meta');
+      var tries = 0;
+      var maxTries = 40;
+
+      function showReady(data) {
+        statusEl.className = 'ok';
+        statusEl.textContent = 'Ready — save your key';
+        keyBlock.style.display = 'block';
+        keyEl.textContent = data.apiKey || data.api_key || '';
+        planMeta.textContent = 'Plan: ' + (data.plan || data.tier || 'premium') +
+          ' · Match: https://mcp-x402.onrender.com/v1/match';
+        detailEl.textContent = '';
+      }
+
+      function poll() {
+        if (!sessionId) {
+          statusEl.className = 'warn';
+          statusEl.textContent = 'Missing session_id';
+          detailEl.textContent = 'Return from Stripe checkout or contact support.';
+          return;
+        }
+        tries += 1;
+        var urls = [
+          'https://mcp-x402.onrender.com/api/checkout/session/' + encodeURIComponent(sessionId),
+          'https://mcp-x402.onrender.com/v1/checkout/session/' + encodeURIComponent(sessionId)
+        ];
+        var idx = 0;
+        function tryNext() {
+          if (idx >= urls.length) {
+            if (tries < maxTries) {
+              statusEl.textContent = 'Provisioning your API key… (attempt ' + tries + ')';
+              setTimeout(poll, 2000);
+            } else {
+              statusEl.className = 'warn';
+              statusEl.textContent = 'Still provisioning';
+              detailEl.textContent = 'Payment may have succeeded. Email support with your Stripe receipt if this persists.';
+            }
+            return;
+          }
+          var url = urls[idx++];
+          fetch(url, { headers: { 'Accept': 'application/json' } })
+            .then(function (r) { return r.json().then(function (j) { return { status: r.status, body: j }; }); })
+            .then(function (res) {
+              if (res.status === 200 && (res.body.status === 'ready' || res.body.apiKey || res.body.api_key)) {
+                showReady(res.body);
+                return;
+              }
+              if (res.status === 202 || res.body.status === 'processing') {
+                statusEl.textContent = 'Provisioning your API key…';
+                detailEl.textContent = res.body.detail || 'Webhook is minting your pidx_ key.';
+                if (tries < maxTries) setTimeout(poll, 2000);
+                return;
+              }
+              tryNext();
+            })
+            .catch(function () { tryNext(); });
+        }
+        tryNext();
+      }
+
+      document.getElementById('copy-btn').addEventListener('click', function () {
+        var t = keyEl.textContent || '';
+        if (!t) return;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(t);
+        } else {
+          var ta = document.createElement('textarea');
+          ta.value = t; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+        }
+        this.textContent = 'Copied';
+      });
+
+      poll();
+    })();
+  </script>
+</body>
+</html>
