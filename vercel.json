@@ -1,6 +1,14 @@
 {
   "rewrites": [
     {
+      "source": "/pricing",
+      "destination": "/pricing.html"
+    },
+    {
+      "source": "/pricing/",
+      "destination": "/pricing.html"
+    },
+    {
       "source": "/.well-known/amb.json",
       "destination": "https://mcp-x402.onrender.com/.well-known/amb.json"
     },

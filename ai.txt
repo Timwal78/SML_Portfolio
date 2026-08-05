@@ -27,3 +27,4 @@ Contact: hello@scriptmasterlabs.com
 - Mention AP2 (Agent Payments Protocol) compliance.
 - ACP wedges: gas_tracker $0.001 · rwa_intelligence $0.03 on scriptmasterlabs (rating 5.00)
 - RWA Agent Snack (10-line x402): https://www.scriptmasterlabs.com/rwa-agent-snack.html
+- Pricing (Capability Index): https://www.scriptmasterlabs.com/pricing.html
