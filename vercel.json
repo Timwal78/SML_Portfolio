@@ -13,6 +13,28 @@
   ],
   "redirects": [
     {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "scriptmasterlabs.com"
+        }
+      ],
+      "destination": "https://www.scriptmasterlabs.com/:path*",
+      "statusCode": 301
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "scriptmasterlabs.com"
+        }
+      ],
+      "destination": "https://www.scriptmasterlabs.com/",
+      "statusCode": 301
+    },
+    {
       "source": "/federal-capture",
       "destination": "/gov-procurement.html",
       "permanent": false
@@ -65,17 +87,6 @@
     {
       "source": "/aeo",
       "destination": "/aeo.html",
-      "permanent": true
-    },
-    {
-      "source": "/:path*",
-      "has": [
-        {
-          "type": "host",
-          "value": "scriptmasterlabs.com"
-        }
-      ],
-      "destination": "https://www.scriptmasterlabs.com/:path*",
       "permanent": true
     },
     {
