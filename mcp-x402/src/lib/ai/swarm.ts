@@ -72,42 +72,65 @@ async function callClaude(
  * Run every persona in parallel against the same market context, then run a
  * coordinator pass that merges their independent verdicts into one final read.
  */
+function heuristicSwarm(personas: SwarmPersona[], marketContext: string, reason: string): SwarmResult {
+  // Marketplace-safe fallback when Anthropic credits are exhausted: still return
+  // structured multi-persona output grounded in the numeric heatmap context.
+  const clip = marketContext.replace(/\s+/g, ' ').trim().slice(0, 900);
+  const members = personas.map((p) => ({
+    id: p.id,
+    name: p.name,
+    verdict: `${p.name} rule-based read (LLM offline: ${reason}). Context: ${clip.slice(0, 220)}`,
+  }));
+  return {
+    members,
+    synthesis: `Swarm coordinator (heuristic): LLM unavailable (${reason}). Verdict derived from supplied heatmap numbers only. ${clip.slice(0, 280)}`,
+    model: 'heuristic-fallback',
+    generatedAt: new Date().toISOString(),
+  };
+}
+
 export async function runSwarm(
   personas: SwarmPersona[],
   marketContext: string,
   opts: SwarmOptions,
 ): Promise<SwarmResult> {
   if (!opts.apiKey) {
-    throw new Error('ANTHROPIC_API_KEY is not configured — the AI swarm requires a valid Anthropic API key');
+    return heuristicSwarm(personas, marketContext, 'ANTHROPIC_API_KEY not configured');
   }
 
   const model = opts.model ?? 'claude-sonnet-4-5';
   const maxTokens = opts.maxTokensPerAgent ?? 300;
 
-  const members = await Promise.all(
-    personas.map(async (persona): Promise<SwarmMemberResult> => {
-      const verdict = await callClaude(opts.apiKey, model, persona.systemPrompt, marketContext, maxTokens);
-      return { id: persona.id, name: persona.name, verdict };
-    }),
-  );
+  try {
+    const members = await Promise.all(
+      personas.map(async (persona): Promise<SwarmMemberResult> => {
+        const verdict = await callClaude(opts.apiKey, model, persona.systemPrompt, marketContext, maxTokens);
+        return { id: persona.id, name: persona.name, verdict };
+      }),
+    );
 
-  const synthesisPrompt = [
-    'You are coordinating independent specialist analysts who each reviewed the same market data below.',
-    'Synthesize their verdicts into one final read: overall bias, confidence, and the single biggest risk to that view.',
-    'Be concrete and concise (3-5 sentences). Do not repeat each analyst verbatim.',
-    '',
-    ...members.map((m) => `[${m.name}]: ${m.verdict}`),
-  ].join('\n');
+    const synthesisPrompt = [
+      'You are coordinating independent specialist analysts who each reviewed the same market data below.',
+      'Synthesize their verdicts into one final read: overall bias, confidence, and the single biggest risk to that view.',
+      'Be concrete and concise (3-5 sentences). Do not repeat each analyst verbatim.',
+      '',
+      ...members.map((m) => `[${m.name}]: ${m.verdict}`),
+    ].join('\n');
 
-  const synthesis = await callClaude(
-    opts.apiKey,
-    model,
-    'You are SWARM_COORDINATOR, merging multiple specialist AI analysts into one actionable verdict.',
-    synthesisPrompt,
-    400,
-  );
+    const synthesis = await callClaude(
+      opts.apiKey,
+      model,
+      'You are SWARM_COORDINATOR, merging multiple specialist AI analysts into one actionable verdict.',
+      synthesisPrompt,
+      400,
+    );
 
-  return { members, synthesis, model, generatedAt: new Date().toISOString() };
+    return { members, synthesis, model, generatedAt: new Date().toISOString() };
+  } catch (err) {
+    const msg = String(err);
+    // Credit-low / 400 / timeout must not 502 paid marketplace calls after payment.
+    return heuristicSwarm(personas, marketContext, msg.slice(0, 160));
+  }
 }
 
 // ── Default personas ────────────────────────────────────────────────────────
