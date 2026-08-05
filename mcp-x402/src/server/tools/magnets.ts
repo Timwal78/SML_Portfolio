@@ -13,6 +13,8 @@ import { recordAmbTraffic } from '../amb/amb-traffic.js';
 const ListSchema = z.object({
   limit: z.number().int().min(1).max(200).optional(),
   min_strength: z.number().min(0).max(1).optional(),
+  min_imp_score: z.number().min(0).max(1).optional(),
+  sort: z.enum(['imp_score', 'magnet_strength']).optional(),
 });
 
 const FullSchema = z.object({
@@ -37,7 +39,17 @@ export function registerMagnets(server: McpServer): void {
         .min(0)
         .max(1)
         .optional()
-        .describe('Minimum magnet_strength filter 0-1.'),
+        .describe('Minimum magnet_strength filter 0-1 (legacy).'),
+      min_imp_score: z
+        .number()
+        .min(0)
+        .max(1)
+        .optional()
+        .describe('Minimum IMP imp_score filter 0-1 (preferred).'),
+      sort: z
+        .enum(['imp_score', 'magnet_strength'])
+        .optional()
+        .describe('Rank key (default imp_score).'),
     },
     async (rawArgs) => {
       const args = Sandbox.validate(ListSchema, rawArgs ?? {});
@@ -55,13 +67,31 @@ export function registerMagnets(server: McpServer): void {
       try {
         recordAmbTraffic('list_magnets', 'mcp-tool');
         const doc = getLiveAmbDocument();
-        let beacons = getCachedBeacons();
+        let beacons = [...getCachedBeacons()];
+        const sortKey = args.sort ?? 'imp_score';
+        const rank = (b: (typeof beacons)[number]) =>
+          sortKey === 'magnet_strength'
+            ? b.magnet_strength
+            : (b.imp_score ?? b.magnet_strength);
+        // free first, then paid by IMP score
+        const free = beacons.filter((b) => b.free_tier);
+        let paid = beacons.filter((b) => !b.free_tier);
         if (args.min_strength != null) {
-          beacons = beacons.filter((b) => b.magnet_strength >= args.min_strength!);
+          paid = paid.filter((b) => b.magnet_strength >= args.min_strength!);
         }
+        if (args.min_imp_score != null) {
+          paid = paid.filter((b) => (b.imp_score ?? b.magnet_strength) >= args.min_imp_score!);
+        }
+        paid = paid.sort((a, b) => rank(b) - rank(a));
+        beacons = [...free, ...paid];
         const limit = args.limit ?? 25;
         beacons = beacons.slice(0, limit);
-        audit.info('list_magnets', { count: beacons.length, pay_to: SAFE_PAY_TO, agents_24h: doc.traffic.unique_agents });
+        audit.info('list_magnets', {
+          count: beacons.length,
+          pay_to: SAFE_PAY_TO,
+          agents_24h: doc.traffic.unique_agents,
+          sort: sortKey,
+        });
         return {
           content: [
             {
@@ -69,6 +99,10 @@ export function registerMagnets(server: McpServer): void {
               text: JSON.stringify({
                 free: true,
                 count: beacons.length,
+                sort: sortKey,
+                ranking: 'imp_score (IMP v0.1 multi-rail); free beacons first',
+                imp_version: (doc as { imp_version?: string }).imp_version || '0.1.0',
+                formula: (doc as { formula?: string }).formula,
                 pay_to: doc.pay_to,
                 rails: doc.rails,
                 top_magnet: doc.top_magnet,

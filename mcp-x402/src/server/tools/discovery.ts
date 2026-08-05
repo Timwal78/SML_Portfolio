@@ -178,7 +178,7 @@ const CATALOG = {
       description: 'FREE discovery magnets — ranked live beacons for all ScriptMasterLabs paid capabilities. Multi-rail x402: Base USDC, RH USDG, Sol USDC, XRPL RLUSD. payTo ACP 0x7233.',
       backend: 'https://mcp-x402.onrender.com/.well-known/amb.json',
       tools: [
-        { name: 'list_magnets', type: 'FREE', description: 'List Agent Magnet Beacons ranked by magnet_strength — free' },
+        { name: 'list_magnets', type: 'FREE', description: 'List Agent Magnet Beacons ranked by IMP imp_score (multi-rail) — free' },
         { name: 'get_agent_magnet_beacons', type: 'FREE', description: 'Full AMB document for scriptmasterlabs — free' },
       ],
     },

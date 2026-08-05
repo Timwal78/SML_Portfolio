@@ -9,6 +9,7 @@
  * NEVER use orphan 0x4e14… as payTo.
  */
 import { createHash } from 'node:crypto';
+import { scoreToolImp, type ImpScoreResult } from './imp-scoring.js';
 
 export const AMB_VERSION = '0.1.0';
 export const ACP_PAY_TO =
@@ -106,6 +107,12 @@ export interface AgentMagnetBeacon {
     source: string;
   };
   magnet_strength: number;
+  /** IMP v0.1 multi-rail composite — primary rank key for list_magnets */
+  imp_score: number;
+  rail_score: number;
+  rail_coverage: number;
+  imp_version: string;
+  imp?: Pick<ImpScoreResult, 'stale' | 'orphan_refused' | 'formula' | 'healthy_rails' | 'total_rails'>;
   capabilities: string[];
   free_tier: boolean;
   description: string;
@@ -249,12 +256,25 @@ export function generateAMB(
   const freeTier = Boolean(input.freeTier);
   const price = freeTier ? '0' : String(input.price || '0.001');
   const payment = buildPaymentBlock(payTo, price, freeTier, input.rails);
-  const strength = magnetStrength(
-    input.reputationScore,
-    input.successRate24h,
-    input.uptime24h,
-    input.avgLatencyMs,
-  );
+  const imp = scoreToolImp({
+    tool: input.toolName,
+    reputation: input.reputationScore,
+    successRate24h: input.successRate24h,
+    uptime24h: input.uptime24h,
+    avgLatencyMs: input.avgLatencyMs,
+    price: freeTier ? '0' : String(input.price || '0.001'),
+    payTo,
+    freeTier,
+    advertisedRails: (input.rails as string[] | undefined) || [
+      'base_usdc',
+      'base_usdg',
+      'solana_usdc',
+      'xrpl_rlusd',
+    ],
+    issuedAtMs: now,
+    ttlMs,
+  });
+  const strength = imp.magnet_strength;
   const id = beaconId({
     tool_name: input.toolName,
     endpoint: input.endpoint,
@@ -292,6 +312,17 @@ export function generateAMB(
       source: '402Proof',
     },
     magnet_strength: strength,
+    imp_score: imp.imp_score,
+    rail_score: imp.rail_score,
+    rail_coverage: imp.rail_coverage,
+    imp_version: imp.imp_version,
+    imp: {
+      stale: imp.stale,
+      orphan_refused: imp.orphan_refused,
+      formula: imp.formula,
+      healthy_rails: imp.healthy_rails,
+      total_rails: imp.total_rails,
+    },
     capabilities: input.capabilities?.length ? input.capabilities : [input.toolName],
     free_tier: freeTier,
     description:
@@ -359,7 +390,7 @@ export function defaultMagnetCatalog(): AMBInput[] {
       successRate24h: 1,
       uptime24h: 1,
       reputationScore: 1,
-      description: 'FREE — list Agent Magnet Beacons ranked by magnet_strength.',
+      description: 'FREE — list Agent Magnet Beacons ranked by IMP imp_score (multi-rail).',
       capabilities: ['amb', 'discovery', 'list_magnets'],
     },
     {
@@ -491,7 +522,7 @@ export function buildAmbDocument(baseUrl?: string): {
   });
   const beacons = catalog.map((t) => generateAMB(t, issuer));
   const free = beacons.filter((b) => b.free_tier);
-  const paid = beacons.filter((b) => !b.free_tier).sort((a, b) => b.magnet_strength - a.magnet_strength);
+  const paid = beacons.filter((b) => !b.free_tier).sort((a, b) => (b.imp_score ?? b.magnet_strength) - (a.imp_score ?? a.magnet_strength));
   const ordered = [...free, ...paid];
   const top = paid[0] || null;
   const now = Date.now();
@@ -517,12 +548,17 @@ export function buildAmbDocument(baseUrl?: string): {
       ? {
           tool_name: top.tool_name,
           magnet_strength: top.magnet_strength,
+          imp_score: top.imp_score,
+          rail_score: top.rail_score,
+          rail_coverage: top.rail_coverage,
           endpoint: top.endpoint,
           price: top.payment.price,
         }
       : null,
     formula:
-      'magnet_strength = reputation*0.50 + success_rate_24h*0.25 + uptime_24h*0.15 + (1/log10(latency_ms+10))*0.10',
+      'imp_score = magnet*0.70 + rail_score*0.20 + rail_coverage*0.10; magnet = rep*0.50 + success*0.25 + uptime*0.15 + lat_term*0.10 (IMP v0.1)',
+    imp_version: '0.1.0',
+    ranking: 'list_magnets ranks by imp_score (fallback magnet_strength); free beacons listed first',
     discovery: {
       amb: `${base}/.well-known/amb.json`,
       agent: `${base}/.well-known/agent.json`,
@@ -533,6 +569,6 @@ export function buildAmbDocument(baseUrl?: string): {
     },
     beacons: ordered,
     note:
-      'Prefer highest magnet_strength. Multi-rail x402: Base USDC, RH USDG (base_usdg), Sol USDC, XRPL RLUSD. pay_to is ACP EOA 0x7233 — never orphan 0x4e14.',
+      'Prefer highest imp_score (IMP v0.1 multi-rail). magnet_strength kept for scanners. Multi-rail x402: Base USDC, RH USDG, Sol USDC, XRPL RLUSD. pay_to ACP EOA 0x7233 — never orphan 0x4e14.',
   };
 }
