@@ -5,6 +5,7 @@ import { CreditBureau } from '../../lib/credit/bureau.js';
 import { alreadyRedeemed, markRedeemed, verifyBaseUsdcPayment } from './verify-inbound.js';
 import { facilitatorChain, decodePaymentHeader, usdcAddress, type PaymentRequirements } from './facilitators.js';
 import { PriceRegistry } from '../registry/pricing.js';
+import { recordAmbTraffic } from '../amb/amb-traffic.js';
 
 export const PaymentConfigSchema = z.object({
   price: z.string().regex(/^\d+(\.\d+)?$/),
@@ -42,10 +43,18 @@ const DAILY_SPEND_CAP = parseFloat(
 // x402-paywall.html). Used as the default so the gateway COLLECTS even when
 // SML_PAYMENT_RECEIVER isn't set in the environment.
 const SML_DEFAULT_RECEIVER = '0x72330994f379a71542e7bd5a4cf99a9d9743f4aa';
+const ORPHAN_PAY_TO_PREFIX = '0x4e14';
 
-/** Resolve the address that collects USDC for paid tool calls. */
+/** Resolve the address that collects USDC for paid tool calls. Never orphan 0x4e14. */
 export function getPaymentReceiver(): string {
-  return process.env['SML_PAYMENT_RECEIVER'] ?? SML_DEFAULT_RECEIVER;
+  const raw = (process.env['SML_PAYMENT_RECEIVER'] ?? SML_DEFAULT_RECEIVER).trim();
+  if (!raw || raw.toLowerCase().startsWith(ORPHAN_PAY_TO_PREFIX)) {
+    if (raw && raw.toLowerCase().startsWith(ORPHAN_PAY_TO_PREFIX)) {
+      console.error('[x402] REFUSED orphan payTo 0x4e14… — forcing ACP receive 0x7233…');
+    }
+    return SML_DEFAULT_RECEIVER;
+  }
+  return raw;
 }
 
 const dailySpend = new Map<string, { amount: number; date: string }>();
@@ -223,6 +232,16 @@ async function verifyAndSettle(config: PaymentConfig): Promise<PaymentResult> {
     txHash: verified.txHash,
     bureauScore: score,
   });
+
+  // Real settle only — skip operator/ACP bypass so paid_calls = stranger/on-chain money
+  if (verified.rail !== 'operator' && verified.rail !== 'sml-acp') {
+    try {
+      const key = (verified.payer || 'unknown').toLowerCase().slice(0, 42);
+      recordAmbTraffic('paid_call', key);
+    } catch {
+      /* never break paid path for metrics */
+    }
+  }
 
   return {
     receiptId: receipt.id,

@@ -166,6 +166,9 @@ export class SelfFacilitator implements Facilitator {
   async settle(payload: PaymentPayload, req: PaymentRequirements): Promise<SettleResult> {
     try {
       const a = payload.payload.authorization;
+      if ((a.to || '').toLowerCase().startsWith('0x4e14') || (req.payTo || '').toLowerCase().startsWith('0x4e14')) {
+        return { success: false, errorReason: 'orphan_payTo_refused' };
+      }
       const mnemonic = await WalletManager.getInstance().getSeed();
       const seed = mnemonicToSeedSync(mnemonic);
       const child = HDKey.fromMasterSeed(seed).derive("m/44'/60'/0'/0/0");

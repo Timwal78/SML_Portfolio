@@ -23,6 +23,7 @@ import { handleStripeWebhookEvent, getApiKeyForCheckoutSession, isEntitledStripe
 import { runCommunityScan } from './marketing/community.js';
 import { registerTools } from './tools/index.js';
 import { mountAMBRoutes, refreshBeacons } from './amb/amb-routes.js';
+import { recordAmbTraffic } from './amb/amb-traffic.js';
 import { lookupPha, lookupFmr, landlordChecklist, windsorBundle, VASH_CONTACTS, section8GeoLookup, section8FmrNational, section8IncomeLimits, phaOpportunities, phaSearch } from './tools/housing.js';
 import { AuditLogger } from './security/audit.js';
 import { RateLimiter } from './security/rate-limit.js';
@@ -628,7 +629,14 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
   // Public crawlable HTTP 402 challenges so x402scan / 402 Index / Bazaar can
   // detect and index this server. Authoritative per-tool pricing lives in the
   // sml_discover MCP tool; these emit a spec-correct x402 V2 PaymentRequirements.
-  const X402_PAY_TO = process.env['SML_PAYMENT_RECEIVER'] ?? '0x72330994f379a71542e7bd5a4cf99a9d9743f4aa';
+  const X402_PAY_TO_DEFAULT = '0x72330994f379a71542e7bd5a4cf99a9d9743f4aa';
+  const _payToRaw = (process.env['SML_PAYMENT_RECEIVER'] ?? X402_PAY_TO_DEFAULT).trim();
+  const X402_PAY_TO = (!_payToRaw || _payToRaw.toLowerCase().startsWith('0x4e14'))
+    ? X402_PAY_TO_DEFAULT
+    : _payToRaw;
+  if (_payToRaw && _payToRaw.toLowerCase().startsWith('0x4e14')) {
+    console.error('[x402] REFUSED orphan SML_PAYMENT_RECEIVER 0x4e14… — using 0x7233…');
+  }
   const USDC_BASE_ASSET = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
   // Sol x402 rail — SPL USDC to ACP Sol address (not the EVM payTo).
   const SOLANA_X402_PAY_TO = process.env['SOLANA_PAYMENT_RECEIVER'] ?? SOLANA_PAY_TO_DEFAULT;
@@ -809,6 +817,21 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
     const header402 = Buffer.from(JSON.stringify(challenge)).toString('base64');
 
     const finishPaid = (payer: { rail: string; from: string; tx: string }): PayResult => {
+      // Count only real settlement rails (standard facilitator / sovereign on-chain).
+      // Marketplace/operator/stripe/zyla/aws bypasses are not stranger x402 snacks.
+      try {
+        const rail = (payer.rail || '').toLowerCase();
+        const isReal =
+          rail.startsWith('standard:') ||
+          rail.startsWith('sovereign') ||
+          rail === 'standard' ||
+          rail === 'sovereign';
+        if (isReal) {
+          recordAmbTraffic('paid_call', (payer.from || 'unknown').toLowerCase().slice(0, 42));
+        }
+      } catch {
+        /* metrics must never break paid path */
+      }
       try {
         const hook = onPaidSettle({
           payer: payer.from,
