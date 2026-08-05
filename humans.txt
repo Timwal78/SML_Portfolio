@@ -1,0 +1,11 @@
+/* TEAM */
+Company: Script Master Labs, LLC
+Location: Kinston, NC 28504, United States
+Site: https://www.scriptmasterlabs.com
+Phone: +1-321-261-8620
+SDVOSB: UEI G24VZA4RLMK3 · CAGE 21U51
+Founder: Timothy Walton
+
+/* SITE */
+Standards: HTML5, OpenAPI, MCP, x402
+Canonical: https://www.scriptmasterlabs.com

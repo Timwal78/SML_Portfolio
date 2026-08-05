@@ -65,3 +65,6 @@ Allow: /
 Host: www.scriptmasterlabs.com
 
 Sitemap: https://www.scriptmasterlabs.com/sitemap.xml
+
+Allow: /humans.txt
+Allow: /.well-known/security.txt

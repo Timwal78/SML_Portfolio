@@ -1,5 +1,5 @@
-Contact: mailto:security@scriptmasterlabs.com
-Expires: 2027-01-01T00:00:00.000Z
+Contact: mailto:scriptmasterlabs@gmail.com
+Contact: https://www.scriptmasterlabs.com/
 Preferred-Languages: en
 Canonical: https://www.scriptmasterlabs.com/.well-known/security.txt
-Policy: https://www.scriptmasterlabs.com/privacy.html
+Expires: 2027-08-05T00:00:00.000Z

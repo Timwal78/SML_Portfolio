@@ -11,6 +11,11 @@
 - Agent floor: 0.001 USDC · eip155:8453 · payTo 0x72330994f379a71542e7bd5a4cf99a9d9743f4aa
 - Target directories: Smithery, mcp.so, Glama, PulseMCP, RapidAPI, Zyla, APILayer, API.market, Composio, Pipedream, Zapier AI, Lindy, Relevance AI, Hugging Face, Kong/Apigee/Azure/AWS APIM
 
+# Company
+# Script Master Labs, LLC · SDVOSB · Kinston, NC 28504 · +1-321-261-8620
+# Canonical site: https://www.scriptmasterlabs.com (www only; apex redirects)
+# UEI G24VZA4RLMK3 · CAGE 21U51
+
 ## VendOS — create your own agent store (PRIMARY TENT)
 
 - **What 0.05 USDC buys:** your own AI-agent storefront on VendOS — not a temp ad. One-time. No subscription.
