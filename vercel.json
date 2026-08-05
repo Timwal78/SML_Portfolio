@@ -1,6 +1,14 @@
 {
   "rewrites": [
     {
+      "source": "/.well-known/amb.json",
+      "destination": "https://mcp-x402.onrender.com/.well-known/amb.json"
+    },
+    {
+      "source": "/amb/traffic",
+      "destination": "https://mcp-x402.onrender.com/amb/traffic"
+    },
+    {
       "source": "/:path*",
       "has": [
         {

@@ -6,8 +6,9 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { RateLimiter } from '../security/rate-limit.js';
 import { Sandbox } from '../security/sandbox.js';
 import { AuditLogger } from '../security/audit.js';
-import { getCachedAmbDocument, getCachedBeacons } from '../amb/amb-routes.js';
+import { getCachedAmbDocument, getCachedBeacons, getLiveAmbDocument } from '../amb/amb-routes.js';
 import { SAFE_PAY_TO } from '../amb/amb-generator.js';
+import { recordAmbTraffic } from '../amb/amb-traffic.js';
 
 const ListSchema = z.object({
   limit: z.number().int().min(1).max(200).optional(),
@@ -52,14 +53,15 @@ export function registerMagnets(server: McpServer): void {
         };
       }
       try {
-        const doc = getCachedAmbDocument();
+        recordAmbTraffic('list_magnets', 'mcp-tool');
+        const doc = getLiveAmbDocument();
         let beacons = getCachedBeacons();
         if (args.min_strength != null) {
           beacons = beacons.filter((b) => b.magnet_strength >= args.min_strength!);
         }
         const limit = args.limit ?? 25;
         beacons = beacons.slice(0, limit);
-        audit.info('list_magnets', { count: beacons.length, pay_to: SAFE_PAY_TO });
+        audit.info('list_magnets', { count: beacons.length, pay_to: SAFE_PAY_TO, agents_24h: doc.traffic.unique_agents });
         return {
           content: [
             {
@@ -70,6 +72,8 @@ export function registerMagnets(server: McpServer): void {
                 pay_to: doc.pay_to,
                 rails: doc.rails,
                 top_magnet: doc.top_magnet,
+                traffic: doc.traffic,
+                agent_tracker: doc.agent_tracker,
                 beacons,
                 full_document: doc.discovery.amb,
               }),
@@ -115,12 +119,13 @@ export function registerMagnets(server: McpServer): void {
         };
       }
       try {
-        const doc = getCachedAmbDocument();
+        recordAmbTraffic('get_agent_magnet_beacons', 'mcp-tool');
+        const doc = getLiveAmbDocument();
         const out =
           args.limit != null
             ? { ...doc, beacons: doc.beacons.slice(0, args.limit), count: Math.min(doc.count, args.limit) }
             : doc;
-        audit.info('get_agent_magnet_beacons', { count: out.count });
+        audit.info('get_agent_magnet_beacons', { count: out.count, agents_24h: doc.traffic.unique_agents });
         return {
           content: [{ type: 'text', text: JSON.stringify(out) }],
         };
