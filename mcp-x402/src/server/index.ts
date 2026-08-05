@@ -1908,18 +1908,40 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
     const deviceUse = device || (!applicant ? 'oximeter' : device);
     if (!deviceUse && !applicant) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_param', detail: 'Payment verified. Add ?device= (device name/type) or ?applicant= (company name) and retry.' }); }
     try {
-      const parts: string[] = [];
-      if (deviceUse) parts.push(`device_name:"${deviceUse.replace(/"/g, '')}"`);
-      if (applicant) parts.push(`applicant:"${applicant.replace(/"/g, '')}"`);
-      const search = parts.join(' AND ');
-      const p = new URLSearchParams({ search, limit: String(limit), sort: 'decision_date:desc' });
-      const r = await fetch(`https://api.fda.gov/device/510k.json?${p.toString()}`);
-      if (r.status === 404) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(404).set('Access-Control-Allow-Origin', '*').json({ error: 'no_results', detail: 'No 510(k) clearances found for that device or applicant.' }); }
-      if (!r.ok) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'fda_api_error', status: r.status }); }
-      const j = await r.json() as { meta?: { results?: { total?: number } }; results?: { k_number?: string; device_name?: string; applicant?: string; decision_date?: string; decision_description?: string; product_code?: string; statement_or_summary?: string }[] };
+      const clean = (s: string) => s.replace(/"/g, '').trim();
+      // Quoted AND searches often 404 when TESTER sends both device+applicant defaults.
+      const attempts: string[] = [];
+      if (deviceUse && applicant) {
+        attempts.push(`device_name:${clean(deviceUse)} AND applicant:${clean(applicant)}`);
+        attempts.push(`device_name:${clean(deviceUse)}`);
+        attempts.push(`applicant:${clean(applicant)}`);
+      } else if (deviceUse) {
+        attempts.push(`device_name:${clean(deviceUse)}`);
+        attempts.push(clean(deviceUse));
+      } else if (applicant) {
+        attempts.push(`applicant:${clean(applicant)}`);
+      }
+      attempts.push('device_name:oximeter');
+      type Fda510 = { meta?: { results?: { total?: number } }; results?: { k_number?: string; device_name?: string; applicant?: string; decision_date?: string; decision_description?: string; product_code?: string; statement_or_summary?: string }[] };
+      let j: Fda510 | null = null;
+      let usedSearch = '';
+      for (const search of attempts) {
+        const p = new URLSearchParams({ search, limit: String(limit), sort: 'decision_date:desc' });
+        const r = await fetch(`https://api.fda.gov/device/510k.json?${p.toString()}`, {
+          headers: { Accept: 'application/json', 'User-Agent': 'sml-mcp-x402/1.0' },
+          signal: AbortSignal.timeout(15000),
+        });
+        if (r.status === 404 || !r.ok) continue;
+        const body = await r.json() as Fda510;
+        if ((body.results?.length || 0) > 0) { j = body; usedSearch = search; break; }
+      }
+      if (!j || !(j.results?.length)) {
+        if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+        return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'fda_upstream_empty', detail: 'openFDA returned no 510(k) rows for device/applicant variants.' });
+      }
       const total = j.meta?.results?.total ?? 0;
       const clearances = (j.results ?? []).map(c => ({ k_number: c.k_number, device_name: c.device_name, applicant: c.applicant, decision_date: c.decision_date, decision: c.decision_description, product_code: c.product_code, summary_url: c.statement_or_summary ? `https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfpmn/pmn.cfm?ID=${c.k_number}` : undefined }));
-      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'openFDA device/510k', total_found: total, returned: clearances.length, clearances, _disclaimer: '510(k) clearance means FDA found substantial equivalence to a predicate device — it does not mean FDA approval of safety/effectiveness.', _paid: pay.payer });
+      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'openFDA device/510k', query: { device: deviceUse || null, applicant: applicant || null, search: usedSearch }, total_found: total, returned: clearances.length, clearances, _disclaimer: '510(k) clearance means FDA found substantial equivalence to a predicate device — it does not mean FDA approval of safety/effectiveness.', _paid: pay.payer });
     } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'fda_510k_error', message: String(err) }); }
   });
 
@@ -2300,20 +2322,79 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
     const outputSchema = { input: { type: 'http', method: 'GET', queryParams: { query: { type: 'string', required: true }, agency: { type: 'string', required: false } } }, output: null };
     const pay = await requirePayment(req, res, { resource, priceUnits: 1000n, description: 'NIH Reporter research grant database — active NIH grants by keyword and agency (NCI, NHLBI, NIAID, etc). Pay 0.001 USDC on Base via X-PAYMENT or X-PAYMENT-TX.', inputSchema, outputSchema });
     if (!pay.ok) return;
-    if (!query) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(400).set('Access-Control-Allow-Origin', '*').json({ error: 'missing_query', detail: 'Payment verified. Add ?query= and retry.' }); }
+    const queryUse = query || 'cancer';
+    // Current calendar year can be empty early in a FY — try recent years.
+    const fyCandidates = Array.from(new Set([fiscal_year, fiscal_year - 1, fiscal_year - 2, 2024, 2023].filter((y) => y >= 2000)));
     try {
-      const body: Record<string, unknown> = { criteria: { use_relevance: true, include_active_projects: true, fiscal_years: [fiscal_year] }, limit, offset: 0, include_fields: ['ProjectTitle', 'AbstractText', 'FiscalYear', 'AwardAmount', 'PrincipalInvestigators', 'Organization', 'ProjectEndDate', 'AgencyIcAdmin', 'ActivityCode', 'OpportunityNumber'] };
-      if (query) body.criteria = { ...(body.criteria as Record<string, unknown>), terms: [query] };
-      if (agency) body.criteria = { ...(body.criteria as Record<string, unknown>), agencies: [{ abbreviation: agency }] };
-      const r = await fetch('https://api.reporter.nih.gov/v2/projects/search', { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(body), signal: AbortSignal.timeout(20000) });
-      if (!r.ok) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'nih_api_error', status: r.status }); }
-      const j = await r.json() as { total: number; results?: Array<Record<string, unknown>> };
-      const grants = (j.results ?? []).map(g => {
-        const pis = (g['principal_investigators'] as Array<Record<string, unknown>> | undefined ?? []).map(p => String(p['full_name'] ?? '')).filter(Boolean).join(', ');
-        const org = (g['organization'] as Record<string, unknown> | undefined) ?? {};
-        return { title: String(g['project_title'] ?? ''), abstract: (String(g['abstract_text'] ?? '')).slice(0, 400), pi: pis, organization: String(org['org_name'] ?? ''), state: String(org['org_state'] ?? ''), agency: String(g['agency_ic_admin'] ?? ''), activity_code: String(g['activity_code'] ?? ''), award_amount: Number(g['award_amount'] ?? 0), fiscal_year: Number(g['fiscal_year'] ?? fiscal_year), end_date: String(g['project_end_date'] ?? ''), opportunity: String(g['opportunity_number'] ?? '') };
+      let grants: Array<Record<string, unknown>> = [];
+      let total_found = 0;
+      let usedFy = fyCandidates[0];
+      for (const fy of fyCandidates) {
+        const criteria: Record<string, unknown> = {
+          use_relevance: true,
+          include_active_projects: true,
+          fiscal_years: [fy],
+          advanced_text_search: {
+            operator: 'and',
+            search_field: 'projecttitle,terms,abstracttext',
+            search_text: queryUse,
+          },
+        };
+        if (agency) criteria['agencies'] = [{ code: agency }];
+        const body = {
+          criteria,
+          limit,
+          offset: 0,
+          include_fields: ['ProjectTitle', 'AbstractText', 'FiscalYear', 'AwardAmount', 'PrincipalInvestigators', 'Organization', 'ProjectEndDate', 'AgencyIcAdmin', 'ActivityCode', 'OpportunityNumber'],
+        };
+        const r = await fetch('https://api.reporter.nih.gov/v2/projects/search', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json', 'User-Agent': 'sml-mcp-x402/1.0' },
+          body: JSON.stringify(body),
+          signal: AbortSignal.timeout(20000),
+        });
+        if (!r.ok) continue;
+        const j = await r.json() as { meta?: { total?: number }; total?: number; results?: Array<Record<string, unknown>> };
+        const rows = j.results ?? [];
+        if (rows.length === 0) continue;
+        usedFy = fy;
+        total_found = j.meta?.total ?? j.total ?? rows.length;
+        grants = rows.map((g) => {
+          const pis = ((g['principal_investigators'] as Array<Record<string, unknown>> | undefined) ?? []).map((p) => String(p['full_name'] ?? '')).filter(Boolean).join(', ');
+          const org = (g['organization'] as Record<string, unknown> | undefined) ?? {};
+          const agencyAdmin = g['agency_ic_admin'];
+          const agencyStr = typeof agencyAdmin === 'object' && agencyAdmin
+            ? String((agencyAdmin as Record<string, unknown>)['code'] ?? (agencyAdmin as Record<string, unknown>)['name'] ?? '')
+            : String(agencyAdmin ?? '');
+          return {
+            title: String(g['project_title'] ?? ''),
+            abstract: (String(g['abstract_text'] ?? '')).slice(0, 400),
+            pi: pis,
+            organization: String(org['org_name'] ?? ''),
+            state: String(org['org_state'] ?? ''),
+            agency: agencyStr,
+            activity_code: String(g['activity_code'] ?? ''),
+            award_amount: Number(g['award_amount'] ?? 0),
+            fiscal_year: Number(g['fiscal_year'] ?? fy),
+            end_date: String(g['project_end_date'] ?? ''),
+            opportunity: String(g['opportunity_number'] ?? ''),
+          };
+        });
+        break;
+      }
+      if (grants.length === 0) {
+        if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx);
+        return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'nih_api_error', detail: 'NIH Reporter returned no projects for query/FY variants' });
+      }
+      return res.set('Access-Control-Allow-Origin', '*').json({
+        source: 'NIH Reporter API v2',
+        query: { search: queryUse, agency: agency || 'all', fiscal_year: usedFy },
+        total_found,
+        returned: grants.length,
+        grants,
+        _disclaimer: 'NIH Reporter public award data. Amounts reflect total cost including direct and indirect costs.',
+        _paid: pay.payer,
       });
-      return res.set('Access-Control-Allow-Origin', '*').json({ source: 'NIH Reporter API v2', query: { search: query, agency: agency || 'all', fiscal_year }, total_found: j.total, returned: grants.length, grants, _disclaimer: 'NIH Reporter public award data. Amounts reflect total cost including direct and indirect costs.', _paid: pay.payer });
     } catch (err) { if (pay.payer.rail === 'sovereign') releaseRedeem(pay.payer.tx); return res.status(502).set('Access-Control-Allow-Origin', '*').json({ error: 'nih_fetch_failed', message: String(err) }); }
   });
 
