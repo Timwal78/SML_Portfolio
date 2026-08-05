@@ -23,6 +23,7 @@ import { handleStripeWebhookEvent, getApiKeyForCheckoutSession, isEntitledStripe
 import { runCommunityScan } from './marketing/community.js';
 import { registerTools } from './tools/index.js';
 import { mountAMBRoutes, refreshBeacons } from './amb/amb-routes.js';
+import { mountPremiumIndexRoutes } from './premium/routes.js';
 import { recordAmbTraffic } from './amb/amb-traffic.js';
 import { lookupPha, lookupFmr, landlordChecklist, windsorBundle, VASH_CONTACTS, section8GeoLookup, section8FmrNational, section8IncomeLimits, phaOpportunities, phaSearch } from './tools/housing.js';
 import { AuditLogger } from './security/audit.js';
@@ -623,6 +624,7 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
 
   // Agent Magnet Beacons — multi-rail payTo ACP 0x7233 (never 0x4e14)
   mountAMBRoutes(app);
+  mountPremiumIndexRoutes(app);
   try { refreshBeacons(); } catch (e) { console.warn('[AMB] initial refresh failed', e); }
 
   // ── x402 discovery resources ──────────────────────────────────────────────
