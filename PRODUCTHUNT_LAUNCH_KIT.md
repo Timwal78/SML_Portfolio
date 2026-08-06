@@ -35,3 +35,17 @@ CRAWLTOLL is an x402-powered payment toll booth for developers and publishers. C
 > Live Demo: https://www.scriptmasterlabs.com/crawltoll.html
 > 
 > Would appreciate thoughts and feedback from developers and site owners!
+
+---
+
+## 3. ProductHunt — Premium Capability Index (2026-08-06)
+
+**Name**: Premium Capability Index  
+**Tagline**: Hosted discovery + ranking so AI agents can find and hire APIs  
+**Link**: https://www.scriptmasterlabs.com/pricing.html  
+**Article**: https://www.scriptmasterlabs.com/ai-agent-api-discovery-premium-index.html  
+
+**Maker comment**:
+> Maker here. IMP (ranking protocol) is open source. You only pay if you want us to host the live index (Match API, AMB distribution, SLA). Starter $49/mo. Category grows; best operator wins. SDVOSB · UEI G24VZA4RLMK3.
+
+**Full multi-platform pack**: `downloads/DEVTO_ETC_PREMIUM_INDEX_PACK.md`
