@@ -269,9 +269,9 @@ export function mountLeadCaptureRoutes(app: Express): void {
       due,
       templates: {
         stage0_welcome_day0: 'already sent at capture page — explore free',
-        stage1_value_day3: 'docs/LEAD_NURTURE_SEQUENCE.md § Stage 1',
-        stage2_soft_paid_day7: 'docs/LEAD_NURTURE_SEQUENCE.md § Stage 2',
-        stage3_direct_day14: 'docs/LEAD_NURTURE_SEQUENCE.md § Stage 3',
+        stage1_value_day7: 'docs/LEAD_NURTURE_SEQUENCE.md § Stage 1',
+        stage2_direct_day14: 'docs/LEAD_NURTURE_SEQUENCE.md § Stage 2',
+        stage3_final_day30: 'docs/LEAD_NURTURE_SEQUENCE.md § Stage 3',
       },
     });
   });
