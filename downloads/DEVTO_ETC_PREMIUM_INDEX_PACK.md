@@ -1,3 +1,5 @@
+**LIVE DEV.TO:** https://dev.to/scriptmaster78/your-api-is-invisible-to-ai-agents-fix-it-with-a-hosted-capability-index-49-2mmm
+
 # Dev.to / Hashnode / Medium / IH / HN / PH — Premium Index pack
 **Canonical CTA:** https://www.scriptmasterlabs.com/pricing.html  
 **Docs:** https://mcp-x402.onrender.com/v1  
