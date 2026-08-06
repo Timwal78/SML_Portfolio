@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Start Free — IMP Capability Index | Script Master Labs</title>
+  <meta name="description" content="Get free IMP protocol resources. Optional email updates about the hosted Premium Index — only after you’ve had time to evaluate." />
+  <link rel="canonical" href="https://www.scriptmasterlabs.com/free-start.html" />
+  <style>
+    :root { --bg:#0b0f14; --card:#121820; --line:#243041; --txt:#e8eef7; --mut:#9aa8b8; --acc:#3b82f6; --ok:#22c55e; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background:var(--bg); color:var(--txt); line-height:1.55; }
+    .wrap { max-width:640px; margin:0 auto; padding:32px 18px 72px; }
+    h1 { font-size:1.55rem; margin:0 0 8px; }
+    p { color:var(--mut); }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:20px; margin-top:18px; }
+    label { display:block; font-size:0.9rem; margin:12px 0 6px; color:var(--txt); }
+    input[type=text], input[type=email], textarea, select {
+      width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--line);
+      background:#0a1018; color:var(--txt); font:inherit;
+    }
+    .check { display:flex; gap:10px; align-items:flex-start; margin-top:14px; font-size:0.92rem; color:var(--mut); }
+    .check input { margin-top:4px; }
+    button {
+      margin-top:16px; width:100%; border:0; border-radius:10px; padding:12px 14px;
+      background:var(--acc); color:#fff; font-weight:700; font:inherit; cursor:pointer;
+    }
+    button:disabled { opacity:0.6; cursor:not-allowed; }
+    .ok { color:var(--ok); font-weight:700; }
+    .links a { color:#93c5fd; }
+    .fine { font-size:0.85rem; color:var(--mut); margin-top:10px; }
+    a.nav { color:#93c5fd; text-decoration:none; margin-right:12px; font-size:0.9rem; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div>
+      <a class="nav" href="https://www.scriptmasterlabs.com/">Home</a>
+      <a class="nav" href="https://www.scriptmasterlabs.com/pricing.html">Pricing</a>
+      <a class="nav" href="https://github.com/Timwal78/intention-market-protocol">GitHub</a>
+    </div>
+    <h1>Start free — then decide</h1>
+    <p>
+      Get the open <strong style="color:var(--txt)">Intention Market Protocol (IMP)</strong> resources.
+      Optional: leave your email for later updates about the <strong style="color:var(--txt)">hosted Premium Index</strong> —
+      not a hard sell today.
+    </p>
+    <p class="fine">Protocol free. Premium Index paid. · Script Master Labs, LLC (SDVOSB) · Kinston, NC 28504</p>
+
+    <div class="card" id="form-card">
+      <form id="lead-form">
+        <label for="email">Email *</label>
+        <input id="email" name="email" type="email" required placeholder="you@company.com" autocomplete="email" />
+
+        <label for="name">Name (optional)</label>
+        <input id="name" name="name" type="text" placeholder="First name" autocomplete="name" />
+
+        <label for="company">Company (optional)</label>
+        <input id="company" name="company" type="text" placeholder="Company" autocomplete="organization" />
+
+        <label for="interest">What are you building? (optional)</label>
+        <textarea id="interest" name="interest" rows="3" placeholder="Agent tool routing, discovery, x402, …"></textarea>
+
+        <label for="source">How you found us</label>
+        <select id="source" name="source">
+          <option value="free-start">Free start page</option>
+          <option value="pricing-free-cta">Pricing page</option>
+          <option value="aws-marketplace-free">AWS Marketplace (free)</option>
+          <option value="oss-github">GitHub / OSS</option>
+          <option value="other">Other</option>
+        </select>
+
+        <label class="check">
+          <input id="consent" name="consent" type="checkbox" required />
+          <span>
+            Send me occasional updates about the <strong style="color:var(--txt)">hosted Premium Index</strong>
+            (ranking, metering, Match API). I can unsubscribe anytime.
+            You will <em>not</em> get a sales pitch before I’ve had time to look at the free protocol.
+          </span>
+        </label>
+
+        <button type="submit" id="submit-btn">Get free resources</button>
+        <p class="fine">
+          Required: email + checkbox. We store your opt-in to follow up later (default ~7 days), not to spam on day one.
+        </p>
+      </form>
+      <div id="result" style="display:none"></div>
+    </div>
+
+    <div class="card links">
+      <p style="margin:0 0 8px;color:var(--txt);font-weight:700">Free resources (no email required)</p>
+      <p class="fine" style="margin:0">
+        <a href="https://github.com/Timwal78/intention-market-protocol">GitHub — IMP v0.1</a><br />
+        <a href="https://mcp-x402.onrender.com/v1">Hosted API discovery docs</a><br />
+        <a href="https://www.scriptmasterlabs.com/pricing.html">Pricing (when you want hosted)</a>
+      </p>
+    </div>
+  </div>
+  <script>
+    (function () {
+      var form = document.getElementById('lead-form');
+      var result = document.getElementById('result');
+      var btn = document.getElementById('submit-btn');
+      var params = new URLSearchParams(location.search);
+      if (params.get('source')) {
+        var s = document.getElementById('source');
+        for (var i = 0; i < s.options.length; i++) {
+          if (s.options[i].value === params.get('source')) s.selectedIndex = i;
+        }
+      }
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        if (!document.getElementById('consent').checked) {
+          alert('Please check the updates box to opt in (or just use the free links below without submitting).');
+          return;
+        }
+        btn.disabled = true;
+        btn.textContent = 'Saving…';
+        var payload = {
+          email: document.getElementById('email').value.trim(),
+          name: document.getElementById('name').value.trim() || undefined,
+          company: document.getElementById('company').value.trim() || undefined,
+          interest: document.getElementById('interest').value.trim() || undefined,
+          source: document.getElementById('source').value,
+          consent_marketing: true,
+          referrer: document.referrer || location.href
+        };
+        fetch('https://mcp-x402.onrender.com/v1/leads/capture', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify(payload)
+        })
+          .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, status: r.status, body: j }; }); })
+          .then(function (res) {
+            form.style.display = 'none';
+            result.style.display = 'block';
+            if (res.body && res.body.ok) {
+              result.innerHTML =
+                '<div class="ok">You’re in — explore free first</div>' +
+                '<p class="fine">' + (res.body.message || '') + '</p>' +
+                '<p class="fine">Paid follow-up eligible after: <strong style="color:var(--txt)">' +
+                (res.body.nurture_eligible_at || 'a few days') +
+                '</strong></p>' +
+                '<p class="fine links">' +
+                '<a href="https://github.com/Timwal78/intention-market-protocol">Open GitHub</a> · ' +
+                '<a href="https://mcp-x402.onrender.com/v1">API docs</a> · ' +
+                '<a href="https://www.scriptmasterlabs.com/pricing.html">Pricing (later)</a>' +
+                '</p>';
+            } else {
+              result.innerHTML =
+                '<p class="fine">Could not save (' + res.status + '): ' +
+                ((res.body && (res.body.detail || res.body.error)) || 'error') +
+                '</p><p class="fine links"><a href="https://github.com/Timwal78/intention-market-protocol">Continue on GitHub</a></p>';
+              btn.disabled = false;
+              btn.textContent = 'Get free resources';
+              form.style.display = 'block';
+            }
+          })
+          .catch(function (err) {
+            btn.disabled = false;
+            btn.textContent = 'Get free resources';
+            alert('Network error: ' + err);
+          });
+      });
+    })();
+  </script>
+</body>
+</html>
