@@ -137,8 +137,8 @@ function parseKeys(envVal: string | undefined): Map<string, ZylaTier> {
     let key = part;
     const m = part.match(/^(review|basic|ultimate):(.+)$/i);
     if (m) {
-      tier = m[1].toLowerCase() as ZylaTier;
-      key = m[2].trim();
+      tier = (m[1] ?? 'review').toLowerCase() as ZylaTier;
+      key = (m[2] ?? '').trim();
     }
     if (!key.startsWith('sml_zyla_')) continue;
     map.set(key, tier);
@@ -153,7 +153,7 @@ function extractZylaKey(req: Request): string {
   const auth = h['authorization'] ?? h['Authorization'];
   if (typeof auth === 'string') {
     const m = auth.match(/^\s*Bearer\s+(.+)\s*$/i);
-    if (m) return m[1].trim();
+    if (m) return (m[1] ?? '').trim();
     // Some marketplaces send raw key in Authorization
     if (auth.trim().startsWith('sml_zyla_')) return auth.trim();
   }

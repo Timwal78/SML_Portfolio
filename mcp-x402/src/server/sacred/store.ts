@@ -145,7 +145,7 @@ export function sacredVerify(objectId: string): Record<string, unknown> {
       protocol: 'SPB/1',
     };
   }
-  obj.provenance = [
+  const verifyProvenance: ProvenanceEvent[] = [
     {
       at: new Date().toISOString(),
       type: 'verify',
@@ -153,7 +153,8 @@ export function sacredVerify(objectId: string): Record<string, unknown> {
       detail: 'verify_read',
     },
     ...obj.provenance,
-  ].slice(0, 100);
+  ];
+  obj.provenance = verifyProvenance.slice(0, 100);
   s.sacred[object_id] = obj;
   save(s);
   const hash_ok = /^[a-fA-F0-9]{16,128}$/.test(obj.content_hash) || obj.content_hash.length >= 8;
@@ -184,7 +185,7 @@ export function profaneDiscard(input: {
   const s = load();
   const sacred = s.sacred[object_id];
   if (sacred && sacred.status === 'sacred') {
-    sacred.provenance = [
+    const discardBlockedProvenance: ProvenanceEvent[] = [
       {
         at: new Date().toISOString(),
         type: 'discard_blocked',
@@ -192,7 +193,8 @@ export function profaneDiscard(input: {
         detail: 'profane discard refused — object is sacred',
       },
       ...sacred.provenance,
-    ].slice(0, 100);
+    ];
+    sacred.provenance = discardBlockedProvenance.slice(0, 100);
     s.sacred[object_id] = sacred;
     save(s);
     return {
