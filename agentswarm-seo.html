@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- agentswarm-seo catalog v2026-07-25b multi-host-stable -->
+<!-- agentswarm-seo catalog v2026-08-06-amb-imp multi-host-stable -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AgentSwarm SEO — Script Master Labs Command Center</title>
@@ -1319,7 +1319,7 @@ html, body {
       <div class="panel-header">
         <div>
           <h2 class="panel-title">AI Indexer</h2>
-          <div class="panel-sub">AI agent discoverability · Plugin descriptors · OpenAPI · Discovery files</div>
+          <div class="panel-sub">AI agent discoverability · AMB beacons · IMP ranking · OpenAPI · Discovery files</div>
         </div>
         <div class="beastmode-badge"><span class="bm-dot"></span> INDEXER ACTIVE</div>
       </div>
@@ -1327,9 +1327,37 @@ html, body {
       <div class="toggle-row">
         <div class="toggle-info">
           <span class="toggle-title">AI Agent Discoverability Core</span>
-          <span class="toggle-desc">Maximize crawlability and tool invocation by Autonomous Agents</span>
+          <span class="toggle-desc">Maximize crawlability via AMB beacons + IMP imp_score ranking — agents find and pick winners</span>
         </div>
         <span class="toggle-on">ENABLED</span>
+      </div>
+
+      <!-- AMB + IMP live strip -->
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+          <span class="card-title">AMB · IMP LIVE INDEX</span>
+          <span class="ep-cost-free" style="font-size:10px" id="amb-imp-status">LOADING…</span>
+        </div>
+        <div class="card-body">
+          <div class="config-row"><span class="config-key">Protocol</span><span class="config-val">IMP v0.1 · Protocol free · Hosted Premium paid</span></div>
+          <div class="config-row"><span class="config-key">AMB beacons (merged)</span><span class="config-val green" id="amb-beacon-count">—</span></div>
+          <div class="config-row"><span class="config-key">Hosts with AMB</span><span class="config-val" id="amb-host-count">—</span></div>
+          <div class="config-row"><span class="config-key">Top magnet</span><span class="config-val" id="amb-top-magnet">—</span></div>
+          <div class="config-row"><span class="config-key">Top imp_score</span><span class="config-val green" id="amb-top-imp">—</span></div>
+          <div class="config-row"><span class="config-key">payTo</span><span class="config-val" style="font-family:var(--mono);font-size:11px" id="amb-payto">0x7233…</span></div>
+          <div class="config-row"><span class="config-key">Formula</span><span class="config-val" style="font-size:11px" id="amb-formula">imp = magnet×0.70 + rail×0.20 + coverage×0.10</span></div>
+          <div style="margin-top:10px">
+            <div class="card-title" style="font-size:11px;margin-bottom:8px;opacity:.85">TOP BEACONS BY IMP</div>
+            <div id="amb-top-list" style="display:flex;flex-direction:column;gap:6px;max-height:220px;overflow:auto"></div>
+          </div>
+          <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px">
+            <a href="https://www.scriptmasterlabs.com/.well-known/amb.json" target="_blank" rel="noopener" class="config-val" style="font-size:11px;color:var(--cyan)">www amb.json</a>
+            <a href="https://mcp-x402.onrender.com/.well-known/amb.json" target="_blank" rel="noopener" class="config-val" style="font-size:11px;color:var(--cyan)">mcp amb.json</a>
+            <a href="https://acp-x402-scriptmasterlabs.onrender.com/.well-known/amb.json" target="_blank" rel="noopener" class="config-val" style="font-size:11px;color:var(--cyan)">acp amb.json</a>
+            <a href="https://www.scriptmasterlabs.com/pricing.html" target="_blank" rel="noopener" class="config-val" style="font-size:11px;color:var(--violet2)">Premium Match $49</a>
+            <a href="https://github.com/Timwal78/intention-market-protocol" target="_blank" rel="noopener" class="config-val" style="font-size:11px;color:var(--text2)">IMP OSS</a>
+          </div>
+        </div>
       </div>
 
       <div class="indexer-grid">
@@ -1355,6 +1383,14 @@ html, body {
             <div class="config-row">
               <span class="config-key">Custom endpoints</span>
               <span class="config-val green">139+ routes</span>
+            </div>
+            <div class="config-row">
+              <span class="config-key">AMB beacons</span>
+              <span class="config-val green" id="amb-plugin-beacons">live multi-host</span>
+            </div>
+            <div class="config-row">
+              <span class="config-key">IMP ranking</span>
+              <span class="config-val green">imp_score v0.1</span>
             </div>
             <div class="config-row">
               <span class="config-key">MCP tools</span>
@@ -1759,6 +1795,7 @@ const SEARCH_QUERIES = [
 ];
 
 const DISCOVERY_ENDPOINTS = [
+  {path:'/.well-known/amb.json',       desc:'AMB beacons + IMP imp_score ranking'},
   {path:'/.well-known/mcp.json',       desc:'MCP server manifest'},
   {path:'/.well-known/x402',           desc:'x402 payment manifest (hosts)'},
   {path:'/.well-known/ai-plugin.json', desc:'ChatGPT/LLM plugin'},
@@ -1766,16 +1803,25 @@ const DISCOVERY_ENDPOINTS = [
   {path:'/.well-known/agents.json',    desc:'Agent discovery'},
   {path:'/.well-known/server.json',    desc:'Server metadata'},
   {path:'/llms.txt',                   desc:'LLM context — $0.001 floor'},
+  {path:'/v1/match',                   desc:'Premium Match API (hosted IMP index)'},
   {path:'/agent-start.html',           desc:'Agent quickstart (Base USDC)'},
   {path:'/.well-known/security.txt',   desc:'Security contact'},
 ];
 
 const WELLKNOWN = [
+  {file:'amb.json',       status:'active', desc:'Agent Magnet Beacons + IMP scores'},
   {file:'mcp.json',       status:'active', desc:'MCP tools + x402 manifests'},
   {file:'ai-plugin.json', status:'active', desc:'ChatGPT plugin descriptor'},
   {file:'openapi.json',   status:'active', desc:'OpenAPI / multi-host routes'},
   {file:'agents.json',    status:'active', desc:'Agent capability manifest'},
   {file:'server.json',    status:'active', desc:'Server info + $0.001 floor'},
+];
+
+/* Multi-host AMB sources for AI Indexer */
+const AMB_SOURCES = [
+  { id: 'www', label: 'www', url: 'https://www.scriptmasterlabs.com/.well-known/amb.json' },
+  { id: 'mcp', label: 'mcp-x402', url: 'https://mcp-x402.onrender.com/.well-known/amb.json' },
+  { id: 'acp', label: 'acp-x402', url: 'https://acp-x402-scriptmasterlabs.onrender.com/.well-known/amb.json' },
 ];
 
 /* Real agent activity only — see loadActivity() below. This used to be a
@@ -2027,58 +2073,184 @@ function renderIndexer() {
     schema_version: 'v1',
     name_for_model: 'SqueezeOS',
     name_for_human: 'Script Master Labs — SqueezeOS',
-    description_for_model: 'Script Master Labs x402 multi-host stack: 139+ paid routes @ $0.001 USDC on Base. Federal grants/FTD/SEC, Otto-style snacks, RWA. No API key. X-PAYMENT-TX sovereign rail.',
+    description_for_model: 'Script Master Labs x402 multi-host stack with AMB Agent Magnet Beacons and IMP v0.1 imp_score ranking. 139+ paid routes @ $0.001 USDC on Base. Discovery: /.well-known/amb.json. Hosted Premium Match API $49/mo. Protocol free. No API key for snacks; X-PAYMENT-TX sovereign rail. payTo 0x7233.',
     auth: { type: 'none' },
     api: { type: 'openapi', url: 'https://www.scriptmasterlabs.com/.well-known/openapi.json' },
     logo_url: 'https://www.scriptmasterlabs.com/favicon.ico',
     contact_email: 'timothy.walton45@gmail.com',
-    legal_info_url: 'https://www.scriptmasterlabs.com'
+    legal_info_url: 'https://www.scriptmasterlabs.com',
+    amb_url: 'https://www.scriptmasterlabs.com/.well-known/amb.json',
+    imp_version: '0.1.0',
+    premium_match: 'https://mcp-x402.onrender.com/v1/match'
   };
 
   const raw = JSON.stringify(pluginJson, null, 2);
   const highlighted = raw
     .replace(/"([^"]+)":/g, '<span class="key">"$1"</span>:')
     .replace(/: "([^"]+)"/g, ': <span class="str">"$1"</span>')
-    .replace(/[{}[\],]/g, '<span class="punc">$&</span>');
+    .replace(/[{}\[\],]/g, '<span class="punc">$&</span>');
   document.getElementById('plugin-json').innerHTML = highlighted;
 
   const discEl = document.getElementById('discovery-endpoints');
+  discEl.innerHTML = '';
   DISCOVERY_ENDPOINTS.forEach(d => {
     const row = document.createElement('div');
     row.className = 'config-row';
+    const isAmb = d.path.indexOf('amb') >= 0 || d.path.indexOf('/v1/match') >= 0;
     row.innerHTML = `
-      <span class="config-val" style="font-size:11px">${d.path}</span>
+      <span class="config-val" style="font-size:11px;${isAmb ? 'color:var(--cyan)' : ''}">${d.path}</span>
       <span class="config-key" style="text-align:right">${d.desc}</span>
     `;
     discEl.appendChild(row);
   });
 
   const wkEl = document.getElementById('wellknown-list');
+  wkEl.innerHTML = '';
   WELLKNOWN.forEach(w => {
     const row = document.createElement('div');
     row.className = 'config-row';
     row.innerHTML = `
       <span class="config-val" style="font-size:11px">/.well-known/${w.file}</span>
-      <span class="ep-cost-free" style="font-size:10px" id="wk-status-${w.file}">CHECKING…</span>
+      <span class="ep-cost-free" style="font-size:10px" id="wk-status-${w.file.replace('.', '-')}">CHECKING…</span>
     `;
     wkEl.appendChild(row);
   });
-  verifyWellknown(); // never assume LIVE — actually check each file
+  verifyWellknown();
+  loadAmbImpIndex();
+}
+
+function _ambImpOf(b) {
+  const v = b && (b.imp_score != null ? b.imp_score : b.magnet_strength);
+  const n = Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function _ambBeaconKey(b) {
+  return String((b && (b.tool_name || b.name || '')) + '|' + (b && (b.endpoint || b.url || ''))).toLowerCase();
+}
+
+/** Live multi-host AMB fetch + IMP ranking for AI Indexer */
+async function loadAmbImpIndex() {
+  const statusEl = document.getElementById('amb-imp-status');
+  const listEl = document.getElementById('amb-top-list');
+  if (statusEl) statusEl.textContent = 'LOADING…';
+  const merged = new Map();
+  let hostsOk = 0;
+  let payTo = '';
+  let formula = '';
+  let impVer = '0.1.0';
+
+  await Promise.all(AMB_SOURCES.map(async (src) => {
+    try {
+      const res = await fetch(src.url, {
+        signal: AbortSignal.timeout ? AbortSignal.timeout(10000) : undefined,
+        headers: { 'Accept': 'application/json' }
+      });
+      if (!res.ok) throw new Error(String(res.status));
+      const doc = await res.json();
+      hostsOk += 1;
+      if (!payTo && doc.pay_to) payTo = String(doc.pay_to);
+      if (!formula && doc.formula) formula = String(doc.formula);
+      if (doc.imp_version) impVer = String(doc.imp_version);
+      const beacons = Array.isArray(doc.beacons) ? doc.beacons : [];
+      beacons.forEach((b) => {
+        if (!b || typeof b !== 'object') return;
+        const key = _ambBeaconKey(b);
+        const imp = _ambImpOf(b);
+        const prev = merged.get(key);
+        if (!prev || imp >= _ambImpOf(prev)) {
+          merged.set(key, Object.assign({}, b, {
+            _host: src.label,
+            imp_score: imp,
+            magnet_strength: Number(b.magnet_strength != null ? b.magnet_strength : imp)
+          }));
+        }
+      });
+    } catch (e) {
+      console.warn('[AMB]', src.id, e && e.message ? e.message : e);
+    }
+  }));
+
+  const all = Array.from(merged.values()).sort((a, b) => _ambImpOf(b) - _ambImpOf(a));
+  const top = all[0];
+
+  if (statusEl) {
+    if (hostsOk === 0) {
+      statusEl.textContent = '○ AMB UNREACHABLE';
+      statusEl.style.color = 'var(--red)';
+    } else {
+      statusEl.textContent = '● AMB LIVE · IMP ' + impVer;
+      statusEl.className = 'ep-cost-free';
+      statusEl.style.color = '';
+    }
+  }
+
+  const setTxt = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  setTxt('amb-beacon-count', String(all.length));
+  setTxt('amb-host-count', hostsOk + ' / ' + AMB_SOURCES.length);
+  setTxt('amb-top-magnet', top ? String(top.tool_name || top.name || '—') + ' · ' + (top._host || '') : '—');
+  setTxt('amb-top-imp', top ? _ambImpOf(top).toFixed(4) : '—');
+  if (payTo) {
+    const short = payTo.length > 14 ? (payTo.slice(0, 6) + '…' + payTo.slice(-4)) : payTo;
+    setTxt('amb-payto', short);
+  }
+  if (formula) setTxt('amb-formula', formula.length > 90 ? formula.slice(0, 87) + '…' : formula);
+  const plug = document.getElementById('amb-plugin-beacons');
+  if (plug) plug.textContent = all.length + ' merged · ' + hostsOk + ' hosts';
+
+  if (listEl) {
+    listEl.innerHTML = '';
+    if (!all.length) {
+      listEl.innerHTML = '<div class="config-key">No beacons loaded</div>';
+    } else {
+      all.slice(0, 12).forEach((b, i) => {
+        const row = document.createElement('div');
+        row.className = 'config-row';
+        const name = escapeHtml(String(b.tool_name || b.name || 'beacon'));
+        const host = escapeHtml(String(b._host || ''));
+        const imp = _ambImpOf(b).toFixed(4);
+        const free = b.free_tier ? 'FREE' : 'PAID';
+        row.innerHTML = `
+          <span class="config-val" style="font-size:11px">#${i + 1} ${name} <span style="color:var(--text3)">· ${host}</span></span>
+          <span class="config-key" style="text-align:right;font-family:var(--mono);font-size:11px">
+            <span class="ep-cost-free">${imp}</span>
+            <span style="margin-left:8px;opacity:.7">${free}</span>
+          </span>
+        `;
+        listEl.appendChild(row);
+      });
+    }
+  }
+
+  // sidebar optional hooks if present later
+  const sideBeacons = document.getElementById('side-amb-beacons');
+  if (sideBeacons) sideBeacons.textContent = String(all.length);
 }
 
 /* Verifies each /.well-known file actually responds on this domain.
    No status is ever assumed — CHECKING… until a real fetch resolves. */
 async function verifyWellknown() {
   for (const w of WELLKNOWN) {
-    const el = document.getElementById('wk-status-' + w.file);
+    const el = document.getElementById('wk-status-' + w.file.replace('.', '-'));
     if (!el) continue;
     try {
+      // Prefer GET for amb.json (some CDNs weak on HEAD)
       const res = await fetch('/.well-known/' + w.file, {
-        method: 'HEAD',
-        signal: AbortSignal.timeout ? AbortSignal.timeout(6000) : undefined
+        method: w.file === 'amb.json' ? 'GET' : 'HEAD',
+        signal: AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined,
+        headers: w.file === 'amb.json' ? { 'Accept': 'application/json' } : undefined
       });
       if (res.ok) {
-        el.textContent = '● LIVE';
+        let extra = '';
+        if (w.file === 'amb.json') {
+          try {
+            const doc = await res.json();
+            const n = Array.isArray(doc.beacons) ? doc.beacons.length : (doc.count || 0);
+            const imp = doc.imp_version || '0.1.0';
+            extra = ' · ' + n + ' beacons · IMP ' + imp;
+          } catch (_) {}
+        }
+        el.textContent = '● LIVE' + extra;
         el.className = 'ep-cost-free';
         el.style.color = '';
       } else {
