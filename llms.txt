@@ -531,3 +531,10 @@ Agent-facing directory + listing surface for machine commerce.
 - Discovery: https://swarm-mm.onrender.com/.well-known/x402
 - agent402.tools: listed/routable (register origin swarm-mm.onrender.com)
 - Free: /v1/sim/* · Paid PPC: /v1/signal/levels @ 0.001 · Monthly: $19 signal
+
+## Premium Capability Index
+- Article: https://www.scriptmasterlabs.com/ai-agent-api-discovery-premium-index.html
+- Pricing: https://www.scriptmasterlabs.com/pricing.html
+- Dev.to: https://dev.to/scriptmaster78/your-api-is-invisible-to-ai-agents-fix-it-with-a-hosted-capability-index-49-2mmm
+- Starter: $49/mo · Protocol free (IMP)
+

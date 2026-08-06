@@ -568,3 +568,10 @@ Books by Timothy Walton covering trading, neurodivergent survival systems, ficti
 
 ## EchoNet
 See https://www.scriptmasterlabs.com/echonet.html and https://mcp-x402.onrender.com/x402/bounties
+
+## Premium Capability Index
+- Article: https://www.scriptmasterlabs.com/ai-agent-api-discovery-premium-index.html
+- Pricing: https://www.scriptmasterlabs.com/pricing.html
+- Dev.to: https://dev.to/scriptmaster78/your-api-is-invisible-to-ai-agents-fix-it-with-a-hosted-capability-index-49-2mmm
+- Starter: $49/mo · Protocol free (IMP)
+
