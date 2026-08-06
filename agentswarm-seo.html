@@ -1036,7 +1036,7 @@ html, body {
 
       <!-- Live stats -->
       <div class="section-pad" style="padding-bottom:0">
-        <div class="live-stats card" style="border-radius:8px;grid-template-columns:repeat(6,1fr)">
+        <div class="live-stats card" style="border-radius:8px;grid-template-columns:repeat(7,1fr)">
           <div class="stat-block">
             <span class="stat-val" data-live-count>—</span>
             <span class="stat-label">PAID ROUTES</span>
@@ -1050,8 +1050,12 @@ html, body {
             <span class="stat-label">HOSTS LIVE</span>
           </div>
           <div class="stat-block">
-            <span class="stat-val" id="stat-agents-today">—</span>
+            <span class="stat-val" id="stat-agents-today" title="Counts any request whose User-Agent matches a known AI-crawler/agent string — this does NOT verify a payment happened. See PAID TODAY for actual settled calls.">—</span>
             <span class="stat-label">AI AGENTS TODAY</span>
+          </div>
+          <div class="stat-block">
+            <span class="stat-val" id="stat-paid-today" style="color:var(--green)" title="Real, verified x402 settlements today — not a User-Agent guess.">—</span>
+            <span class="stat-label">PAID TODAY</span>
           </div>
           <div class="stat-block">
             <span class="stat-val" id="stat-ping">—</span>
@@ -1062,6 +1066,7 @@ html, body {
             <span class="stat-label">API STATUS</span>
           </div>
         </div>
+        <div id="payer-integrity-note" style="font-size:11px;color:var(--text3);padding:8px 12px 0"></div>
       </div>
 
       <!-- Config card -->
@@ -2722,13 +2727,39 @@ async function loadAgentStats() {
       if (el) {
         el.textContent = fmt(today);
         el.style.color = today > 0 ? 'var(--green)' : '';
-        el.title = paidToday ? (paidToday + ' paid x402 hits today') : 'AI/agent hits today (UA + paid + MCP)';
+        // Honest, always-accurate: this counter is a User-Agent string match
+        // and does NOT verify a payment happened — see PAID TODAY for that.
+        el.title = 'Counts requests whose User-Agent matches a known AI-crawler/agent string. Does NOT verify a payment — includes free crawlers. ' + (paidToday ? paidToday + ' of today\'s hits were verified paid settlements (see PAID TODAY).' : 'No verified paid settlements yet today.');
       }
     });
+    const paidEl = document.getElementById('stat-paid-today');
+    if (paidEl) paidEl.textContent = fmt(paidToday);
     const totalEl = document.getElementById('metric-agents-total');
     if (totalEl) {
       totalEl.textContent = fmt(total);
       totalEl.title = 'All-time agent hits (persisted)';
+    }
+  } catch (_) { /* non-critical */ }
+
+  // Self-payment / distinct-payer transparency — added 2026-08-03 after the
+  // operator asked "is this a self payment or stranger" and no honest answer
+  // existed anywhere on this dashboard. /x402/stats now computes this
+  // server-side (see mcp-x402/src/server/security/x402-stats.ts); this just
+  // surfaces it instead of leaving it buried in an API response nobody
+  // reads. Never invents a verdict — shows exactly what the server reports.
+  try {
+    const res2 = await fetch('https://mcp-x402.onrender.com/x402/stats', {
+      mode: 'cors', credentials: 'omit', cache: 'no-store',
+      signal: AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined
+    });
+    const noteEl = document.getElementById('payer-integrity-note');
+    if (res2.ok && noteEl) {
+      const s = await res2.json();
+      const note = s.distinctRecentPayersNote;
+      if (note) {
+        noteEl.textContent = '💳 ' + note;
+        noteEl.style.color = (s.distinctRecentPayers === 1) ? 'var(--amber, #d9a441)' : 'var(--text3)';
+      }
     }
   } catch (_) { /* non-critical */ }
 }
