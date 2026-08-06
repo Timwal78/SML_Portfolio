@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- agentswarm-seo catalog v2026-08-06-amb-imp multi-host-stable -->
+<!-- agentswarm-seo catalog v2026-08-06-audit2 multi-host-stable -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AgentSwarm SEO — Script Master Labs Command Center</title>
-<meta name="description" content="Live command center for Script Master Labs' AI marketing swarm — Directory Ranger, Community Scout, Federal Scout — plus the x402 stack: 139+ paid routes across mcp-x402, ACP snacks, and RWA at $0.001 USDC on Base. No API key. Sovereign X-PAYMENT-TX.">
+<meta name="description" content="Live command center for Script Master Labs AI swarm — AMB beacons, IMP ranking, x402 paid routes on mcp + acp at $0.001 USDC (Base). Premium Index Match API $49/$199. Protocol free. Hosted paid. No API key for snacks.">
 <link rel="canonical" href="https://www.scriptmasterlabs.com/agentswarm-seo.html">
 <meta property="og:title" content="AgentSwarm SEO — Script Master Labs Command Center">
 <meta property="og:description" content="Live dashboard for the AI marketing swarm + x402 multi-host stack — 139+ routes @ $0.001 USDC on Base. Federal, snacks, RWA. No API key.">
@@ -865,7 +865,7 @@ html, body {
 
   <div class="url-bar">
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-    <span>mcp-x402 · acp-x402 · sml-rwa · $0.001 Base USDC</span>
+    <span>mcp-x402 · acp-x402 · AMB/IMP · $0.001 Base USDC</span>
   </div>
 
   <div class="topbar-right">
@@ -929,11 +929,19 @@ html, body {
       </div>
       <div class="metric-row">
         <span class="metric-label">Paid routes</span>
-        <span class="metric-value live" data-live-count>139+</span>
+        <span class="metric-value live" data-live-count>—</span>
       </div>
       <div class="metric-row">
         <span class="metric-label">Hosts live</span>
-        <span class="metric-value live" id="metric-hosts">3</span>
+        <span class="metric-value live" id="metric-hosts">—</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">AMB beacons</span>
+        <span class="metric-value live" id="metric-amb-beacons">—</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Top imp_score</span>
+        <span class="metric-value live" id="metric-top-imp">—</span>
       </div>
       <div class="metric-row">
         <span class="metric-label">Price floor</span>
@@ -969,6 +977,7 @@ html, body {
           <div class="sis-mini-row"><span>Coverage</span><div class="sis-mini-track"><div id="sm-coverage" style="width:0%;background:var(--violet2)"></div></div></div>
           <div class="sis-mini-row"><span>Reach</span><div class="sis-mini-track"><div id="sm-reach" style="width:0%;background:var(--amber)"></div></div></div>
           <div class="sis-mini-row"><span>Uptime</span><div class="sis-mini-track"><div id="sm-uptime" style="width:0%;background:var(--green)"></div></div></div>
+          <div class="sis-mini-row"><span>AMB/IMP</span><div class="sis-mini-track"><div id="sm-amb" style="width:0%;background:var(--cyan)"></div></div></div>
         </div>
       </div>
     </div>
@@ -983,7 +992,7 @@ html, body {
       <div class="panel-header">
         <div>
           <h1 class="panel-title">Swarm Center</h1>
-          <div class="panel-sub">x402 multi-host stack · Federal + Otto-style snacks + RWA · $0.001 USDC on Base · No API key · Sovereign X-PAYMENT-TX · 139+ live routes</div>
+          <div class="panel-sub">x402 multi-host · AMB + IMP ranking · mcp + acp live · $0.001 USDC Base · Premium Match $49/$199 · No API key for snacks</div>
         </div>
         <div class="beastmode-badge"><span class="bm-dot"></span> BEASTMODE ACTIVE</div>
       </div>
@@ -992,7 +1001,7 @@ html, body {
       <div class="section-pad" style="padding-bottom:0">
         <div class="live-stats card" style="border-radius:8px;grid-template-columns:repeat(6,1fr)">
           <div class="stat-block">
-            <span class="stat-val" data-live-count>139+</span>
+            <span class="stat-val" data-live-count>—</span>
             <span class="stat-label">PAID ROUTES</span>
           </div>
           <div class="stat-block">
@@ -1000,7 +1009,7 @@ html, body {
             <span class="stat-label">PRICE FLOOR</span>
           </div>
           <div class="stat-block">
-            <span class="stat-val" id="stat-hosts">3</span>
+            <span class="stat-val" id="stat-hosts">—</span>
             <span class="stat-label">HOSTS LIVE</span>
           </div>
           <div class="stat-block">
@@ -1037,7 +1046,19 @@ html, body {
             </div>
             <div class="config-row">
               <span class="config-key">RWA suite</span>
-              <span class="config-val">sml-rwa-api.onrender.com</span>
+              <span class="config-val" style="color:var(--text3)">offline (not deployed)</span>
+            </div>
+            <div class="config-row">
+              <span class="config-key">Desk / SqueezeOS</span>
+              <span class="config-val">squeezeos-api.onrender.com</span>
+            </div>
+            <div class="config-row">
+              <span class="config-key">AMB (www)</span>
+              <span class="config-val">/.well-known/amb.json</span>
+            </div>
+            <div class="config-row">
+              <span class="config-key">payTo</span>
+              <span class="config-val" style="font-family:var(--mono);font-size:11px">0x7233…F4aA</span>
             </div>
             <div class="config-row">
               <span class="config-key">Brand</span>
@@ -1083,7 +1104,15 @@ html, body {
             </div>
             <div class="config-row">
               <span class="config-key">AI Indexer</span>
-              <span class="config-val green">ENABLED</span>
+              <span class="config-val green">ENABLED · AMB+IMP</span>
+            </div>
+            <div class="config-row">
+              <span class="config-key">IMP version</span>
+              <span class="config-val green">0.1.0</span>
+            </div>
+            <div class="config-row">
+              <span class="config-key">Ranking</span>
+              <span class="config-val">imp_score (multi-rail)</span>
             </div>
           </div>
         </div>
@@ -1095,16 +1124,16 @@ html, body {
         <div class="card">
           <div class="card-body" style="padding:16px">
             <div style="color:var(--text3,#94a3b8);font-size:13px;margin-bottom:14px">
-              Every paid route is <strong style="color:var(--green)">$0.001 USDC</strong> on Base via x402 — no signup, no API key. Agents: hit route → 402 → pay → retry with <code style="color:var(--cyan)">X-PAYMENT-TX</code>. Prefer flat-rate human access instead?
+              Snack routes are <strong style="color:var(--green)">$0.001 USDC</strong> on Base via x402 — no API key. Agents: hit route → 402 → pay → retry with <code style="color:var(--cyan)">X-PAYMENT-TX</code>. Need ranked discovery? <strong style="color:var(--violet2)">Hosted Premium Index</strong> (AMB+IMP Match API):
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
-              <button class="checkout-btn starter" onclick="startCheckout('starter', this)">
-                <span class="checkout-tier">STARTER</span>
-                <span class="checkout-price">$29/mo</span>
+              <button class="checkout-btn starter" onclick="startCheckout('premium_starter', this)">
+                <span class="checkout-tier">PREMIUM STARTER</span>
+                <span class="checkout-price">$49/mo</span>
               </button>
-              <button class="checkout-btn elite" onclick="startCheckout('elite', this)">
-                <span class="checkout-tier">ELITE</span>
-                <span class="checkout-price">$97/mo</span>
+              <button class="checkout-btn elite" onclick="startCheckout('premium_pro', this)">
+                <span class="checkout-tier">PREMIUM PRO</span>
+                <span class="checkout-price">$199/mo</span>
               </button>
             </div>
             <div id="checkout-status" style="font-size:11px;min-height:14px;margin-bottom:14px"></div>
@@ -1160,7 +1189,7 @@ html, body {
 
       <!-- Endpoint table -->
       <div class="section-pad">
-        <div class="section-title">ALL PAID ROUTES — MULTI-HOST · $0.001 FLOOR <span id="ep-count-label" style="color:var(--cyan);margin-left:8px">139+</span></div>
+        <div class="section-title">ALL PAID ROUTES — MCP + ACP LIVE · $0.001 FLOOR <span id="ep-count-label" style="color:var(--cyan);margin-left:8px">—</span></div>
         <div class="card">
           <div class="ep-controls">
             <input class="ep-search" type="text" id="ep-search" placeholder="Search endpoints…" oninput="filterEndpoints()">
@@ -1510,7 +1539,7 @@ ENDPOINTS.forEach(ep => {
 const X402_HOSTS = [
   { id: 'mcp', label: 'mcp-x402', base: 'https://mcp-x402.onrender.com', manifest: 'https://mcp-x402.onrender.com/.well-known/x402', defaultCat: 'Federal' },
   { id: 'acp', label: 'acp-x402', base: 'https://acp-x402-scriptmasterlabs.onrender.com', manifest: 'https://acp-x402-scriptmasterlabs.onrender.com/.well-known/x402', defaultCat: 'Snacks' },
-  { id: 'rwa', label: 'sml-rwa', base: 'https://sml-rwa-api.onrender.com', manifest: 'https://sml-rwa-api.onrender.com/openapi.json', defaultCat: 'RWA' },
+  // sml-rwa-api intentionally omitted — host not deployed (404). Re-add when live.
 ];
 
 const SNACK_HINTS = /news|funding|gas|trending|defi|stablecoin|web-fetch|token|crypto-price|fx-rate|fear-greed|altcoin/i;
@@ -1538,7 +1567,7 @@ function amountToCost(amt) {
 }
 
 /* Catalog size = multi-host paid target (~139). Updated when live load succeeds. */
-let ENDPOINTS_CATALOG_SIZE = 139;
+let ENDPOINTS_CATALOG_SIZE = 0; // set from live multi-host x402 load
 let liveEndpointCount = null;
 let hostsOnline = 0;
 
@@ -1629,11 +1658,13 @@ function applyEndpointCatalog(list, hostsCount) {
 
   ENDPOINTS.length = 0;
   deduped.forEach(ep => ENDPOINTS.push(ep));
-  ENDPOINTS_CATALOG_SIZE = Math.max(deduped.length, 139);
+  ENDPOINTS_CATALOG_SIZE = Math.max(deduped.length, 1);
   liveEndpointCount = deduped.length;
   if (hostsCount != null) {
     hostsOnline = hostsCount;
     const hostEl = document.getElementById('stat-hosts');
+    const mHost = document.getElementById('metric-hosts');
+    if (mHost) mHost.textContent = String(hostsCount);
     if (hostEl) hostEl.textContent = String(hostsCount);
     const mHost = document.getElementById('metric-hosts');
     if (mHost) mHost.textContent = String(hostsCount);
@@ -2222,9 +2253,21 @@ async function loadAmbImpIndex() {
     }
   }
 
-  // sidebar optional hooks if present later
-  const sideBeacons = document.getElementById('side-amb-beacons');
-  if (sideBeacons) sideBeacons.textContent = String(all.length);
+  ambIndexState = {
+    hostsOk: hostsOk,
+    beaconCount: all.length,
+    topImp: top ? _ambImpOf(top) : 0,
+    loaded: true
+  };
+  const sideBeacons = document.getElementById('metric-amb-beacons');
+  if (sideBeacons) {
+    sideBeacons.textContent = String(all.length);
+    sideBeacons.style.color = all.length ? 'var(--green)' : '';
+  }
+  const sideImp = document.getElementById('metric-top-imp');
+  if (sideImp) sideImp.textContent = top ? _ambImpOf(top).toFixed(3) : '—';
+  // Recompute SIS with AMB component
+  if (typeof updateSIS === 'function') updateSIS(isOnline === true);
 }
 
 /* Verifies each /.well-known file actually responds on this domain.
@@ -2298,10 +2341,9 @@ async function loadActivity() {
   }
 }
 
-/* ── CHECKOUT — real Stripe session via mcp-x402's live /api/checkout/create-session.
-   Prices shown ($29/$97) match what Stripe actually charges; keep both in sync if
-   either changes. No fabricated success — a failed call shows a real error, not a
-   fake redirect. ── */
+/* ── CHECKOUT — Stripe via mcp-x402 /api/checkout/create-session.
+   Premium Index: premium_starter $49 / premium_pro $199 (Match API).
+   No fabricated success — failed call shows real error. ── */
 async function startCheckout(tier, btn) {
   const status = document.getElementById('checkout-status');
   const buttons = document.querySelectorAll('.checkout-btn');
@@ -2312,7 +2354,7 @@ async function startCheckout(tier, btn) {
     const res = await fetch('https://mcp-x402.onrender.com/api/checkout/create-session', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tier }),
+      body: JSON.stringify({ tier, product: 'premium-index' }),
       signal: AbortSignal.timeout ? AbortSignal.timeout(15000) : undefined,
     });
     if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -2333,6 +2375,9 @@ function switchTab(id, btn) {
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-' + id).classList.add('active');
   btn.classList.add('active');
+  if (id === 'indexer' && typeof loadAmbImpIndex === 'function') {
+    try { loadAmbImpIndex(); } catch (_) {}
+  }
 }
 
 /* ── RADAR CANVAS ── */
@@ -2519,9 +2564,8 @@ async function checkStatus() {
   const start = Date.now();
   const probes = [
     'https://mcp-x402.onrender.com/health',
-    'https://mcp-x402.onrender.com/',
-    'https://acp-x402-scriptmasterlabs.onrender.com/',
-    'https://sml-rwa-api.onrender.com/health',
+    'https://acp-x402-scriptmasterlabs.onrender.com/api/status',
+    'https://www.scriptmasterlabs.com/.well-known/amb.json',
   ];
   let ok = 0;
   let ms = null;
@@ -2541,7 +2585,9 @@ async function checkStatus() {
     lastPingAge = 0;
     const hostEl = document.getElementById('stat-hosts');
     // keep host count from endpoint loader if better; else show probe hits (dedupe-ish)
-    if (hostEl && (!hostsOnline || hostsOnline < 1)) hostEl.textContent = String(Math.min(ok, 3));
+    if (hostEl && (!hostsOnline || hostsOnline < 1)) hostEl.textContent = String(Math.min(ok, 2));
+    const mHost = document.getElementById('metric-hosts');
+    if (mHost && (!hostsOnline || hostsOnline < 1)) mHost.textContent = String(Math.min(ok, 2));
   } else {
     setSwarmStatus(false, null, null);
   }
@@ -2561,30 +2607,36 @@ function startHeartbeatCounter() {
 /* Every component below is either 0 or computed from a real fetched value.
    Nothing here is a hardcoded fraction — if the real data hasn't loaded yet,
    the component stays at 0 rather than showing a guessed number. */
-const SIS_MAX = { coverage: 34, reach: 33, uptime: 33 };
-let sisState  = { coverage: 0, reach: 0, uptime: 0 };
+const SIS_MAX = { coverage: 28, reach: 24, uptime: 24, amb: 24 };
+let sisState  = { coverage: 0, reach: 0, uptime: 0, amb: 0 };
+let ambIndexState = { hostsOk: 0, beaconCount: 0, topImp: 0, loaded: false };
 let sisAnimCurrent = 0;
 
 function computeSIS(networkUp) {
-  // Real live endpoint count (from loadLiveEndpoints' fetch of openapi.json)
-  // vs. the actual size of our endpoint catalog. 0 until the fetch succeeds.
+  // Live multi-host x402 route coverage vs catalog size (0 until fetch succeeds).
   const coverage = (liveEndpointCount != null && ENDPOINTS_CATALOG_SIZE > 0)
-    ? Math.round((liveEndpointCount / ENDPOINTS_CATALOG_SIZE) * SIS_MAX.coverage)
+    ? Math.min(SIS_MAX.coverage, Math.round((liveEndpointCount / ENDPOINTS_CATALOG_SIZE) * SIS_MAX.coverage))
     : 0;
 
-  // Real directory audit result (from renderDirectories' fetch) vs. the
-  // total directories we track. 0 until a real audit has actually run.
+  // Directory audit reach (0 until real audit).
   const reach = (dirAudit.audited && dirAudit.listedCount != null && dirAudit.total > 0)
     ? Math.round((dirAudit.listedCount / dirAudit.total) * SIS_MAX.reach)
     : 0;
 
-  // Reflects the real-time health check result — full points while the API is
-  // actually responding, zero while it isn't. Not a session-local counter, so
-  // it can't drift between tabs or reset on reload.
+  // API/swarm health.
   const uptime = networkUp ? SIS_MAX.uptime : 0;
 
-  sisState = { coverage, reach, uptime };
-  return coverage + reach + uptime;
+  // AMB+IMP discoverability (hosts with live amb.json + beacon depth).
+  let amb = 0;
+  if (ambIndexState.loaded) {
+    const hostFrac = Math.min(1, (ambIndexState.hostsOk || 0) / Math.max(1, (typeof AMB_SOURCES !== 'undefined' ? AMB_SOURCES.length : 3)));
+    const depthFrac = Math.min(1, (ambIndexState.beaconCount || 0) / 100); // 100+ beacons = full depth
+    const impFrac = Math.min(1, (ambIndexState.topImp || 0)); // already 0-1
+    amb = Math.round(SIS_MAX.amb * (0.45 * hostFrac + 0.35 * depthFrac + 0.20 * impFrac));
+  }
+
+  sisState = { coverage, reach, uptime, amb };
+  return Math.min(100, coverage + reach + uptime + amb);
 }
 
 function getSISGrade(score) {
@@ -2596,7 +2648,7 @@ function getSISGrade(score) {
 }
 
 function getSISDesc(score) {
-  if (score >= 90) return 'Maximum swarm penetration. All vectors sovereign.';
+  if (score >= 90) return 'Maximum swarm penetration. AMB+IMP + routes sovereign.';
   if (score >= 75) return 'Elite swarm coverage. Intelligence vectors flowing.';
   if (score >= 60) return 'Active swarm deployment. Core vectors online.';
   if (score >= 40) return 'Swarm building coverage. Agents acquiring targets.';
@@ -2701,6 +2753,7 @@ function updateSIS(networkUp) {
   setDimBar('coverage', sisState.coverage, SIS_MAX.coverage);
   setDimBar('reach',    sisState.reach,    SIS_MAX.reach);
   setDimBar('uptime',   sisState.uptime,   SIS_MAX.uptime);
+  setDimBar('amb',      sisState.amb || 0, SIS_MAX.amb || 24);
 
   // Sidebar SIS
   setEl('sis-num', score);
@@ -2715,6 +2768,7 @@ function updateSIS(networkUp) {
   setMini('sm-coverage', sisState.coverage, SIS_MAX.coverage);
   setMini('sm-reach',    sisState.reach,    SIS_MAX.reach);
   setMini('sm-uptime',   sisState.uptime,   SIS_MAX.uptime);
+  setMini('sm-amb',      sisState.amb || 0, SIS_MAX.amb || 24);
 }
 
 /* ── BOOT ── */
