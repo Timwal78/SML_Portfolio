@@ -538,3 +538,5 @@ Agent-facing directory + listing surface for machine commerce.
 - Dev.to: https://dev.to/scriptmaster78/your-api-is-invisible-to-ai-agents-fix-it-with-a-hosted-capability-index-49-2mmm
 - Starter: $49/mo · Protocol free (IMP)
 
+## Partners & reciprocals (fresh 2026-08-06)
+- https://www.scriptmasterlabs.com/partners.html
