@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>x402-BEACON Engine — Intent Discovery + Bid Negotiate + Attest | Script Master Labs</title>
+<meta name="description" content="BEACON bridges isolated x402 endpoints into a self-routing agent economy: universal manifest, intent indexer, machine bid negotiation, peer attestation trust. payTo 0x7233.">
+<meta property="og:title" content="x402-BEACON Engine — Script Master Labs">
+<meta property="og:description" content="Discovery + telephone directory + credit rating for agent payments. Live on acp-x402.">
+<meta property="og:image" content="https://www.scriptmasterlabs.com/og-sml-brand-v2.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://www.scriptmasterlabs.com/x402-beacon.html">
+<style>
+:root{--bg:#050508;--g:#39FF14;--mute:#8a8a9e;--w:#f2f2f7;--line:#1e1e2a;--mono:ui-monospace,Menlo,Consolas,monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}body{background:var(--bg);color:var(--w);font-family:var(--sans);line-height:1.55}
+.wrap{max-width:880px;margin:0 auto;padding:28px 18px}a{color:#6b9eff}
+h1{font-size:clamp(26px,5vw,40px);letter-spacing:-1px;margin:12px 0 10px}h1 em{color:var(--g);font-style:normal}
+.sub{color:var(--mute);font-size:16px;max-width:62ch}.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-family:var(--mono);font-size:11px;color:var(--g);margin:4px 4px 0 0}
+section{margin:28px 0;padding:18px;border:1px solid var(--line);border-radius:12px;background:#0c0c12}
+h2{font-size:18px;margin-bottom:10px}code,pre{font-family:var(--mono);font-size:12.5px}pre{background:#0a0a10;border:1px solid var(--line);border-radius:8px;padding:12px;overflow:auto;color:#cfe7cf}
+ul{margin:8px 0 0 18px}li{margin:6px 0;color:var(--mute)}li strong{color:var(--w)}
+.cta{display:inline-block;margin-top:10px;padding:10px 14px;border:1px solid var(--g);color:var(--g);border-radius:8px;font-family:var(--mono);font-size:12px;text-decoration:none}
+.cta:hover{background:var(--g);color:#000}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="pill">BEACON v1.0</div>
+  <div class="pill">payTo 0x7233…f4aa</div>
+  <div class="pill">no new Render burn</div>
+  <h1>x402-<em>BEACON</em> Engine</h1>
+  <p class="sub">Connective tissue between isolated x402 endpoints and a self-routing agent economy — discovery, negotiation, and trust on top of live payment rails.</p>
+
+  <section>
+    <h2>Four pillars (live)</h2>
+    <ul>
+      <li><strong>1. Universal Manifest</strong> — <code>GET /.well-known/x402.json</code></li>
+      <li><strong>2. Intent Indexer</strong> — <code>POST /beacon/query</code> (vector/tag match, sub‑ms–tens‑ms in-process)</li>
+      <li><strong>3. Bid Negotiation</strong> — <code>X-x402-Bid</code> / <code>X-x402-Negotiate</code> on HTTP 402 + <code>/beacon/negotiate</code></li>
+      <li><strong>4. Attestation Trust</strong> — <code>POST /beacon/attest</code> · reputation slash on bad SLA</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Handshake lifecycle</h2>
+    <pre>1. Agent queries /beacon/query with intent + max price
+2. BEACON returns top verified endpoints + reputation
+3. Agent calls route with X-x402-Bid (optional)
+4. Endpoint returns HTTP 402 (+ negotiate headers)
+5. Agent settles micro-payment (Base USDC / RH USDG / Sol / XRPL)
+6. Agent POSTs signed quality receipt to /beacon/attest</pre>
+    <a class="cta" href="https://acp-x402-scriptmasterlabs.onrender.com/.well-known/x402.json">Open live manifest</a>
+    <a class="cta" href="https://acp-x402-scriptmasterlabs.onrender.com/beacon/status">Status</a>
+    <a class="cta" href="https://www.scriptmasterlabs.com/pricing.html">$49 Index</a>
+  </section>
+
+  <section>
+    <h2>Money wedges</h2>
+    <ul>
+      <li><a href="https://acp-x402-scriptmasterlabs.onrender.com/x402/gas-tracker">/x402/gas-tracker</a></li>
+      <li><a href="https://acp-x402-scriptmasterlabs.onrender.com/x402/crypto-price">/x402/crypto-price</a></li>
+      <li><a href="https://acp-x402-scriptmasterlabs.onrender.com/x402/rwa-aggregates">/x402/rwa-aggregates</a></li>
+    </ul>
+  </section>
+
+  <p style="color:var(--mute);font-size:13px;margin-top:24px">Script Master Labs, LLC · SDVOSB · Kinston, NC · Built on AMB + IMP + x402 — BEACON is the ecology layer.</p>
+</div>
+</body>
+</html>

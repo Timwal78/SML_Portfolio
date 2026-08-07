@@ -40,3 +40,10 @@ Contact: hello@scriptmasterlabs.com
 - Wedge 2 price: https://acp-x402-scriptmasterlabs.onrender.com/x402/crypto-price
 - Wedge 3 RWA: https://acp-x402-scriptmasterlabs.onrender.com/x402/rwa-aggregates
 - x402scan: https://www.x402scan.com/recipient/0x72330994f379A71542e7bd5a4CF99A9d9743F4aA
+
+# x402-BEACON Engine
+- Manifest: https://acp-x402-scriptmasterlabs.onrender.com/.well-known/x402.json
+- Query: POST https://acp-x402-scriptmasterlabs.onrender.com/beacon/query
+- Negotiate: POST https://acp-x402-scriptmasterlabs.onrender.com/beacon/negotiate
+- Attest: POST https://acp-x402-scriptmasterlabs.onrender.com/beacon/attest
+- Docs: https://www.scriptmasterlabs.com/x402-beacon.html

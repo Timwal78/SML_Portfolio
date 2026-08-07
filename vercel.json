@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/.well-known/x402.json",
+      "destination": "https://acp-x402-scriptmasterlabs.onrender.com/.well-known/x402.json"
+    },
+    {
       "source": "/pricing",
       "destination": "/pricing.html"
     },

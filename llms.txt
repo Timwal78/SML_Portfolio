@@ -553,3 +553,10 @@ Agent-facing directory + listing surface for machine commerce.
 - Well-known: https://www.scriptmasterlabs.com/.well-known/imp.json
 - Pricing: https://www.scriptmasterlabs.com/pricing.html · product premium-index · tiers premium_starter / premium_pro
 - Sales guide (ad-ready): https://www.scriptmasterlabs.com/imp-suite-guide.html
+
+# x402-BEACON Engine
+- Manifest: https://acp-x402-scriptmasterlabs.onrender.com/.well-known/x402.json
+- Query: POST https://acp-x402-scriptmasterlabs.onrender.com/beacon/query
+- Negotiate: POST https://acp-x402-scriptmasterlabs.onrender.com/beacon/negotiate
+- Attest: POST https://acp-x402-scriptmasterlabs.onrender.com/beacon/attest
+- Docs: https://www.scriptmasterlabs.com/x402-beacon.html

@@ -1,0 +1,1918 @@
+{
+  "beacon_version": "1.0.0",
+  "type": "X402BeaconManifest",
+  "entity": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
+  "entity_did": "did:agentcard:scriptmasterlabs:0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
+  "agent": {
+    "name": "scriptmasterlabs",
+    "id": "019f5f40-c194-7776-b5e1-7a666ce631c0",
+    "wallet": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
+    "role": "HYBRID",
+    "marketplace": "Virtuals ACP"
+  },
+  "issued_at": 1786098197572,
+  "public_key": "ed25519_pk_b2002e351c5e0f7ab7d8e9ae5579cb5fe2ad53b6",
+  "capabilities": [
+    "gas_tracker",
+    "crypto_price",
+    "rwa_aggregates",
+    "base_rpc",
+    "web_search",
+    "ai_fact_check",
+    "airdrop_check",
+    "base64_encode",
+    "binance_funding",
+    "binance_ticker",
+    "btc_mempool_fees",
+    "btc_price",
+    "calculator",
+    "clinical_trials_search",
+    "coingecko_categories",
+    "compliance_anomaly_report",
+    "compliance_bank_audit",
+    "compliance_regulator_query",
+    "congressional_bills_search",
+    "crypto_global",
+    "crypto_news",
+    "csv_to_json",
+    "defi_analytics",
+    "defi_chains_tvl",
+    "defi_protocol_tvl",
+    "defi_tvl_ranking",
+    "defi_yield",
+    "defi_yield_rates",
+    "defi_yields_pools",
+    "dexscreener_boosts",
+    "dexscreener_search",
+    "domain_enrich",
+    "druckenmiller_macro_regime_analysis",
+    "email_validate",
+    "entity_compliance_check",
+    "epa_environmental_violations",
+    "eth_price",
+    "eth_rpc",
+    "excluded_parties_check",
+    "fda_adverse_events_report"
+  ],
+  "capability_catalog": [
+    {
+      "id": "gas_tracker",
+      "name": "gas_tracker",
+      "route": "https://acp-x402-scriptmasterlabs.onrender.com/x402/gas-tracker",
+      "method": "GET",
+      "capabilities": [
+        "gas",
+        "tracker"
+      ],
+      "pricing": {
+        "base_rate": "0.001",
+        "asset": "USDC",
+        "network": "eip155:8453",
+        "floor": "0.001",
+        "ceiling": "0.005",
+        "dynamic_bidding": true,
+        "batch_discount": true
+      },
+      "sla_min_latency_ms": 50,
+      "reputation": {
+        "tool": "gas_tracker",
+        "score": 0.92,
+        "attestations": 0,
+        "avg_latency_ms": 420.0,
+        "ok_rate": 0.99,
+        "source": "beacon_peer_attest_v1"
+      },
+      "schema": {
+        "input": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "result"
+          ]
+        }
+      },
+      "vector": {
+        "gas": 0.7071067811865475,
+        "tracker": 0.7071067811865475
+      }
+    },
+    {
+      "id": "crypto_price",
+      "name": "crypto_price",
+      "route": "https://acp-x402-scriptmasterlabs.onrender.com/x402/crypto-price",
+      "method": "GET",
+      "capabilities": [
+        "price",
+        "crypto"
+      ],
+      "pricing": {
+        "base_rate": "0.001",
+        "asset": "USDC",
+        "network": "eip155:8453",
+        "floor": "0.001",
+        "ceiling": "0.005",
+        "dynamic_bidding": true,
+        "batch_discount": true
+      },
+      "sla_min_latency_ms": 200,
+      "reputation": {
+        "tool": "crypto_price",
+        "score": 0.994,
+        "attestations": 1,
+        "avg_latency_ms": 120.0,
+        "ok_rate": 1.0,
+        "source": "beacon_peer_attest_v1"
+      },
+      "schema": {
+        "input": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "result"
+          ]
+        }
+      },
+      "vector": {
+        "price": 0.7071067811865475,
+        "crypto": 0.7071067811865475
+      }
+    },
+    {
+      "id": "rwa_aggregates",
+      "name": "rwa_aggregates",
+      "route": "https://acp-x402-scriptmasterlabs.onrender.com/x402/rwa-aggregates",
+      "method": "GET",
+      "capabilities": [
+        "rwa",
+        "aggregates"
+      ],
+      "pricing": {
+        "base_rate": "0.001",
+        "asset": "USDC",
+        "network": "eip155:8453",
+        "floor": "0.001",
+        "ceiling": "0.005",
+        "dynamic_bidding": true,
+        "batch_discount": true
+      },
+      "sla_min_latency_ms": 200,
+      "reputation": {
+        "tool": "rwa_aggregates",
+        "score": 0.92,
+        "attestations": 0,
+        "avg_latency_ms": 420.0,
+        "ok_rate": 0.99,
+        "source": "beacon_peer_attest_v1"
+      },
+      "schema": {
+        "input": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "result"
+          ]
+        }
+      },
+      "vector": {
+        "rwa": 0.7071067811865475,
+        "aggregates": 0.7071067811865475
+      }
+    },
+    {
+      "id": "base_rpc",
+      "name": "base_rpc",
+      "route": "https://acp-x402-scriptmasterlabs.onrender.com/x402/base-rpc",
+      "method": "GET",
+      "capabilities": [
+        "rpc",
+        "base"
+      ],
+      "pricing": {
+        "base_rate": "0.001",
+        "asset": "USDC",
+        "network": "eip155:8453",
+        "floor": "0.001",
+        "ceiling": "0.005",
+        "dynamic_bidding": true,
+        "batch_discount": true
+      },
+      "sla_min_latency_ms": 50,
+      "reputation": {
+        "tool": "base_rpc",
+        "score": 0.92,
+        "attestations": 0,
+        "avg_latency_ms": 420.0,
+        "ok_rate": 0.99,
+        "source": "beacon_peer_attest_v1"
+      },
+      "schema": {
+        "input": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "result"
+          ]
+        }
+      },
+      "vector": {
+        "rpc": 0.7071067811865475,
+        "base": 0.7071067811865475
+      }
+    },
+    {
+      "id": "web_search",
+      "name": "web_search",
+      "route": "https://acp-x402-scriptmasterlabs.onrender.com/x402/web-search",
+      "method": "GET",
+      "capabilities": [
+        "search",
+        "web"
+      ],
+      "pricing": {
+        "base_rate": "0.001",
+        "asset": "USDC",
+        "network": "eip155:8453",
+        "floor": "0.001",
+        "ceiling": "0.005",
+        "dynamic_bidding": true,
+        "batch_discount": true
+      },
+      "sla_min_latency_ms": 200,
+      "reputation": {
+        "tool": "web_search",
+        "score": 0.92,
+        "attestations": 0,
+        "avg_latency_ms": 420.0,
+        "ok_rate": 0.99,
+        "source": "beacon_peer_attest_v1"
+      },
+      "schema": {
+        "input": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "result"
+          ]
+        }
+      },
+      "vector": {
+        "search": 0.7071067811865475,
+        "web": 0.7071067811865475
+      }
+    },
+    {
+      "id": "ai_fact_check",
+      "name": "ai_fact_check",
+      "route": "https://acp-x402-scriptmasterlabs.onrender.com/x402/ai-fact-check",
+      "method": "GET",
+      "capabilities": [
+        "fact",
+        "check"
+      ],
+      "pricing": {
+        "base_rate": "0.001",
+        "asset": "USDC",
+        "network": "eip155:8453",
+        "floor": "0.001",
+        "ceiling": "0.005",
+        "dynamic_bidding": true,
+        "batch_discount": true
+      },
+      "sla_min_latency_ms": 200,
+      "reputation": {
+        "tool": "ai_fact_check",
+        "score": 0.92,
+        "attestations": 0,
+        "avg_latency_ms": 420.0,
+        "ok_rate": 0.99,
+        "source": "beacon_peer_attest_v1"
+      },
+      "schema": {
+        "input": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "result"
+          ]
+        }
+      },
+      "vector": {
+        "fact": 0.7071067811865475,
+        "check": 0.7071067811865475
+      }
+    },
+    {
+      "id": "airdrop_check",
+      "name": "airdrop_check",
+      "route": "https://acp-x402-scriptmasterlabs.onrender.com/x402/airdrop-check",
+      "method": "GET",
+      "capabilities": [
+        "airdrop",
+        "check"
+      ],
+      "pricing": {
+        "base_rate": "0.001",
+        "asset": "USDC",
+        "network": "eip155:8453",
+        "floor": "0.001",
+        "ceiling": "0.005",
+        "dynamic_bidding": true,
+        "batch_discount": true
+      },
+      "sla_min_latency_ms": 200,
+      "reputation": {
+        "tool": "airdrop_check",
+        "score": 0.92,
+        "attestations": 0,
+        "avg_latency_ms": 420.0,
+        "ok_rate": 0.99,
+        "source": "beacon_peer_attest_v1"
+      },
+      "schema": {
+        "input": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "result"
+          ]
+        }
+      },
+      "vector": {
+        "airdrop": 0.7071067811865475,
+        "check": 0.7071067811865475
+      }
+    },
+    {
+      "id": "base64_encode",
+      "name": "base64_encode",
+      "route": "https://acp-x402-scriptmasterlabs.onrender.com/x402/base64-encode",
+      "method": "GET",
+      "capabilities": [
+        "base64",
+        "encode"
+      ],
+      "pricing": {
+        "base_rate": "0.001",
+        "asset": "USDC",
+        "network": "eip155:8453",
+        "floor": "0.001",
+        "ceiling": "0.005",
+        "dynamic_bidding": true,
+        "batch_discount": true
+      },
+      "sla_min_latency_ms": 200,
+      "reputation": {
+        "tool": "base64_encode",
+        "score": 0.92,
+        "attestations": 0,
+        "avg_latency_ms": 420.0,
+        "ok_rate": 0.99,
+        "source": "beacon_peer_attest_v1"
+      },
+      "schema": {
+        "input": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "result"
+          ]
+        }
+      },
+      "vector": {
+        "base64": 0.7071067811865475,
+        "encode": 0.7071067811865475
+      }
+    },
+    {
+      "id": "binance_funding",
+      "name": "binance_funding",
+      "route": "https://acp-x402-scriptmasterlabs.onrender.com/x402/binance-funding",
+      "method": "GET",
+      "capabilities": [
+        "funding",
+        "binance"
+      ],
+      "pricing": {
+        "base_rate": "0.001",
+        "asset": "USDC",
+        "network": "eip155:8453",
+        "floor": "0.001",
+        "ceiling": "0.005",
+        "dynamic_bidding": true,
+        "batch_discount": true
+      },
+      "sla_min_latency_ms": 200,
+      "reputation": {
+        "tool": "binance_funding",
+        "score": 0.92,
+        "attestations": 0,
+        "avg_latency_ms": 420.0,
+        "ok_rate": 0.99,
+        "source": "beacon_peer_attest_v1"
+      },
+      "schema": {
+        "input": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "result"
+          ]
+        }
+      },
+      "vector": {
+        "funding": 0.7071067811865475,
+        "binance": 0.7071067811865475
+      }
+    },
+    {
+      "id": "binance_ticker",
+      "name": "binance_ticker",
+      "route": "https://acp-x402-scriptmasterlabs.onrender.com/x402/binance-ticker",
+      "method": "GET",
+      "capabilities": [
+        "binance",
+        "ticker"
+      ],
+      "pricing": {
+        "base_rate": "0.001",
+        "asset": "USDC",
+        "network": "eip155:8453",
+        "floor": "0.001",
+        "ceiling": "0.005",
+        "dynamic_bidding": true,
+        "batch_discount": true
+      },
+      "sla_min_latency_ms": 200,
+      "reputation": {
+        "tool": "binance_ticker",
+        "score": 0.92,
+        "attestations": 0,
+        "avg_latency_ms": 420.0,
+        "ok_rate": 0.99,
+        "source": "beacon_peer_attest_v1"
+      },
+      "schema": {
+        "input": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "result"
+          ]
+        }
+      },
+      "vector": {
+        "binance": 0.7071067811865475,
+        "ticker": 0.7071067811865475
+      }
+    },
+    {
+      "id": "btc_mempool_fees",
+      "name": "btc_mempool_fees",
+      "route": "https://acp-x402-scriptmasterlabs.onrender.com/x402/btc-mempool-fees",
+      "method": "GET",
+      "capabilities": [
+        "mempool",
+        "fees"
+      ],
+      "pricing": {
+        "base_rate": "0.001",
+        "asset": "USDC",
+        "network": "eip155:8453",
+        "floor": "0.001",
+        "ceiling": "0.005",
+        "dynamic_bidding": true,
+        "batch_discount": true
+      },
+      "sla_min_latency_ms": 200,
+      "reputation": {
+        "tool": "btc_mempool_fees",
+        "score": 0.92,
+        "attestations": 0,
+        "avg_latency_ms": 420.0,
+        "ok_rate": 0.99,
+        "source": "beacon_peer_attest_v1"
+      },
+      "schema": {
+        "input": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "result"
+          ]
+        }
+      },
+      "vector": {
+        "mempool": 0.7071067811865475,
+        "fees": 0.7071067811865475
+      }
+    },
+    {
+      "id": "btc_price",
+      "name": "btc_price",
+      "route": "https://acp-x402-scriptmasterlabs.onrender.com/x402/btc-price",
+      "method": "GET",
+      "capabilities": [
+        "price"
+      ],
+      "pricing": {
+        "base_rate": "0.001",
+        "asset": "USDC",
+        "network": "eip155:8453",
+        "floor": "0.001",
+        "ceiling": "0.005",
+        "dynamic_bidding": true,
+        "batch_discount": true
+      },
+      "sla_min_latency_ms": 200,
+      "reputation": {
+        "tool": "btc_price",
+        "score": 0.92,
+        "attestations": 0,
+        "avg_latency_ms": 420.0,
+        "ok_rate": 0.99,
+        "source": "beacon_peer_attest_v1"
+      },
+      "schema": {
+        "input": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "result"
+          ]
+        }
+      },
+      "vector": {
+        "price": 1.0
+      }
+    },
+    {
+      "id": "calculator",
+      "name": "calculator",
+      "route": "https://acp-x402-scriptmasterlabs.onrender.com/x402/calculator",
+      "method": "GET",
+      "capabilities": [
+        "calculator"
+      ],
+      "pricing": {
+        "base_rate": "0.001",
+        "asset": "USDC",
+        "network": "eip155:8453",
+        "floor": "0.001",
+        "ceiling": "0.005",
+        "dynamic_bidding": true,
+        "batch_discount": true
+      },
+      "sla_min_latency_ms": 200,
+      "reputation": {
+        "tool": "calculator",
+        "score": 0.92,
+        "attestations": 0,
+        "avg_latency_ms": 420.0,
+        "ok_rate": 0.99,
+        "source": "beacon_peer_attest_v1"
+      },
+      "schema": {
+        "input": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "result"
+          ]
+        }
+      },
+      "vector": {
+        "calculator": 1.0
+      }
+    },
+    {
+      "id": "clinical_trials_search",
+      "name": "clinical_trials_search",
+      "route": "https://acp-x402-scriptmasterlabs.onrender.com/x402/clinical-trials-search",
+      "method": "GET",
+      "capabilities": [
+        "search",
+        "clinical",
+        "trials"
+      ],
+      "pricing": {
+        "base_rate": "0.001",
+        "asset": "USDC",
+        "network": "eip155:8453",
+        "floor": "0.001",
+        "ceiling": "0.005",
+        "dynamic_bidding": true,
+        "batch_discount": true
+      },
+      "sla_min_latency_ms": 200,
+      "reputation": {
+        "tool": "clinical_trials_search",
+        "score": 0.92,
+        "attestations": 0,
+        "avg_latency_ms": 420.0,
+        "ok_rate": 0.99,
+        "source": "beacon_peer_attest_v1"
+      },
+      "schema": {
+        "input": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "result"
+          ]
+        }
+      },
+      "vector": {
+        "search": 0.5773502691896258,
+        "clinical": 0.5773502691896258,
+        "trials": 0.5773502691896258
+      }
+    },
+    {
+      "id": "coingecko_categories",
+      "name": "coingecko_categories",
+      "route": "https://acp-x402-scriptmasterlabs.onrender.com/x402/coingecko-categories",
+      "method": "GET",
+      "capabilities": [
+        "coingecko",
+        "categories"
+      ],
+      "pricing": {
+        "base_rate": "0.001",
+        "asset": "USDC",
+        "network": "eip155:8453",
+        "floor": "0.001",
+        "ceiling": "0.005",
+        "dynamic_bidding": true,
+        "batch_discount": true
+      },
+      "sla_min_latency_ms": 200,
+      "reputation": {
+        "tool": "coingecko_categories",
+        "score": 0.92,
+        "attestations": 0,
+        "avg_latency_ms": 420.0,
+        "ok_rate": 0.99,
+        "source": "beacon_peer_attest_v1"
+      },
+      "schema": {
+        "input": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "result"
+          ]
+        }
+      },
+      "vector": {
+        "coingecko": 0.7071067811865475,
+        "categories": 0.7071067811865475
+      }
+    },
+    {
+      "id": "compliance_anomaly_report",
+      "name": "compliance_anomaly_report",
+      "route": "https://acp-x402-scriptmasterlabs.onrender.com/x402/compliance-anomaly-report",
+      "method": "GET",
+      "capabilities": [
+        "compliance",
+        "anomaly",
+        "report"
+      ],
+      "pricing": {
+        "base_rate": "0.001",
+        "asset": "USDC",
+        "network": "eip155:8453",
+        "floor": "0.001",
+        "ceiling": "0.005",
+        "dynamic_bidding": true,
+        "batch_discount": true
+      },
+      "sla_min_latency_ms": 200,
+      "reputation": {
+        "tool": "compliance_anomaly_report",
+        "score": 0.92,
+        "attestations": 0,
+        "avg_latency_ms": 420.0,
+        "ok_rate": 0.99,
+        "source": "beacon_peer_attest_v1"
+      },
+      "schema": {
+        "input": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "result"
+          ]
+        }
+      },
+      "vector": {
+        "compliance": 0.5773502691896258,
+        "anomaly": 0.5773502691896258,
+        "report": 0.5773502691896258
+      }
+    },
+    {
+      "id": "compliance_bank_audit",
+      "name": "compliance_bank_audit",
+      "route": "https://acp-x402-scriptmasterlabs.onrender.com/x402/compliance-bank-audit",
+      "method": "GET",
+      "capabilities": [
+        "compliance",
+        "audit",
+        "bank"
+      ],
+      "pricing": {
+        "base_rate": "0.001",
+        "asset": "USDC",
+        "network": "eip155:8453",
+        "floor": "0.001",
+        "ceiling": "0.005",
+        "dynamic_bidding": true,
+        "batch_discount": true
+      },
+      "sla_min_latency_ms": 200,
+      "reputation": {
+        "tool": "compliance_bank_audit",
+        "score": 0.92,
+        "attestations": 0,
+        "avg_latency_ms": 420.0,
+        "ok_rate": 0.99,
+        "source": "beacon_peer_attest_v1"
+      },
+      "schema": {
+        "input": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "result"
+          ]
+        }
+      },
+      "vector": {
+        "compliance": 0.5773502691896258,
+        "audit": 0.5773502691896258,
+        "bank": 0.5773502691896258
+      }
+    },
+    {
+      "id": "compliance_regulator_query",
+      "name": "compliance_regulator_query",
+      "route": "https://acp-x402-scriptmasterlabs.onrender.com/x402/compliance-regulator-query",
+      "method": "GET",
+      "capabilities": [
+        "compliance",
+        "regulator",
+        "query"
+      ],
+      "pricing": {
+        "base_rate": "0.001",
+        "asset": "USDC",
+        "network": "eip155:8453",
+        "floor": "0.001",
+        "ceiling": "0.005",
+        "dynamic_bidding": true,
+        "batch_discount": true
+      },
+      "sla_min_latency_ms": 200,
+      "reputation": {
+        "tool": "compliance_regulator_query",
+        "score": 0.92,
+        "attestations": 0,
+        "avg_latency_ms": 420.0,
+        "ok_rate": 0.99,
+        "source": "beacon_peer_attest_v1"
+      },
+      "schema": {
+        "input": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "result"
+          ]
+        }
+      },
+      "vector": {
+        "compliance": 0.5773502691896258,
+        "regulator": 0.5773502691896258,
+        "query": 0.5773502691896258
+      }
+    },
+    {
+      "id": "congressional_bills_search",
+      "name": "congressional_bills_search",
+      "route": "https://acp-x402-scriptmasterlabs.onrender.com/x402/congressional-bills-search",
+      "method": "GET",
+      "capabilities": [
+        "search",
+        "congressional",
+        "bills"
+      ],
+      "pricing": {
+        "base_rate": "0.001",
+        "asset": "USDC",
+        "network": "eip155:8453",
+        "floor": "0.001",
+        "ceiling": "0.005",
+        "dynamic_bidding": true,
+        "batch_discount": true
+      },
+      "sla_min_latency_ms": 200,
+      "reputation": {
+        "tool": "congressional_bills_search",
+        "score": 0.92,
+        "attestations": 0,
+        "avg_latency_ms": 420.0,
+        "ok_rate": 0.99,
+        "source": "beacon_peer_attest_v1"
+      },
+      "schema": {
+        "input": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "result"
+          ]
+        }
+      },
+      "vector": {
+        "search": 0.5773502691896258,
+        "congressional": 0.5773502691896258,
+        "bills": 0.5773502691896258
+      }
+    },
+    {
+      "id": "crypto_global",
+      "name": "crypto_global",
+      "route": "https://acp-x402-scriptmasterlabs.onrender.com/x402/crypto-global",
+      "method": "GET",
+      "capabilities": [
+        "crypto",
+        "global"
+      ],
+      "pricing": {
+        "base_rate": "0.001",
+        "asset": "USDC",
+        "network": "eip155:8453",
+        "floor": "0.001",
+        "ceiling": "0.005",
+        "dynamic_bidding": true,
+        "batch_discount": true
+      },
+      "sla_min_latency_ms": 200,
+      "reputation": {
+        "tool": "crypto_global",
+        "score": 0.92,
+        "attestations": 0,
+        "avg_latency_ms": 420.0,
+        "ok_rate": 0.99,
+        "source": "beacon_peer_attest_v1"
+      },
+      "schema": {
+        "input": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "result"
+          ]
+        }
+      },
+      "vector": {
+        "crypto": 0.7071067811865475,
+        "global": 0.7071067811865475
+      }
+    },
+    {
+      "id": "crypto_news",
+      "name": "crypto_news",
+      "route": "https://acp-x402-scriptmasterlabs.onrender.com/x402/crypto-news",
+      "method": "GET",
+      "capabilities": [
+        "crypto",
+        "news"
+      ],
+      "pricing": {
+        "base_rate": "0.001",
+        "asset": "USDC",
+        "network": "eip155:8453",
+        "floor": "0.001",
+        "ceiling": "0.005",
+        "dynamic_bidding": true,
+        "batch_discount": true
+      },
+      "sla_min_latency_ms": 200,
+      "reputation": {
+        "tool": "crypto_news",
+        "score": 0.92,
+        "attestations": 0,
+        "avg_latency_ms": 420.0,
+        "ok_rate": 0.99,
+        "source": "beacon_peer_attest_v1"
+      },
+      "schema": {
+        "input": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "result"
+          ]
+        }
+      },
+      "vector": {
+        "crypto": 0.7071067811865475,
+        "news": 0.7071067811865475
+      }
+    },
+    {
+      "id": "csv_to_json",
+      "name": "csv_to_json",
+      "route": "https://acp-x402-scriptmasterlabs.onrender.com/x402/csv-to-json",
+      "method": "GET",
+      "capabilities": [
+        "json"
+      ],
+      "pricing": {
+        "base_rate": "0.001",
+        "asset": "USDC",
+        "network": "eip155:8453",
+        "floor": "0.001",
+        "ceiling": "0.005",
+        "dynamic_bidding": true,
+        "batch_discount": true
+      },
+      "sla_min_latency_ms": 200,
+      "reputation": {
+        "tool": "csv_to_json",
+        "score": 0.92,
+        "attestations": 0,
+        "avg_latency_ms": 420.0,
+        "ok_rate": 0.99,
+        "source": "beacon_peer_attest_v1"
+      },
+      "schema": {
+        "input": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "result"
+          ]
+        }
+      },
+      "vector": {
+        "json": 1.0
+      }
+    },
+    {
+      "id": "defi_analytics",
+      "name": "defi_analytics",
+      "route": "https://acp-x402-scriptmasterlabs.onrender.com/x402/defi-analytics",
+      "method": "GET",
+      "capabilities": [
+        "defi",
+        "analytics"
+      ],
+      "pricing": {
+        "base_rate": "0.001",
+        "asset": "USDC",
+        "network": "eip155:8453",
+        "floor": "0.001",
+        "ceiling": "0.005",
+        "dynamic_bidding": true,
+        "batch_discount": true
+      },
+      "sla_min_latency_ms": 200,
+      "reputation": {
+        "tool": "defi_analytics",
+        "score": 0.92,
+        "attestations": 0,
+        "avg_latency_ms": 420.0,
+        "ok_rate": 0.99,
+        "source": "beacon_peer_attest_v1"
+      },
+      "schema": {
+        "input": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "result"
+          ]
+        }
+      },
+      "vector": {
+        "defi": 0.7071067811865475,
+        "analytics": 0.7071067811865475
+      }
+    },
+    {
+      "id": "defi_chains_tvl",
+      "name": "defi_chains_tvl",
+      "route": "https://acp-x402-scriptmasterlabs.onrender.com/x402/defi-chains-tvl",
+      "method": "GET",
+      "capabilities": [
+        "defi",
+        "tvl",
+        "chains"
+      ],
+      "pricing": {
+        "base_rate": "0.001",
+        "asset": "USDC",
+        "network": "eip155:8453",
+        "floor": "0.001",
+        "ceiling": "0.005",
+        "dynamic_bidding": true,
+        "batch_discount": true
+      },
+      "sla_min_latency_ms": 200,
+      "reputation": {
+        "tool": "defi_chains_tvl",
+        "score": 0.92,
+        "attestations": 0,
+        "avg_latency_ms": 420.0,
+        "ok_rate": 0.99,
+        "source": "beacon_peer_attest_v1"
+      },
+      "schema": {
+        "input": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "result"
+          ]
+        }
+      },
+      "vector": {
+        "defi": 0.5773502691896258,
+        "tvl": 0.5773502691896258,
+        "chains": 0.5773502691896258
+      }
+    },
+    {
+      "id": "defi_protocol_tvl",
+      "name": "defi_protocol_tvl",
+      "route": "https://acp-x402-scriptmasterlabs.onrender.com/x402/defi-protocol-tvl",
+      "method": "GET",
+      "capabilities": [
+        "defi",
+        "tvl",
+        "protocol"
+      ],
+      "pricing": {
+        "base_rate": "0.001",
+        "asset": "USDC",
+        "network": "eip155:8453",
+        "floor": "0.001",
+        "ceiling": "0.005",
+        "dynamic_bidding": true,
+        "batch_discount": true
+      },
+      "sla_min_latency_ms": 200,
+      "reputation": {
+        "tool": "defi_protocol_tvl",
+        "score": 0.92,
+        "attestations": 0,
+        "avg_latency_ms": 420.0,
+        "ok_rate": 0.99,
+        "source": "beacon_peer_attest_v1"
+      },
+      "schema": {
+        "input": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "result"
+          ]
+        }
+      },
+      "vector": {
+        "defi": 0.5773502691896258,
+        "tvl": 0.5773502691896258,
+        "protocol": 0.5773502691896258
+      }
+    },
+    {
+      "id": "defi_tvl_ranking",
+      "name": "defi_tvl_ranking",
+      "route": "https://acp-x402-scriptmasterlabs.onrender.com/x402/defi-tvl-ranking",
+      "method": "GET",
+      "capabilities": [
+        "defi",
+        "tvl",
+        "ranking"
+      ],
+      "pricing": {
+        "base_rate": "0.001",
+        "asset": "USDC",
+        "network": "eip155:8453",
+        "floor": "0.001",
+        "ceiling": "0.005",
+        "dynamic_bidding": true,
+        "batch_discount": true
+      },
+      "sla_min_latency_ms": 200,
+      "reputation": {
+        "tool": "defi_tvl_ranking",
+        "score": 0.92,
+        "attestations": 0,
+        "avg_latency_ms": 420.0,
+        "ok_rate": 0.99,
+        "source": "beacon_peer_attest_v1"
+      },
+      "schema": {
+        "input": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "result"
+          ]
+        }
+      },
+      "vector": {
+        "defi": 0.5773502691896258,
+        "tvl": 0.5773502691896258,
+        "ranking": 0.5773502691896258
+      }
+    },
+    {
+      "id": "defi_yield",
+      "name": "defi_yield",
+      "route": "https://acp-x402-scriptmasterlabs.onrender.com/x402/defi-yield",
+      "method": "GET",
+      "capabilities": [
+        "defi",
+        "yield"
+      ],
+      "pricing": {
+        "base_rate": "0.001",
+        "asset": "USDC",
+        "network": "eip155:8453",
+        "floor": "0.001",
+        "ceiling": "0.005",
+        "dynamic_bidding": true,
+        "batch_discount": true
+      },
+      "sla_min_latency_ms": 200,
+      "reputation": {
+        "tool": "defi_yield",
+        "score": 0.92,
+        "attestations": 0,
+        "avg_latency_ms": 420.0,
+        "ok_rate": 0.99,
+        "source": "beacon_peer_attest_v1"
+      },
+      "schema": {
+        "input": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "result"
+          ]
+        }
+      },
+      "vector": {
+        "defi": 0.7071067811865475,
+        "yield": 0.7071067811865475
+      }
+    },
+    {
+      "id": "defi_yield_rates",
+      "name": "defi_yield_rates",
+      "route": "https://acp-x402-scriptmasterlabs.onrender.com/x402/defi-yield-rates",
+      "method": "GET",
+      "capabilities": [
+        "defi",
+        "yield",
+        "rates"
+      ],
+      "pricing": {
+        "base_rate": "0.001",
+        "asset": "USDC",
+        "network": "eip155:8453",
+        "floor": "0.001",
+        "ceiling": "0.005",
+        "dynamic_bidding": true,
+        "batch_discount": true
+      },
+      "sla_min_latency_ms": 200,
+      "reputation": {
+        "tool": "defi_yield_rates",
+        "score": 0.92,
+        "attestations": 0,
+        "avg_latency_ms": 420.0,
+        "ok_rate": 0.99,
+        "source": "beacon_peer_attest_v1"
+      },
+      "schema": {
+        "input": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "result"
+          ]
+        }
+      },
+      "vector": {
+        "defi": 0.5773502691896258,
+        "yield": 0.5773502691896258,
+        "rates": 0.5773502691896258
+      }
+    },
+    {
+      "id": "defi_yields_pools",
+      "name": "defi_yields_pools",
+      "route": "https://acp-x402-scriptmasterlabs.onrender.com/x402/defi-yields-pools",
+      "method": "GET",
+      "capabilities": [
+        "defi",
+        "yields",
+        "pools"
+      ],
+      "pricing": {
+        "base_rate": "0.001",
+        "asset": "USDC",
+        "network": "eip155:8453",
+        "floor": "0.001",
+        "ceiling": "0.005",
+        "dynamic_bidding": true,
+        "batch_discount": true
+      },
+      "sla_min_latency_ms": 200,
+      "reputation": {
+        "tool": "defi_yields_pools",
+        "score": 0.92,
+        "attestations": 0,
+        "avg_latency_ms": 420.0,
+        "ok_rate": 0.99,
+        "source": "beacon_peer_attest_v1"
+      },
+      "schema": {
+        "input": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "result"
+          ]
+        }
+      },
+      "vector": {
+        "defi": 0.5773502691896258,
+        "yields": 0.5773502691896258,
+        "pools": 0.5773502691896258
+      }
+    },
+    {
+      "id": "dexscreener_boosts",
+      "name": "dexscreener_boosts",
+      "route": "https://acp-x402-scriptmasterlabs.onrender.com/x402/dexscreener-boosts",
+      "method": "GET",
+      "capabilities": [
+        "dexscreener",
+        "boosts"
+      ],
+      "pricing": {
+        "base_rate": "0.001",
+        "asset": "USDC",
+        "network": "eip155:8453",
+        "floor": "0.001",
+        "ceiling": "0.005",
+        "dynamic_bidding": true,
+        "batch_discount": true
+      },
+      "sla_min_latency_ms": 200,
+      "reputation": {
+        "tool": "dexscreener_boosts",
+        "score": 0.92,
+        "attestations": 0,
+        "avg_latency_ms": 420.0,
+        "ok_rate": 0.99,
+        "source": "beacon_peer_attest_v1"
+      },
+      "schema": {
+        "input": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "result"
+          ]
+        }
+      },
+      "vector": {
+        "dexscreener": 0.7071067811865475,
+        "boosts": 0.7071067811865475
+      }
+    },
+    {
+      "id": "dexscreener_search",
+      "name": "dexscreener_search",
+      "route": "https://acp-x402-scriptmasterlabs.onrender.com/x402/dexscreener-search",
+      "method": "GET",
+      "capabilities": [
+        "search",
+        "dexscreener"
+      ],
+      "pricing": {
+        "base_rate": "0.001",
+        "asset": "USDC",
+        "network": "eip155:8453",
+        "floor": "0.001",
+        "ceiling": "0.005",
+        "dynamic_bidding": true,
+        "batch_discount": true
+      },
+      "sla_min_latency_ms": 200,
+      "reputation": {
+        "tool": "dexscreener_search",
+        "score": 0.92,
+        "attestations": 0,
+        "avg_latency_ms": 420.0,
+        "ok_rate": 0.99,
+        "source": "beacon_peer_attest_v1"
+      },
+      "schema": {
+        "input": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "result"
+          ]
+        }
+      },
+      "vector": {
+        "search": 0.7071067811865475,
+        "dexscreener": 0.7071067811865475
+      }
+    },
+    {
+      "id": "domain_enrich",
+      "name": "domain_enrich",
+      "route": "https://acp-x402-scriptmasterlabs.onrender.com/x402/domain-enrich",
+      "method": "GET",
+      "capabilities": [
+        "domain",
+        "enrich"
+      ],
+      "pricing": {
+        "base_rate": "0.001",
+        "asset": "USDC",
+        "network": "eip155:8453",
+        "floor": "0.001",
+        "ceiling": "0.005",
+        "dynamic_bidding": true,
+        "batch_discount": true
+      },
+      "sla_min_latency_ms": 200,
+      "reputation": {
+        "tool": "domain_enrich",
+        "score": 0.92,
+        "attestations": 0,
+        "avg_latency_ms": 420.0,
+        "ok_rate": 0.99,
+        "source": "beacon_peer_attest_v1"
+      },
+      "schema": {
+        "input": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "result"
+          ]
+        }
+      },
+      "vector": {
+        "domain": 0.7071067811865475,
+        "enrich": 0.7071067811865475
+      }
+    },
+    {
+      "id": "druckenmiller_macro_regime_analysis",
+      "name": "druckenmiller_macro_regime_analysis",
+      "route": "https://acp-x402-scriptmasterlabs.onrender.com/x402/druckenmiller-macro-regime-analysis",
+      "method": "GET",
+      "capabilities": [
+        "macro",
+        "druckenmiller",
+        "regime",
+        "analysis"
+      ],
+      "pricing": {
+        "base_rate": "0.001",
+        "asset": "USDC",
+        "network": "eip155:8453",
+        "floor": "0.001",
+        "ceiling": "0.005",
+        "dynamic_bidding": true,
+        "batch_discount": true
+      },
+      "sla_min_latency_ms": 200,
+      "reputation": {
+        "tool": "druckenmiller_macro_regime_analysis",
+        "score": 0.92,
+        "attestations": 0,
+        "avg_latency_ms": 420.0,
+        "ok_rate": 0.99,
+        "source": "beacon_peer_attest_v1"
+      },
+      "schema": {
+        "input": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "result"
+          ]
+        }
+      },
+      "vector": {
+        "macro": 0.5,
+        "druckenmiller": 0.5,
+        "regime": 0.5,
+        "analysis": 0.5
+      }
+    },
+    {
+      "id": "email_validate",
+      "name": "email_validate",
+      "route": "https://acp-x402-scriptmasterlabs.onrender.com/x402/email-validate",
+      "method": "GET",
+      "capabilities": [
+        "email",
+        "validate"
+      ],
+      "pricing": {
+        "base_rate": "0.001",
+        "asset": "USDC",
+        "network": "eip155:8453",
+        "floor": "0.001",
+        "ceiling": "0.005",
+        "dynamic_bidding": true,
+        "batch_discount": true
+      },
+      "sla_min_latency_ms": 200,
+      "reputation": {
+        "tool": "email_validate",
+        "score": 0.92,
+        "attestations": 0,
+        "avg_latency_ms": 420.0,
+        "ok_rate": 0.99,
+        "source": "beacon_peer_attest_v1"
+      },
+      "schema": {
+        "input": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "result"
+          ]
+        }
+      },
+      "vector": {
+        "email": 0.7071067811865475,
+        "validate": 0.7071067811865475
+      }
+    },
+    {
+      "id": "entity_compliance_check",
+      "name": "entity_compliance_check",
+      "route": "https://acp-x402-scriptmasterlabs.onrender.com/x402/entity-compliance-check",
+      "method": "GET",
+      "capabilities": [
+        "compliance",
+        "entity",
+        "check"
+      ],
+      "pricing": {
+        "base_rate": "0.001",
+        "asset": "USDC",
+        "network": "eip155:8453",
+        "floor": "0.001",
+        "ceiling": "0.005",
+        "dynamic_bidding": true,
+        "batch_discount": true
+      },
+      "sla_min_latency_ms": 200,
+      "reputation": {
+        "tool": "entity_compliance_check",
+        "score": 0.92,
+        "attestations": 0,
+        "avg_latency_ms": 420.0,
+        "ok_rate": 0.99,
+        "source": "beacon_peer_attest_v1"
+      },
+      "schema": {
+        "input": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "result"
+          ]
+        }
+      },
+      "vector": {
+        "compliance": 0.5773502691896258,
+        "entity": 0.5773502691896258,
+        "check": 0.5773502691896258
+      }
+    },
+    {
+      "id": "epa_environmental_violations",
+      "name": "epa_environmental_violations",
+      "route": "https://acp-x402-scriptmasterlabs.onrender.com/x402/epa-environmental-violations",
+      "method": "GET",
+      "capabilities": [
+        "environmental",
+        "violations"
+      ],
+      "pricing": {
+        "base_rate": "0.001",
+        "asset": "USDC",
+        "network": "eip155:8453",
+        "floor": "0.001",
+        "ceiling": "0.005",
+        "dynamic_bidding": true,
+        "batch_discount": true
+      },
+      "sla_min_latency_ms": 200,
+      "reputation": {
+        "tool": "epa_environmental_violations",
+        "score": 0.92,
+        "attestations": 0,
+        "avg_latency_ms": 420.0,
+        "ok_rate": 0.99,
+        "source": "beacon_peer_attest_v1"
+      },
+      "schema": {
+        "input": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "result"
+          ]
+        }
+      },
+      "vector": {
+        "environmental": 0.7071067811865475,
+        "violations": 0.7071067811865475
+      }
+    },
+    {
+      "id": "eth_price",
+      "name": "eth_price",
+      "route": "https://acp-x402-scriptmasterlabs.onrender.com/x402/eth-price",
+      "method": "GET",
+      "capabilities": [
+        "price"
+      ],
+      "pricing": {
+        "base_rate": "0.001",
+        "asset": "USDC",
+        "network": "eip155:8453",
+        "floor": "0.001",
+        "ceiling": "0.005",
+        "dynamic_bidding": true,
+        "batch_discount": true
+      },
+      "sla_min_latency_ms": 200,
+      "reputation": {
+        "tool": "eth_price",
+        "score": 0.92,
+        "attestations": 0,
+        "avg_latency_ms": 420.0,
+        "ok_rate": 0.99,
+        "source": "beacon_peer_attest_v1"
+      },
+      "schema": {
+        "input": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "result"
+          ]
+        }
+      },
+      "vector": {
+        "price": 1.0
+      }
+    },
+    {
+      "id": "eth_rpc",
+      "name": "eth_rpc",
+      "route": "https://acp-x402-scriptmasterlabs.onrender.com/x402/eth-rpc",
+      "method": "GET",
+      "capabilities": [
+        "rpc"
+      ],
+      "pricing": {
+        "base_rate": "0.001",
+        "asset": "USDC",
+        "network": "eip155:8453",
+        "floor": "0.001",
+        "ceiling": "0.005",
+        "dynamic_bidding": true,
+        "batch_discount": true
+      },
+      "sla_min_latency_ms": 50,
+      "reputation": {
+        "tool": "eth_rpc",
+        "score": 0.92,
+        "attestations": 0,
+        "avg_latency_ms": 420.0,
+        "ok_rate": 0.99,
+        "source": "beacon_peer_attest_v1"
+      },
+      "schema": {
+        "input": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "result"
+          ]
+        }
+      },
+      "vector": {
+        "rpc": 1.0
+      }
+    },
+    {
+      "id": "excluded_parties_check",
+      "name": "excluded_parties_check",
+      "route": "https://acp-x402-scriptmasterlabs.onrender.com/x402/excluded-parties-check",
+      "method": "GET",
+      "capabilities": [
+        "excluded",
+        "parties",
+        "check"
+      ],
+      "pricing": {
+        "base_rate": "0.001",
+        "asset": "USDC",
+        "network": "eip155:8453",
+        "floor": "0.001",
+        "ceiling": "0.005",
+        "dynamic_bidding": true,
+        "batch_discount": true
+      },
+      "sla_min_latency_ms": 200,
+      "reputation": {
+        "tool": "excluded_parties_check",
+        "score": 0.92,
+        "attestations": 0,
+        "avg_latency_ms": 420.0,
+        "ok_rate": 0.99,
+        "source": "beacon_peer_attest_v1"
+      },
+      "schema": {
+        "input": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "result"
+          ]
+        }
+      },
+      "vector": {
+        "excluded": 0.5773502691896258,
+        "parties": 0.5773502691896258,
+        "check": 0.5773502691896258
+      }
+    },
+    {
+      "id": "fda_adverse_events_report",
+      "name": "fda_adverse_events_report",
+      "route": "https://acp-x402-scriptmasterlabs.onrender.com/x402/fda-adverse-events-report",
+      "method": "GET",
+      "capabilities": [
+        "fda",
+        "adverse",
+        "events",
+        "report"
+      ],
+      "pricing": {
+        "base_rate": "0.001",
+        "asset": "USDC",
+        "network": "eip155:8453",
+        "floor": "0.001",
+        "ceiling": "0.005",
+        "dynamic_bidding": true,
+        "batch_discount": true
+      },
+      "sla_min_latency_ms": 200,
+      "reputation": {
+        "tool": "fda_adverse_events_report",
+        "score": 0.92,
+        "attestations": 0,
+        "avg_latency_ms": 420.0,
+        "ok_rate": 0.99,
+        "source": "beacon_peer_attest_v1"
+      },
+      "schema": {
+        "input": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "result"
+          ]
+        }
+      },
+      "vector": {
+        "fda": 0.5,
+        "adverse": 0.5,
+        "events": 0.5,
+        "report": 0.5
+      }
+    }
+  ],
+  "pricing": {
+    "base_rate": "0.001",
+    "asset": "USDC",
+    "dynamic_bidding": true,
+    "floor": "0.001"
+  },
+  "sla_min_latency_ms": 45,
+  "settlement": {
+    "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
+    "rails": [
+      {
+        "id": "base_usdc",
+        "network": "eip155:8453",
+        "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+        "symbol": "USDC",
+        "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
+        "header": "X-PAYMENT"
+      },
+      {
+        "id": "robinhood_usdg",
+        "network": "eip155:4663",
+        "asset": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "symbol": "USDG",
+        "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
+        "header": "X-PAYMENT-TX"
+      },
+      {
+        "id": "solana_usdc",
+        "network": "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
+        "asset": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "symbol": "USDC",
+        "payTo": "E4d3JwcTjeqTRkkQS4moszcfa4R7G1NMgPSew4KBNFrB",
+        "header": "X-PAYMENT-TX"
+      },
+      {
+        "id": "xrpl_rlusd",
+        "network": "xrpl",
+        "asset": "RLUSD",
+        "issuer": "rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De",
+        "payTo": "rNduuviQ3CCvHqWUTjJDD82Ko2tjqFGs3q",
+        "header": "X-PAYMENT-TX"
+      }
+    ],
+    "refuse_payTo": [
+      "0x4e14"
+    ]
+  },
+  "handshake": {
+    "bid_header": "X-x402-Bid",
+    "negotiate_header": "X-x402-Negotiate",
+    "batch_header": "X-x402-Batch-Size",
+    "negotiate_endpoint": "https://acp-x402-scriptmasterlabs.onrender.com/beacon/negotiate"
+  },
+  "discovery": {
+    "manifest": "https://acp-x402-scriptmasterlabs.onrender.com/.well-known/x402.json",
+    "x402_openapi": "https://acp-x402-scriptmasterlabs.onrender.com/.well-known/x402",
+    "amb": "https://acp-x402-scriptmasterlabs.onrender.com/.well-known/amb.json",
+    "query": "https://acp-x402-scriptmasterlabs.onrender.com/beacon/query",
+    "attest": "https://acp-x402-scriptmasterlabs.onrender.com/beacon/attest",
+    "wedges": [
+      "https://acp-x402-scriptmasterlabs.onrender.com/x402/gas-tracker",
+      "https://acp-x402-scriptmasterlabs.onrender.com/x402/crypto-price",
+      "https://acp-x402-scriptmasterlabs.onrender.com/x402/rwa-aggregates"
+    ],
+    "x402scan": "https://www.x402scan.com/recipient/0x72330994f379A71542e7bd5a4CF99A9d9743F4aA",
+    "homepage": "https://www.scriptmasterlabs.com"
+  },
+  "protocol": {
+    "steps": [
+      "GET /.well-known/x402.json",
+      "POST /beacon/query with intent",
+      "HTTP GET capability route with optional X-x402-Bid",
+      "Settle 402 (X-PAYMENT / X-PAYMENT-TX)",
+      "POST /beacon/attest quality receipt"
+    ]
+  },
+  "note": "BEACON = discovery+negotiation+attestation layer on live x402. Payment settle is unchanged multi-rail x402; payTo always 0x7233."
+}
