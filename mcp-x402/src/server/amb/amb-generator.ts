@@ -501,6 +501,8 @@ export function buildAmbDocument(baseUrl?: string): {
   free_count: number;
   top_magnet: Record<string, unknown> | null;
   formula: string;
+  imp_version: string;
+  ranking: string;
   discovery: Record<string, string>;
   beacons: AgentMagnetBeacon[];
   note: string;
