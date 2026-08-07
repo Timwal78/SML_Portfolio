@@ -1072,6 +1072,26 @@ html, body {
           </div>
         </div>
         <div id="payer-integrity-note" style="font-size:11px;color:var(--text3);padding:8px 12px 0"></div>
+
+        <!-- Receipt Theater — last paid settlements (public proof) -->
+        <div class="card" style="margin-top:14px;border-radius:8px" id="receipt-theater-card">
+          <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+            <span class="card-title">RECEIPT THEATER · LAST 10 PAID</span>
+            <span class="ep-cost-free" style="font-size:10px" id="receipt-theater-status">LOADING…</span>
+          </div>
+          <div class="card-body" style="padding-top:8px">
+            <div style="font-size:12px;color:var(--text3);margin-bottom:10px;line-height:1.5">
+              Public proof wall: route · amount · chain · latency · attest score.
+              Payers hashed · tx truncated. Live from acp-x402 BEACON + mcp-x402 stats.
+            </div>
+            <div id="receipt-theater-list" style="display:flex;flex-direction:column;gap:6px;max-height:320px;overflow:auto"></div>
+            <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:8px;font-size:11px">
+              <a href="https://acp-x402-scriptmasterlabs.onrender.com/beacon/receipts?limit=10" target="_blank" rel="noopener" style="color:var(--cyan)">/beacon/receipts</a>
+              <a href="https://mcp-x402.onrender.com/x402/stats" target="_blank" rel="noopener" style="color:var(--cyan)">mcp /x402/stats</a>
+              <a href="https://www.scriptmasterlabs.com/pricing.html" target="_blank" rel="noopener" style="color:var(--violet2)">Premium Match $49</a>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Config card -->
@@ -1663,9 +1683,11 @@ const BEACON_HOST = {
   status: 'https://acp-x402-scriptmasterlabs.onrender.com/beacon/status',
   manifest: 'https://acp-x402-scriptmasterlabs.onrender.com/.well-known/x402.json',
   query: 'https://acp-x402-scriptmasterlabs.onrender.com/beacon/query',
+  receipts: 'https://acp-x402-scriptmasterlabs.onrender.com/beacon/receipts?limit=10',
   docs: 'https://www.scriptmasterlabs.com/x402-beacon.html',
 };
 let beaconState = { ok: false, version: '', caps: 0, atts: 0, top: '', ms: null };
+const MCP_X402_STATS = 'https://mcp-x402.onrender.com/x402/stats';
 
 const SNACK_HINTS = /news|funding|gas|trending|defi|stablecoin|web-fetch|token|crypto-price|fx-rate|fear-greed|altcoin/i;
 const RWA_HINTS = /rwa|reserves|aggregates/i;
@@ -3055,6 +3077,158 @@ loadAgentStats();
 setInterval(loadAgentStats, 60000);
 loadBeaconEngine();
 setInterval(loadBeaconEngine, 60000);
+loadReceiptTheater();
+setInterval(loadReceiptTheater, 60000);
+
+/* ── Receipt Theater (last paid settlements) ── */
+function _rtEsc(s) {
+  return escapeHtml(String(s == null ? '' : s));
+}
+function _rtTime(tsIso, tsMs) {
+  try {
+    if (tsIso) {
+      const d = new Date(tsIso);
+      if (!isNaN(d.getTime())) return d.toISOString().replace('T', ' ').replace(/\.\d+Z$/, 'Z');
+    }
+    if (tsMs) {
+      const d = new Date(Number(tsMs));
+      if (!isNaN(d.getTime())) return d.toISOString().replace('T', ' ').replace(/\.\d+Z$/, 'Z');
+    }
+  } catch (_) {}
+  return '—';
+}
+function _rtScore(v) {
+  const n = Number(v);
+  if (!Number.isFinite(n)) return '—';
+  return n.toFixed(3);
+}
+function _rtAmount(row) {
+  if (row.amount == null || row.amount === '') return row.kind === 'attestation' ? 'attest' : '—';
+  const a = String(row.amount);
+  const asset = row.asset ? (' ' + String(row.asset)) : ' USDC';
+  return a.startsWith('$') ? a : ('$' + a + asset.replace(/^ USDC$/, ' USDC'));
+}
+
+async function loadReceiptTheater() {
+  const box = document.getElementById('receipt-theater-list');
+  const stEl = document.getElementById('receipt-theater-status');
+  if (!box) return;
+  try {
+    const [acpRes, mcpRes] = await Promise.all([
+      fetch(BEACON_HOST.receipts, {
+        mode: 'cors', credentials: 'omit',
+        headers: { 'Accept': 'application/json' },
+        signal: AbortSignal.timeout ? AbortSignal.timeout(12000) : undefined
+      }),
+      fetch(MCP_X402_STATS, {
+        mode: 'cors', credentials: 'omit',
+        headers: { 'Accept': 'application/json' },
+        signal: AbortSignal.timeout ? AbortSignal.timeout(12000) : undefined
+      }).catch(() => null)
+    ]);
+    const rows = [];
+    let acpOk = false;
+    if (acpRes && acpRes.ok) {
+      const doc = await acpRes.json();
+      acpOk = true;
+      (doc.receipts || []).forEach((r) => {
+        if (!r || typeof r !== 'object') return;
+        rows.push({
+          source: r.source || 'acp-x402',
+          kind: r.kind || 'settlement',
+          route: r.route || (r.tool ? ('/x402/' + String(r.tool).replace(/_/g, '-')) : '—'),
+          amount: r.amount,
+          asset: r.asset || (r.kind === 'attestation' ? null : 'USDC'),
+          chain: r.chain || (r.kind === 'attestation' ? null : 'base'),
+          rail: r.rail || 'x402',
+          tx: r.tx || null,
+          payer_hash: r.payer_hash || null,
+          latency_ms: r.latency_ms,
+          attest_score: r.attest_score,
+          ts_iso: r.ts_iso,
+          ts: r.ts,
+          ok: r.ok !== false,
+        });
+      });
+    }
+    if (mcpRes && mcpRes.ok) {
+      const st = await mcpRes.json();
+      (st.recentSettled || []).forEach((e) => {
+        if (!e || typeof e !== 'object') return;
+        rows.push({
+          source: 'mcp-x402',
+          kind: 'settlement',
+          route: e.route || '—',
+          amount: '0.001',
+          asset: 'USDC',
+          chain: 'base',
+          rail: e.facilitator || 'facilitator',
+          tx: e.tx ? (String(e.tx).slice(0, 10) + '…' + String(e.tx).slice(-6)) : null,
+          payer_hash: e.payerHash || null,
+          latency_ms: null,
+          attest_score: null,
+          ts_iso: e.ts || null,
+          ts: e.ts ? Date.parse(e.ts) : 0,
+          ok: true,
+        });
+      });
+    }
+    // sort newest first, take 10
+    rows.sort((a, b) => {
+      const ta = a.ts || (a.ts_iso ? Date.parse(a.ts_iso) : 0) || 0;
+      const tb = b.ts || (b.ts_iso ? Date.parse(b.ts_iso) : 0) || 0;
+      return tb - ta;
+    });
+    const top = rows.slice(0, 10);
+    if (stEl) {
+      if (!acpOk && !top.length) {
+        stEl.textContent = '○ FEEDS QUIET';
+        stEl.style.color = 'var(--text3)';
+      } else {
+        stEl.textContent = '● ' + top.length + ' RECEIPTS';
+        stEl.className = 'ep-cost-free';
+        stEl.style.color = '';
+      }
+    }
+    if (!top.length) {
+      box.innerHTML = '<div class="config-key" style="line-height:1.5">No settlements in the live window yet. '
+        + 'When agents pay x402 (or ACP jobs settle), rows appear here automatically. '
+        + 'Quality attestations from BEACON also show as <em>attest</em> rows.</div>';
+      return;
+    }
+    box.innerHTML = top.map((r, i) => {
+      const route = _rtEsc(r.route);
+      const amt = _rtEsc(_rtAmount(r));
+      const chain = _rtEsc(r.chain || (r.kind === 'attestation' ? 'attest' : 'base'));
+      const lat = (r.latency_ms != null && Number.isFinite(Number(r.latency_ms)))
+        ? (Number(r.latency_ms).toFixed(0) + 'ms') : '—';
+      const score = _rtScore(r.attest_score);
+      const when = _rtEsc(_rtTime(r.ts_iso, r.ts));
+      const payer = r.payer_hash ? _rtEsc(String(r.payer_hash).slice(0, 12)) : '—';
+      const src = _rtEsc(r.source || '');
+      const okDot = r.ok === false ? '<span style="color:var(--red)">●</span>' : '<span style="color:var(--green)">●</span>';
+      const tx = r.tx ? _rtEsc(r.tx) : '—';
+      return '<div class="config-row" style="align-items:flex-start;gap:8px">'
+        + '<span class="config-val" style="font-size:11px;flex:1;min-width:0;line-height:1.45">'
+        + okDot + ' <strong>#' + (i + 1) + '</strong> '
+        + '<span style="color:var(--cyan)">' + route + '</span>'
+        + ' <span style="color:var(--text3)">· ' + src + '</span><br/>'
+        + '<span style="color:var(--text3)">' + when + '</span>'
+        + ' · payer <code style="font-size:10px">' + payer + '</code>'
+        + (tx !== '—' ? (' · tx <code style="font-size:10px">' + tx + '</code>') : '')
+        + '</span>'
+        + '<span class="config-key" style="text-align:right;font-family:var(--mono);font-size:11px;white-space:nowrap;line-height:1.45">'
+        + '<span class="ep-cost-free">' + amt + '</span><br/>'
+        + chain + ' · ' + lat + '<br/>'
+        + 'score <span class="ep-cost-free">' + score + '</span>'
+        + '</span></div>';
+    }).join('');
+  } catch (e) {
+    console.warn('[RECEIPTS]', e && e.message ? e.message : e);
+    if (stEl) { stEl.textContent = '○ UNREACHABLE'; stEl.style.color = 'var(--red)'; }
+    if (box) box.innerHTML = '<div class="config-key" style="color:var(--red)">Receipt feeds unreachable</div>';
+  }
+}
 
 /* ── x402-BEACON engine (acp-x402) ── */
 async function loadBeaconEngine() {
