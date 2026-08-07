@@ -865,7 +865,7 @@ html, body {
 
   <div class="url-bar">
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-    <span>mcp-x402 · acp-x402 · AMB/IMP · $0.001 Base USDC</span>
+    <span>mcp-x402 · acp-x402 · AMB · BEACON/IMP · $0.001 Base USDC</span>
   </div>
 
   <div class="topbar-right">
@@ -1023,12 +1023,13 @@ html, body {
                 </button>
               </div>
             </div>
-            <div class="live-stats" style="grid-template-columns:repeat(5,1fr);gap:10px;background:transparent;border:0;padding:0">
+            <div class="live-stats" style="grid-template-columns:repeat(6,1fr);gap:10px;background:transparent;border:0;padding:0">
               <div class="stat-block"><span class="stat-val" id="proof-routes" data-live-count>—</span><span class="stat-label">LIVE X402 ROUTES</span></div>
               <div class="stat-block"><span class="stat-val" id="proof-beacons">—</span><span class="stat-label">AMB BEACONS</span></div>
               <div class="stat-block"><span class="stat-val" id="proof-imp">—</span><span class="stat-label">TOP IMP</span></div>
               <div class="stat-block"><span class="stat-val" id="proof-hosts">—</span><span class="stat-label">HOSTS ONLINE</span></div>
               <div class="stat-block"><span class="stat-val" id="proof-match" style="font-size:16px">—</span><span class="stat-label">MATCH API</span></div>
+              <div class="stat-block"><span class="stat-val" id="proof-beacon" style="color:var(--green)">—</span><span class="stat-label">BEACON</span></div>
             </div>
           </div>
         </div>
@@ -1036,7 +1037,7 @@ html, body {
 
       <!-- Live stats -->
       <div class="section-pad" style="padding-bottom:0">
-        <div class="live-stats card" style="border-radius:8px;grid-template-columns:repeat(7,1fr)">
+        <div class="live-stats card" style="border-radius:8px;grid-template-columns:repeat(8,1fr)">
           <div class="stat-block">
             <span class="stat-val" data-live-count>—</span>
             <span class="stat-label">PAID ROUTES</span>
@@ -1056,6 +1057,10 @@ html, body {
           <div class="stat-block">
             <span class="stat-val" id="stat-paid-today" style="color:var(--green)" title="Real, verified x402 settlements today — not a User-Agent guess.">—</span>
             <span class="stat-label">PAID TODAY</span>
+          </div>
+          <div class="stat-block">
+            <span class="stat-val" id="stat-beacon" style="color:var(--green)" title="x402-BEACON engine: intent query + bid negotiate + attest on acp-x402">—</span>
+            <span class="stat-label">BEACON</span>
           </div>
           <div class="stat-block">
             <span class="stat-val" id="stat-ping">—</span>
@@ -1394,7 +1399,7 @@ html, body {
       <div class="panel-header">
         <div>
           <h2 class="panel-title">AI Indexer</h2>
-          <div class="panel-sub">AI agent discoverability · AMB beacons · IMP ranking · OpenAPI · Discovery files</div>
+          <div class="panel-sub">AI agent discoverability · AMB beacons · IMP ranking · x402-BEACON · OpenAPI · Discovery files</div>
         </div>
         <div class="beastmode-badge"><span class="bm-dot"></span> INDEXER ACTIVE</div>
       </div>
@@ -1435,6 +1440,43 @@ html, body {
         </div>
       </div>
 
+
+      <!-- x402-BEACON live strip -->
+      <div class="card" style="margin-bottom:14px" id="beacon-engine-card">
+        <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+          <span class="card-title">x402-BEACON ENGINE</span>
+          <span class="ep-cost-free" style="font-size:10px" id="beacon-status">LOADING…</span>
+        </div>
+        <div class="card-body">
+          <div style="font-size:12px;color:var(--text3);margin-bottom:10px;line-height:1.5">
+            Connective tissue on live x402: <strong style="color:var(--text1)">intent query</strong>,
+            <strong style="color:var(--cyan)">bid negotiate</strong> (<code>X-x402-Bid</code>),
+            and <strong style="color:var(--green)">peer attestation</strong> reputation.
+            Payment settle unchanged · payTo <code>0x7233…</code>.
+          </div>
+          <div class="config-row"><span class="config-key">Version</span><span class="config-val green" id="beacon-version">—</span></div>
+          <div class="config-row"><span class="config-key">Manifest caps</span><span class="config-val" id="beacon-caps">—</span></div>
+          <div class="config-row"><span class="config-key">Attestations</span><span class="config-val" id="beacon-atts">—</span></div>
+          <div class="config-row"><span class="config-key">Intent demo top</span><span class="config-val" id="beacon-top">—</span></div>
+          <div class="config-row"><span class="config-key">Query latency</span><span class="config-val" id="beacon-ms">—</span></div>
+          <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+            <input id="beacon-demo-q" type="text" value="sub-50ms gas tracker under 0.001" placeholder="agent intent"
+              style="flex:1;min-width:180px;background:#0b0b14;border:1px solid rgba(255,255,255,.12);color:var(--text1);border-radius:6px;padding:10px 12px;font-size:13px"/>
+            <button class="checkout-btn starter" id="beacon-demo-btn" onclick="runBeaconQuery()" style="min-width:110px">
+              <span class="checkout-tier">QUERY</span>
+              <span class="checkout-price">Intent</span>
+            </button>
+          </div>
+          <div id="beacon-demo-results" style="display:flex;flex-direction:column;gap:6px;max-height:200px;overflow:auto;margin-top:10px"></div>
+          <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px">
+            <a href="https://acp-x402-scriptmasterlabs.onrender.com/.well-known/x402.json" target="_blank" rel="noopener" class="config-val" style="font-size:11px;color:var(--cyan)">manifest</a>
+            <a href="https://acp-x402-scriptmasterlabs.onrender.com/beacon/status" target="_blank" rel="noopener" class="config-val" style="font-size:11px;color:var(--cyan)">status</a>
+            <a href="https://acp-x402-scriptmasterlabs.onrender.com/beacon/query" target="_blank" rel="noopener" class="config-val" style="font-size:11px;color:var(--cyan)">query</a>
+            <a href="https://acp-x402-scriptmasterlabs.onrender.com/x402/gas-tracker" target="_blank" rel="noopener" class="config-val" style="font-size:11px;color:var(--green)">gas-tracker</a>
+            <a href="https://www.scriptmasterlabs.com/x402-beacon.html" target="_blank" rel="noopener" class="config-val" style="font-size:11px;color:var(--violet2)">docs</a>
+          </div>
+        </div>
+      </div>
 
       <div class="card" style="margin-bottom:14px" id="match-demo-card">
         <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
@@ -1615,6 +1657,15 @@ const X402_HOSTS = [
   { id: 'acp', label: 'acp-x402', base: 'https://acp-x402-scriptmasterlabs.onrender.com', manifest: 'https://acp-x402-scriptmasterlabs.onrender.com/.well-known/x402', defaultCat: 'Snacks' },
   // sml-rwa-api intentionally omitted — host not deployed (404). Re-add when live.
 ];
+
+const BEACON_HOST = {
+  base: 'https://acp-x402-scriptmasterlabs.onrender.com',
+  status: 'https://acp-x402-scriptmasterlabs.onrender.com/beacon/status',
+  manifest: 'https://acp-x402-scriptmasterlabs.onrender.com/.well-known/x402.json',
+  query: 'https://acp-x402-scriptmasterlabs.onrender.com/beacon/query',
+  docs: 'https://www.scriptmasterlabs.com/x402-beacon.html',
+};
+let beaconState = { ok: false, version: '', caps: 0, atts: 0, top: '', ms: null };
 
 const SNACK_HINTS = /news|funding|gas|trending|defi|stablecoin|web-fetch|token|crypto-price|fx-rate|fear-greed|altcoin/i;
 const RWA_HINTS = /rwa|reserves|aggregates/i;
@@ -1900,6 +1951,10 @@ const SEARCH_QUERIES = [
 
 const DISCOVERY_ENDPOINTS = [
   {path:'/.well-known/amb.json',       desc:'AMB beacons + IMP imp_score ranking'},
+  {path:'/.well-known/x402.json',      desc:'x402-BEACON universal manifest (intent + bid + attest)'},
+  {path:'/beacon/query',               desc:'BEACON intent indexer (POST/GET)'},
+  {path:'/beacon/negotiate',           desc:'BEACON bid negotiate (X-x402-Bid)'},
+  {path:'/beacon/attest',              desc:'BEACON quality attestation / reputation'},
   {path:'/.well-known/mcp.json',       desc:'MCP server manifest'},
   {path:'/.well-known/x402',           desc:'x402 payment manifest (hosts)'},
   {path:'/.well-known/ai-plugin.json', desc:'ChatGPT/LLM plugin'},
@@ -1914,6 +1969,7 @@ const DISCOVERY_ENDPOINTS = [
 
 const WELLKNOWN = [
   {file:'amb.json',       status:'active', desc:'Agent Magnet Beacons + IMP scores'},
+  {file:'x402.json',      status:'active', desc:'x402-BEACON universal manifest'},
   {file:'mcp.json',       status:'active', desc:'MCP tools + x402 manifests'},
   {file:'ai-plugin.json', status:'active', desc:'ChatGPT plugin descriptor'},
   {file:'openapi.json',   status:'active', desc:'OpenAPI / multi-host routes'},
@@ -2997,6 +3053,117 @@ setInterval(checkStatus, 30000);
 startHeartbeatCounter();
 loadAgentStats();
 setInterval(loadAgentStats, 60000);
+loadBeaconEngine();
+setInterval(loadBeaconEngine, 60000);
+
+/* ── x402-BEACON engine (acp-x402) ── */
+async function loadBeaconEngine() {
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  const stEl = document.getElementById('beacon-status');
+  try {
+    const [stRes, manRes, qRes] = await Promise.all([
+      fetch(BEACON_HOST.status, { mode: 'cors', credentials: 'omit', headers: { 'Accept': 'application/json' }, signal: AbortSignal.timeout ? AbortSignal.timeout(10000) : undefined }),
+      fetch(BEACON_HOST.manifest, { mode: 'cors', credentials: 'omit', headers: { 'Accept': 'application/json' }, signal: AbortSignal.timeout ? AbortSignal.timeout(12000) : undefined }),
+      fetch(BEACON_HOST.query, {
+        method: 'POST', mode: 'cors', credentials: 'omit',
+        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ q: 'sub-50ms gas tracker under 0.001', max_price: 0.001, limit: 3 }),
+        signal: AbortSignal.timeout ? AbortSignal.timeout(12000) : undefined
+      })
+    ]);
+    if (!stRes.ok) throw new Error('status ' + stRes.status);
+    const st = await stRes.json();
+    const man = manRes.ok ? await manRes.json() : {};
+    const qj = qRes.ok ? await qRes.json() : {};
+    const caps = Array.isArray(man.capability_catalog) ? man.capability_catalog.length : (Array.isArray(man.capabilities) ? man.capabilities.length : 0);
+    const top = ((qj.results || [])[0] || {}).tool || '—';
+    const ms = qj.routing_ms != null ? Number(qj.routing_ms) : null;
+    beaconState = {
+      ok: st.ok === true,
+      version: String(st.beacon_version || man.beacon_version || '1.0.0'),
+      caps,
+      atts: Number(st.attestation_count || 0),
+      top: String(top),
+      ms
+    };
+    if (stEl) {
+      stEl.textContent = beaconState.ok ? ('● BEACON LIVE · v' + beaconState.version) : '○ BEACON DOWN';
+      stEl.style.color = beaconState.ok ? '' : 'var(--red)';
+      if (beaconState.ok) stEl.className = 'ep-cost-free';
+    }
+    set('beacon-version', 'v' + beaconState.version);
+    set('beacon-caps', String(beaconState.caps || '—'));
+    set('beacon-atts', String(beaconState.atts));
+    set('beacon-top', beaconState.top);
+    set('beacon-ms', ms != null && Number.isFinite(ms) ? (ms.toFixed(1) + ' ms') : '—');
+    set('proof-beacon', beaconState.ok ? ('v' + beaconState.version) : '—');
+    set('stat-beacon', beaconState.ok ? ('v' + beaconState.version) : 'DOWN');
+    // fill demo results quietly on boot
+    const box = document.getElementById('beacon-demo-results');
+    if (box && Array.isArray(qj.results)) {
+      box.innerHTML = qj.results.map((r, i) => {
+        const name = escapeHtml(String(r.tool || '—'));
+        const score = (r.score != null ? Number(r.score).toFixed(3) : '—');
+        const price = escapeHtml(String(r.price || '0.001'));
+        const route = escapeHtml(String(r.route || ''));
+        return '<div class="config-row"><span class="config-val" style="font-size:11px">#' + (i + 1) + ' ' + name +
+          ' <span style="color:var(--text3)">· $' + price + '</span></span>' +
+          '<span class="config-key" style="text-align:right;font-family:var(--mono);font-size:11px">' +
+          '<span class="ep-cost-free">' + score + '</span></span></div>' +
+          (route ? '<div style="font-size:10px;color:var(--text3);margin:-2px 0 6px 0;word-break:break-all">' + route + '</div>' : '');
+      }).join('');
+    }
+  } catch (e) {
+    console.warn('[BEACON]', e && e.message ? e.message : e);
+    if (stEl) { stEl.textContent = '○ BEACON UNREACHABLE'; stEl.style.color = 'var(--red)'; }
+    set('proof-beacon', '—');
+    set('stat-beacon', '—');
+    beaconState.ok = false;
+  }
+}
+
+async function runBeaconQuery() {
+  const qEl = document.getElementById('beacon-demo-q');
+  const box = document.getElementById('beacon-demo-results');
+  const btn = document.getElementById('beacon-demo-btn');
+  const q = (qEl && qEl.value ? qEl.value : 'gas tracker').trim();
+  if (btn) btn.disabled = true;
+  if (box) box.innerHTML = '<div class="config-key">Querying BEACON…</div>';
+  try {
+    const res = await fetch(BEACON_HOST.query, {
+      method: 'POST', mode: 'cors', credentials: 'omit',
+      headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+      body: JSON.stringify({ q: q, max_price: 0.001, limit: 5 }),
+      signal: AbortSignal.timeout ? AbortSignal.timeout(12000) : undefined
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const j = await res.json();
+    const rows = Array.isArray(j.results) ? j.results : [];
+    const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+    if (rows[0]) set('beacon-top', String(rows[0].tool || '—'));
+    if (j.routing_ms != null) set('beacon-ms', Number(j.routing_ms).toFixed(1) + ' ms');
+    if (!box) return;
+    if (!rows.length) {
+      box.innerHTML = '<div class="config-key">No matches — try gas, rwa, sec, or crypto price</div>';
+      return;
+    }
+    box.innerHTML = rows.map((r, i) => {
+      const name = escapeHtml(String(r.tool || '—'));
+      const score = (r.score != null ? Number(r.score).toFixed(3) : '—');
+      const price = escapeHtml(String(r.price || '0.001'));
+      const route = escapeHtml(String(r.route || ''));
+      return '<div class="config-row"><span class="config-val" style="font-size:11px">#' + (i + 1) + ' ' + name +
+        ' <span style="color:var(--text3)">· $' + price + '</span></span>' +
+        '<span class="config-key" style="text-align:right;font-family:var(--mono);font-size:11px">' +
+        '<span class="ep-cost-free">' + score + '</span></span></div>' +
+        (route ? '<div style="font-size:10px;color:var(--text3);margin:-2px 0 6px 0;word-break:break-all">' + route + '</div>' : '');
+    }).join('');
+  } catch (e) {
+    if (box) box.innerHTML = '<div class="config-key" style="color:var(--red)">BEACON query failed</div>';
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+}
 
 </script>
 

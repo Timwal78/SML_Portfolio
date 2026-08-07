@@ -115,6 +115,16 @@
       "permanent": true
     },
     {
+      "source": "/agents",
+      "destination": "/agentswarm-seo.html",
+      "permanent": false
+    },
+    {
+      "source": "/agents/",
+      "destination": "/agentswarm-seo.html",
+      "permanent": false
+    },
+    {
       "source": "/hermes",
       "destination": "/hermes.html",
       "permanent": true
