@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QHTHMG61N6"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-QHTHMG61N6');</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent Radar — Live Intent Heat for APIs | Script Master Labs</title>
+<meta name="description" content="See what agents are hunting. Free public heat. Named intel + alerts inside Premium Index $49/$199.">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="canonical" href="https://www.scriptmasterlabs.com/agent-radar.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.scriptmasterlabs.com/agent-radar.html">
+<meta property="og:title" content="Agent Radar — Live Intent Heat for APIs | Script Master Labs">
+<meta property="og:description" content="See what agents are hunting. Free public heat. Named intel + alerts inside Premium Index $49/$199.">
+<meta property="og:image" content="https://www.scriptmasterlabs.com/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="author" content="Timothy Walton, Script Master Labs">
+
+<style>
+:root { color-scheme: dark; --bg:#070a12; --card:#10182a; --line:#243049; --txt:#e8eefc; --mut:#9aabcc; --acc:#5b8cff; --ok:#3dd68c; --gold:#e6c35c; --warn:#ffcc66; --mag:#ff2d95; }
+* { box-sizing: border-box; }
+body { margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background:radial-gradient(1200px 600px at 10% -10%, #152244 0%, var(--bg) 55%); color:var(--txt); line-height:1.55; }
+main { max-width: 1040px; margin: 0 auto; padding: 28px 18px 80px; }
+h1 { font-size: clamp(1.7rem, 3.2vw, 2.35rem); margin: 0 0 10px; letter-spacing:-.02em; }
+h2 { margin: 28px 0 12px; font-size: 1.2rem; color:var(--txt); }
+h3 { margin:0 0 6px; font-size:1.05rem; color:var(--txt); }
+p, li { color: var(--mut); }
+a { color: var(--acc); }
+.nav { margin-bottom:14px; font-size:14px; }
+.nav a { margin-right:12px; }
+.hero { background: linear-gradient(180deg, #15203a, var(--card)); border:1px solid var(--line); border-radius:16px; padding:24px; }
+.tagline { color: var(--txt); font-size:1.08rem; margin: 10px 0 0; max-width: 58ch; }
+.pill { display:inline-block; background:#17301f; color:var(--ok); border:1px solid #2a5a3c; border-radius:999px; padding:3px 10px; font-size:12px; margin:0 6px 6px 0; }
+.pill.gold { background:#3a2a12; color:var(--gold); border-color:#6a4d1a; }
+.pill.blue { background:#152a4a; color:#9ec1ff; border-color:#2a4a7a; }
+.pill.mag { background:#3a1230; color:#ff9ad5; border-color:#6a2a55; }
+.grid { display:grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin-top:16px; }
+.card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px; display:flex; flex-direction:column; gap:8px; }
+.card.featured { border-color:#3d6fd8; box-shadow:0 0 0 1px rgba(91,140,255,.25); }
+.card.money { border-color:#2a5a3c; }
+.price { font-size:1.45rem; font-weight:800; color:var(--txt); }
+.price span { font-size:.9rem; font-weight:600; color:var(--mut); }
+.cta { display:inline-block; text-decoration:none; font-weight:700; padding:10px 14px; border-radius:10px; background:var(--acc); color:#fff; margin-top:auto; text-align:center; border:0; cursor:pointer; font:inherit; }
+.cta.secondary { background:transparent; border:1px solid var(--line); color:var(--txt); }
+.cta.ghost { background:transparent; border:1px solid #2a5a3c; color:var(--ok); }
+.cta.gold { background:#b8860b; color:#0b0f14; }
+.note { font-size:13px; }
+.table-wrap { overflow:auto; border:1px solid var(--line); border-radius:12px; background:var(--card); }
+table { width:100%; border-collapse: collapse; font-size:13px; min-width:680px; }
+th, td { border-bottom:1px solid var(--line); padding:10px 8px; text-align:left; vertical-align:top; }
+th { color:#c9d7f5; background:#0c1424; }
+td.yes { color:var(--ok); font-weight:600; }
+td.no { color:#6b7a96; }
+code, pre { background:#0b1220; border:1px solid var(--line); border-radius:6px; color:#cfe0ff; }
+code { padding:1px 6px; font-size:12.5px; }
+pre { padding:12px; overflow:auto; font-size:12px; line-height:1.45; }
+.ladder { display:grid; gap:10px; margin-top:12px; }
+.ladder .step { display:grid; grid-template-columns: 88px 1fr; gap:12px; align-items:start; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; }
+.ladder .step strong { color:var(--txt); }
+.ladder .amt { font-weight:800; color:var(--gold); font-size:1.05rem; }
+footer { margin-top:36px; color:#7f8fad; font-size:13px; border-top:1px solid var(--line); padding-top:16px; }
+ul.tight { margin:4px 0 0; padding-left:18px; }
+.bar { height:10px; border-radius:6px; background:#0b1220; border:1px solid var(--line); overflow:hidden; }
+.bar > i { display:block; height:100%; background:linear-gradient(90deg,#5b8cff,#3dd68c); }
+.kpis { display:grid; grid-template-columns: repeat(auto-fit,minmax(140px,1fr)); gap:10px; margin-top:12px; }
+.kpi { background:#0c1424; border:1px solid var(--line); border-radius:10px; padding:12px; }
+.kpi b { display:block; color:var(--txt); font-size:1.25rem; }
+</style>
+</head>
+<body>
+<main>
+
+<nav class="nav" aria-label="Primary">
+  <a href="https://www.scriptmasterlabs.com/">Home</a>
+  <a href="https://www.scriptmasterlabs.com/imp-suite.html">IMP Suite</a>
+  <a href="https://www.scriptmasterlabs.com/pricing.html">Pricing</a>
+  <a href="https://www.scriptmasterlabs.com/free-start.html">Start free</a>
+  <a href="https://www.scriptmasterlabs.com/partners.html">Partners</a>
+</nav>
+
+
+  <div class="hero">
+    <span class="pill blue">Public heat free</span>
+    <span class="pill gold">Named intel paid</span>
+    <h1>Agent Radar</h1>
+    <p class="tagline">FOMO layer for IMP. Free page shows category heat. Paid unlocks who matched you, alerts, and export.</p>
+  </div>
+  <div class="kpis">
+    <div class="kpi"><b>128</b><span class="note">intent samples / 24h (demo seed)</span></div>
+    <div class="kpi"><b>36</b><span class="note">capability categories hot</span></div>
+    <div class="kpi"><b>14</b><span class="note">x402 settle paths seen</span></div>
+    <div class="kpi"><b>$49</b><span class="note">unlocks named Radar</span></div>
+  </div>
+  <h2>Public heat (free)</h2>
+  <div class="card">
+    <p><strong style="color:var(--txt)">discovery / match</strong></p>
+    <div class="bar"><i style="width:86%"></i></div>
+    <p style="margin-top:10px"><strong style="color:var(--txt)">payments / x402</strong></p>
+    <div class="bar"><i style="width:72%"></i></div>
+    <p style="margin-top:10px"><strong style="color:var(--txt)">market data</strong></p>
+    <div class="bar"><i style="width:64%"></i></div>
+    <p style="margin-top:10px"><strong style="color:var(--txt)">crawl / extract</strong></p>
+    <div class="bar"><i style="width:51%"></i></div>
+    <p class="note">Seed visualization for launch — wires to live match logs as volume grows. Counts free; identities paid.</p>
+  </div>
+  <div class="grid">
+    <div class="card money featured">
+      <h3>Starter Radar (in $49)</h3>
+      <ul class="tight"><li>Daily alert digest</li><li>Your endpoint match counts</li><li>Top competing categories</li></ul>
+      <button class="cta" type="button" data-checkout-tier="premium_starter" data-checkout-product="premium-index">Get Radar via $49</button>
+    </div>
+    <div class="card">
+      <h3>Pro Radar (in $199)</h3>
+      <ul class="tight"><li>Named agent graph</li><li>Webhook / Discord</li><li>CSV + API export</li></ul>
+      <button class="cta secondary" type="button" data-checkout-tier="premium_pro" data-checkout-product="premium-index">Upgrade Pro</button>
+    </div>
+  </div>
+
+
+<footer>
+  <p><strong style="color:var(--txt)">Script Master Labs, LLC</strong> · SDVOSB · Kinston, NC 28504 · 321-261-8620</p>
+  <p><strong style="color:var(--txt)">Protocol free. Premium Index paid.</strong> Suite modules are bundled into Starter/Pro — not $10 nickels.</p>
+  <p>
+    <a href="/imp-suite.html">Suite</a> ·
+    <a href="/pricing.html">Pricing</a> ·
+    <a href="/agent-ready-badge.html">Badge</a> ·
+    <a href="/agent-radar.html">Radar</a> ·
+    <a href="/match-receipts.html">Receipts</a> ·
+    <a href="/intention-drops.html">Drops</a> ·
+    <a href="/agentrank-live.html">AgentRank</a> ·
+    <a href="/amb-amplify.html">AMB Amplify</a>
+  </p>
+</footer>
+
+</main>
+
+<script>
+(function () {
+  var BASE = 'https://mcp-x402.onrender.com';
+  function goCheckout(tier, product, btn) {
+    if (btn) { btn.disabled = true; btn.textContent = 'Redirecting to Stripe…'; }
+    fetch(BASE + '/api/checkout/create-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ tier: tier, product: product || 'premium-index' })
+    })
+      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, status: r.status, body: j }; }); })
+      .then(function (res) {
+        if (res.body && res.body.checkout_url) { window.location.href = res.body.checkout_url; return; }
+        var msg = (res.body && (res.body.detail || res.body.error || res.body.message)) || ('Checkout unavailable (' + res.status + ')');
+        alert(msg);
+        if (btn) { btn.disabled = false; btn.textContent = btn.getAttribute('data-label') || 'Try again'; }
+      })
+      .catch(function (e) {
+        alert('Checkout request failed: ' + e);
+        if (btn) { btn.disabled = false; btn.textContent = btn.getAttribute('data-label') || 'Try again'; }
+      });
+  }
+  document.querySelectorAll('[data-checkout-tier]').forEach(function (btn) {
+    btn.setAttribute('data-label', btn.textContent);
+    btn.addEventListener('click', function () {
+      goCheckout(btn.getAttribute('data-checkout-tier'), btn.getAttribute('data-checkout-product'), btn);
+    });
+  });
+})();
+</script>
+
+</body>
+</html>

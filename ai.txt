@@ -28,3 +28,5 @@ Contact: hello@scriptmasterlabs.com
 - ACP wedges: gas_tracker $0.001 · rwa_intelligence $0.03 on scriptmasterlabs (rating 5.00)
 - RWA Agent Snack (10-line x402): https://www.scriptmasterlabs.com/rwa-agent-snack.html
 - Pricing (Capability Index): https://www.scriptmasterlabs.com/pricing.html
+- IMP Suite: https://www.scriptmasterlabs.com/imp-suite.html
+- AMB Amplify: https://www.scriptmasterlabs.com/amb-amplify.html

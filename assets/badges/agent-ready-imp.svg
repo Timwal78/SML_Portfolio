@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="48" role="img" aria-label="Agent-Ready IMP">
+  <rect width="220" height="48" rx="8" fill="#0b1220" stroke="#3d6fd8" stroke-width="2"/>
+  <circle cx="24" cy="24" r="8" fill="#3dd68c"/>
+  <text x="42" y="22" fill="#e8eefc" font-family="ui-sans-serif,system-ui,sans-serif" font-size="13" font-weight="700">Agent-Ready</text>
+  <text x="42" y="38" fill="#9aabcc" font-family="ui-sans-serif,system-ui,sans-serif" font-size="11">IMP · Script Master Labs</text>
+</svg>

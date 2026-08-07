@@ -1,0 +1,46 @@
+{
+  "protocol": "imp",
+  "version": "0.1",
+  "name": "Script Master Labs Premium Capability Index",
+  "url": "https://www.scriptmasterlabs.com",
+  "description": "Hosted multi-rail capability discovery for AI agents. Protocol free. Premium Index paid.",
+  "capabilities": [
+    "capability-match",
+    "agent-discovery",
+    "x402-settlement",
+    "amb-beacon",
+    "match-receipts",
+    "agent-radar",
+    "agentrank"
+  ],
+  "payments": [
+    "x402",
+    "stripe-subscription"
+  ],
+  "pricing": {
+    "open_source": 0,
+    "premium_starter_usd_mo": 49,
+    "premium_pro_usd_mo": 199,
+    "amb_amplify_usd_mo": 79
+  },
+  "payTo": {
+    "base_usdc": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa"
+  },
+  "links": {
+    "suite": "https://www.scriptmasterlabs.com/imp-suite.html",
+    "pricing": "https://www.scriptmasterlabs.com/pricing.html",
+    "badge": "https://www.scriptmasterlabs.com/agent-ready-badge.html",
+    "radar": "https://www.scriptmasterlabs.com/agent-radar.html",
+    "amb": "https://www.scriptmasterlabs.com/.well-known/amb.json",
+    "github_imp": "https://github.com/Timwal78/intention-market-protocol"
+  },
+  "contact": "timothy.walton45@gmail.com",
+  "org": {
+    "name": "Script Master Labs, LLC",
+    "sdvosb": true,
+    "uei": "G24VZA4RLMK3",
+    "cage": "21U51",
+    "locality": "Kinston, NC 28504",
+    "phone": "321-261-8620"
+  }
+}

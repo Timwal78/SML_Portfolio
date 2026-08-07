@@ -540,3 +540,15 @@ Agent-facing directory + listing surface for machine commerce.
 
 ## Partners & reciprocals (fresh 2026-08-06)
 - https://www.scriptmasterlabs.com/partners.html
+
+## IMP Suite (monetized on free protocol)
+- Hub: https://www.scriptmasterlabs.com/imp-suite.html
+- Rule: NOT +$10 add-ons. Badge/Radar/Receipts/Drops/AgentRank bundled in Premium Index $49/$199.
+- AMB Amplify separate SKU $79/mo: https://www.scriptmasterlabs.com/amb-amplify.html
+- Badge: https://www.scriptmasterlabs.com/agent-ready-badge.html
+- Radar: https://www.scriptmasterlabs.com/agent-radar.html
+- Receipts: https://www.scriptmasterlabs.com/match-receipts.html
+- Drops: https://www.scriptmasterlabs.com/intention-drops.html
+- AgentRank: https://www.scriptmasterlabs.com/agentrank-live.html
+- Well-known: https://www.scriptmasterlabs.com/.well-known/imp.json
+- Pricing: https://www.scriptmasterlabs.com/pricing.html · product premium-index · tiers premium_starter / premium_pro
