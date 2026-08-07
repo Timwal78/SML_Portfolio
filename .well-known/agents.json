@@ -18,13 +18,21 @@
       "name": "x402 Data API",
       "endpoint": "https://mcp-x402.onrender.com",
       "transport": "http",
-      "description": "44 pay-per-call U.S. federal data endpoints — grants, SEC filings, healthcare, FTD, compliance, signals. USDC on Base.",
+      "description": "44 pay-per-call U.S. federal data endpoints \u2014 grants, SEC filings, healthcare, FTD, compliance, signals. USDC on Base.",
       "endpoint_count": 44,
       "currency": "USDC",
       "chain": "Base",
       "openapi": "https://mcp-x402.onrender.com/.well-known/openapi.json",
       "stats": "https://mcp-x402.onrender.com/api/stats",
-      "categories": ["Federal", "Healthcare", "SEC", "FTD", "Compliance", "Signals", "Economic"]
+      "categories": [
+        "Federal",
+        "Healthcare",
+        "SEC",
+        "FTD",
+        "Compliance",
+        "Signals",
+        "Economic"
+      ]
     },
     {
       "name": "SqueezeOS",
@@ -32,8 +40,23 @@
       "transport": "streamable-http",
       "protocol_version": "2024-11-05",
       "tool_count": 46,
-      "free_tools": ["signal_preview", "oracle_directive", "ftd_alerts", "get_agent_credit", "marketplace_browse", "futures_leaderboard"],
-      "paid_tools": ["council_verdict", "market_scan", "options_flow", "iam_resolve", "ftd_analysis", "macro_741_scan", "marketplace_read_signal"],
+      "free_tools": [
+        "signal_preview",
+        "oracle_directive",
+        "ftd_alerts",
+        "get_agent_credit",
+        "marketplace_browse",
+        "futures_leaderboard"
+      ],
+      "paid_tools": [
+        "council_verdict",
+        "market_scan",
+        "options_flow",
+        "iam_resolve",
+        "ftd_analysis",
+        "macro_741_scan",
+        "marketplace_read_signal"
+      ],
       "currency": "RLUSD",
       "chain": "XRPL"
     },
@@ -42,8 +65,16 @@
       "endpoint": "https://ghost-layer.onrender.com/mcp",
       "transport": "streamable-http",
       "description": "Dual-chain bridge, notary, loyalty, Xahau Hooks",
-      "currencies": ["RLUSD", "XAH", "USDC"],
-      "chains": ["XRPL", "Xahau", "Base"]
+      "currencies": [
+        "RLUSD",
+        "XAH",
+        "USDC"
+      ],
+      "chains": [
+        "XRPL",
+        "Xahau",
+        "Base"
+      ]
     },
     {
       "name": "Shadow Desk",
@@ -84,5 +115,12 @@
     "mcp_manifest": "https://www.scriptmasterlabs.com/.well-known/mcp.json",
     "openapi": "https://www.scriptmasterlabs.com/.well-known/openapi.json",
     "server": "https://www.scriptmasterlabs.com/.well-known/server.json"
-  }
+  },
+  "aws_marketplace": {
+    "listing": "https://aws.amazon.com/marketplace/pp/prodview-lop2m2yjjcs76",
+    "subscribe": "https://aws.amazon.com/marketplace/saas/ordering?productId=c6g8c5zsvgof5a4rpp6eqlzn",
+    "price": "$599/mo",
+    "description": "62 MCP tools + 183 x402 APIs \u00b7 SDVOSB \u00b7 150+ API seat"
+  },
+  "mcp_tools_count": 62
 }

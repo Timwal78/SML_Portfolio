@@ -47,3 +47,5 @@ Contact: hello@scriptmasterlabs.com
 - Negotiate: POST https://acp-x402-scriptmasterlabs.onrender.com/beacon/negotiate
 - Attest: POST https://acp-x402-scriptmasterlabs.onrender.com/beacon/attest
 - Docs: https://www.scriptmasterlabs.com/x402-beacon.html
+aws_marketplace: https://aws.amazon.com/marketplace/pp/prodview-lop2m2yjjcs76
+aws_marketplace_subscribe: https://aws.amazon.com/marketplace/saas/ordering?productId=c6g8c5zsvgof5a4rpp6eqlzn

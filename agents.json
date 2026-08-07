@@ -454,5 +454,12 @@
     "https://acp-x402-scriptmasterlabs.onrender.com/x402/crypto-price",
     "https://acp-x402-scriptmasterlabs.onrender.com/x402/rwa-aggregates"
   ],
-  "x402_host": "https://acp-x402-scriptmasterlabs.onrender.com"
+  "x402_host": "https://acp-x402-scriptmasterlabs.onrender.com",
+  "aws_marketplace": {
+    "listing": "https://aws.amazon.com/marketplace/pp/prodview-lop2m2yjjcs76",
+    "subscribe": "https://aws.amazon.com/marketplace/saas/ordering?productId=c6g8c5zsvgof5a4rpp6eqlzn",
+    "price": "$599/mo",
+    "description": "62 MCP tools + 183 x402 APIs \u00b7 SDVOSB \u00b7 150+ API seat"
+  },
+  "mcp_tools_count": 62
 }
