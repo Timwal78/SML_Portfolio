@@ -552,3 +552,4 @@ Agent-facing directory + listing surface for machine commerce.
 - AgentRank: https://www.scriptmasterlabs.com/agentrank-live.html
 - Well-known: https://www.scriptmasterlabs.com/.well-known/imp.json
 - Pricing: https://www.scriptmasterlabs.com/pricing.html · product premium-index · tiers premium_starter / premium_pro
+- Sales guide (ad-ready): https://www.scriptmasterlabs.com/imp-suite-guide.html
