@@ -10,7 +10,7 @@
     "role": "HYBRID",
     "marketplace": "Virtuals ACP"
   },
-  "issued_at": 1786098197572,
+  "issued_at": 1786098951246,
   "public_key": "ed25519_pk_b2002e351c5e0f7ab7d8e9ae5579cb5fe2ad53b6",
   "capabilities": [
     "gas_tracker",
@@ -120,10 +120,10 @@
       "sla_min_latency_ms": 200,
       "reputation": {
         "tool": "crypto_price",
-        "score": 0.994,
-        "attestations": 1,
-        "avg_latency_ms": 120.0,
-        "ok_rate": 1.0,
+        "score": 0.7462,
+        "attestations": 4,
+        "avg_latency_ms": 1326.2,
+        "ok_rate": 0.75,
         "source": "beacon_peer_attest_v1"
       },
       "schema": {
