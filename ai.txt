@@ -30,3 +30,13 @@ Contact: hello@scriptmasterlabs.com
 - Pricing (Capability Index): https://www.scriptmasterlabs.com/pricing.html
 - IMP Suite: https://www.scriptmasterlabs.com/imp-suite.html
 - AMB Amplify: https://www.scriptmasterlabs.com/amb-amplify.html
+
+# Money wedges
+
+# x402 money wedges (hyphen routes · Base USDC · payTo 0x7233…f4aa)
+- Host: https://acp-x402-scriptmasterlabs.onrender.com
+- Discovery: https://acp-x402-scriptmasterlabs.onrender.com/.well-known/x402
+- Wedge 1 gas: https://acp-x402-scriptmasterlabs.onrender.com/x402/gas-tracker
+- Wedge 2 price: https://acp-x402-scriptmasterlabs.onrender.com/x402/crypto-price
+- Wedge 3 RWA: https://acp-x402-scriptmasterlabs.onrender.com/x402/rwa-aggregates
+- x402scan: https://www.x402scan.com/recipient/0x72330994f379A71542e7bd5a4CF99A9d9743F4aA

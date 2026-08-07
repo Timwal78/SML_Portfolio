@@ -336,5 +336,11 @@
   "network": "eip155:8453",
   "endpoints": {
     "paid_demo": "https://mcp-x402.onrender.com/x402/crypto-price"
-  }
+  },
+  "x402_wedges": [
+    "https://acp-x402-scriptmasterlabs.onrender.com/x402/gas-tracker",
+    "https://acp-x402-scriptmasterlabs.onrender.com/x402/crypto-price",
+    "https://acp-x402-scriptmasterlabs.onrender.com/x402/rwa-aggregates"
+  ],
+  "x402_host": "https://acp-x402-scriptmasterlabs.onrender.com"
 }
