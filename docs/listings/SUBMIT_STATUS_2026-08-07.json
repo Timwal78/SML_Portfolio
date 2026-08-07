@@ -1,0 +1,123 @@
+{
+  "date": "2026-08-07",
+  "policy": "Real submits only. OTP/human portals cannot be completed by agent without browser login.",
+  "already_submitted_automated": [
+    {
+      "target": "e2b-dev/awesome-ai-agents",
+      "status": "open_pr",
+      "url": "https://github.com/e2b-dev/awesome-ai-agents/pull/1362",
+      "number": 1362,
+      "title": "Add Script Master Labs Premium Capability Index"
+    },
+    {
+      "target": "e2b-dev/awesome-ai-agents",
+      "status": "tree_fail",
+      "code": 422,
+      "err": {
+        "message": "base_tree is not a valid tree oid",
+        "documentation_url": "https://docs.github.com/rest/git/trees#create-a-tree",
+        "status": "422"
+      }
+    },
+    {
+      "target": "appcypher/awesome-mcp-servers",
+      "status": "pr_fail",
+      "code": 404,
+      "err": {
+        "message": "Not Found",
+        "documentation_url": "https://docs.github.com/rest/pulls/pulls#create-a-pull-request",
+        "status": "404"
+      }
+    },
+    {
+      "target": "public-apis/public-apis",
+      "status": "no_crypto_section"
+    }
+  ],
+  "human_required": [
+    {
+      "platform": "Glama.ai MCP",
+      "url": "https://glama.ai/mcp/servers",
+      "action": "Submit/claim MCP server via Glama UI (GitHub login).",
+      "payload": {
+        "name": "SqueezeOS",
+        "endpoint": "https://squeezeos-api.onrender.com/mcp",
+        "website": "https://www.scriptmasterlabs.com",
+        "repo": "https://github.com/Timwal78/SqueezeOS"
+      }
+    },
+    {
+      "platform": "There's An AI",
+      "url": "https://theresanaiforthat.com/submit/",
+      "action": "Human form + possible captcha",
+      "payload": {
+        "name": "SqueezeOS by Script Master Labs",
+        "url": "https://www.scriptmasterlabs.com",
+        "description": "Agent-native x402 APIs + MCP market intelligence. Pay-per-call USDC on Base. BEACON discovery."
+      }
+    },
+    {
+      "platform": "Toolify.ai",
+      "url": "https://www.toolify.ai/submit",
+      "action": "Human form"
+    },
+    {
+      "platform": "OpenTools.ai",
+      "url": "https://opentools.ai",
+      "action": "Create listing in UI"
+    },
+    {
+      "platform": "ProductHunt",
+      "url": "https://www.producthunt.com/posts/new",
+      "action": "Human launch (use PRODUCTHUNT_LAUNCH_KIT.md)"
+    },
+    {
+      "platform": "G2 Software",
+      "url": "https://www.g2.com/",
+      "action": "Vendor claim \u2014 human + business email"
+    },
+    {
+      "platform": "AlternativeTo",
+      "url": "https://alternativeto.net/manage/new/",
+      "action": "Human account form"
+    },
+    {
+      "platform": "npmjs",
+      "url": "https://www.npmjs.com/",
+      "action": "Publish/verify package under @scriptmasterlabs if package ready (not a directory form)"
+    },
+    {
+      "platform": "PyPI",
+      "url": "https://pypi.org/",
+      "action": "Publish package if ready \u2014 not a free-text directory"
+    },
+    {
+      "platform": "DeFi Llama Tools",
+      "url": "https://github.com/DefiLlama/defillama-app",
+      "action": "Usually PR/tooling list \u2014 research current contribute path"
+    },
+    {
+      "platform": "CoinGecko Apps",
+      "url": "https://www.coingecko.com/",
+      "action": "Partner/application \u2014 human"
+    },
+    {
+      "platform": "APILayer / public-apis.io",
+      "url": "various",
+      "action": "Portal forms; public-apis often GitHub PR to public-apis/public-apis"
+    }
+  ],
+  "copy_paste_blurb": {
+    "name": "SqueezeOS \u2014 Script Master Labs",
+    "website": "https://www.scriptmasterlabs.com",
+    "pricing": "https://www.scriptmasterlabs.com/pricing.html",
+    "mcp": "https://squeezeos-api.onrender.com/mcp",
+    "x402": "https://acp-x402-scriptmasterlabs.onrender.com/.well-known/x402.json",
+    "agents": "https://www.scriptmasterlabs.com/agents",
+    "email": "timothy.walton45@gmail.com",
+    "nap": "Kinston, NC 28504 \u00b7 321-261-8620",
+    "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
+    "short": "Agent-native x402 data APIs + MCP market intelligence. Pay-per-call Base USDC. BEACON discovery + Receipt Theater.",
+    "long": "Script Master Labs provides SqueezeOS and an x402 API mesh for autonomous agents: live market intelligence MCP tools, pay-per-call data (gas, crypto price, RWA aggregates), BEACON intent discovery, and verifiable payment receipts. No fake demo scoreboards \u2014 real settlements on Base USDC to payTo 0x7233\u2026"
+  }
+}
