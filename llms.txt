@@ -563,4 +563,4 @@ Agent-facing directory + listing surface for machine commerce.
 ## AWS Marketplace
 - Public listing: https://aws.amazon.com/marketplace/pp/prodview-lop2m2yjjcs76
 - Subscribe ($599/mo): https://aws.amazon.com/marketplace/saas/ordering?productId=c6g8c5zsvgof5a4rpp6eqlzn
-- Platform: 62 MCP tools + 183 x402 APIs · SDVOSB · SAM UEI G24VZA4RLMK3 · CAGE 21U51
+- Platform: 96 MCP tools + 183 x402 APIs · SDVOSB · SAM UEI G24VZA4RLMK3 · CAGE 21U51
