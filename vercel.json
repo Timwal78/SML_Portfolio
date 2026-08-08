@@ -33,14 +33,14 @@
   ],
   "redirects": [
     {
-      "source": "/:path*",
+      "source": "/:path((?!\\.well-known/mcp-registry-auth).*)",
       "has": [
         {
           "type": "host",
           "value": "scriptmasterlabs.com"
         }
       ],
-      "destination": "https://www.scriptmasterlabs.com/:path*",
+      "destination": "https://www.scriptmasterlabs.com/:path",
       "statusCode": 301
     },
     {
@@ -871,6 +871,23 @@
         {
           "key": "Cache-Control",
           "value": "public, max-age=300, stale-while-revalidate=86400"
+        }
+      ]
+    },
+    {
+      "source": "/.well-known/mcp-registry-auth",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/plain; charset=utf-8"
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=60"
         }
       ]
     }

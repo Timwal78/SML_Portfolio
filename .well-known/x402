@@ -95,10 +95,63 @@
     1,
     2
   ],
-  "serviceManifest": "https://mcp-x402.onrender.com/.well-known/x402",
-  "serviceManifestSpec": "x402-service-manifest/1",
-  "health": "https://mcp-x402.onrender.com/health",
+  "serviceManifest": "https://acp-x402-scriptmasterlabs.onrender.com/.well-known/x402",
+  "serviceManifestSpec": "openapi/3.1",
+  "health": [
+    "https://acp-x402-scriptmasterlabs.onrender.com/health",
+    "https://mcp-x402.onrender.com/health"
+  ],
   "mcpDirectory": "https://www.scriptmasterlabs.com/.well-known/mcp.json",
   "agentCard": "https://squeezeos-api.onrender.com/.well-known/agent.json",
-  "pricing": "https://www.scriptmasterlabs.com/pricing"
+  "pricing": "https://www.scriptmasterlabs.com/pricing",
+  "serviceManifests": [
+    {
+      "name": "ScriptMasterLabs x402 API catalog",
+      "url": "https://acp-x402-scriptmasterlabs.onrender.com/.well-known/x402",
+      "spec": "openapi/3.1",
+      "entries": 137,
+      "description": "Full priced HTTP API catalog, including the squeeze scanner line."
+    },
+    {
+      "name": "ScriptMasterLabs MCP tool catalog",
+      "url": "https://mcp-x402.onrender.com/.well-known/x402",
+      "spec": "x402-service-manifest/1",
+      "entries": 81,
+      "description": "MCP tool surface (85+ pay-per-call tools) and OpenAPI for the MCP host."
+    }
+  ],
+  "featuredProducts": [
+    {
+      "name": "Equity squeeze scanner",
+      "endpoint": "https://acp-x402-scriptmasterlabs.onrender.com/x402/squeeze-scanner",
+      "price": "0.01",
+      "asset": "USDC",
+      "network": "eip155:8453",
+      "universe": "$1-$200 equities, real-time"
+    },
+    {
+      "name": "Penny squeeze scanner",
+      "endpoint": "https://acp-x402-scriptmasterlabs.onrender.com/x402/penny-squeeze-scanner",
+      "price": "0.01",
+      "asset": "USDC",
+      "network": "eip155:8453",
+      "universe": "sub-$10 equities, real-time"
+    },
+    {
+      "name": "Crypto squeeze scanner",
+      "endpoint": "https://acp-x402-scriptmasterlabs.onrender.com/x402/crypto-squeeze-scanner",
+      "price": "0.001",
+      "asset": "USDC",
+      "network": "eip155:8453",
+      "universe": "CoinGecko markets, real-time"
+    },
+    {
+      "name": "Crypto penny squeeze scanner",
+      "endpoint": "https://acp-x402-scriptmasterlabs.onrender.com/x402/crypto-penny-squeeze-scanner",
+      "price": "0.001",
+      "asset": "USDC",
+      "network": "eip155:8453",
+      "universe": "sub-$1 crypto, real-time"
+    }
+  ]
 }
