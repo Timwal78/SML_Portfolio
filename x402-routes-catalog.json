@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-06Tproduction",
+  "generated": "2026-08-08T00:01:02Zproduction",
   "price_floor_usdc": 0.001,
   "hosts": 2,
   "host_ids": [
@@ -7,7 +7,7 @@
     "acp"
   ],
   "host_note": "Live x402 hosts only. sml-rwa not deployed.",
-  "count": 215,
+  "count": 219,
   "routes": [
     {
       "method": "GET",
@@ -2156,6 +2156,46 @@
       "path": "/x402/yaml-to-json",
       "desc": "ScriptMasterLabs yaml to json API. Pay 0.001 USDC on Base via x402 (X-PAYMENT), then retry.",
       "cat": "Snacks",
+      "free": false,
+      "cost": "0.001 USDC"
+    },
+    {
+      "method": "GET",
+      "host": "acp",
+      "hostLabel": "acp-x402",
+      "path": "/x402/squeeze-scanner",
+      "desc": "ScriptMasterLabs equity squeeze scanner API ($1-$200 universe, real-time). Pay 0.01 USDC on Base via x402 (X-PAYMENT), then retry.",
+      "cat": "Snacks",
+      "free": false,
+      "cost": "0.01 USDC"
+    },
+    {
+      "method": "GET",
+      "host": "acp",
+      "hostLabel": "acp-x402",
+      "path": "/x402/penny-squeeze-scanner",
+      "desc": "ScriptMasterLabs penny stock squeeze scanner API (sub-$10 universe, real-time). Pay 0.01 USDC on Base via x402 (X-PAYMENT), then retry.",
+      "cat": "Snacks",
+      "free": false,
+      "cost": "0.01 USDC"
+    },
+    {
+      "method": "GET",
+      "host": "acp",
+      "hostLabel": "acp-x402",
+      "path": "/x402/crypto-squeeze-scanner",
+      "desc": "ScriptMasterLabs crypto squeeze scanner API (real-time CoinGecko markets). Pay 0.001 USDC on Base via x402 (X-PAYMENT), then retry.",
+      "cat": "Crypto",
+      "free": false,
+      "cost": "0.001 USDC"
+    },
+    {
+      "method": "GET",
+      "host": "acp",
+      "hostLabel": "acp-x402",
+      "path": "/x402/crypto-penny-squeeze-scanner",
+      "desc": "ScriptMasterLabs sub-$1 crypto squeeze scanner API (real-time CoinGecko markets). Pay 0.001 USDC on Base via x402 (X-PAYMENT), then retry.",
+      "cat": "Crypto",
       "free": false,
       "cost": "0.001 USDC"
     }
