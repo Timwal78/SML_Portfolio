@@ -189,6 +189,7 @@ const CATALOG = {
       tools: [
         { name: 'get_beacon_score', type: 'FREE', description: 'Real BEACON Score for one tool, or the full ranked list — same underlying data as AMB, not a second scoring system' },
         { name: 'get_beacon_passport', type: 'FREE', description: 'Provider- or tool-level BEACON Passport — real capabilities/networks/prices/payment history; honestly empty attestations/risk_policies' },
+        { name: 'beacon_scout', type: 'FREE', description: 'The agent-magnet report: real proof strangers/AI agents are finding and paying SML (live traffic + payment data), confirms SML\'s own discovery surface is reachable, and lists real external discovery targets worth getting listed on' },
       ],
     },
     {

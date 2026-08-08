@@ -21,6 +21,7 @@ import { Router as createRouter } from 'express';
 import { getLiveAmbDocument, getCachedBeacons } from './amb-routes.js';
 import { SAFE_PAY_TO, MULTI_RAILS, AMB_VERSION } from './amb-generator.js';
 import { X402Stats } from '../security/x402-stats.js';
+import { getScoutReport } from '../tools/beacon-scout.js';
 
 export const BEACON_VERSION = '0.1.0';
 
@@ -153,6 +154,23 @@ export function createBeaconRouter(): Router {
       supported_agent_protocols: ['x402', 'MCP (Model Context Protocol)', 'Virtuals ACP'],
       as_of: new Date().toISOString(),
     });
+  });
+
+  // beacon_scout — the agent-magnet report. See tools/beacon-scout.ts's
+  // header comment for the full design rationale (real traffic/payment
+  // proof + real reachability checks, never projected or seeded).
+  router.get('/beacon/scout', async (req: Request, res: Response) => {
+    try {
+      const host = req.headers.host || 'mcp-x402.onrender.com';
+      const proto = (req.headers['x-forwarded-proto'] as string) || 'https';
+      const report = await getScoutReport(`${proto}://${host}`);
+      res.setHeader('Cache-Control', 'public, max-age=30').setHeader('Access-Control-Allow-Origin', '*').json({
+        beacon_version: BEACON_VERSION,
+        ...report,
+      });
+    } catch (err) {
+      res.status(500).json({ error: 'beacon_scout_error', message: String(err) });
+    }
   });
 
   return router;

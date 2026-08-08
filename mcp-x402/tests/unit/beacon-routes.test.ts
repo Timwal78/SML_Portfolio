@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import express from 'express';
 import request from 'supertest';
 import { createBeaconRouter } from '../../src/server/amb/beacon-routes.js';
@@ -98,5 +98,27 @@ describe('GET /beacon/passport/:tool', () => {
     expect(res.status).toBe(200);
     expect(res.body.attestations.count).toBe(0);
     expect(res.body.risk_policies.note).toMatch(/not implemented/i);
+  });
+});
+
+describe('GET /beacon/scout', () => {
+  // getScoutReport() makes real outbound fetch calls (SML's own discovery
+  // surface + external sites like x402scan.com) — must be mocked, never
+  // hit real network in a test run.
+  beforeEach(() => {
+    vi.stubGlobal('fetch', vi.fn(async () => new Response('{}', { status: 200 })));
+  });
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+  });
+
+  it('returns the real sign/attraction/go_get_found report shape over HTTP', async () => {
+    const res = await request(makeApp()).get('/beacon/scout');
+    expect(res.status).toBe(200);
+    expect(res.body.sign).toBeDefined();
+    expect(res.body.attraction).toBeDefined();
+    expect(res.body.go_get_found).toBeDefined();
+    expect(res.body.sign.all_reachable).toBe(true);
   });
 });
