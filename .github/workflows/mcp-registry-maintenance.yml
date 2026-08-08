@@ -1,0 +1,50 @@
+name: MCP Registry Maintenance
+
+on:
+  workflow_dispatch:
+    inputs:
+      server:
+        description: Full server name (e.g. io.github.Timwal78/402proof)
+        required: true
+      status:
+        description: New status
+        required: true
+        default: deprecated
+        type: choice
+        options: [active, deprecated, deleted]
+      message:
+        description: Reason for the status change
+        required: false
+        default: Host offline; listing deprecated to prevent failed agent connections.
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  update-status:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install mcp-publisher
+        run: |
+          curl -sL -o mp.tgz \
+            https://github.com/modelcontextprotocol/registry/releases/download/v1.8.1/mcp-publisher_linux_amd64.tar.gz
+          tar xzf mp.tgz
+          chmod +x mcp-publisher
+          ./mcp-publisher --version || true
+
+      - name: Authenticate via GitHub OIDC
+        run: ./mcp-publisher login github-oidc
+
+      - name: Update server status
+        run: |
+          yes y | ./mcp-publisher status \
+            --status "${{ inputs.status }}" \
+            --all-versions \
+            --message "${{ inputs.message }}" \
+            "${{ inputs.server }}"
+
+      - name: Verify
+        run: |
+          curl -s "https://registry.modelcontextprotocol.io/v0/servers?search=${{ inputs.server }}&limit=10" \
+            | python3 -c "import sys,json;d=json.load(sys.stdin);[print(s.get('server',s).get('name'), s.get('server',s).get('version'), (s.get('_meta') or {}).get('io.modelcontextprotocol.registry/official',{}).get('status')) for s in d.get('servers',[])]"
