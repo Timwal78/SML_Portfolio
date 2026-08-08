@@ -358,6 +358,8 @@ export function generateAMB(
       mcp: 'https://mcp-x402.onrender.com/mcp',
       homepage: 'https://www.scriptmasterlabs.com',
       acp: 'https://acp-x402-scriptmasterlabs.onrender.com/.well-known/amb.json',
+      beacon_score: `https://mcp-x402.onrender.com/beacon/score/${input.toolName}`,
+      beacon_passport: `https://mcp-x402.onrender.com/beacon/passport/${input.toolName}`,
     },
   };
 }
@@ -631,6 +633,8 @@ export function buildAmbDocument(baseUrl?: string): {
       mcp: `${base}/mcp`,
       www: 'https://www.scriptmasterlabs.com/.well-known/amb.json',
       acp: 'https://acp-x402-scriptmasterlabs.onrender.com/.well-known/amb.json',
+      beacon_scores: `${base}/beacon/scores`,
+      beacon_passport: `${base}/beacon/passport`,
     },
     beacons: ordered,
     note:

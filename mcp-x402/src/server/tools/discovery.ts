@@ -183,6 +183,15 @@ const CATALOG = {
       ],
     },
     {
+      product: 'BEACON Score / BEACON Passport',
+      description: 'FREE public branding layer over the same real AMB/IMP data above — a per-tool quality score (measured from real settled/failed calls, honestly disclosed when it isn\'t yet) and a per-provider/per-tool profile (capabilities, networks, prices, real payment history). attestations and risk_policies are disclosed as not-yet-implemented, never fabricated.',
+      backend: 'https://mcp-x402.onrender.com/beacon/scores',
+      tools: [
+        { name: 'get_beacon_score', type: 'FREE', description: 'Real BEACON Score for one tool, or the full ranked list — same underlying data as AMB, not a second scoring system' },
+        { name: 'get_beacon_passport', type: 'FREE', description: 'Provider- or tool-level BEACON Passport — real capabilities/networks/prices/payment history; honestly empty attestations/risk_policies' },
+      ],
+    },
+    {
       product: 'agentcard',
       description: 'Ed25519 A2A agent identity cards — mint, lookup, verify agent signatures',
       backend: 'configurable via AGENTCARD_URL env var',
