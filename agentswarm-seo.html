@@ -3064,6 +3064,18 @@ renderCampaigns();
 renderCommunityScan();
 setInterval(renderCommunityScan, 300000); // live HN query on each poll — no server-side cache to go stale
 renderIndexer();
+// Match Demo box previously only populated when a visitor manually clicked
+// into the AI Indexer tab (see switchTab()'s window.__matchDemoRan gate) --
+// tab-swarm is the default active tab, so most visitors (and any AI agent
+// just fetching/parsing the page without simulating clicks) never saw it
+// run and the box stayed empty indefinitely. Every other live-proof panel
+// on this page already runs unconditionally on boot; this brings Match
+// Demo in line with that. The window.__matchDemoRan guard already in
+// switchTab() prevents a redundant re-fetch if the tab is clicked later.
+if (typeof runMatchDemo === 'function') {
+  window.__matchDemoRan = true;
+  runMatchDemo();
+}
 loadActivity();
 setInterval(loadActivity, 60000);
 
