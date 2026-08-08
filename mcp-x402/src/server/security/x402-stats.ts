@@ -46,6 +46,21 @@ interface PersistedShape {
   aiAgentsAllTime?: number;
   paidToday?: number;
   paidTodayDate?: string;
+  settledByRoute?: Record<string, number>;
+  failedByRoute?: Record<string, number>;
+  latencySumMsByRoute?: Record<string, number>;
+  latencyCountByRoute?: Record<string, number>;
+}
+
+export interface RouteQuality {
+  route: string;
+  settled: number;
+  failed: number;
+  /** null when settled+failed===0 — never fabricated, honestly absent. */
+  successRate: number | null;
+  /** null when no successful call has ever reported timing. */
+  avgLatencyMs: number | null;
+  sampleSize: number;
 }
 
 function hashWallet(address: string): string {
@@ -86,6 +101,18 @@ export class X402Stats {
   // as index.ts's _agentCounts.today.
   private paidToday = 0;
   private paidTodayDate = new Date().toDateString();
+
+  // Per-route quality signal — added 2026-08-06 after finding AMB's
+  // reputationScore/successRate24h/uptime24h/avgLatencyMs were 100%
+  // hardcoded constants (0.94/0.987/0.999/420ms) applied identically to
+  // EVERY tool, computed from nothing. This is the real replacement data
+  // source: cumulative (not a true rolling 24h window — that would need
+  // timestamped time-bucketed storage this class doesn't have; "cumulative
+  // since startedAt" is the honest label, see getRouteQuality()'s callers).
+  private settledByRoute = new Map<string, number>();
+  private failedByRoute = new Map<string, number>();
+  private latencySumMsByRoute = new Map<string, number>();
+  private latencyCountByRoute = new Map<string, number>();
 
   private redis: RedisClientType | null = null;
   private redisReady = false;
@@ -143,6 +170,10 @@ export class X402Stats {
     if (data.paidTodayDate === this.paidTodayDate && typeof data.paidToday === 'number') {
       this.paidToday = data.paidToday;
     }
+    if (data.settledByRoute) this.settledByRoute = new Map(Object.entries(data.settledByRoute));
+    if (data.failedByRoute) this.failedByRoute = new Map(Object.entries(data.failedByRoute));
+    if (data.latencySumMsByRoute) this.latencySumMsByRoute = new Map(Object.entries(data.latencySumMsByRoute));
+    if (data.latencyCountByRoute) this.latencyCountByRoute = new Map(Object.entries(data.latencyCountByRoute));
   }
 
   private loadLocal(): void {
@@ -167,6 +198,10 @@ export class X402Stats {
       aiAgentsAllTime: this.aiAgentsAllTime,
       paidToday: this.paidToday,
       paidTodayDate: this.paidTodayDate,
+      settledByRoute: Object.fromEntries(this.settledByRoute),
+      failedByRoute: Object.fromEntries(this.failedByRoute),
+      latencySumMsByRoute: Object.fromEntries(this.latencySumMsByRoute),
+      latencyCountByRoute: Object.fromEntries(this.latencyCountByRoute),
     };
   }
 
@@ -207,17 +242,30 @@ export class X402Stats {
     this.touch();
   }
 
-  recordSettled(facilitator: string, payer: string, tx: string, resource: string): void {
+  /**
+   * durationMs is optional and additive — every existing caller that predates
+   * this parameter still works unchanged (route quality just has no latency
+   * sample from that call). Only successful settlements report latency:
+   * "how long does a real successful call take" is what AMB's avgLatencyMs
+   * actually needs, and a failed/rejected call's timing isn't the same signal.
+   */
+  recordSettled(facilitator: string, payer: string, tx: string, resource: string, durationMs?: number): void {
     this.settledByFacilitator.set(facilitator, (this.settledByFacilitator.get(facilitator) ?? 0) + 1);
     this.aiAgentsAllTime += 1;
     const today = new Date().toDateString();
     if (today !== this.paidTodayDate) { this.paidToday = 0; this.paidTodayDate = today; }
     this.paidToday += 1;
+    const route = routeFromResource(resource);
+    this.settledByRoute.set(route, (this.settledByRoute.get(route) ?? 0) + 1);
+    if (typeof durationMs === 'number' && Number.isFinite(durationMs) && durationMs >= 0) {
+      this.latencySumMsByRoute.set(route, (this.latencySumMsByRoute.get(route) ?? 0) + durationMs);
+      this.latencyCountByRoute.set(route, (this.latencyCountByRoute.get(route) ?? 0) + 1);
+    }
     this.recentSettled.unshift({
       facilitator,
       payerHash: hashWallet(payer),
       tx,
-      route: routeFromResource(resource),
+      route,
       ts: new Date().toISOString(),
     });
     if (this.recentSettled.length > this.maxRecent) this.recentSettled.length = this.maxRecent;
@@ -227,15 +275,38 @@ export class X402Stats {
   recordFailed(stage: 'verify' | 'settle', facilitator: string, reason: string, resource: string): void {
     const key = `${facilitator}:${stage}`;
     this.failedByFacilitatorStage.set(key, (this.failedByFacilitatorStage.get(key) ?? 0) + 1);
+    const route = routeFromResource(resource);
+    this.failedByRoute.set(route, (this.failedByRoute.get(route) ?? 0) + 1);
     this.recentFailed.unshift({
       facilitator,
       stage,
       reason: reason.slice(0, 200),
-      route: routeFromResource(resource),
+      route,
       ts: new Date().toISOString(),
     });
     if (this.recentFailed.length > this.maxRecent) this.recentFailed.length = this.maxRecent;
     this.touch();
+  }
+
+  /**
+   * Real per-route quality — the honest replacement for AMB's old hardcoded
+   * reputationScore/successRate24h/uptime24h/avgLatencyMs constants. Never
+   * fabricates: successRate/avgLatencyMs are null (not a rosy guess) when
+   * there isn't yet a real sample to compute them from.
+   */
+  getRouteQuality(route: string): RouteQuality {
+    const settled = this.settledByRoute.get(route) ?? 0;
+    const failed = this.failedByRoute.get(route) ?? 0;
+    const latSum = this.latencySumMsByRoute.get(route) ?? 0;
+    const latCount = this.latencyCountByRoute.get(route) ?? 0;
+    return {
+      route,
+      settled,
+      failed,
+      successRate: settled + failed > 0 ? settled / (settled + failed) : null,
+      avgLatencyMs: latCount > 0 ? Math.round(latSum / latCount) : null,
+      sampleSize: settled + failed,
+    };
   }
 
   /** Optional: bump all-time agent visit counter from public request middleware. */
@@ -278,6 +349,8 @@ export class X402Stats {
       requestsByRoute: Object.fromEntries(this.requestsByRoute),
       settledByFacilitator: Object.fromEntries(this.settledByFacilitator),
       failedByFacilitatorStage: Object.fromEntries(this.failedByFacilitatorStage),
+      settledByRoute: Object.fromEntries(this.settledByRoute),
+      failedByRoute: Object.fromEntries(this.failedByRoute),
       recentSettled: this.recentSettled,
       recentFailed: this.recentFailed,
       distinctRecentPayers,

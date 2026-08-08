@@ -23,6 +23,7 @@ import { handleStripeWebhookEvent, getApiKeyForCheckoutSession, isEntitledStripe
 import { runCommunityScan } from './marketing/community.js';
 import { registerTools } from './tools/index.js';
 import { mountAMBRoutes, refreshBeacons } from './amb/amb-routes.js';
+import { mountBeaconRoutes } from './amb/beacon-routes.js';
 import { mountPremiumIndexRoutes } from './premium/routes.js';
 import { mountLeadCaptureRoutes } from './premium/leads.js';
 import { recordAmbTraffic } from './amb/amb-traffic.js';
@@ -706,6 +707,10 @@ POST https://mcp-x402.onrender.com/aws/marketplace/sns</pre>
 
   // Agent Magnet Beacons — multi-rail payTo ACP 0x7233 (never 0x4e14)
   mountAMBRoutes(app);
+  // BEACON Score / BEACON Passport — public branding layer over the same
+  // real AMB/IMP data above (see beacon-routes.ts's own header comment for
+  // why this doesn't rename amb.json/imp_score instead).
+  mountBeaconRoutes(app);
   mountPremiumIndexRoutes(app);
   mountLeadCaptureRoutes(app);
   try { refreshBeacons(); } catch (e) { console.warn('[AMB] initial refresh failed', e); }

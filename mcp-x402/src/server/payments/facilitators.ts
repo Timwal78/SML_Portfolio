@@ -391,6 +391,9 @@ export class FacilitatorChain {
     const audit = AuditLogger.getInstance();
     const stats = X402Stats.getInstance();
     stats.recordAttempt(req.resource);
+    // Real per-route latency for AMB's avgLatencyMs (was a hardcoded 420ms
+    // constant for every tool) — measures actual verify+settle wall time.
+    const startedAtMs = Date.now();
     const attempts: Array<{ facilitator: string; stage: string; reason: string }> = [];
     let lastReason = 'no_facilitator';
     for (const f of this.chain) {
@@ -405,7 +408,7 @@ export class FacilitatorChain {
       const s = await f.settle(payload, req);
       if (s.success) {
         audit.info('facilitator_settled', { facilitator: f.name, tx: s.transaction ?? '' });
-        stats.recordSettled(f.name, s.payer ?? 'unknown', s.transaction ?? '', req.resource);
+        stats.recordSettled(f.name, s.payer ?? 'unknown', s.transaction ?? '', req.resource, Date.now() - startedAtMs);
         return { ...s, facilitator: f.name, attempts };
       }
       lastReason = s.errorReason ?? 'settle_failed';
