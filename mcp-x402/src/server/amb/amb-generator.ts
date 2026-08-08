@@ -10,6 +10,7 @@
  */
 import { createHash } from 'node:crypto';
 import { scoreToolImp, type ImpScoreResult } from './imp-scoring.js';
+import { computeRealToolMetrics, type DataConfidence } from './amb-quality.js';
 
 export const AMB_VERSION = '0.1.0';
 export const ACP_PAY_TO =
@@ -66,6 +67,10 @@ export interface AMBInput {
   description?: string;
   capabilities?: string[];
   ttlMinutes?: number;
+  /** Whether performance/reputation numbers below are real measurements or the scoring formula's neutral cold-start defaults — never left ambiguous. */
+  dataConfidence?: DataConfidence;
+  qualitySampleSize?: number;
+  qualityNote?: string;
 }
 
 export interface AgentMagnetBeacon {
@@ -105,6 +110,18 @@ export interface AgentMagnetBeacon {
     score: number;
     settlements: number;
     source: string;
+  };
+  /**
+   * Added 2026-08-06 — whether performance/reputation above is a real
+   * measurement or the scoring formula's own documented neutral default.
+   * Every field above this used to be a hardcoded constant applied to
+   * every tool with no way to tell; this makes that distinction explicit
+   * instead of silently indistinguishable.
+   */
+  data_quality: {
+    confidence: DataConfidence;
+    sample_size: number;
+    note: string;
   };
   magnet_strength: number;
   /** IMP v0.1 multi-rail composite — primary rank key for list_magnets */
@@ -311,6 +328,11 @@ export function generateAMB(
       settlements: input.settlements ?? 0,
       source: '402Proof',
     },
+    data_quality: {
+      confidence: input.dataConfidence ?? 'not_tracked',
+      sample_size: input.qualitySampleSize ?? 0,
+      note: input.qualityNote ?? 'No real-metrics wiring configured for this beacon.',
+    },
     magnet_strength: strength,
     imp_score: imp.imp_score,
     rail_score: imp.rail_score,
@@ -365,18 +387,37 @@ export function exampleSqueezeScannerBeacon(privateKeyPem?: string): AgentMagnet
   );
 }
 
-/** Default live tool set advertised as magnets on mcp-x402 */
+/**
+ * Default live tool set advertised as magnets on mcp-x402.
+ *
+ * Was: one hardcoded `common` block (avgLatencyMs=420, successRate24h=0.987,
+ * uptime24h=0.999, reputationScore=0.94) spread onto every single tool below,
+ * identical regardless of whether that tool had ever been called — a live
+ * public document presenting fabricated quality signals as real ones. Now:
+ * each paid tool gets computeRealToolMetrics(toolName) (see amb-quality.ts),
+ * which returns real per-tool numbers once enough real calls exist, and
+ * honestly discloses (via dataConfidence/qualityNote) when it's still
+ * falling back to the scoring formula's own neutral cold-start default.
+ */
 export function defaultMagnetCatalog(): AMBInput[] {
   const base = process.env['PUBLIC_BASE_URL'] || 'https://mcp-x402.onrender.com';
   const mcp = `${base}/mcp`;
   const common = {
     payTo: SAFE_PAY_TO,
     rails: ['base_usdc', 'base_usdg', 'solana_usdc', 'xrpl_rlusd'] as string[],
-    avgLatencyMs: 420,
-    successRate24h: 0.987,
-    uptime24h: 0.999,
-    reputationScore: 0.94,
-    settlements: Number(process.env['AMB_SETTLEMENTS'] || '0'),
+  };
+  const paidTool = (toolName: string) => {
+    const m = computeRealToolMetrics(toolName);
+    return {
+      avgLatencyMs: m.avgLatencyMs,
+      successRate24h: m.successRate24h,
+      uptime24h: m.uptime24h,
+      reputationScore: m.reputationScore,
+      settlements: m.settlements,
+      dataConfidence: m.dataConfidence,
+      qualitySampleSize: m.sampleSize,
+      qualityNote: m.note,
+    };
   };
   return [
     {
@@ -386,10 +427,16 @@ export function defaultMagnetCatalog(): AMBInput[] {
       endpoint: `${base}/.well-known/amb.json`,
       price: '0',
       freeTier: true,
+      // Free, no payment ever attempted against this route — there is no
+      // settled/failed signal that could exist for it, so this stays a
+      // disclosed static assumption rather than pretending to measure it.
       avgLatencyMs: 40,
       successRate24h: 1,
       uptime24h: 1,
       reputationScore: 1,
+      dataConfidence: 'not_tracked',
+      qualitySampleSize: 0,
+      qualityNote: 'Free route — no payment is ever attempted here, so there is no settled/failed signal to measure.',
       description: 'FREE — list Agent Magnet Beacons ranked by IMP imp_score (multi-rail).',
       capabilities: ['amb', 'discovery', 'list_magnets'],
     },
@@ -400,11 +447,19 @@ export function defaultMagnetCatalog(): AMBInput[] {
       endpoint: mcp,
       price: '0',
       freeTier: true,
+      avgLatencyMs: 40,
+      successRate24h: 1,
+      uptime24h: 1,
+      reputationScore: 1,
+      dataConfidence: 'not_tracked',
+      qualitySampleSize: 0,
+      qualityNote: 'Free route — no payment is ever attempted here, so there is no settled/failed signal to measure.',
       description: 'FREE catalog of all ScriptMasterLabs MCP tools + prices.',
       capabilities: ['sml_discover', 'discovery'],
     },
     {
       ...common,
+      ...paidTool('squeeze_scanner'),
       toolName: 'squeeze_scanner',
       namespace: 'Finance.TradingIntelligence.SqueezeOS',
       endpoint: mcp,
@@ -414,6 +469,7 @@ export function defaultMagnetCatalog(): AMBInput[] {
     },
     {
       ...common,
+      ...paidTool('squeezeos_council'),
       toolName: 'squeezeos_council',
       namespace: 'Finance.TradingIntelligence.SqueezeOS',
       endpoint: mcp,
@@ -423,6 +479,7 @@ export function defaultMagnetCatalog(): AMBInput[] {
     },
     {
       ...common,
+      ...paidTool('options_flow'),
       toolName: 'options_flow',
       namespace: 'Finance.TradingIntelligence.Options',
       endpoint: mcp,
@@ -432,6 +489,7 @@ export function defaultMagnetCatalog(): AMBInput[] {
     },
     {
       ...common,
+      ...paidTool('gas_tracker'),
       toolName: 'gas_tracker',
       namespace: 'Crypto.Onchain.Gas',
       endpoint: `${base}/x402/gas-tracker`,
@@ -441,6 +499,7 @@ export function defaultMagnetCatalog(): AMBInput[] {
     },
     {
       ...common,
+      ...paidTool('crypto_token_price'),
       toolName: 'crypto_token_price',
       namespace: 'Crypto.Market.Data',
       endpoint: mcp,
@@ -450,6 +509,7 @@ export function defaultMagnetCatalog(): AMBInput[] {
     },
     {
       ...common,
+      ...paidTool('fx_exchange_rate'),
       toolName: 'fx_exchange_rate',
       namespace: 'Finance.FX',
       endpoint: mcp,
@@ -459,6 +519,7 @@ export function defaultMagnetCatalog(): AMBInput[] {
     },
     {
       ...common,
+      ...paidTool('search_grants'),
       toolName: 'search_grants',
       namespace: 'Gov.Federal.Grants',
       endpoint: mcp,
@@ -468,6 +529,7 @@ export function defaultMagnetCatalog(): AMBInput[] {
     },
     {
       ...common,
+      ...paidTool('search_contracts'),
       toolName: 'search_contracts',
       namespace: 'Gov.Federal.SAM',
       endpoint: mcp,
@@ -477,6 +539,7 @@ export function defaultMagnetCatalog(): AMBInput[] {
     },
     {
       ...common,
+      ...paidTool('rwa_intelligence'),
       toolName: 'rwa_intelligence',
       namespace: 'Finance.RWA.Intelligence',
       endpoint: mcp,
