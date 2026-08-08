@@ -1,5 +1,5 @@
 {
-  "x402Version": 1,
+  "x402Version": 2,
   "product": "ScriptMasterLabs multi-rail x402",
   "company": "Script Master Labs, LLC",
   "homepage": "https://www.scriptmasterlabs.com",
@@ -37,7 +37,10 @@
       "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
       "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "decimals": 6,
-      "headers": ["X-PAYMENT", "X-PAYMENT-TX"],
+      "headers": [
+        "X-PAYMENT",
+        "X-PAYMENT-TX"
+      ],
       "status": "live"
     },
     {
@@ -46,12 +49,16 @@
       "network": "eip155:4663",
       "chainId": 4663,
       "symbol": "USDG",
-      "aliases": ["USCG"],
+      "aliases": [
+        "USCG"
+      ],
       "name": "Global Dollar",
       "asset": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
       "payTo": "0x72330994f379a71542e7bd5a4cf99a9d9743f4aa",
       "decimals": 6,
-      "headers": ["X-PAYMENT-TX"],
+      "headers": [
+        "X-PAYMENT-TX"
+      ],
       "settlement": "sovereign-tx",
       "rpc": "https://rpc.mainnet.chain.robinhood.com",
       "explorer": "https://robinhoodchain.blockscout.com",
@@ -68,7 +75,9 @@
       "asset": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
       "payTo": "E4d3JwcTjeqTRkkQS4moszcfa4R7G1NMgPSew4KBNFrB",
       "decimals": 6,
-      "headers": ["X-PAYMENT-TX"],
+      "headers": [
+        "X-PAYMENT-TX"
+      ],
       "settlement": "sovereign-tx",
       "status": "live"
     }
@@ -81,5 +90,15 @@
     "https://mcp-x402.onrender.com/.well-known/x402",
     "https://acp-x402-scriptmasterlabs.onrender.com/.well-known/x402"
   ],
-  "updated": "2026-08-02"
+  "updated": "2026-08-08",
+  "supportedX402Versions": [
+    1,
+    2
+  ],
+  "serviceManifest": "https://mcp-x402.onrender.com/.well-known/x402",
+  "serviceManifestSpec": "x402-service-manifest/1",
+  "health": "https://mcp-x402.onrender.com/health",
+  "mcpDirectory": "https://www.scriptmasterlabs.com/.well-known/mcp.json",
+  "agentCard": "https://squeezeos-api.onrender.com/.well-known/agent.json",
+  "pricing": "https://www.scriptmasterlabs.com/pricing"
 }
