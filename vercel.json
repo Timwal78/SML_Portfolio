@@ -278,6 +278,386 @@
       "source": "/rwa-snack",
       "destination": "/rwa-agent-snack.html",
       "permanent": false
+    },
+    {
+      "source": "/about",
+      "destination": "/about.html",
+      "permanent": false
+    },
+    {
+      "source": "/agent-credit-bureau",
+      "destination": "/agent-credit-bureau.html",
+      "permanent": false
+    },
+    {
+      "source": "/agent-radar",
+      "destination": "/agent-radar.html",
+      "permanent": false
+    },
+    {
+      "source": "/agent-ready-badge",
+      "destination": "/agent-ready-badge.html",
+      "permanent": false
+    },
+    {
+      "source": "/agent-send",
+      "destination": "/agent-send.html",
+      "permanent": false
+    },
+    {
+      "source": "/agent-start",
+      "destination": "/agent-start.html",
+      "permanent": false
+    },
+    {
+      "source": "/agent-to-agent-payment",
+      "destination": "/agent-to-agent-payment.html",
+      "permanent": false
+    },
+    {
+      "source": "/agentrank-live",
+      "destination": "/agentrank-live.html",
+      "permanent": false
+    },
+    {
+      "source": "/ai-agent-api-discovery-premium-index",
+      "destination": "/ai-agent-api-discovery-premium-index.html",
+      "permanent": false
+    },
+    {
+      "source": "/ai-seo-agent-os",
+      "destination": "/ai-seo-agent-os.html",
+      "permanent": false
+    },
+    {
+      "source": "/amb-amplify",
+      "destination": "/amb-amplify.html",
+      "permanent": false
+    },
+    {
+      "source": "/api-docs",
+      "destination": "/api-docs.html",
+      "permanent": false
+    },
+    {
+      "source": "/autonomous-agent-payments",
+      "destination": "/autonomous-agent-payments.html",
+      "permanent": false
+    },
+    {
+      "source": "/books",
+      "destination": "/books.html",
+      "permanent": false
+    },
+    {
+      "source": "/building-agent-native-business",
+      "destination": "/building-agent-native-business.html",
+      "permanent": false
+    },
+    {
+      "source": "/central-bank",
+      "destination": "/central-bank.html",
+      "permanent": false
+    },
+    {
+      "source": "/crawltoll",
+      "destination": "/crawltoll.html",
+      "permanent": false
+    },
+    {
+      "source": "/earn",
+      "destination": "/earn.html",
+      "permanent": false
+    },
+    {
+      "source": "/echonet",
+      "destination": "/echonet.html",
+      "permanent": false
+    },
+    {
+      "source": "/free-start",
+      "destination": "/free-start.html",
+      "permanent": false
+    },
+    {
+      "source": "/gamma-pin",
+      "destination": "/gamma-pin.html",
+      "permanent": false
+    },
+    {
+      "source": "/ghost-cube",
+      "destination": "/ghost-cube.html",
+      "permanent": false
+    },
+    {
+      "source": "/heatmap",
+      "destination": "/heatmap.html",
+      "permanent": false
+    },
+    {
+      "source": "/hermes-loop",
+      "destination": "/hermes-loop.html",
+      "permanent": false
+    },
+    {
+      "source": "/housing-landlord",
+      "destination": "/housing-landlord.html",
+      "permanent": false
+    },
+    {
+      "source": "/housing-landlord-toolkit",
+      "destination": "/housing-landlord-toolkit.html",
+      "permanent": false
+    },
+    {
+      "source": "/how-to-charge-ai-agents-for-your-api",
+      "destination": "/how-to-charge-ai-agents-for-your-api.html",
+      "permanent": false
+    },
+    {
+      "source": "/http-402-ai-agents",
+      "destination": "/http-402-ai-agents.html",
+      "permanent": false
+    },
+    {
+      "source": "/http-402-payment-required-guide",
+      "destination": "/http-402-payment-required-guide.html",
+      "permanent": false
+    },
+    {
+      "source": "/imp-suite",
+      "destination": "/imp-suite.html",
+      "permanent": false
+    },
+    {
+      "source": "/imp-suite-guide",
+      "destination": "/imp-suite-guide.html",
+      "permanent": false
+    },
+    {
+      "source": "/indicators",
+      "destination": "/indicators.html",
+      "permanent": false
+    },
+    {
+      "source": "/intention-drops",
+      "destination": "/intention-drops.html",
+      "permanent": false
+    },
+    {
+      "source": "/launchpad",
+      "destination": "/launchpad.html",
+      "permanent": false
+    },
+    {
+      "source": "/listings",
+      "destination": "/listings.html",
+      "permanent": false
+    },
+    {
+      "source": "/marketplace",
+      "destination": "/marketplace.html",
+      "permanent": false
+    },
+    {
+      "source": "/match-receipts",
+      "destination": "/match-receipts.html",
+      "permanent": false
+    },
+    {
+      "source": "/mcp-payment-middleware",
+      "destination": "/mcp-payment-middleware.html",
+      "permanent": false
+    },
+    {
+      "source": "/mcp-x402-npm",
+      "destination": "/mcp-x402-npm.html",
+      "permanent": false
+    },
+    {
+      "source": "/micropayments-for-apis-complete-guide",
+      "destination": "/micropayments-for-apis-complete-guide.html",
+      "permanent": false
+    },
+    {
+      "source": "/no-fake-trading-data-policy",
+      "destination": "/no-fake-trading-data-policy.html",
+      "permanent": false
+    },
+    {
+      "source": "/partners",
+      "destination": "/partners.html",
+      "permanent": false
+    },
+    {
+      "source": "/pine-script-squeeze-indicator",
+      "destination": "/pine-script-squeeze-indicator.html",
+      "permanent": false
+    },
+    {
+      "source": "/pipeline",
+      "destination": "/pipeline.html",
+      "permanent": false
+    },
+    {
+      "source": "/premium-success",
+      "destination": "/premium-success.html",
+      "permanent": false
+    },
+    {
+      "source": "/proof402-python-middleware",
+      "destination": "/proof402-python-middleware.html",
+      "permanent": false
+    },
+    {
+      "source": "/rh-usdg",
+      "destination": "/rh-usdg.html",
+      "permanent": false
+    },
+    {
+      "source": "/rlusd-mcp-payments",
+      "destination": "/rlusd-mcp-payments.html",
+      "permanent": false
+    },
+    {
+      "source": "/scriptdocs-30s",
+      "destination": "/scriptdocs-30s.html",
+      "permanent": false
+    },
+    {
+      "source": "/seo-go",
+      "destination": "/seo-go.html",
+      "permanent": false
+    },
+    {
+      "source": "/sml-sovereign-payrails",
+      "destination": "/sml-sovereign-payrails.html",
+      "permanent": false
+    },
+    {
+      "source": "/smlsheets",
+      "destination": "/smlsheets.html",
+      "permanent": false
+    },
+    {
+      "source": "/squeezeos-trading-signals",
+      "destination": "/squeezeos-trading-signals.html",
+      "permanent": false
+    },
+    {
+      "source": "/stripe-vs-crypto-api-payments",
+      "destination": "/stripe-vs-crypto-api-payments.html",
+      "permanent": false
+    },
+    {
+      "source": "/swarm-market-making",
+      "destination": "/swarm-market-making.html",
+      "permanent": false
+    },
+    {
+      "source": "/trustverify-competitive-faq",
+      "destination": "/trustverify-competitive-faq.html",
+      "permanent": false
+    },
+    {
+      "source": "/trustverify-integrations",
+      "destination": "/trustverify-integrations.html",
+      "permanent": false
+    },
+    {
+      "source": "/trustverify-scoring-guide",
+      "destination": "/trustverify-scoring-guide.html",
+      "permanent": false
+    },
+    {
+      "source": "/trustverify-security",
+      "destination": "/trustverify-security.html",
+      "permanent": false
+    },
+    {
+      "source": "/watch-the-agent-pay",
+      "destination": "/watch-the-agent-pay.html",
+      "permanent": false
+    },
+    {
+      "source": "/x402-beacon",
+      "destination": "/x402-beacon.html",
+      "permanent": false
+    },
+    {
+      "source": "/x402-launchpad",
+      "destination": "/x402-launchpad.html",
+      "permanent": false
+    },
+    {
+      "source": "/x402-market-rates",
+      "destination": "/x402-market-rates.html",
+      "permanent": false
+    },
+    {
+      "source": "/x402-paywall",
+      "destination": "/x402-paywall.html",
+      "permanent": false
+    },
+    {
+      "source": "/x402-protocol-guide",
+      "destination": "/x402-protocol-guide.html",
+      "permanent": false
+    },
+    {
+      "source": "/x402-snacks",
+      "destination": "/x402-snacks.html",
+      "permanent": false
+    },
+    {
+      "source": "/x402-vs-api-key",
+      "destination": "/x402-vs-api-key.html",
+      "permanent": false
+    },
+    {
+      "source": "/x402-xrpl-payments",
+      "destination": "/x402-xrpl-payments.html",
+      "permanent": false
+    },
+    {
+      "source": "/xahau-uritokenmint-hooks",
+      "destination": "/xahau-uritokenmint-hooks.html",
+      "permanent": false
+    },
+    {
+      "source": "/xrpl-ai-agent-micropayments",
+      "destination": "/xrpl-ai-agent-micropayments.html",
+      "permanent": false
+    },
+    {
+      "source": "/zeroquery-proof-of-intent",
+      "destination": "/zeroquery-proof-of-intent.html",
+      "permanent": false
+    },
+    {
+      "source": "/docs",
+      "destination": "/scriptdocs-30s.html",
+      "permanent": false
+    },
+    {
+      "source": "/api",
+      "destination": "/api-docs.html",
+      "permanent": false
+    },
+    {
+      "source": "/openapi.json",
+      "destination": "https://mcp-x402.onrender.com/openapi.json",
+      "permanent": false
+    },
+    {
+      "source": "/mcp",
+      "destination": "https://mcp-x402.onrender.com/mcp",
+      "permanent": false
+    },
+    {
+      "source": "/.well-known/openapi.json",
+      "destination": "https://mcp-x402.onrender.com/openapi.json",
+      "permanent": false
     }
   ],
   "headers": [
@@ -389,6 +769,108 @@
         {
           "key": "Cache-Control",
           "value": "public, max-age=3600"
+        }
+      ]
+    },
+    {
+      "source": "/.well-known/x402",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/json; charset=utf-8"
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=300, stale-while-revalidate=86400"
+        }
+      ]
+    },
+    {
+      "source": "/.well-known/mcp.json",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/json; charset=utf-8"
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=300, stale-while-revalidate=86400"
+        }
+      ]
+    },
+    {
+      "source": "/.well-known/agent.json",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/json; charset=utf-8"
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=300, stale-while-revalidate=86400"
+        }
+      ]
+    },
+    {
+      "source": "/.well-known/ai-plugin.json",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/json; charset=utf-8"
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=300, stale-while-revalidate=86400"
+        }
+      ]
+    },
+    {
+      "source": "/llms.txt",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/plain; charset=utf-8"
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=300, stale-while-revalidate=86400"
+        }
+      ]
+    },
+    {
+      "source": "/llms-full.txt",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/plain; charset=utf-8"
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=300, stale-while-revalidate=86400"
         }
       ]
     }
